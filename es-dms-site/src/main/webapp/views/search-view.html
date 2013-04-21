@@ -5,6 +5,13 @@
             <button type="button" class="btn btn-primary" data-ng-click="search()">Search</button>
 			<br/>
 			<ul>
-				<li data-ng-repeat="document in documents">{{ document.id }}</li>
+				<li data-ng-repeat="document in documents">{{ document.id }} - {{ document.file.name }}
+					<br/>
+					<div ng-bind-html-unsafe="{{ document.file.highlight }}"></div>
+					<br/>
+					<div ng-bind-html="{{ mytext }}"></div>
+					<br/>
+					<div ng-bind-html-unsafe="{{ mytext }}"></div>
+				</li>
 			</ul>
 		</div>

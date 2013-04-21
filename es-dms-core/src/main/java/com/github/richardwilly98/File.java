@@ -1,7 +1,10 @@
 package com.github.richardwilly98;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonInclude(Include.NON_NULL)
 public class File {
 
 	@JsonProperty("content")
@@ -13,6 +16,9 @@ public class File {
 	@JsonProperty("_content_type")
 	String contentType;
 
+//	@JsonIgnore
+	String highlight;
+	
 	public File() {}
 	
 	public File(String content, String name, String contentType) {
@@ -38,5 +44,11 @@ public class File {
 	}
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
+	}
+	public String getHighlight() {
+		return highlight;
+	}
+	public void setHighlight(String highlight) {
+		this.highlight = highlight;
 	}
 }
