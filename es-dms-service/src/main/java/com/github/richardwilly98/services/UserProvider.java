@@ -10,12 +10,19 @@ import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 
 import com.github.richardwilly98.User;
+import com.google.inject.Inject;
 
 public class UserProvider extends ProviderBase {
+
+	@Inject
+	UserProvider(Client client) {
+		super(client);
+	}
 
 	private static Logger log = Logger.getLogger(UserProvider.class);
 	private final static String index = "test-users";

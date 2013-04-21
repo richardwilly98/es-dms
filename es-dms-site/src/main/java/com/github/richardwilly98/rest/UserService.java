@@ -13,9 +13,13 @@ import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 
+import com.github.richardwilly98.inject.ProviderModule;
+
 import com.github.richardwilly98.User;
 import com.github.richardwilly98.services.ServiceException;
 import com.github.richardwilly98.services.UserProvider;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 @Path("/users")
 public class UserService {
@@ -26,7 +30,9 @@ public class UserService {
 
 	private UserProvider getProvider() {
 		if (provider == null) {
-			provider = new UserProvider();
+//			provider = new UserProvider();
+			Injector injector = Guice.createInjector(new ProviderModule());
+			provider = injector.getInstance(UserProvider.class);
 		}
 		return provider;
 	}

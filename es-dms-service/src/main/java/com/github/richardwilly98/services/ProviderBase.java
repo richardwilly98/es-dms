@@ -3,9 +3,9 @@ package com.github.richardwilly98.services;
 import java.io.IOException;
 import java.util.UUID;
 
+import javax.inject.Inject;
+
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -16,13 +16,20 @@ abstract class ProviderBase {
 	private Client client;
 
 	protected Client getClient() throws IOException {
-		if (client == null) {
-			client = new TransportClient()
-					.addTransportAddress(new InetSocketTransportAddress(
-							"localhost", 9300));
-			createIndex();
-		}
 		return client;
+	}
+//		if (client == null) {
+//			client = new TransportClient()
+//					.addTransportAddress(new InetSocketTransportAddress(
+//							"localhost", 9300));
+//			createIndex();
+//		}
+//		return client;
+//	}
+
+	@Inject
+	ProviderBase(Client client) {
+		this.client = client;
 	}
 	
 	protected String generateUniqueId() {

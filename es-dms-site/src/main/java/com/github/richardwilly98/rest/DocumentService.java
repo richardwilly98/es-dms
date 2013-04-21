@@ -5,11 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -24,10 +20,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.Base64;
 
+import com.github.richardwilly98.inject.ProviderModule;
+
 import com.github.richardwilly98.Document;
 import com.github.richardwilly98.File;
 import com.github.richardwilly98.services.DocumentProvider;
 import com.github.richardwilly98.services.ServiceException;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataParam;
@@ -41,7 +41,8 @@ public class DocumentService {
 
 	private DocumentProvider getProvider() {
 		if (provider == null) {
-			provider = new DocumentProvider();
+			Injector injector = Guice.createInjector(new ProviderModule());
+			provider = injector.getInstance(DocumentProvider.class);
 		}
 		return provider;
 	}
@@ -107,30 +108,31 @@ public class DocumentService {
 		}
 	}
 
-//	@POST
-//	@Path("/upload")
-//	@Consumes(MediaType.MULTIPART_FORM_DATA)
-//	public Response upload(FormDataMultiPart multiPart) {
-//		if (log.isTraceEnabled()) {
-//			log.trace(String.format("upload - %s", multiPart));
-//		}
-//		try {
-//			for (String key : multiPart.getFields().keySet()) {
-////				log.debug(String.format("Key: %s - class: %s", key, multiPart
-////						.getField(key).getValue()));
-//				try {
-//				log.debug(String.format("Key: %s - %s", key, multiPart.getField(key).getEntityAs(String.class)));
-//				}
-//				catch (Throwable t) {
-//					log.error("", t);
-//				}
-//			}
-//		} catch (Throwable t) {
-//			log.error("upload failed", t);
-//		}
-//		return Response.status(200).build();
-//
-//	}
+	// @POST
+	// @Path("/upload")
+	// @Consumes(MediaType.MULTIPART_FORM_DATA)
+	// public Response upload(FormDataMultiPart multiPart) {
+	// if (log.isTraceEnabled()) {
+	// log.trace(String.format("upload - %s", multiPart));
+	// }
+	// try {
+	// for (String key : multiPart.getFields().keySet()) {
+	// // log.debug(String.format("Key: %s - class: %s", key, multiPart
+	// // .getField(key).getValue()));
+	// try {
+	// log.debug(String.format("Key: %s - %s", key,
+	// multiPart.getField(key).getEntityAs(String.class)));
+	// }
+	// catch (Throwable t) {
+	// log.error("", t);
+	// }
+	// }
+	// } catch (Throwable t) {
+	// log.error("upload failed", t);
+	// }
+	// return Response.status(200).build();
+	//
+	// }
 
 	@POST
 	@Path("/upload2")
@@ -140,15 +142,18 @@ public class DocumentService {
 			@FormDataParam("file") InputStream uploadedInputStream,
 			@FormDataParam("file") FormDataContentDisposition fileDetail) {
 		if (log.isTraceEnabled()) {
-			log.trace(String.format("upload - %s - %s - %s - %s - %s", name, date,
-					fileDetail.getFileName(), fileDetail.getSize(), fileDetail.getType()));
+			log.trace(String.format("upload - %s - %s - %s - %s - %s", name,
+					date, fileDetail.getFileName(), fileDetail.getSize(),
+					fileDetail.getType()));
 		}
 		try {
-			String filename = "D:/temp/test-elasticsearch/" + fileDetail.getFileName();
+			String filename = "D:/temp/test-elasticsearch/"
+					+ fileDetail.getFileName();
 			writeToFile(uploadedInputStream, filename);
 			byte[] content = IOUtils.toByteArray(new FileInputStream(filename));
 			String encodedContent = Base64.encodeBytes(content);
-			File file = new File(encodedContent, fileDetail.getFileName(), fileDetail.getType());
+			File file = new File(encodedContent, fileDetail.getFileName(),
+					fileDetail.getType());
 			Document document = new Document(null, file);
 			String id = getProvider().createDocument(document);
 			log.debug(String.format("New document uploaded %s", id));
@@ -166,19 +171,23 @@ public class DocumentService {
 			@FormDataParam("date") String date,
 			@FormDataParam("file") FormDataBodyPart body) {
 		try {
-			FormDataContentDisposition fileDetail = body.getFormDataContentDisposition();
+			FormDataContentDisposition fileDetail = body
+					.getFormDataContentDisposition();
 			if (log.isTraceEnabled()) {
-				log.trace(String.format("upload - %s - %s - %s - %s - %s", name, date,
-						fileDetail.getFileName(), fileDetail.getSize(), fileDetail.getType()));
+				log.trace(String.format("upload - %s - %s - %s - %s - %s",
+						name, date, fileDetail.getFileName(),
+						fileDetail.getSize(), fileDetail.getType()));
 			}
 			byte[] content = body.getEntityAs(byte[].class);
 			String contentType = body.getMediaType().toString();
 			String encodedContent = Base64.encodeBytes(content);
-			File file = new File(encodedContent, fileDetail.getFileName(), contentType);
-//			Map<String, Serializable> attributes = new HashMap<String, Serializable>();
-//			attributes.put(Document.CREATION_DATE, new Date());
-//			attributes.put(Document.AUTHOR, "rlouapre");
-//			Document document = new Document(null, file, attributes);
+			File file = new File(encodedContent, fileDetail.getFileName(),
+					contentType);
+			// Map<String, Serializable> attributes = new HashMap<String,
+			// Serializable>();
+			// attributes.put(Document.CREATION_DATE, new Date());
+			// attributes.put(Document.AUTHOR, "rlouapre");
+			// Document document = new Document(null, file, attributes);
 			Document document = new Document(null, file);
 			String id = getProvider().createDocument(document);
 			log.debug(String.format("New document uploaded %s", id));

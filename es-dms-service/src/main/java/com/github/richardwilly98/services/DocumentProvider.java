@@ -14,12 +14,20 @@ import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 
 import com.github.richardwilly98.Document;
+import com.google.inject.Inject;
 
 public class DocumentProvider extends ProviderBase {
+
+	@Inject
+	DocumentProvider(Client client) {
+		super(client);
+	}
 
 	private static Logger log = Logger.getLogger(DocumentProvider.class);
 	private final static String index = "test-documents";
@@ -89,13 +97,22 @@ public class DocumentProvider extends ProviderBase {
 					.addHighlightedField("file").execute().actionGet();
 			log.debug("totalHits: " + searchResponse.getHits().totalHits());
 			for (SearchHit hit : searchResponse.getHits().hits()) {
+				String highlight = null;
 				log.debug(String.format("HighlightFields: %s", hit
 						.getHighlightFields().size()));
 				for (String key : hit.getHighlightFields().keySet()) {
 					log.debug(String.format("Highlight key: %s", key));
+					for(Text text : hit.getHighlightFields().get(key).fragments()) {
+						log.debug(String.format("Fragment: %s", text));
+						highlight = text.toString();
+					}
 				}
 				String json = hit.getSourceAsString();
 				Document document = mapper.readValue(json, Document.class);
+				document.getFile().setContent(null);
+				if (highlight != null) {
+					document.getFile().setHighlight(highlight);
+				}
 				documents.add(document);
 			}
 
