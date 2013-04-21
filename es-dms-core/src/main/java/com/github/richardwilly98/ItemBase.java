@@ -1,8 +1,12 @@
 package com.github.richardwilly98;
 
+import java.util.Map;
+
 abstract class ItemBase {
 
 	String id;
+	
+	Map<String, String> permissions;
 
 	public String getId() {
 		return id;
@@ -10,5 +14,10 @@ abstract class ItemBase {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
+	public Map<String, String> getPermissions() {
+		return permissions;
+	}
+	public void setPermissions(Map<String, String> permissions) {
+		this.permissions = permissions;
+	}
 }

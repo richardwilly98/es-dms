@@ -1,5 +1,7 @@
 package com.github.richardwilly98;
 
+import org.joda.time.DateTime;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,6 +20,15 @@ public class File {
 
 //	@JsonIgnore
 	String highlight;
+	
+	@JsonProperty("date")
+	DateTime date;
+	
+	@JsonProperty("title")
+	String title;
+	
+	@JsonProperty("author")
+	String author;
 	
 	public File() {}
 	
@@ -50,5 +61,23 @@ public class File {
 	}
 	public void setHighlight(String highlight) {
 		this.highlight = highlight;
+	}
+	public DateTime getDate() {
+		return date;
+	}
+	public void setDate(DateTime date) {
+		this.date = date;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getAuthor() {
+		return author;
+	}
+	public void setAuthor(String author) {
+		this.author = author;
 	}
 }

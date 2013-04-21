@@ -5,7 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -19,11 +21,11 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.Base64;
-
-import com.github.richardwilly98.inject.ProviderModule;
+import org.joda.time.DateTime;
 
 import com.github.richardwilly98.Document;
 import com.github.richardwilly98.File;
+import com.github.richardwilly98.inject.ProviderModule;
 import com.github.richardwilly98.services.DocumentProvider;
 import com.github.richardwilly98.services.ServiceException;
 import com.google.inject.Guice;
@@ -57,6 +59,7 @@ public class DocumentService {
 		try {
 			return getProvider().getDocument(id);
 		} catch (ServiceException e) {
+			log.error("get document failed", e);
 			throw new RestServiceException(e.getLocalizedMessage());
 		}
 	}
@@ -71,6 +74,7 @@ public class DocumentService {
 		try {
 			return getProvider().contentSearch(criteria);
 		} catch (ServiceException e) {
+			log.error("search failed", e);
 			throw new RestServiceException(e.getLocalizedMessage());
 		}
 	}
@@ -85,6 +89,7 @@ public class DocumentService {
 		try {
 			return getProvider().getDocuments(name);
 		} catch (ServiceException e) {
+			log.error("find failed", e);
 			throw new RestServiceException(e.getLocalizedMessage());
 		}
 	}
@@ -104,6 +109,7 @@ public class DocumentService {
 			document.setId(id);
 			return Response.status(201).entity(document).build();
 		} catch (ServiceException e) {
+			log.error("create failed", e);
 			throw new RestServiceException(e.getLocalizedMessage());
 		}
 	}
@@ -147,7 +153,7 @@ public class DocumentService {
 					fileDetail.getType()));
 		}
 		try {
-			String filename = "D:/temp/test-elasticsearch/"
+			String filename = System.getProperty("java.io.tmpdir")
 					+ fileDetail.getFileName();
 			writeToFile(uploadedInputStream, filename);
 			byte[] content = IOUtils.toByteArray(new FileInputStream(filename));
@@ -159,6 +165,7 @@ public class DocumentService {
 			log.debug(String.format("New document uploaded %s", id));
 			return Response.status(200).build();
 		} catch (Throwable t) {
+			log.error("upload2 failed", t);
 			throw new RestServiceException(t.getLocalizedMessage());
 		}
 	}
@@ -183,18 +190,19 @@ public class DocumentService {
 			String encodedContent = Base64.encodeBytes(content);
 			File file = new File(encodedContent, fileDetail.getFileName(),
 					contentType);
-			// Map<String, Serializable> attributes = new HashMap<String,
-			// Serializable>();
-			// attributes.put(Document.CREATION_DATE, new Date());
-			// attributes.put(Document.AUTHOR, "rlouapre");
-			// Document document = new Document(null, file, attributes);
-			Document document = new Document(null, file);
+			Map<String, Object> attributes = new HashMap<String, Object>();
+			DateTime now = new DateTime();
+			attributes.put(Document.CREATION_DATE, now.toString());
+			attributes.put(Document.AUTHOR, "rlouapre");
+			Document document = new Document(null, file, attributes);
+
 			String id = getProvider().createDocument(document);
 			log.debug(String.format("New document uploaded %s", id));
 			document.setId(id);
 			document.setFile(null);
 			return Response.status(200).entity(document).build();
 		} catch (Throwable t) {
+			log.error("upload failed", t);
 			throw new RestServiceException(t.getLocalizedMessage());
 		}
 	}

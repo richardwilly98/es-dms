@@ -24,14 +24,15 @@ import com.google.inject.Inject;
 
 public class DocumentProvider extends ProviderBase {
 
+	private static Logger log = Logger.getLogger(DocumentProvider.class);
+	private static final String DOCUMENT_MAPPING_JSON = "/com/github/richardwilly98/services/document-mapping.json";
+	private final static String index = "test-documents";
+	private final static String type = "document";
+
 	@Inject
 	DocumentProvider(Client client) {
 		super(client);
 	}
-
-	private static Logger log = Logger.getLogger(DocumentProvider.class);
-	private final static String index = "test-documents";
-	private final static String type = "document";
 
 	public Document getDocument(String id) throws ServiceException {
 		try {
@@ -49,14 +50,6 @@ public class DocumentProvider extends ProviderBase {
 	public List<Document> getDocuments(String name) throws ServiceException {
 		try {
 			List<Document> documents = new ArrayList<Document>();
-			if (!getClient().admin().indices().prepareExists(index).execute()
-					.actionGet().exists()) {
-				getClient().admin().indices().prepareCreate(index).execute()
-						.actionGet();
-				// Force index to be refreshed.
-				getClient().admin().indices()
-						.refresh(new RefreshRequest(index)).actionGet();
-			}
 
 			SearchResponse searchResponse = getClient().prepareSearch(index)
 					.setTypes(type).setQuery(QueryBuilders.queryString(name))
@@ -83,14 +76,6 @@ public class DocumentProvider extends ProviderBase {
 	public List<Document> contentSearch(String criteria) throws ServiceException {
 		try {
 			List<Document> documents = new ArrayList<Document>();
-			if (!getClient().admin().indices().prepareExists(index).execute()
-					.actionGet().exists()) {
-				getClient().admin().indices().prepareCreate(index).execute()
-						.actionGet();
-				// Force index to be refreshed.
-				getClient().admin().indices()
-						.refresh(new RefreshRequest(index)).actionGet();
-			}
 
 			SearchResponse searchResponse = getClient().prepareSearch(index)
 					.setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH).setQuery(fieldQuery("file", criteria))
@@ -98,10 +83,14 @@ public class DocumentProvider extends ProviderBase {
 			log.debug("totalHits: " + searchResponse.getHits().totalHits());
 			for (SearchHit hit : searchResponse.getHits().hits()) {
 				String highlight = null;
-				log.debug(String.format("HighlightFields: %s", hit
-						.getHighlightFields().size()));
+				if (log.isTraceEnabled()) {
+					log.trace(String.format("HighlightFields: %s", hit
+							.getHighlightFields().size()));
+				}
 				for (String key : hit.getHighlightFields().keySet()) {
-					log.debug(String.format("Highlight key: %s", key));
+					if (log.isTraceEnabled()) {
+						log.trace(String.format("Highlight key: %s", key));
+					}
 					for(Text text : hit.getHighlightFields().get(key).fragments()) {
 						log.debug(String.format("Fragment: %s", text));
 						highlight = text.toString();
@@ -174,11 +163,16 @@ public class DocumentProvider extends ProviderBase {
 //		return mapping;
 //	}
 	
-	private String getMapping() throws IOException {
-		return copyToStringFromClasspath("/com/github/richardwilly98/services/document-mapping.json");
+	private String getMapping() {
+		try {
+			return copyToStringFromClasspath(DOCUMENT_MAPPING_JSON);
+		} catch (IOException ioEx) {
+			log.error("getMapping failed", ioEx);
+			return null;
+		}
 	}
 
-	protected void createIndex() throws IOException {
+	protected void createIndex() {
 		if (!getClient().admin().indices().prepareExists(index).execute()
 				.actionGet().exists()) {
 			getClient().admin().indices().prepareCreate(index).execute()

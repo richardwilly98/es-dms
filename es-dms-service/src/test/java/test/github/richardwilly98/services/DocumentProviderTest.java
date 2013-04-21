@@ -2,10 +2,15 @@ package test.github.richardwilly98.services;
 
 import static org.elasticsearch.common.io.Streams.copyToBytesFromClasspath;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.Base64;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -95,4 +100,44 @@ public class DocumentProviderTest {
 //		documents = provider.getDocuments("Lorem ipsum dolor");
 //		Assert.assertEquals(documents.size() - startCount, 1);
 //	}
+	
+	@Test
+	public void testCreateDocumentWithAuthor() throws Throwable {
+		DocumentProvider provider = getDocumentProvider();
+		String id = String.valueOf(System.currentTimeMillis());
+		Map<String, Object> attributes = new HashMap<String, Object>();
+		attributes.put(Document.AUTHOR, "richard");
+		Document document = new Document(id, null, attributes);
+		document.setId(id);
+		String newId = provider.createDocument(document);
+		log.info(String.format("New document created #%s", newId));
+		document = provider.getDocument(newId);
+		Assert.assertNotNull(document);
+		attributes = document.getAttributes();
+		Assert.assertTrue(attributes != null && attributes.size() == 1);
+		Assert.assertTrue(attributes.containsKey(Document.AUTHOR) && attributes.get(Document.AUTHOR).equals("richard"));
+	}
+	
+	@Test
+	public void testCreateDocumentWithCreationDate() throws Throwable {
+		DocumentProvider provider = getDocumentProvider();
+		String id = String.valueOf(System.currentTimeMillis());
+		Map<String, Object> attributes = new HashMap<String, Object>();
+		DateTime now = new DateTime();
+		attributes.put(Document.CREATION_DATE, now.toString());
+		Document document = new Document(id, null, attributes);
+		document.setId(id);
+		String newId = provider.createDocument(document);
+		log.info(String.format("New document created #%s", newId));
+		document = provider.getDocument(newId);
+		Assert.assertNotNull(document);
+		attributes = document.getAttributes();
+		Assert.assertTrue(attributes != null && attributes.size() == 1);
+		Assert.assertTrue(attributes.containsKey(Document.CREATION_DATE));
+		log.info(attributes.get(Document.CREATION_DATE));
+		DateTimeFormatter formatter = ISODateTimeFormat.dateOptionalTimeParser();
+		DateTime newDate = formatter.parseDateTime(attributes.get(Document.CREATION_DATE).toString()); 
+		Assert.assertEquals(now, newDate);
+	}
+
 }

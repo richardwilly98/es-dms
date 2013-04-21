@@ -1,6 +1,5 @@
 package com.github.richardwilly98.services;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import javax.inject.Inject;
@@ -13,28 +12,23 @@ abstract class ProviderBase {
 
 	static ObjectMapper mapper = new ObjectMapper();
 
-	private Client client;
+	private final Client client;
+	
+	String index;
 
-	protected Client getClient() throws IOException {
+	protected Client getClient() {
 		return client;
 	}
-//		if (client == null) {
-//			client = new TransportClient()
-//					.addTransportAddress(new InetSocketTransportAddress(
-//							"localhost", 9300));
-//			createIndex();
-//		}
-//		return client;
-//	}
 
 	@Inject
 	ProviderBase(Client client) {
 		this.client = client;
+		createIndex();
 	}
 	
 	protected String generateUniqueId() {
 		return UUID.randomUUID().toString();
 	}
 	
-	protected abstract void createIndex() throws IOException;
+	protected abstract void createIndex();
 }

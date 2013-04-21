@@ -1,8 +1,6 @@
 package com.github.richardwilly98.services;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -28,9 +26,6 @@ public class UserProvider extends ProviderBase {
 	private final static String index = "test-users";
 	private final static String type = "user";
 
-	private List<User> users = Arrays.asList(new User("dsandron", "Danilo",
-			"Bankok"), new User("rlouapre", "Richard", "Jersey City"));
-
 	public User getUser(String id) throws ServiceException {
 		try {
 			GetResponse response = getClient().prepareGet(index, type, id)
@@ -47,24 +42,24 @@ public class UserProvider extends ProviderBase {
 	public List<User> getUsers(String name) throws ServiceException {
 		try {
 			List<User> users = new ArrayList<User>();
-			if (!getClient().admin().indices().prepareExists(index).execute()
-					.actionGet().exists()) {
-				getClient().admin().indices().prepareCreate(index).execute()
-						.actionGet();
-				// Force index to be refreshed.
-				getClient().admin().indices()
-						.refresh(new RefreshRequest(index)).actionGet();
-				for (User u : this.users) {
-					String json;
-					json = mapper.writeValueAsString(u);
-					IndexResponse response = getClient()
-							.prepareIndex(index, type).setId(u.getId())
-							.setSource(json).execute().actionGet();
-					log.trace(String.format("Index: %s  - Type: %s - Id: %s",
-							response.getIndex(), response.getType(),
-							response.getId()));
-				}
-			}
+//			if (!getClient().admin().indices().prepareExists(index).execute()
+//					.actionGet().exists()) {
+//				getClient().admin().indices().prepareCreate(index).execute()
+//						.actionGet();
+//				// Force index to be refreshed.
+//				getClient().admin().indices()
+//						.refresh(new RefreshRequest(index)).actionGet();
+//				for (User u : this.users) {
+//					String json;
+//					json = mapper.writeValueAsString(u);
+//					IndexResponse response = getClient()
+//							.prepareIndex(index, type).setId(u.getId())
+//							.setSource(json).execute().actionGet();
+//					log.trace(String.format("Index: %s  - Type: %s - Id: %s",
+//							response.getIndex(), response.getType(),
+//							response.getId()));
+//				}
+//			}
 			SearchResponse searchResponse = getClient().prepareSearch(index)
 					.setTypes(type).setQuery(QueryBuilders.queryString(name))
 					.execute().actionGet();
@@ -109,7 +104,7 @@ public class UserProvider extends ProviderBase {
 		return super.generateUniqueId();
 	}
 
-	protected void createIndex() throws IOException {
+	protected void createIndex() {
 		if (!getClient().admin().indices().prepareExists(index).execute()
 				.actionGet().exists()) {
 			getClient().admin().indices().prepareCreate(index).execute()

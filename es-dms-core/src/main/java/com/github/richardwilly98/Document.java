@@ -1,6 +1,5 @@
 package com.github.richardwilly98;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,26 +16,26 @@ public class Document extends ItemBase {
 	@JsonProperty("file")
 	File file;
 	
-//	Map<String, Serializable> attributes = new HashMap<String, Serializable>();
+	Map<String, Object> attributes = new HashMap<String, Object>();
 	
 	public Document() {
 		
 	}
 	
-	public Document(String id, File file) {
-		this.id = id;
-		this.file = file;
-	}
-
 //	public Document(String id, File file) {
-//		this(id, file, null);
-//	}
-	
-//	public Document(String id, File file, Map<String, Serializable> attributes) {
 //		this.id = id;
 //		this.file = file;
-//		this.attributes = attributes;
 //	}
+
+	public Document(String id, File file) {
+		this(id, file, null);
+	}
+	
+	public Document(String id, File file, Map<String, Object> attributes) {
+		this.id = id;
+		this.file = file;
+		this.attributes = attributes;
+	}
 
 	public File getFile() {
 		return file;
@@ -46,8 +45,8 @@ public class Document extends ItemBase {
 		this.file = file;
 	}
 	
-//	public Map<String, Serializable> getAttributes() {
-//		return attributes;
-//	}
+	public Map<String, Object> getAttributes() {
+		return attributes;
+	}
 	
 }
