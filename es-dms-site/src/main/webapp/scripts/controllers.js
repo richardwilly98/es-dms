@@ -24,7 +24,6 @@ simpleApp.controller('simpleController', function ($scope, userService) {
 
 simpleApp.controller('documentController', function ($scope, documentService) {
     $scope.documents = [];
-    $scope.mytext = "<h3>Hello<h3/> world!"
 
     init();
 

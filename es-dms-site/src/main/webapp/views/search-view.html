@@ -7,11 +7,8 @@
 			<ul>
 				<li data-ng-repeat="document in documents">{{ document.id }} - {{ document.file.name }}
 					<br/>
-					<div ng-bind-html-unsafe="{{ document.file.highlight }}"></div>
+					<div ng-bind-html-unsafe="document.file.highlight"></div>
 					<br/>
-					<div ng-bind-html="{{ mytext }}"></div>
-					<br/>
-					<div ng-bind-html-unsafe="{{ mytext }}"></div>
 				</li>
 			</ul>
 		</div>

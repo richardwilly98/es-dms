@@ -1,4 +1,4 @@
-﻿var simpleApp = angular.module('simpleApp', ['ui.bootstrap', 'ngResource', '$strap.directives', 'ngUpload', 'ngSanitize']);
+﻿var simpleApp = angular.module('simpleApp', ['ui.bootstrap', 'ngResource', '$strap.directives', 'ngUpload']);
 
 simpleApp.config(function ($routeProvider) {
     $routeProvider
