@@ -164,3 +164,6 @@ pip-log.txt
 
 # Maven
 target/
+
+#TestNg
+test-output/
