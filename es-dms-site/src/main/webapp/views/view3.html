@@ -1,0 +1,22 @@
+<div class="container" data-ng-controller="modalCtrl">
+    <br />
+    <button type="button" class="btn btn-large btn-primary" bs-modal="'views/new-user.html'">New User</button>
+    <br />
+    <button type="button" class="btn btn-primary" bs-modal="'views/new-document.html'">New Document</button>
+    <br />
+    <button type="button" class="btn btn-small btn-info" data-ng-click="open()" >New Document</button>
+    <div modal="shouldBeOpen" options="opts" close="close()">
+    	<ng-include src="'views/new-document.html'"></ng-include>
+    </div>
+</div>
+<div data-ng-controller="AlertDemoCtrl">
+    <alert data-ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
+    <button class='btn' data-ng-click="addAlert()">
+        Add Alert</button>
+</div>
+<div ng-controller="ModalDemoCtrl">
+    <button class="btn" ng-click="open()">Open me!</button>
+    <div modal="shouldBeOpen" close="close()" options="opts">
+    <ng-include src="'views/dummy-modal.html'"></ng-include>
+    </div>
+</div>

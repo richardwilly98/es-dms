@@ -1,0 +1,15 @@
+{
+	"document": {
+		"properties": {
+			"file": {
+				"type": "attachment",
+				"fields": {
+					"file": {
+						"store": "yes",
+						"term_vector": "with_positions_offsets"
+					}
+				}
+			}
+		}
+	}
+}

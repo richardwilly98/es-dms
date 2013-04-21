@@ -1,0 +1,10 @@
+		<div class="container">
+			<h2>Documents Search</h2>
+			Search criteria:<br />
+            <input type="text" data-ng-model="criteria" />
+            <button type="button" class="btn btn-primary" data-ng-click="search()">Search</button>
+			<br/>
+			<ul>
+				<li data-ng-repeat="document in documents">{{ document.id }}</li>
+			</ul>
+		</div>
