@@ -18,6 +18,10 @@ simpleApp.config(function ($routeProvider) {
 		    controller: 'documentController',
 		    templateUrl: 'views/search-view.html'
 		})
+		.when('/edit-view', {
+		    controller: 'documentController',
+		    templateUrl: 'views/edit-view.html'
+		})
 		.otherwise({ redirectTo: '/view1' })
 });
 
@@ -34,6 +38,7 @@ function NavBarCtrl($scope) {
         { "view": "/view1", title: "View #1" },
         { "view": "/view2", title: "View #2" },
         { "view": "/search-view", title: "Search" },
+        { "view": "/edit-view", title: "Edit" },
         { "view": "/view3", title: "Test View" }
     ];
 }
