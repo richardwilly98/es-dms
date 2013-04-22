@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="styles/bootstrap-responsive.min.css" />
     <link rel="stylesheet" href="styles/bootstrap-datepicker.css" />
 </head>
-<body data-ng-controller="MainCtrl">
+<body data-authentication-directive="" data-ng-controller="MainCtrl">
     <!-- Navigation bar -->
     <div class="navbar" data-ng-controller="NavBarCtrl" data-bs-navbar="">
         <!-- div data-fade="1" data-ng-controller="NavBarCtrl" data-bs-tabs="" -->
@@ -22,6 +22,10 @@
         <!-- Placeholder for views -->
         <div data-ng-view="">
         </div>
+        
+        <div id="login-holder" ng-controller="loginController" bs-modal="'views/login.html'">
+		</div>
+        
     </div>
     <script type="text/javascript" src="scripts/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="scripts/angular.min.js"></script>

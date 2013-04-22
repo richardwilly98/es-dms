@@ -6,9 +6,7 @@
 
 	<servlet>
 		<servlet-name>es-dms-site</servlet-name>
-		<servlet-class>
-			com.sun.jersey.spi.container.servlet.ServletContainer
-		</servlet-class>
+		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>com.sun.jersey.config.property.packages</param-name>
 			<param-value>com.github.richardwilly98.rest</param-value>
@@ -20,6 +18,20 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
+	<listener>
+    	<listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+	</listener>
+	
+	<filter>
+		<filter-name>shiro-filter</filter-name>
+		<filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>shiro-filter</filter-name>
+		<url-pattern>/api/*</url-pattern>
+	</filter-mapping>
+	
 	<servlet-mapping>
 		<servlet-name>es-dms-site</servlet-name>
 		<url-pattern>/api/*</url-pattern>

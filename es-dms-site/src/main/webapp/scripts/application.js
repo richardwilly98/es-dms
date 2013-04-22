@@ -7,12 +7,38 @@
 	'http-auth-interceptor'
 ]);
 
+simpleApp.directive('authenticationDirective', function() {
+	console.log('Start authenticationDirective');
+    return {
+      restrict: 'A',
+      link: function(scope, elem, attrs) {
+        //once Angular is started, remove class:
+        //elem.removeClass('waiting-for-angular');
+        
+        var login = elem.find('#login-holder');
+        //var main = elem.find('#content');
+        
+        login.hide();
+        
+        scope.$on('event:auth-loginRequired', function() {
+          login.slideDown('slow', function() {
+            //main.hide();
+          });
+        });
+        scope.$on('event:auth-loginConfirmed', function() {
+          main.show();
+          //login.slideUp();
+        });
+      }
+    }
+  });
+
 simpleApp.config(function ($routeProvider) {
     $routeProvider
-		.when('/login', {
-		    controller: 'loginController',
-		    templateUrl: 'views/login.html'
-		})
+//		.when('/login', {
+//		    controller: 'loginController',
+//		    templateUrl: 'views/login.html'
+//		})
 		.when('/view1', {
 		    controller: 'simpleController',
 		    templateUrl: 'views/view1.html'
@@ -33,7 +59,7 @@ simpleApp.config(function ($routeProvider) {
 		    controller: 'documentController',
 		    templateUrl: 'views/edit-view.html'
 		})
-		.otherwise({ redirectTo: '/login' })
+		.otherwise({ redirectTo: '/view1' })
 });
 
 simpleApp.factory('userService', function ($resource) {

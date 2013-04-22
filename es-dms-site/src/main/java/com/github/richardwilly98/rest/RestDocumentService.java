@@ -17,9 +17,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.shiro.SecurityUtils;
 import org.elasticsearch.common.Base64;
 import org.joda.time.DateTime;
 
@@ -58,7 +60,7 @@ public class RestDocumentService {
 			log.trace(String.format("get - %s", id));
 		}
 		try {
-			return getProvider().getDocument(id);
+			return getProvider().get(id);
 		} catch (ServiceException e) {
 			log.error("get document failed", e);
 			throw new RestServiceException(e.getLocalizedMessage());
@@ -73,7 +75,7 @@ public class RestDocumentService {
 			log.trace(String.format("search - %s", criteria));
 		}
 		try {
-			return getProvider().contentSearch(criteria);
+			return getProvider().search(criteria);
 		} catch (ServiceException e) {
 			log.error("search failed", e);
 			throw new RestServiceException(e.getLocalizedMessage());
@@ -106,7 +108,11 @@ public class RestDocumentService {
 			log.trace(String.format("create - %s", document));
 		}
 		try {
-			String id = getProvider().createDocument(document);
+//			log.debug("Principal: " + SecurityUtils.getSubject().getPrincipal());
+//			if (! SecurityUtils.getSubject().hasRole("writer")) {
+//				return Response.status(Status.UNAUTHORIZED).build();
+//			}
+			String id = getProvider().create(document);
 			document.setId(id);
 			return Response.status(201).entity(document).build();
 		} catch (ServiceException e) {
@@ -162,7 +168,7 @@ public class RestDocumentService {
 			File file = new File(encodedContent, fileDetail.getFileName(),
 					fileDetail.getType());
 			Document document = new Document(null, file);
-			String id = getProvider().createDocument(document);
+			String id = getProvider().create(document);
 			log.debug(String.format("New document uploaded %s", id));
 			return Response.status(200).build();
 		} catch (Throwable t) {
@@ -179,6 +185,11 @@ public class RestDocumentService {
 			@FormDataParam("date") String date,
 			@FormDataParam("file") FormDataBodyPart body) {
 		try {
+//			log.debug("Principal: " + SecurityUtils.getSubject().getPrincipal());
+//			if (! SecurityUtils.getSubject().hasRole("writer")) {
+//				return Response.status(Status.UNAUTHORIZED).build();
+//			}
+
 			FormDataContentDisposition fileDetail = body
 					.getFormDataContentDisposition();
 			if (log.isTraceEnabled()) {
@@ -197,7 +208,7 @@ public class RestDocumentService {
 			attributes.put(Document.AUTHOR, "rlouapre");
 			Document document = new Document(null, file, attributes);
 
-			String id = getProvider().createDocument(document);
+			String id = getProvider().create(document);
 			log.debug(String.format("New document uploaded %s", id));
 			document.setId(id);
 			document.setFile(null);

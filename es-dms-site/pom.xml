@@ -18,6 +18,7 @@
 		<jersey.version>1.17.1</jersey.version>
 		<jackson.version>2.1.4</jackson.version>
 		<commons.io.version>2.4</commons.io.version>
+		<shiro.version>1.2.1</shiro.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -64,6 +65,18 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>${commons.io.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-web</artifactId>
+			<version>${shiro.version}</version>
+			<!-- type>bundle</type -->
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-guice</artifactId>
+			<version>${shiro.version}</version>
+			<!-- type>bundle</type -->
 		</dependency>
 	</dependencies>
 	<build>
