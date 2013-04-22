@@ -10,6 +10,9 @@ Test web app using AngujarJS, Jersey and ElasticSearch
 - Run: mvn clean install
 - Run: es-dms-site\mvn clean tomcat7:run
 - Open browser: http://localhost:8080/es-dms-site
+- Elasticsearch is required with mapper-attachment plugin.
+
+  Run `bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/1.7.0`
 
 ## Project structure ##
 
@@ -30,4 +33,5 @@ This project contains 3 modules:
 ## Resources ##
 * [AngularJS] (http://angularjs.org/)
 * [Elasticsearch] (http://www.elasticsearch.org/)
+* [mapper-attachments] (https://github.com/elasticsearch/elasticsearch-mapper-attachments)
 * [Jersey] (https://jersey.java.net/)
