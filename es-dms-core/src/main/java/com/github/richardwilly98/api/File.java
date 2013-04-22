@@ -2,6 +2,7 @@ package com.github.richardwilly98.api;
 
 import org.joda.time.DateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,7 +19,7 @@ public class File {
 	@JsonProperty("_content_type")
 	String contentType;
 
-//	@JsonIgnore
+	@JsonIgnore
 	String highlight;
 	
 	@JsonProperty("date")
@@ -30,7 +31,9 @@ public class File {
 	@JsonProperty("author")
 	String author;
 	
-	public File() {}
+	public File() {
+		this("", "", "");
+	}
 	
 	public File(String content, String name, String contentType) {
 		this.content = content;

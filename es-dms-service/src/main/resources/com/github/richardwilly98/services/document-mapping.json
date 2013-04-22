@@ -11,7 +11,15 @@
 				}
 			},
 			"attributes" : {
-				"creation": "date"
+				"type": "object",
+				"properties": {
+					"creation": {
+						"type": "date"
+					},
+					"author": {
+						"type": "string"
+					}
+				}
 			}
 		}
 	}
