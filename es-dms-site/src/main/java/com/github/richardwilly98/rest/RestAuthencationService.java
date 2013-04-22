@@ -15,22 +15,21 @@ import org.apache.log4j.Logger;
 
 import com.github.richardwilly98.inject.ProviderModule;
 
-import com.github.richardwilly98.User;
-import com.github.richardwilly98.services.ServiceException;
+import com.github.richardwilly98.api.User;
+import com.github.richardwilly98.api.exception.ServiceException;
 import com.github.richardwilly98.services.UserProvider;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-@Path("/users")
-public class UserService {
+@Path("/auth")
+public class RestAuthencationService {
 
-	private static Logger log = Logger.getLogger(UserService.class);
+	private static Logger log = Logger.getLogger(RestAuthencationService.class);
 
 	private UserProvider provider;
 
 	private UserProvider getProvider() {
 		if (provider == null) {
-//			provider = new UserProvider();
 			Injector injector = Guice.createInjector(new ProviderModule());
 			provider = injector.getInstance(UserProvider.class);
 		}

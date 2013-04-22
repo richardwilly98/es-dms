@@ -12,13 +12,9 @@ abstract class ProviderBase {
 
 	static ObjectMapper mapper = new ObjectMapper();
 
-	private final Client client;
+	final Client client;
 	
 	String index;
-
-	protected Client getClient() {
-		return client;
-	}
 
 	@Inject
 	ProviderBase(Client client) {

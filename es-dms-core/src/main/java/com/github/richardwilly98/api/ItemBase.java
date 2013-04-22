@@ -1,4 +1,4 @@
-package com.github.richardwilly98;
+package com.github.richardwilly98.api;
 
 import java.util.Map;
 

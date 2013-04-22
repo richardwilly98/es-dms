@@ -19,10 +19,12 @@ import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 
-import com.github.richardwilly98.Document;
+import com.github.richardwilly98.api.Document;
+import com.github.richardwilly98.api.services.DocumentService;
+import com.github.richardwilly98.api.exception.ServiceException;
 import com.google.inject.Inject;
 
-public class DocumentProvider extends ProviderBase {
+public class DocumentProvider extends ProviderBase implements DocumentService {
 
 	private static Logger log = Logger.getLogger(DocumentProvider.class);
 	private static final String DOCUMENT_MAPPING_JSON = "/com/github/richardwilly98/services/document-mapping.json";
@@ -34,9 +36,13 @@ public class DocumentProvider extends ProviderBase {
 		super(client);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.github.richardwilly98.services.IDocumentService#getDocument(java.lang.String)
+	 */
+	@Override
 	public Document getDocument(String id) throws ServiceException {
 		try {
-			GetResponse response = getClient().prepareGet(index, type, id)
+			GetResponse response = client.prepareGet(index, type, id)
 					.execute().actionGet();
 			String json = response.getSourceAsString();
 			Document document = mapper.readValue(json, Document.class);
@@ -47,11 +53,15 @@ public class DocumentProvider extends ProviderBase {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see com.github.richardwilly98.services.IDocumentService#getDocuments(java.lang.String)
+	 */
+	@Override
 	public List<Document> getDocuments(String name) throws ServiceException {
 		try {
 			List<Document> documents = new ArrayList<Document>();
 
-			SearchResponse searchResponse = getClient().prepareSearch(index)
+			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type).setQuery(QueryBuilders.queryString(name))
 					.addHighlightedField("file").execute().actionGet();
 			log.debug("totalHits: " + searchResponse.getHits().totalHits());
@@ -73,11 +83,15 @@ public class DocumentProvider extends ProviderBase {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.github.richardwilly98.services.IDocumentService#contentSearch(java.lang.String)
+	 */
+	@Override
 	public List<Document> contentSearch(String criteria) throws ServiceException {
 		try {
 			List<Document> documents = new ArrayList<Document>();
 
-			SearchResponse searchResponse = getClient().prepareSearch(index)
+			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH).setQuery(fieldQuery("file", criteria))
 					.addHighlightedField("file").execute().actionGet();
 			log.debug("totalHits: " + searchResponse.getHits().totalHits());
@@ -113,6 +127,10 @@ public class DocumentProvider extends ProviderBase {
 	}
 
 
+	/* (non-Javadoc)
+	 * @see com.github.richardwilly98.services.IDocumentService#createDocument(com.github.richardwilly98.Document)
+	 */
+	@Override
 	public String createDocument(Document document) throws ServiceException {
 		try {
 			if (document.getId() == null) {
@@ -121,12 +139,12 @@ public class DocumentProvider extends ProviderBase {
 			String json;
 			json = mapper.writeValueAsString(document);
 //			log.trace(json);
-			IndexResponse response = getClient().prepareIndex(index, type)
+			IndexResponse response = client.prepareIndex(index, type)
 					.setId(document.getId()).setSource(json).execute()
 					.actionGet();
 			log.trace(String.format("Index: %s - Type: %s - Id: %s",
 					response.getIndex(), response.getType(), response.getId()));
-			getClient().admin().indices().refresh(new RefreshRequest(index))
+			client.admin().indices().refresh(new RefreshRequest(index))
 					.actionGet();
 			return response.getId();
 		} catch (Throwable t) {
@@ -173,18 +191,43 @@ public class DocumentProvider extends ProviderBase {
 	}
 
 	protected void createIndex() {
-		if (!getClient().admin().indices().prepareExists(index).execute()
+		if (!client.admin().indices().prepareExists(index).execute()
 				.actionGet().exists()) {
-			getClient().admin().indices().prepareCreate(index).execute()
+			client.admin().indices().prepareCreate(index).execute()
 					.actionGet();
-			PutMappingResponse mappingResponse = getClient().admin().indices().preparePutMapping(index)
+			PutMappingResponse mappingResponse = client.admin().indices().preparePutMapping(index)
 					.setType(type).setSource(getMapping()).execute()
 					.actionGet();
 			log.debug(String.format("Mapping response acknowledged: %s", mappingResponse.acknowledged()));
 			// Force index to be refreshed.
-			getClient().admin().indices().refresh(new RefreshRequest(index))
+			client.admin().indices().refresh(new RefreshRequest(index))
 					.actionGet();
 		}
 
+	}
+
+	@Override
+	public void deleteDocument(Document document) throws ServiceException {
+		try {
+		if (document == null) {
+			throw new IllegalArgumentException("document is null");
+		}
+			client.prepareDelete(index, type, document.getId());
+		} catch (Throwable t) {
+			log.error("getDocuments failed", t);
+			throw new ServiceException(t.getLocalizedMessage());
+		}
+	}
+
+	@Override
+	public void checkinDocument(Document document) throws ServiceException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void checkoutDocument(Document document) throws ServiceException {
+		// TODO Auto-generated method stub
+		
 	}
 }

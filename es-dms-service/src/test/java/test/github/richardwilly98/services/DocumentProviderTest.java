@@ -17,9 +17,10 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import com.github.richardwilly98.Document;
-import com.github.richardwilly98.File;
+import com.github.richardwilly98.api.Document;
+import com.github.richardwilly98.api.File;
 import com.github.richardwilly98.services.DocumentProvider;
+import com.github.richardwilly98.api.services.DocumentService;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -43,13 +44,13 @@ public class DocumentProviderTest {
 	public void closeServer() {
 	}
 
-	protected DocumentProvider getDocumentProvider() {
+	protected DocumentService getDocumentProvider() {
 		Injector injector = Guice.createInjector(new ProviderModule());
 		return injector.getInstance(DocumentProvider.class);
 	}
 	
 	private void testCreateDocument(String name, String contentType, String path, String contentSearch) throws Throwable {
-		DocumentProvider provider = getDocumentProvider();
+		DocumentService provider = getDocumentProvider();
 		String id = String.valueOf(System.currentTimeMillis());
 		byte[] content = copyToBytesFromClasspath(path);
 		String encodedContent = Base64.encodeBytes(content);
@@ -103,7 +104,7 @@ public class DocumentProviderTest {
 	
 	@Test
 	public void testCreateDocumentWithAuthor() throws Throwable {
-		DocumentProvider provider = getDocumentProvider();
+		DocumentService provider = getDocumentProvider();
 		String id = String.valueOf(System.currentTimeMillis());
 		Map<String, Object> attributes = new HashMap<String, Object>();
 		attributes.put(Document.AUTHOR, "richard");
@@ -120,7 +121,7 @@ public class DocumentProviderTest {
 	
 	@Test
 	public void testCreateDocumentWithCreationDate() throws Throwable {
-		DocumentProvider provider = getDocumentProvider();
+		DocumentService provider = getDocumentProvider();
 		String id = String.valueOf(System.currentTimeMillis());
 		Map<String, Object> attributes = new HashMap<String, Object>();
 		DateTime now = new DateTime();

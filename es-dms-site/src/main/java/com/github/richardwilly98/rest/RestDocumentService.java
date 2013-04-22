@@ -23,11 +23,12 @@ import org.apache.log4j.Logger;
 import org.elasticsearch.common.Base64;
 import org.joda.time.DateTime;
 
-import com.github.richardwilly98.Document;
-import com.github.richardwilly98.File;
+import com.github.richardwilly98.api.Document;
+import com.github.richardwilly98.api.File;
 import com.github.richardwilly98.inject.ProviderModule;
 import com.github.richardwilly98.services.DocumentProvider;
-import com.github.richardwilly98.services.ServiceException;
+import com.github.richardwilly98.api.services.DocumentService;
+import com.github.richardwilly98.api.exception.ServiceException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.sun.jersey.core.header.FormDataContentDisposition;
@@ -35,13 +36,13 @@ import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataParam;
 
 @Path("/documents")
-public class DocumentService {
+public class RestDocumentService {
 
-	private static Logger log = Logger.getLogger(DocumentService.class);
+	private static Logger log = Logger.getLogger(RestDocumentService.class);
 
-	private DocumentProvider provider;
+	private DocumentService provider;
 
-	private DocumentProvider getProvider() {
+	private DocumentService getProvider() {
 		if (provider == null) {
 			Injector injector = Guice.createInjector(new ProviderModule());
 			provider = injector.getInstance(DocumentProvider.class);

@@ -12,7 +12,8 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 
-import com.github.richardwilly98.User;
+import com.github.richardwilly98.api.User;
+import com.github.richardwilly98.api.exception.ServiceException;
 import com.google.inject.Inject;
 
 public class UserProvider extends ProviderBase {
@@ -28,7 +29,7 @@ public class UserProvider extends ProviderBase {
 
 	public User getUser(String id) throws ServiceException {
 		try {
-			GetResponse response = getClient().prepareGet(index, type, id)
+			GetResponse response = client.prepareGet(index, type, id)
 					.execute().actionGet();
 			String json = response.getSourceAsString();
 			User user = mapper.readValue(json, User.class);
@@ -42,17 +43,17 @@ public class UserProvider extends ProviderBase {
 	public List<User> getUsers(String name) throws ServiceException {
 		try {
 			List<User> users = new ArrayList<User>();
-//			if (!getClient().admin().indices().prepareExists(index).execute()
+//			if (!client.admin().indices().prepareExists(index).execute()
 //					.actionGet().exists()) {
-//				getClient().admin().indices().prepareCreate(index).execute()
+//				client.admin().indices().prepareCreate(index).execute()
 //						.actionGet();
 //				// Force index to be refreshed.
-//				getClient().admin().indices()
+//				client.admin().indices()
 //						.refresh(new RefreshRequest(index)).actionGet();
 //				for (User u : this.users) {
 //					String json;
 //					json = mapper.writeValueAsString(u);
-//					IndexResponse response = getClient()
+//					IndexResponse response = client
 //							.prepareIndex(index, type).setId(u.getId())
 //							.setSource(json).execute().actionGet();
 //					log.trace(String.format("Index: %s  - Type: %s - Id: %s",
@@ -60,7 +61,7 @@ public class UserProvider extends ProviderBase {
 //							response.getId()));
 //				}
 //			}
-			SearchResponse searchResponse = getClient().prepareSearch(index)
+			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type).setQuery(QueryBuilders.queryString(name))
 					.execute().actionGet();
 			log.debug("totalHits: " + searchResponse.getHits().totalHits());
@@ -89,7 +90,7 @@ public class UserProvider extends ProviderBase {
 			String json;
 			json = mapper.writeValueAsString(user);
 			log.trace(json);
-			IndexResponse response = getClient().prepareIndex(index, type)
+			IndexResponse response = client.prepareIndex(index, type)
 					.setId(user.getId()).setSource(json).execute().actionGet();
 			log.trace(String.format("Index: %s  - Type: %s - Id: %s",
 					response.getIndex(), response.getType(), response.getId()));
@@ -105,12 +106,12 @@ public class UserProvider extends ProviderBase {
 	}
 
 	protected void createIndex() {
-		if (!getClient().admin().indices().prepareExists(index).execute()
+		if (!client.admin().indices().prepareExists(index).execute()
 				.actionGet().exists()) {
-			getClient().admin().indices().prepareCreate(index).execute()
+			client.admin().indices().prepareCreate(index).execute()
 					.actionGet();
 			// Force index to be refreshed.
-			getClient().admin().indices().refresh(new RefreshRequest(index))
+			client.admin().indices().refresh(new RefreshRequest(index))
 					.actionGet();
 		}
 

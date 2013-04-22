@@ -1,4 +1,4 @@
-package com.github.richardwilly98;
+package com.github.richardwilly98.api;
 
 import org.joda.time.DateTime;
 
