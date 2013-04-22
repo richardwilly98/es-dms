@@ -1,7 +1,18 @@
-﻿var simpleApp = angular.module('simpleApp', ['ui.bootstrap', 'ngResource', '$strap.directives', 'ngUpload']);
+﻿var simpleApp = angular.module('simpleApp', [
+	'ui.bootstrap', 
+	'ngResource', 
+	'ngCookies', 
+	'$strap.directives', 
+	'ngUpload', 
+	'http-auth-interceptor'
+]);
 
 simpleApp.config(function ($routeProvider) {
     $routeProvider
+		.when('/login', {
+		    controller: 'loginController',
+		    templateUrl: 'views/login.html'
+		})
 		.when('/view1', {
 		    controller: 'simpleController',
 		    templateUrl: 'views/view1.html'
@@ -22,7 +33,7 @@ simpleApp.config(function ($routeProvider) {
 		    controller: 'documentController',
 		    templateUrl: 'views/edit-view.html'
 		})
-		.otherwise({ redirectTo: '/view1' })
+		.otherwise({ redirectTo: '/login' })
 });
 
 simpleApp.factory('userService', function ($resource) {
@@ -31,6 +42,10 @@ simpleApp.factory('userService', function ($resource) {
 
 simpleApp.factory('documentService', function ($resource) {
     return $resource('api/documents/:verb/:name', {}, {});
+});
+
+simpleApp.factory('authenticationService', function ($resource) {
+    return $resource('api/auth/:verb/:name', {}, {});
 });
 
 function NavBarCtrl($scope) {

@@ -22,6 +22,17 @@ simpleApp.controller('simpleController', function ($scope, userService) {
     };
 });
 
+simpleApp.controller('loginController', function ($scope, $cookieStore, authenticationService) {
+
+    init();
+
+    function init() {
+    }
+
+    $scope.login = function() {
+    }
+});
+
 simpleApp.controller('documentController', function ($scope, documentService) {
     $scope.documents = [];
 
