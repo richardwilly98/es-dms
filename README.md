@@ -2,6 +2,9 @@
 
 Test web app using AngujarJS, Jersey and ElasticSearch
 
+## Build status##
+[![Build Status](https://buildhive.cloudbees.com/job/richardwilly98/job/es-dms/badge/icon)](https://buildhive.cloudbees.com/job/richardwilly98/job/es-dms/)
+
 ## How to compile and run ##
 
 - Run: mvn clean install
