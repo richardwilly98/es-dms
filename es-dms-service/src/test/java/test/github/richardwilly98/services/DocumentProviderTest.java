@@ -62,9 +62,9 @@ public class DocumentProviderTest {
 		File file = new File(encodedContent, name, contentType);
 		document.setFile(file);
 		document.setId(id);
-		String newId = provider.createDocument(document);
+		String newId = provider.create(document);
 		log.info(String.format("New document created #%s", newId));
-		document = provider.getDocument(newId);
+		document = provider.get(newId);
 		Assert.assertNotNull(document);
 		// TODO: How to load mapper-attachments plugin for unit test?
 //		documents = provider.getDocuments(contentSearch);
@@ -110,9 +110,9 @@ public class DocumentProviderTest {
 		attributes.put(Document.AUTHOR, "richard");
 		Document document = new Document(id, null, attributes);
 		document.setId(id);
-		String newId = provider.createDocument(document);
+		String newId = provider.create(document);
 		log.info(String.format("New document created #%s", newId));
-		document = provider.getDocument(newId);
+		document = provider.get(newId);
 		Assert.assertNotNull(document);
 		attributes = document.getAttributes();
 		Assert.assertTrue(attributes != null && attributes.size() == 1);
@@ -128,9 +128,9 @@ public class DocumentProviderTest {
 		attributes.put(Document.CREATION_DATE, now.toString());
 		Document document = new Document(id, null, attributes);
 		document.setId(id);
-		String newId = provider.createDocument(document);
+		String newId = provider.create(document);
 		log.info(String.format("New document created #%s", newId));
-		document = provider.getDocument(newId);
+		document = provider.get(newId);
 		Assert.assertNotNull(document);
 		attributes = document.getAttributes();
 		Assert.assertTrue(attributes != null && attributes.size() == 1);

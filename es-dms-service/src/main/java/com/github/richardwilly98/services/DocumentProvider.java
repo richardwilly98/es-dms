@@ -40,7 +40,7 @@ public class DocumentProvider extends ProviderBase implements DocumentService {
 	 * @see com.github.richardwilly98.services.IDocumentService#getDocument(java.lang.String)
 	 */
 	@Override
-	public Document getDocument(String id) throws ServiceException {
+	public Document get(String id) throws ServiceException {
 		try {
 			GetResponse response = client.prepareGet(index, type, id)
 					.execute().actionGet();
@@ -87,7 +87,7 @@ public class DocumentProvider extends ProviderBase implements DocumentService {
 	 * @see com.github.richardwilly98.services.IDocumentService#contentSearch(java.lang.String)
 	 */
 	@Override
-	public List<Document> contentSearch(String criteria) throws ServiceException {
+	public List<Document> search(String criteria) throws ServiceException {
 		try {
 			List<Document> documents = new ArrayList<Document>();
 
@@ -131,7 +131,7 @@ public class DocumentProvider extends ProviderBase implements DocumentService {
 	 * @see com.github.richardwilly98.services.IDocumentService#createDocument(com.github.richardwilly98.Document)
 	 */
 	@Override
-	public String createDocument(Document document) throws ServiceException {
+	public String create(Document document) throws ServiceException {
 		try {
 			if (document.getId() == null) {
 				document.setId(generateUniqueId(document));
@@ -148,7 +148,7 @@ public class DocumentProvider extends ProviderBase implements DocumentService {
 					.actionGet();
 			return response.getId();
 		} catch (Throwable t) {
-			log.error("getDocuments failed", t);
+			log.error("createDocument failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}
@@ -207,7 +207,7 @@ public class DocumentProvider extends ProviderBase implements DocumentService {
 	}
 
 	@Override
-	public void deleteDocument(Document document) throws ServiceException {
+	public void delete(Document document) throws ServiceException {
 		try {
 		if (document == null) {
 			throw new IllegalArgumentException("document is null");
@@ -220,13 +220,13 @@ public class DocumentProvider extends ProviderBase implements DocumentService {
 	}
 
 	@Override
-	public void checkinDocument(Document document) throws ServiceException {
+	public void checkin(Document document) throws ServiceException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void checkoutDocument(Document document) throws ServiceException {
+	public void checkout(Document document) throws ServiceException {
 		// TODO Auto-generated method stub
 		
 	}

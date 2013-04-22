@@ -7,23 +7,23 @@ import com.github.richardwilly98.api.exception.ServiceException;
 
 public interface DocumentService {
 
-	public abstract Document getDocument(String id) throws ServiceException;
+	public abstract Document get(String id) throws ServiceException;
 
 	public abstract List<Document> getDocuments(String name)
 			throws ServiceException;
 
-	public abstract List<Document> contentSearch(String criteria)
+	public abstract List<Document> search(String criteria)
 			throws ServiceException;
 
-	public abstract String createDocument(Document document)
+	public abstract String create(Document document)
 			throws ServiceException;
 
-	public abstract void deleteDocument(Document document)
+	public abstract void delete(Document document)
 			throws ServiceException;
 	
-	public abstract void checkinDocument(Document document)
+	public abstract void checkin(Document document)
 			throws ServiceException;
 
-	public abstract void checkoutDocument(Document document)
+	public abstract void checkout(Document document)
 			throws ServiceException;
 }
