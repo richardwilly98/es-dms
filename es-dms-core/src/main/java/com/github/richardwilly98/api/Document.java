@@ -19,7 +19,7 @@ public class Document extends SecuredItem {
 	Map<String, Object> attributes = new HashMap<String, Object>();
 	
 	public Document() {
-		
+		super();
 	}
 	
 	public Document(String id, File file) {

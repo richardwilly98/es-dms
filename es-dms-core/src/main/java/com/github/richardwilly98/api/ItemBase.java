@@ -1,6 +1,5 @@
 package com.github.richardwilly98.api;
 
-import java.util.Map;
 
 abstract class ItemBase {
 
@@ -9,6 +8,10 @@ abstract class ItemBase {
 	Boolean disabled;
 	String description;
 
+	protected ItemBase() {
+		disabled = false;
+	}
+	
 	public String getId() {
 		return id;
 	}
