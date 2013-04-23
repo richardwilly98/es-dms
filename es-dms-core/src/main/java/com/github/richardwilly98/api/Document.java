@@ -6,7 +6,7 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-public class Document extends ItemBase {
+public class Document extends SecuredItem {
 
 	public final static String CREATION_DATE = "creation";
 	public final static String MODIFIED_DATE = "modified";

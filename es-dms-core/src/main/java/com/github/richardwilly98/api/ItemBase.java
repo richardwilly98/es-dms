@@ -5,8 +5,9 @@ import java.util.Map;
 abstract class ItemBase {
 
 	String id;
-	
-	Map<String, String> permissions;
+	String name;
+	Boolean disabled;
+	String description;
 
 	public String getId() {
 		return id;
@@ -14,10 +15,26 @@ abstract class ItemBase {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public Map<String, String> getPermissions() {
-		return permissions;
+	
+	public boolean isDisabled() {
+		return this.disabled;
 	}
-	public void setPermissions(Map<String, String> permissions) {
-		this.permissions = permissions;
+	
+	public void setDisabled(boolean value) {
+		this.disabled = value;
+	}
+	
+	public String getName() {
+		return this.name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getDescription() {
+		return this.description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }
