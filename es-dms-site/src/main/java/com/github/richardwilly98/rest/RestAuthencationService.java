@@ -1,17 +1,15 @@
 package com.github.richardwilly98.rest;
 
-import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
-
-import com.sun.jersey.multipart.FormDataParam;
 
 @Path("/auth")
 public class RestAuthencationService {
@@ -20,9 +18,8 @@ public class RestAuthencationService {
 
 	@POST
 	@Path("/login")
-	@Consumes({MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_JSON})
-	public Response login(@FormDataParam("username") String username,
-			@FormDataParam("password") String password) {
+	public Response login(@FormParam("username") String username,
+			@FormParam("password") String password) {
 		if (log.isTraceEnabled()) {
 			log.trace(String.format("login - %s - %s", username, password));
 		}
@@ -30,7 +27,7 @@ public class RestAuthencationService {
 			UsernamePasswordToken token = new UsernamePasswordToken(username,
 					password);
 			SecurityUtils.getSubject().login(token);
-			return Response.status(Status.OK).build();
+			return Response.status(Status.OK).entity("SUCCESS").cookie(new NewCookie("LLL", "XXXX")).build();
 		} catch (Throwable t) {
 			log.error("login failed", t);
 			throw new RestServiceException(t.getLocalizedMessage());

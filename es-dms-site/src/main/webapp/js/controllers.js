@@ -26,9 +26,9 @@ simpleApp.controller('loginController', function ($scope, $cookieStore, authenti
 
     $scope.login = function() {
     	console.log('username: ' + $scope.username);
-//    	authenticationService.login($scope.username, $scope.password, function(data) {
-//    		console.log(data);
-//    	});
+    	authenticationService.login($scope.username, $scope.password, function(data) {
+    		console.log(data);
+    	});
     };
 });
 

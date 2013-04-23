@@ -52,6 +52,12 @@ public class RestDocumentService {
 		return provider;
 	}
 
+	private void isAuthenticated() {
+		log.debug("Principal: " + SecurityUtils.getSubject().getPrincipal());
+		if (SecurityUtils.getSubject().getPrincipal() == null)
+			throw new UnauthorizedException("Unauthorize request", "/documents");
+	}
+	
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("/{id}")
@@ -73,10 +79,11 @@ public class RestDocumentService {
 	public Response search(@PathParam("criteria") String criteria) {
 //	public List<Document> search(@PathParam("criteria") String criteria) {
 		try {
-			log.debug("Principal: " + SecurityUtils.getSubject().getPrincipal());
-			if (! SecurityUtils.getSubject().hasRole("writer")) {
-				return Response.status(Status.UNAUTHORIZED).build();
-			}
+			isAuthenticated();
+//			log.debug("Principal: " + SecurityUtils.getSubject().getPrincipal());
+//			if (! SecurityUtils.getSubject().hasRole("writer")) {
+//				return Response.status(Status.UNAUTHORIZED).build();
+//			}
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("search - %s", criteria));
 			}
@@ -92,6 +99,7 @@ public class RestDocumentService {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("/find/{name}")
 	public Response find(@PathParam("name") String name) {
+		isAuthenticated();
 		if (log.isTraceEnabled()) {
 			log.trace(String.format("find - %s", name));
 		}
@@ -108,6 +116,7 @@ public class RestDocumentService {
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response create(Document document) {
+		isAuthenticated();
 		if (document == null) {
 			throw new IllegalArgumentException("document");
 		}
@@ -192,10 +201,11 @@ public class RestDocumentService {
 			@FormDataParam("date") String date,
 			@FormDataParam("file") FormDataBodyPart body) {
 		try {
-			log.debug("Principal: " + SecurityUtils.getSubject().getPrincipal());
-			if (! SecurityUtils.getSubject().hasRole("writer")) {
-				return Response.status(Status.UNAUTHORIZED).build();
-			}
+			isAuthenticated();
+//			log.debug("Principal: " + SecurityUtils.getSubject().getPrincipal());
+//			if (! SecurityUtils.getSubject().hasRole("writer")) {
+//				return Response.status(Status.UNAUTHORIZED).build();
+//			}
 
 			FormDataContentDisposition fileDetail = body
 					.getFormDataContentDisposition();

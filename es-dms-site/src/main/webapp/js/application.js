@@ -37,10 +37,10 @@ simpleApp.directive('authenticationDirective', function() {
 
 simpleApp.config(function ($routeProvider) {
     $routeProvider
-//		.when('/login', {
-//		    controller: 'loginController',
-//		    templateUrl: 'views/login.html'
-//		})
+		.when('/login', {
+		    controller: 'loginController',
+		    templateUrl: 'views/login.html'
+		})
 		.when('/view1', {
 		    controller: 'simpleController',
 		    templateUrl: 'views/view1.html'
@@ -61,7 +61,7 @@ simpleApp.config(function ($routeProvider) {
 		    controller: 'documentController',
 		    templateUrl: 'views/edit-view.html'
 		})
-		.otherwise({ redirectTo: '/view1' })
+		.otherwise({ redirectTo: '/login' })
 });
 
 simpleApp.factory('userService', function ($resource) {
@@ -74,9 +74,15 @@ simpleApp.factory('documentService', function ($resource) {
 
 simpleApp.factory('authenticationService', function ($http) {
 	return {
-		login: function() {
-			return "OK";
-		};
+		login: function(username, password, callback) {
+//			return username + ' - ' + password;
+			var payload = $.param({username: username, password: password});
+//			var payload = {username: username, password: password};
+			var config = {
+					headers: {'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'}
+			};
+			$http.post('api/auth/login', payload, config).success(callback);
+		}
 	};
 });
 
