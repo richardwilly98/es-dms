@@ -1,16 +1,22 @@
-<div class="container" id="loginbox">
-	<div id="login-inner" data-ng-controller="loginController">
-		<!-- form action="api/auth/login" enctype="multipart/form-data" ng-submit="submit()" -->
-		<form action="api/auth/login" enctype="multipart/form-data">
-			<label>Username</label> 
-			<br /> 
-			<input type="text" class="login-inp" ng-model="username" />
-			<label>Password</label>
-			<br />
-			<input type="password" class="login-inp" ng-model="password" /> 
-			<label>Login</label>
-			<input type="submit" class="btn btn-success" value="Login" />
+<div class="modal-header">
+	<button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="close()">&times;</button>
+	<h3>Please sign in</h3>
+</div>
+<div class="modal-body">
+	<div id="loginbox"data-ng-controller="loginController">
+		<form action="api/auth/login" enctype="multipart/form-data" method="post">
+			<fieldset>
+				<label>Username</label> 
+				<input type="text" name="username" data-ng-model="username" placeholder="Username" />
+				<label>Password</label>
+				<input type="password" name="password" data-ng-model="password" placeholder="Password" /> 
+				<label class="checkbox">
+          			<input type="checkbox" value="remember-me"> Remember me
+        		</label>
+				<input type="submit" class="btn btn-success" value="Login" />
+			</fieldset>
 		</form>
 	</div>
-	<div class="clear"></div>
+</div>
+<div class="modal-footer">
 </div>

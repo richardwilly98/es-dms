@@ -21,11 +21,13 @@ simpleApp.directive('authenticationDirective', function() {
         login.hide();
         
         scope.$on('event:auth-loginRequired', function() {
+        	console.log('event:auth-loginRequired');
           login.slideDown('slow', function() {
             //main.hide();
           });
         });
         scope.$on('event:auth-loginConfirmed', function() {
+        	console.log('event:auth-loginConfirmed');
           main.show();
           //login.slideUp();
         });

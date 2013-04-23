@@ -1,14 +1,8 @@
 <div class="container" data-ng-controller="modalCtrl">
-    <br />
-    <button type="button" class="btn btn-primary" bs-modal="'views/login.html'">Login</button>
-    <br />
-    <button type="button" class="btn btn-large btn-primary" bs-modal="'views/new-user.html'">New User</button>
-    <br />
-    <button type="button" class="btn btn-primary" bs-modal="'views/new-document.html'">New Document</button>
-    <br />
-    <button type="button" class="btn btn-small btn-info" data-ng-click="open()" >New Document</button>
-    <div modal="shouldBeOpen" options="opts" close="close()">
-    	<ng-include src="'views/new-document.html'"></ng-include>
+    <div class="btn-group">
+    	<button type="button" class="btn btn-success" data-bs-modal="'views/login.html'">Login</button>
+    	<button type="button" class="btn btn-inverse" data-bs-modal="'views/new-user.html'">New User</button>
+    	<button type="button" class="btn btn-primary" data-bs-modal="'views/new-document.html'">New Document</button>
     </div>
 </div>
 <div data-ng-controller="AlertDemoCtrl">
