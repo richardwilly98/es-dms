@@ -4,12 +4,12 @@ import java.util.Map;
 
 public class SecuredItem extends ItemBase {
 	
-	Map<String, String> permissions;
+	Map<String, Permission> permissions;
 	
-	public Map<String, String> getPermissions() {
+	public Map<String, Permission> getPermissions() {
 		return permissions;
 	}
-	public void setPermissions(Map<String, String> permissions) {
+	public void setPermissions(Map<String, Permission> permissions) {
 		this.permissions = permissions;
 	}
 

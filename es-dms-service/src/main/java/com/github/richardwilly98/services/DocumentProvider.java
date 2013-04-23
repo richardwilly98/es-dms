@@ -83,6 +83,33 @@ public class DocumentProvider extends ProviderBase implements DocumentService {
 		}
 	}
 	
+	@Override
+	public List<Document> getList(String name) throws ServiceException {
+		try {
+			List<Document> documents = new ArrayList<Document>();
+
+			SearchResponse searchResponse = client.prepareSearch(index)
+					.setTypes(type).setQuery(QueryBuilders.queryString(name))
+					.addHighlightedField("file").execute().actionGet();
+			log.debug("totalHits: " + searchResponse.getHits().totalHits());
+			for (SearchHit hit : searchResponse.getHits().hits()) {
+				log.debug(String.format("HighlightFields: %s", hit
+						.getHighlightFields().size()));
+				for (String key : hit.getHighlightFields().keySet()) {
+					log.debug(String.format("Highlight key: %s", key));
+				}
+				String json = hit.getSourceAsString();
+				Document document = mapper.readValue(json, Document.class);
+				documents.add(document);
+			}
+
+			return documents;
+		} catch (Throwable t) {
+			log.error("getDocuments failed", t);
+			throw new ServiceException(t.getLocalizedMessage());
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.github.richardwilly98.services.IDocumentService#contentSearch(java.lang.String)
 	 */
