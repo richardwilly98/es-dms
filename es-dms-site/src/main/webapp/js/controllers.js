@@ -22,13 +22,29 @@ simpleApp.controller('simpleController', function ($scope, userService) {
     };
 });
 
-simpleApp.controller('loginController', function ($scope, $cookieStore, authenticationService) {
+simpleApp.controller('loginController', function ($scope, authenticationService, authService) {
+
+    $scope.shouldBeOpen = true;
 
     $scope.login = function() {
-    	console.log('username: ' + $scope.username);
+    	console.log('loginController - login');
     	authenticationService.login($scope.username, $scope.password, function(data) {
     		console.log(data);
+    		//$dialog.close(undefined);
+    		$scope.shouldBeOpen = false;
+//    		$scope.$broadcast('event:auth-loginConfirmed');
+    		authService.loginConfirmed();
     	});
+    };
+
+    $scope.open = function () {
+    	console.log('loginController - open');
+        $scope.shouldBeOpen = true;
+    };
+
+    $scope.close = function () {
+    	console.log('loginController - close');
+        $scope.shouldBeOpen = false;
     };
 });
 
@@ -100,8 +116,4 @@ simpleApp.controller('modalCtrl', function ($scope) {
 		$scope.$broadcast('event:auth-loginRequired');
 	};
 	
-	$scope.showLogin = function() {
-		var login = $element.find('login-holder');
-		login.show();
-	};
 });

@@ -7,7 +7,7 @@
 	'http-auth-interceptor'
 ]);
 
-simpleApp.directive('authenticationDirective', function() {
+simpleApp.directive('authenticationDirective', function($dialog) {
 	console.log('Start authenticationDirective');
     return {
       restrict: 'A',
@@ -18,18 +18,24 @@ simpleApp.directive('authenticationDirective', function() {
         var login = elem.find('#login-holder');
         var main = elem.find('#content');
         
-        login.hide();
+        var d = $dialog.dialog({dialogFade: true, backdropFade: true});
+        
+//        login.hide();
         
         scope.$on('event:auth-loginRequired', function() {
         	console.log('event:auth-loginRequired');
-        	login.slideDown('slow', function() {
-        		main.hide();
-        	});
+            d.open('views/login.html');
+
+//        	login.show()
+//        	login.slideDown('slow', function() {
+//        		main.hide();
+//        	});
         });
         scope.$on('event:auth-loginConfirmed', function() {
         	console.log('event:auth-loginConfirmed');
-        	main.show();
-        	login.slideUp();
+        	d.close();
+        	//main.show();
+        	//login.slideUp();
         });
       }
     }
@@ -61,7 +67,7 @@ simpleApp.config(function ($routeProvider) {
 		    controller: 'documentController',
 		    templateUrl: 'views/edit-view.html'
 		})
-		.otherwise({ redirectTo: '/login' })
+		.otherwise({ redirectTo: '/view1' })
 });
 
 simpleApp.factory('userService', function ($resource) {
@@ -75,9 +81,7 @@ simpleApp.factory('documentService', function ($resource) {
 simpleApp.factory('authenticationService', function ($http) {
 	return {
 		login: function(username, password, callback) {
-//			return username + ' - ' + password;
 			var payload = $.param({username: username, password: password});
-//			var payload = {username: username, password: password};
 			var config = {
 					headers: {'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'}
 			};
@@ -85,22 +89,6 @@ simpleApp.factory('authenticationService', function ($http) {
 		}
 	};
 });
-
-/*
-simpleApp.factory('authenticationService', function ($http) {
-    //return $resource('api/auth/:verb/:name', {}, {});
-	return {
-		login: function(username, password, callback) {
-			return username + '-' + password;
-//			var payload = $.param({username: username, password: password});
-//			var config = {
-//					headers: {'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'}
-//			};
-//			$http.post('api/auth/login', payload, config).success(callback);
-		};
-	};
-});
- */
 
 function NavBarCtrl($scope) {
     $scope.tabs = [
