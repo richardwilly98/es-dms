@@ -20,7 +20,7 @@ public class RestAuthencationService {
 
 	@POST
 	@Path("/login")
-	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Consumes({MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_JSON})
 	public Response login(@FormDataParam("username") String username,
 			@FormDataParam("password") String password) {
 		if (log.isTraceEnabled()) {

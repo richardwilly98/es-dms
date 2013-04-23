@@ -4,16 +4,17 @@
 </div>
 <div class="modal-body">
 	<div id="loginbox"data-ng-controller="loginController">
-		<form action="api/auth/login" enctype="multipart/form-data" method="post">
+		<!-- form action="api/auth/login" enctype="multipart/form-data" method="post" -->
+		<form>
 			<fieldset>
 				<label>Username</label> 
-				<input type="text" name="username" data-ng-model="username" placeholder="Username" />
+				<input type="text" name="username" data-ng-model="username" placeholder="Username" autofocus="autofocus" required />
 				<label>Password</label>
-				<input type="password" name="password" data-ng-model="password" placeholder="Password" /> 
+				<input type="password" name="password" data-ng-model="password" placeholder="Password" required /> 
 				<label class="checkbox">
-          			<input type="checkbox" value="remember-me"> Remember me
+          			<input type="checkbox" value="rememberMe" /> Remember me
         		</label>
-				<input type="submit" class="btn btn-success" value="Login" />
+				<input type="submit" class="btn btn-success" value="Login" ng-click="login()" />
 			</fieldset>
 		</form>
 	</div>

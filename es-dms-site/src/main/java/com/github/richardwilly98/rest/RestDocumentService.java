@@ -70,12 +70,18 @@ public class RestDocumentService {
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("/search/{criteria}")
-	public List<Document> search(@PathParam("criteria") String criteria) {
-		if (log.isTraceEnabled()) {
-			log.trace(String.format("search - %s", criteria));
-		}
+	public Response search(@PathParam("criteria") String criteria) {
+//	public List<Document> search(@PathParam("criteria") String criteria) {
 		try {
-			return getProvider().search(criteria);
+			log.debug("Principal: " + SecurityUtils.getSubject().getPrincipal());
+			if (! SecurityUtils.getSubject().hasRole("writer")) {
+				return Response.status(Status.UNAUTHORIZED).build();
+			}
+			if (log.isTraceEnabled()) {
+				log.trace(String.format("search - %s", criteria));
+			}
+			List<Document> documents = getProvider().search(criteria);
+			return Response.status(Status.OK).entity(documents).build();
 		} catch (ServiceException e) {
 			log.error("search failed", e);
 			throw new RestServiceException(e.getLocalizedMessage());
@@ -85,12 +91,13 @@ public class RestDocumentService {
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("/find/{name}")
-	public List<Document> find(@PathParam("name") String name) {
+	public Response find(@PathParam("name") String name) {
 		if (log.isTraceEnabled()) {
 			log.trace(String.format("find - %s", name));
 		}
 		try {
-			return getProvider().getDocuments(name);
+			List<Document> documents = getProvider().getDocuments(name);
+			return Response.status(Status.OK).entity(documents).build();
 		} catch (ServiceException e) {
 			log.error("find failed", e);
 			throw new RestServiceException(e.getLocalizedMessage());
@@ -185,10 +192,10 @@ public class RestDocumentService {
 			@FormDataParam("date") String date,
 			@FormDataParam("file") FormDataBodyPart body) {
 		try {
-//			log.debug("Principal: " + SecurityUtils.getSubject().getPrincipal());
-//			if (! SecurityUtils.getSubject().hasRole("writer")) {
-//				return Response.status(Status.UNAUTHORIZED).build();
-//			}
+			log.debug("Principal: " + SecurityUtils.getSubject().getPrincipal());
+			if (! SecurityUtils.getSubject().hasRole("writer")) {
+				return Response.status(Status.UNAUTHORIZED).build();
+			}
 
 			FormDataContentDisposition fileDetail = body
 					.getFormDataContentDisposition();
