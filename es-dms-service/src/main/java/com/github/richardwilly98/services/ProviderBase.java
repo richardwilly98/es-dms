@@ -27,4 +27,5 @@ abstract class ProviderBase {
 	}
 	
 	protected abstract void createIndex();
+	
 }

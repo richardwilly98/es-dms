@@ -1,7 +1,5 @@
 package com.github.richardwilly98.api;
 
-import java.util.Map;
-
 abstract class ItemBase {
 
 	String id;
