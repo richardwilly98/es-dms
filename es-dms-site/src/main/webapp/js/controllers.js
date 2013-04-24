@@ -22,7 +22,7 @@ simpleApp.controller('simpleController', function ($scope, userService) {
     };
 });
 
-simpleApp.controller('loginController', function ($scope, authenticationService, authService) {
+simpleApp.controller('loginController', function ($scope, authenticationService, authService, sharedService) {
 
     $scope.shouldBeOpen = true;
 
@@ -30,20 +30,19 @@ simpleApp.controller('loginController', function ($scope, authenticationService,
     	console.log('loginController - login');
     	authenticationService.login($scope.username, $scope.password, function(data) {
     		console.log(data);
-    		//$dialog.close(undefined);
-    		$scope.shouldBeOpen = false;
-//    		$scope.$broadcast('event:auth-loginConfirmed');
-    		authService.loginConfirmed();
+    		if (data === 'AUTHENTICATED') {
+        		authService.loginConfirmed();
+        		$scope.shouldBeOpen = false;
+        		sharedService.prepForBroadcast({logout: true});
+    		}
     	});
     };
 
     $scope.open = function () {
-    	console.log('loginController - open');
         $scope.shouldBeOpen = true;
     };
 
     $scope.close = function () {
-    	console.log('loginController - close');
         $scope.shouldBeOpen = false;
     };
 });

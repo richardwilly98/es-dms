@@ -14,6 +14,8 @@
             <ul class="nav">
                 <li data-ng-repeat="tab in tabs" data-match-route="{{tab.view}}"><a href="#{{tab.view}}">
                     {{tab.title}}</a> </li>
+                <li ng-show="showLogout" class="divider-vertical"></li>
+                <li ng-show="showLogout"><a href="#logout">Logout</a></li>
             </ul>
         </div>
     </div>
@@ -22,9 +24,9 @@
         <div id="content" data-ng-view="">
         </div>
         
-        <div id="login-holder" ng-controller="loginController" bs-modal="'views/login.html'">
+		<div id="login-holder" data-ng-include src="'views/login.html'">
 		</div>
-        
+              
     </div>
     <script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="js/angular.min.js"></script>

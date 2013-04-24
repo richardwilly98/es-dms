@@ -12,30 +12,22 @@ simpleApp.directive('authenticationDirective', function($dialog) {
     return {
       restrict: 'A',
       link: function(scope, elem, attrs) {
-        //once Angular is started, remove class:
-        //elem.removeClass('waiting-for-angular');
         
         var login = elem.find('#login-holder');
         var main = elem.find('#content');
         
-        var d = $dialog.dialog({dialogFade: true, backdropFade: true});
-        
-//        login.hide();
+        login.hide();
         
         scope.$on('event:auth-loginRequired', function() {
-        	console.log('event:auth-loginRequired');
-            d.open('views/login.html');
-
-//        	login.show()
-//        	login.slideDown('slow', function() {
-//        		main.hide();
-//        	});
+        	login.show()
+        	login.slideDown('slow', function() {
+        		main.hide();
+        	});
         });
         scope.$on('event:auth-loginConfirmed', function() {
-        	console.log('event:auth-loginConfirmed');
-        	d.close();
-        	//main.show();
-        	//login.slideUp();
+        	main.show();
+        	login.slideUp();
+        	login.hide();
         });
       }
     }
@@ -70,6 +62,23 @@ simpleApp.config(function ($routeProvider) {
 		.otherwise({ redirectTo: '/view1' })
 });
 
+simpleApp.factory('sharedService', function($rootScope) {
+    var sharedService = {};
+    
+    sharedService.message = '';
+
+    sharedService.prepForBroadcast = function(msg) {
+        this.message = msg;
+        this.broadcastItem();
+    };
+
+    sharedService.broadcastItem = function() {
+        $rootScope.$broadcast('handleBroadcast');
+    };
+
+    return sharedService;
+});
+
 simpleApp.factory('userService', function ($resource) {
     return $resource('api/users/:verb/:name', {}, {});
 });
@@ -81,17 +90,22 @@ simpleApp.factory('documentService', function ($resource) {
 simpleApp.factory('authenticationService', function ($http) {
 	return {
 		login: function(username, password, callback) {
-			var payload = $.param({username: username, password: password});
+			var payload = {username: username, password: password};
 			var config = {
-					headers: {'Content-Type':'application/x-www-form-urlencoded; charset=UTF-8'}
+					headers: {'Content-Type':'application/json; charset=UTF-8'}
 			};
 			$http.post('api/auth/login', payload, config).success(callback);
 		}
 	};
 });
 
-function NavBarCtrl($scope) {
-    $scope.tabs = [
+function NavBarCtrl($scope, sharedService) {
+	$scope.showLogout = false;
+	$scope.$on('handleBroadcast', function() {
+        $scope.showLogout = sharedService.message.logout;
+    }); 
+	
+	$scope.tabs = [
         { "view": "/view1", title: "View #1" },
         { "view": "/view2", title: "View #2" },
         { "view": "/search-view", title: "Search" },
