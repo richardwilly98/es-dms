@@ -257,4 +257,32 @@ public class DocumentProvider extends ProviderBase implements DocumentService {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public boolean disabled(Document document) throws ServiceException {
+		try {
+			if (document == null) {
+				throw new IllegalArgumentException("document is null");
+			}
+				//
+			} catch (Throwable t) {
+				log.error("getDocuments failed", t);
+				throw new ServiceException(t.getLocalizedMessage());
+			}
+		return document.isDisabled();
+	}
+	
+	@Override
+	public void disable(Document document, boolean b) throws ServiceException {
+		try {
+			if (document == null) {
+				throw new IllegalArgumentException("document is null");
+			}
+				//
+			} catch (Throwable t) {
+				log.error("getDocuments failed", t);
+				throw new ServiceException(t.getLocalizedMessage());
+			}
+		document.setDisabled(b);
+	}
 }

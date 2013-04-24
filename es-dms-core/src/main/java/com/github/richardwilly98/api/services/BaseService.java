@@ -19,5 +19,10 @@ public interface BaseService <I>{
 
 	public abstract void delete(I item)
 			throws ServiceException;
+	
+	public abstract boolean disabled(I item)
+			throws ServiceException;
 
+	public abstract void disable(I item, boolean b)
+			throws ServiceException;
 }
