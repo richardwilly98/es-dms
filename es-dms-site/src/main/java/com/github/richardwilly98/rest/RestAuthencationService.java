@@ -7,16 +7,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
-import org.apache.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 
 @Path("/auth")
-public class RestAuthencationService {
-
-	private static Logger log = Logger.getLogger(RestAuthencationService.class);
+public class RestAuthencationService extends RestServiceBase {
 
 	@POST
 	@Path("/login")

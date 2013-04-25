@@ -20,17 +20,15 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.apache.shiro.SecurityUtils;
 import org.elasticsearch.common.Base64;
 import org.joda.time.DateTime;
 
 import com.github.richardwilly98.api.Document;
 import com.github.richardwilly98.api.File;
+import com.github.richardwilly98.api.exception.ServiceException;
+import com.github.richardwilly98.api.services.DocumentService;
 import com.github.richardwilly98.inject.ProviderModule;
 import com.github.richardwilly98.services.DocumentProvider;
-import com.github.richardwilly98.api.services.DocumentService;
-import com.github.richardwilly98.api.exception.ServiceException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.sun.jersey.core.header.FormDataContentDisposition;
@@ -38,9 +36,7 @@ import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataParam;
 
 @Path("/documents")
-public class RestDocumentService {
-
-	private static Logger log = Logger.getLogger(RestDocumentService.class);
+public class RestDocumentService extends RestServiceBase {
 
 	private DocumentService provider;
 
@@ -52,12 +48,6 @@ public class RestDocumentService {
 		return provider;
 	}
 
-	private void isAuthenticated() {
-		log.debug("Principal: " + SecurityUtils.getSubject().getPrincipal());
-		if (SecurityUtils.getSubject().getPrincipal() == null)
-			throw new UnauthorizedException("Unauthorize request", "/documents");
-	}
-	
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("/{id}")
@@ -104,7 +94,7 @@ public class RestDocumentService {
 			log.trace(String.format("find - %s", name));
 		}
 		try {
-			List<Document> documents = getProvider().getDocuments(name);
+			List<Document> documents = getProvider().getList(name);
 			return Response.status(Status.OK).entity(documents).build();
 		} catch (ServiceException e) {
 			log.error("find failed", e);

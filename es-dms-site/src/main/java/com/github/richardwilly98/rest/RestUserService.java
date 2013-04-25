@@ -11,20 +11,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.log4j.Logger;
-
-import com.github.richardwilly98.inject.ProviderModule;
-
 import com.github.richardwilly98.api.User;
 import com.github.richardwilly98.api.exception.ServiceException;
+import com.github.richardwilly98.inject.ProviderModule;
 import com.github.richardwilly98.services.UserProvider;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 @Path("/users")
-public class RestUserService {
-
-	private static Logger log = Logger.getLogger(RestUserService.class);
+public class RestUserService extends RestServiceBase {
 
 	private UserProvider provider;
 
@@ -44,7 +39,7 @@ public class RestUserService {
 			log.trace(String.format("get - %s", id));
 		}
 		try {
-			return getProvider().getUser(id);
+			return getProvider().get(id);
 		} catch (ServiceException e) {
 			throw new RestServiceException(e.getLocalizedMessage());
 		}
@@ -58,7 +53,7 @@ public class RestUserService {
 			log.trace(String.format("find - %s", name));
 		}
 		try {
-			return getProvider().getUsers(name);
+			return getProvider().getList(name);
 		} catch (ServiceException e) {
 			throw new RestServiceException(e.getLocalizedMessage());
 		}
@@ -75,7 +70,7 @@ public class RestUserService {
 			log.trace(String.format("create - %s", user));
 		}
 		try {
-			String id = getProvider().createUser(user);
+			String id = getProvider().create(user);
 			user.setId(id);
 			return Response.status(201).entity(user).build();
 		} catch (ServiceException e) {
