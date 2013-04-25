@@ -7,11 +7,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
@@ -20,20 +17,19 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 
 import com.github.richardwilly98.api.Document;
-import com.github.richardwilly98.api.services.DocumentService;
 import com.github.richardwilly98.api.exception.ServiceException;
+import com.github.richardwilly98.api.services.DocumentService;
 import com.google.inject.Inject;
 
-public class DocumentProvider extends ProviderBase implements DocumentService {
+public class DocumentProvider extends ProviderBase<Document> implements DocumentService {
 
-	private static Logger log = Logger.getLogger(DocumentProvider.class);
 	private static final String DOCUMENT_MAPPING_JSON = "/com/github/richardwilly98/services/document-mapping.json";
 	private final static String index = "test-documents";
 	private final static String type = "document";
 
 	@Inject
 	DocumentProvider(Client client) {
-		super(client);
+		super(client, DocumentProvider.index, DocumentProvider.type);
 	}
 
 	/* (non-Javadoc)
@@ -56,32 +52,32 @@ public class DocumentProvider extends ProviderBase implements DocumentService {
 	/* (non-Javadoc)
 	 * @see com.github.richardwilly98.services.IDocumentService#getDocuments(java.lang.String)
 	 */
-	@Override
-	public List<Document> getDocuments(String name) throws ServiceException {
-		try {
-			List<Document> documents = new ArrayList<Document>();
-
-			SearchResponse searchResponse = client.prepareSearch(index)
-					.setTypes(type).setQuery(QueryBuilders.queryString(name))
-					.addHighlightedField("file").execute().actionGet();
-			log.debug("totalHits: " + searchResponse.getHits().totalHits());
-			for (SearchHit hit : searchResponse.getHits().hits()) {
-				log.debug(String.format("HighlightFields: %s", hit
-						.getHighlightFields().size()));
-				for (String key : hit.getHighlightFields().keySet()) {
-					log.debug(String.format("Highlight key: %s", key));
-				}
-				String json = hit.getSourceAsString();
-				Document document = mapper.readValue(json, Document.class);
-				documents.add(document);
-			}
-
-			return documents;
-		} catch (Throwable t) {
-			log.error("getDocuments failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
-	}
+//	@Override
+//	public List<Document> getDocuments(String name) throws ServiceException {
+//		try {
+//			List<Document> documents = new ArrayList<Document>();
+//
+//			SearchResponse searchResponse = client.prepareSearch(index)
+//					.setTypes(type).setQuery(QueryBuilders.queryString(name))
+//					.addHighlightedField("file").execute().actionGet();
+//			log.debug("totalHits: " + searchResponse.getHits().totalHits());
+//			for (SearchHit hit : searchResponse.getHits().hits()) {
+//				log.debug(String.format("HighlightFields: %s", hit
+//						.getHighlightFields().size()));
+//				for (String key : hit.getHighlightFields().keySet()) {
+//					log.debug(String.format("Highlight key: %s", key));
+//				}
+//				String json = hit.getSourceAsString();
+//				Document document = mapper.readValue(json, Document.class);
+//				documents.add(document);
+//			}
+//
+//			return documents;
+//		} catch (Throwable t) {
+//			log.error("getDocuments failed", t);
+//			throw new ServiceException(t.getLocalizedMessage());
+//		}
+//	}
 	
 	@Override
 	public List<Document> getList(String name) throws ServiceException {
@@ -105,7 +101,7 @@ public class DocumentProvider extends ProviderBase implements DocumentService {
 
 			return documents;
 		} catch (Throwable t) {
-			log.error("getDocuments failed", t);
+			log.error("getList failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}
@@ -148,40 +144,41 @@ public class DocumentProvider extends ProviderBase implements DocumentService {
 
 			return documents;
 		} catch (Throwable t) {
-			log.error("getDocuments failed", t);
+			log.error("search failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}
 
 
-	/* (non-Javadoc)
-	 * @see com.github.richardwilly98.services.IDocumentService#createDocument(com.github.richardwilly98.Document)
-	 */
+//	/* (non-Javadoc)
+//	 * @see com.github.richardwilly98.services.IDocumentService#createDocument(com.github.richardwilly98.Document)
+//	 */
+//	@Override
+//	public String create(Document document) throws ServiceException {
+//		try {
+//			if (document.getId() == null) {
+//				document.setId(generateUniqueId(document));
+//			}
+//			String json;
+//			json = mapper.writeValueAsString(document);
+////			log.trace(json);
+//			IndexResponse response = client.prepareIndex(index, type)
+//					.setId(document.getId()).setSource(json).execute()
+//					.actionGet();
+//			log.trace(String.format("Index: %s - Type: %s - Id: %s",
+//					response.getIndex(), response.getType(), response.getId()));
+//			client.admin().indices().refresh(new RefreshRequest(index))
+//					.actionGet();
+//			return response.getId();
+//		} catch (Throwable t) {
+//			log.error("createDocument failed", t);
+//			throw new ServiceException(t.getLocalizedMessage());
+//		}
+//	}
+
 	@Override
-	public String create(Document document) throws ServiceException {
-		try {
-			if (document.getId() == null) {
-				document.setId(generateUniqueId(document));
-			}
-			String json;
-			json = mapper.writeValueAsString(document);
-//			log.trace(json);
-			IndexResponse response = client.prepareIndex(index, type)
-					.setId(document.getId()).setSource(json).execute()
-					.actionGet();
-			log.trace(String.format("Index: %s - Type: %s - Id: %s",
-					response.getIndex(), response.getType(), response.getId()));
-			client.admin().indices().refresh(new RefreshRequest(index))
-					.actionGet();
-			return response.getId();
-		} catch (Throwable t) {
-			log.error("createDocument failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
-	}
-
-	private String generateUniqueId(Document document) {
-		return super.generateUniqueId();
+	protected String generateUniqueId(Document document) {
+		return super.generateUniqueId(document);
 	}
 
 //	private XContentBuilder getMapping() throws IOException {
@@ -226,24 +223,8 @@ public class DocumentProvider extends ProviderBase implements DocumentService {
 					.setType(type).setSource(getMapping()).execute()
 					.actionGet();
 			log.debug(String.format("Mapping response acknowledged: %s", mappingResponse.acknowledged()));
-			// Force index to be refreshed.
-			client.admin().indices().refresh(new RefreshRequest(index))
-					.actionGet();
 		}
 
-	}
-
-	@Override
-	public void delete(Document document) throws ServiceException {
-		try {
-		if (document == null) {
-			throw new IllegalArgumentException("document is null");
-		}
-			client.prepareDelete(index, type, document.getId());
-		} catch (Throwable t) {
-			log.error("getDocuments failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
 	}
 
 	@Override

@@ -55,7 +55,7 @@ public class DocumentProviderTest {
 		byte[] content = copyToBytesFromClasspath(path);
 		String encodedContent = Base64.encodeBytes(content);
 		int startCount = 0;
-		List<Document> documents = provider.getDocuments(contentSearch);
+		List<Document> documents = provider.getList(contentSearch);
 		startCount = documents.size();
 		log.info(String.format("startCount: %s", startCount));
 		Document document = new Document();
@@ -66,11 +66,6 @@ public class DocumentProviderTest {
 		log.info(String.format("New document created #%s", newId));
 		document = provider.get(newId);
 		Assert.assertNotNull(document);
-		// TODO: How to load mapper-attachments plugin for unit test?
-//		documents = provider.getDocuments(contentSearch);
-//		documents = provider.contentSearch(contentSearch);
-//		log.info(String.format("Documents count: %s", documents.size()));
-//		Assert.assertEquals(documents.size() - startCount, 1);
 	}
 
 	@Test

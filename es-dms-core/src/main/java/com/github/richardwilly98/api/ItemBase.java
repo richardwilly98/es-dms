@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 
 @JsonInclude(Include.NON_NULL)
-abstract class ItemBase {
+public abstract class ItemBase {
 
 	String id;
 	String name;
