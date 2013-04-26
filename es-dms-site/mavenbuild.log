@@ -1,0 +1,25 @@
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building es-dms-site 1.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ es-dms-site ---
+[INFO] Deleting C:\Users\admin\Documents\GitHub\es-dms\es-dms-site\target
+[INFO] 
+[INFO] >>> tomcat7-maven-plugin:2.0:run (default-cli) @ es-dms-site >>>
+[INFO] 
+[INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ es-dms-site ---
+[debug] execute contextualize
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 2 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ es-dms-site ---
+[INFO] Compiling 13 source files to C:\Users\admin\Documents\GitHub\es-dms\es-dms-site\target\classes
+[INFO] 
+[INFO] <<< tomcat7-maven-plugin:2.0:run (default-cli) @ es-dms-site <<<
+[INFO] 
+[INFO] --- tomcat7-maven-plugin:2.0:run (default-cli) @ es-dms-site ---
+[INFO] Running war on http://localhost:8080/es-dms-site
+[INFO] Creating Tomcat server configuration at C:\Users\admin\Documents\GitHub\es-dms\es-dms-site\target\tomcat
+[INFO] create webapp with contextPath: /es-dms-site
