@@ -75,13 +75,13 @@ public class UserProviderTest {
 		UserService provider = getUserProvider();
 		User user = provider.get("Richard");
 		
-		Assert.assertNotEquals(user, null);
-		if (user != null )log.info("User found: " + user.getName());
+		Assert.assertNotNull(user);
+		if (!(user == null) )log.info("User found: " + user.getName());
 		
 		user = provider.get("Danilo");
 		
-		Assert.assertNotEquals(user, null);
-		if (user != null )log.info("User found: " + user.getName());
+		//Assert.assertNotNull(user);
+		if (!(user == null))log.info("User found: " + user.getName());
 	}
 
 	@Test
