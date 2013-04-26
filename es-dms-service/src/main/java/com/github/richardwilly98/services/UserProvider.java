@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -18,7 +17,7 @@ import com.google.inject.Inject;
 
 public class UserProvider extends ProviderBase<User> implements UserService {
 
-	private final static String index = "test-users";
+	private final static String index = "users";
 	private final static String type = "user";
 
 	@Inject

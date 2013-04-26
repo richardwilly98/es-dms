@@ -59,6 +59,14 @@ simpleApp.config(function ($routeProvider) {
 		    controller: 'documentController',
 		    templateUrl: 'views/edit-view.html'
 		})
+		.when('/admin/users', {
+		    controller: 'adminController',
+		    templateUrl: 'views/user-list.html'
+		})
+		.when('/admin/roles', {
+		    controller: 'adminController',
+		    templateUrl: 'views/role-list.html'
+		})
 		.otherwise({ redirectTo: '/view1' })
 });
 
@@ -79,8 +87,44 @@ simpleApp.factory('sharedService', function($rootScope) {
     return sharedService;
 });
 
-simpleApp.factory('userService', function ($resource) {
-    return $resource('api/users/:verb/:name', {}, {});
+simpleApp.factory('userService', function ($rootScope, $resource) {
+	var resource = $resource('api/users/:verb/:name', {}, {});
+	var users = [];
+	var editedUser = null;
+	
+	return {
+		find: function(criteria) {
+			users = resource.query({ verb: 'find', name: criteria });
+			return users;
+		},
+		edit: function(id) {
+			console.log('edit user: ' + id);
+			if (id == 'new') {
+				editedUser = null;
+			} else {
+				editedUser = id;
+			}
+			$rootScope.$broadcast('user:edit');
+		},
+		currentUser: function() {
+			if (editedUser) {
+				for (i in users) {
+					if (users[i].id == editedUser) {
+						return users[i];
+					}
+				}
+			} else {
+				return {};
+			}
+		},
+		save: function(user) {
+			console.log('save user: ' + user);
+			resource.save(user);
+			if (!editedUser) {
+				users.push(user);
+			}
+		}
+	};
 });
 
 simpleApp.factory('documentService', function ($resource) {
@@ -98,19 +142,4 @@ simpleApp.factory('authenticationService', function ($http) {
 		}
 	};
 });
-
-function NavBarCtrl($scope, sharedService) {
-	$scope.showLogout = false;
-	$scope.$on('handleBroadcast', function() {
-        $scope.showLogout = sharedService.message.logout;
-    }); 
-	
-	$scope.tabs = [
-        { "view": "/view1", title: "View #1" },
-        { "view": "/view2", title: "View #2" },
-        { "view": "/search-view", title: "Search" },
-        { "view": "/edit-view", title: "Edit" },
-        { "view": "/view3", title: "Test View" }
-    ];
-}
 

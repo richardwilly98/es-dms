@@ -1,0 +1,21 @@
+<div class="container" data-ng-controller="roleController">
+    <h2>Roles</h2>
+	<form class="form-search">
+		<input type="text" data-ng-model="criteria" />
+		<button type="button" class="btn btn-primary" data-ng-click="search()">Search</button>
+	</form>
+
+    <ul>
+        <li data-ng-repeat="user in users | filter: filter.name | orderBy: 'name'">{{
+            user.name }} - {{ user.city }}</li>
+    </ul>
+    <br />
+    Customer Name:<br />
+    <input type="text" data-ng-model="newCustomer.name" />
+    <br />
+    Customer City:<br />
+    <input type="text" data-ng-model="newCustomer.city" />
+    <br />
+    <button data-ng-click="addCustomer()">
+        Add Customer</button>
+</div>

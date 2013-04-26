@@ -1,0 +1,40 @@
+<div class="container" data-ng-controller="userController">
+    <h2>Users</h2>
+	<form class="form-search">
+		<input type="text" data-ng-model="criteria" />
+		<button type="button" class="btn btn-primary" data-ng-click="find()">Search</button>
+	</form>
+
+    <table class="table table-condensed">
+    	<thead>
+    		<tr>
+    			<th>Name</th>
+    			<th>Email</th>
+    			<th>City</th>
+    			<th style="width: 10%">Disabled</th>
+    			<th>Actions</th>
+    		</tr>
+    	</thead>
+    	<tbody>
+    		<tr data-ng-repeat="user in users | filter: filter.name | orderBy: 'name'">
+    			<td>{{ user.name }}</td>
+    			<td>{{ user.email }}</td>
+    			<td>{{ user.city }}</td>
+    			<td>{{ user.disabled }}</td>
+    			<td>
+    				<button class="btn btn-primary" data-ng-click="edit(user.id)" data-toggle="modal" href="#editModal">
+    					<i class="icon-pencil icon-white"></i> Edit
+    				</button>
+    			</td>
+    		</tr>
+    	</tbody>
+    </table>
+    <br />
+
+	<button class="btn btn-success" ng-click="edit('new')" data-toggle="modal" href="#editModal">
+        <i class="icon-user icon-white"></i>&nbsp;Create New User
+	</button>
+	
+	<div class="modal hide fade" ng-include="'views/edit-user.html'" id="editModal"></div>
+	
+</div>
