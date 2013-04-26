@@ -18,7 +18,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 
 	Logger log = Logger.getLogger(this.getClass());
 
-	static ObjectMapper mapper = new ObjectMapper();
+	final static ObjectMapper mapper = new ObjectMapper();
 	final Client client;
 
 	final String index;

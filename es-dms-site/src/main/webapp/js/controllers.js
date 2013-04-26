@@ -2,13 +2,111 @@
     $scope.$location = $location;
 });
 
+simpleApp.controller('adminController', function ($scope) {
+});
+
+simpleApp.controller('userController', function ($scope, userService) {
+    $scope.users = [];
+    var currentUser = null;
+    
+    init();
+
+    function init() {
+    }
+
+    $scope.find = function() {
+    	$scope.users = userService.find($scope.criteria);
+    };
+    
+    $scope.edit = function(id) {
+    	userService.edit(id);
+    };
+    
+    $scope.add = function () {
+//        var user = new userService();
+//        user.name = $scope.name;
+//        user.city = $scope.city;
+//        user.email = $scope.email
+//        user.$save(); 
+//        $scope.user.push(user);
+    };
+});
+
+simpleApp.controller('userEditController', function ($scope, $rootScope, $http, userService) {
+	$scope.user = null;
+	$scope.newUser = false;
+	$scope.uid = '';
+	$scope.user = {};
+	$scope.pw1 = '';
+	$scope.pw2 = '';
+	$scope.pwError = false;
+	$scope.incomplete = false;
+	  
+	$rootScope.$on('user:edit', function() {
+		var editUser = userService.currentUser();
+	    if (editUser.id) {
+	    	$scope.user = editUser;
+	    	$scope.newUser = false;
+	    	//$scope.uid = editUser.id;
+	    } else {
+	    	$scope.newUser = true;
+	    	$scope.incomplete = true;
+	    	$scope.user = {};
+	    }
+	});
+	
+	$scope.save = function() {
+		$scope.user.password = $scope.pw1;
+		console.log('save user: ' + JSON.stringify($scope.user));
+		userService.save($scope.user);
+	};
+	
+	$scope.$watch('pw1', function() {
+		if ($scope.pw1 !== $scope.pw2) {
+			$scope.pwError = true;
+		} else {
+			$scope.pwError = false;
+	    }
+	    $scope.incompleteTest();
+	});
+	
+	$scope.$watch('pw2', function() {
+		if ($scope.pw1 !== $scope.pw2) {
+			$scope.pwError = true;
+		} else {
+			$scope.pwError = false;
+		}
+	    $scope.incompleteTest();
+	});
+
+	$scope.$watch('username', function() {
+		$scope.incompleteTest();
+	});
+	  
+	$scope.incompleteTest = function() {
+		if ($scope.newUser) {
+			if (!$scope.username.length || !$scope.pw1.length || !$scope.pw2.length) {
+				$scope.incomplete = true;
+			} else {
+				$scope.incomplete = false;
+			}
+		} else {
+			$scope.incomplete = false;
+	    }
+	};
+});
+
+simpleApp.controller('roleController', function ($scope) {
+});
+
 simpleApp.controller('simpleController', function ($scope, userService) {
     $scope.customers = [];
 
     init();
 
     function init() {
-        $scope.customers = userService.query({ verb: 'find', name: '*' });
+        //$scope.customers = userService.query({ verb: 'find', name: '*' });
+    	$scope.customers = userService.find('*');
     }
     $scope.addCustomer = function () {
         var user = new userService();
@@ -116,3 +214,24 @@ simpleApp.controller('modalCtrl', function ($scope) {
 	};
 	
 });
+
+simpleApp.controller('navbarController', function ($scope, sharedService) {
+	$scope.showLogout = false;
+	$scope.$on('handleBroadcast', function() {
+        $scope.showLogout = sharedService.message.logout;
+    }); 
+	
+	$scope.tabs = [
+        { "view": "/view1", title: "View #1" },
+        { "view": "/view2", title: "View #2" },
+        { "view": "/search-view", title: "Search" },
+        { "view": "/edit-view", title: "Edit" },
+        { "view": "/view3", title: "Test View" }
+    ];
+	
+	$scope.adminTabs = [
+		 { "view": "/admin/users", title: "Users" },
+		 { "view": "/admin/roles", title: "Roles" }
+	];
+});
+

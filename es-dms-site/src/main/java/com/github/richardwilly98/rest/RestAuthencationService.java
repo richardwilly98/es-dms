@@ -10,6 +10,10 @@ import javax.ws.rs.core.Response;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.realm.Realm;
+
+import com.github.richardwilly98.rest.exception.RestServiceException;
 
 @Path("/auth")
 public class RestAuthencationService extends RestServiceBase {
@@ -25,9 +29,13 @@ public class RestAuthencationService extends RestServiceBase {
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("login - %s", credential.getUsername()));
 			}
+			for (Realm realm : ((RealmSecurityManager) SecurityUtils.getSecurityManager()).getRealms())
+				log.trace("Realm: " + realm.getName());
+			
 			UsernamePasswordToken token = new UsernamePasswordToken(
 					credential.getUsername(), credential.getPassword());
 			SecurityUtils.getSubject().login(token);
+			token.clear();
 			return Response.ok().entity("AUTHENTICATED")
 					.cookie(new NewCookie("ES_DMS_TICKET", "XXXX")).build();
 		} catch (Throwable t) {

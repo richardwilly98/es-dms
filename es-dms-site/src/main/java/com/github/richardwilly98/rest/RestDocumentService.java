@@ -28,6 +28,7 @@ import com.github.richardwilly98.api.File;
 import com.github.richardwilly98.api.exception.ServiceException;
 import com.github.richardwilly98.api.services.DocumentService;
 import com.github.richardwilly98.inject.ProviderModule;
+import com.github.richardwilly98.rest.exception.RestServiceException;
 import com.github.richardwilly98.services.DocumentProvider;
 import com.google.inject.Guice;
 import com.google.inject.Injector;

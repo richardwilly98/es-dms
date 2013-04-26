@@ -1,4 +1,4 @@
-package com.github.richardwilly98.rest;
+package com.github.richardwilly98.rest.exception;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
