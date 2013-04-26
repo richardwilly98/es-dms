@@ -47,4 +47,8 @@ public class Document extends SecuredItem {
 		return attributes;
 	}
 	
+	public void setAttribute(String name, Object attribute){
+		if (this.attributes == null) this.attributes = new HashMap<String, Object>();
+		this.attributes.put(name, attribute);
+	}
 }
