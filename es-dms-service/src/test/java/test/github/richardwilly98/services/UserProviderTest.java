@@ -67,6 +67,22 @@ public class UserProviderTest {
 				"richard@pippo.pippo", null);
 		testCreateUser("Danilo", "Mezza calzetta", true, "danilo@pippo.pippo", null);
 	}
+	
+	@Test
+	public void testFindUser() throws Throwable {
+		log.info("Start testFindUser");
+		
+		UserService provider = getUserProvider();
+		User user = provider.get("Richard");
+		
+		Assert.assertNotEquals(user, null);
+		if (user != null )log.info("User found: " + user.getName());
+		
+		user = provider.get("Danilo");
+		
+		Assert.assertNotEquals(user, null);
+		if (user != null )log.info("User found: " + user.getName());
+	}
 
 	@Test
 	public void testDeleteUser() throws Throwable {
