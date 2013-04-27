@@ -1,4 +1,5 @@
 <div class="container" data-ng-controller="modalCtrl">
     <br />
-    <button type="button" class="btn btn-primary" bs-modal="'views/new-document.html'">New Document</button>
+    <a href="#newDocument" role="button" class="btn btn-primary" data-toggle="modal">New Document</a>
+    <div id="newDocument" class="modal hide fade" data-ng-include src="'views/new-document.html'">
 </div>
