@@ -142,5 +142,3 @@ simpleApp.factory('authenticationService', function ($http) {
 		}
 	};
 });
-
-$(":file").filestyle();
