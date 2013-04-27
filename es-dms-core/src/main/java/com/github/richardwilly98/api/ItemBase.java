@@ -15,20 +15,22 @@ public abstract class ItemBase {
 	Boolean disabled;
 	String description;
 	
-	Map<String, Object> properties = new HashMap<String, Object>();
+	final Map<String, Object> properties;
 
 	protected ItemBase() {
-		disabled = false;
+		this(null);
 	}
 	
 	public ItemBase(String id) {
-		disabled = false;
-		this.id = id;
+		this(id, new HashMap<String, Object>());
 	}
 	
 	public ItemBase(String id, Map<String, Object> properties) {
-		disabled = false;
+		this.disabled = false;
 		this.id = id;
+		if (properties == null) {
+			properties = new HashMap<String, Object>();
+		}
 		this.properties = properties;
 	}
 	
@@ -66,7 +68,7 @@ public abstract class ItemBase {
 	}
 	
 	public void setProperties(String name, Object property){
-		if (this.properties == null) this.properties = new HashMap<String, Object>();
+//		if (this.properties == null) this.properties = new HashMap<String, Object>();
 		this.properties.put(name, property);
 	}
 }
