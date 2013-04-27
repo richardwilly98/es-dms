@@ -52,12 +52,15 @@ simpleApp.controller('userEditController', function ($scope, $rootScope, $http, 
 	    	$scope.newUser = true;
 	    	$scope.incomplete = true;
 	    	$scope.user = {};
+	    	$scope.pw1 = '';
+	    	$scope.pw2 = '';
 	    }
 	});
 	
 	$scope.save = function() {
-		$scope.user.password = $scope.pw1;
-		console.log('save user: ' + JSON.stringify($scope.user));
+		if ($scope.newUser) {
+			$scope.user.password = $scope.pw1;
+		}
 		userService.save($scope.user);
 	};
 	
@@ -151,7 +154,7 @@ simpleApp.controller('documentController', function ($scope, documentService) {
     init();
 
     function init() {
-        $scope.documents = documentService.query({ verb: 'find', name: '*' });
+        //$scope.documents = documentService.query({ verb: 'find', name: '*' });
     }
     
     $scope.search = function() {
@@ -175,7 +178,8 @@ simpleApp.controller('AlertDemoCtrl', function ($scope) {
 
 });
 
-simpleApp.controller('newDocumentCtrl', function ($scope) {
+simpleApp.controller('newDocumentController', function ($scope) {
+	$scope.showAlert = false;
 	$scope.alert = {};
 	$scope.newDocument = {};
     $scope.uploadComplete = function (content, completed) {
@@ -190,8 +194,13 @@ simpleApp.controller('newDocumentCtrl', function ($scope) {
             $scope.newDocument.date = '';
             // $scope.newDocument.id = response.id;
             $scope.alert = { type: 'success', msg: 'New document created #' + response.id};
+            $scope.showAlert = true;
             // Look for way to clear the input[type=file] element
         }
+    };
+    $scope.closeAlert = function() {
+    	$scope.showAlert = false;
+    	$scope.alert = {};
     };
 });
 
