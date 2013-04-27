@@ -1,18 +1,24 @@
-package com.github.richardwilly98.rest;
+package com.github.richardwilly98.service;
 
+import org.apache.log4j.Logger;
 import org.apache.shiro.crypto.hash.DefaultHashService;
 import org.apache.shiro.crypto.hash.Hash;
 import org.apache.shiro.crypto.hash.HashRequest;
 import org.apache.shiro.crypto.hash.SimpleHashRequest;
 import org.apache.shiro.util.ByteSource;
 
-public class Md5HashService implements HashService {
+public class SHA512HashService implements HashService {
 
+	private static Logger log = Logger.getLogger(SHA512HashService.class);
+	
 	private final DefaultHashService service;
 
-	public Md5HashService() {
+	public SHA512HashService() {
 		super();
 		service = new DefaultHashService();
+		if (log.isTraceEnabled()) {
+			log.trace("AlgorithmName: " + service.getHashAlgorithmName());
+		}
 	}
 
 	@Override
@@ -31,7 +37,7 @@ public class Md5HashService implements HashService {
 			Hash hash = service.computeHash(request);
 			return hash;
 		} catch (Throwable t) {
-			t.printStackTrace();
+			log.error("compute failed", t);
 			throw new NullPointerException("hash");
 		}
 	}

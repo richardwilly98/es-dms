@@ -10,6 +10,8 @@ import org.apache.shiro.guice.web.GuiceShiroFilter;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 
 import com.github.richardwilly98.inject.ProviderModule;
+import com.github.richardwilly98.service.HashService;
+import com.github.richardwilly98.service.SHA512HashService;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
@@ -61,7 +63,7 @@ public class EsJerseyServletModule extends JerseyServletModule {
 		bind(MessageBodyWriter.class).to(JacksonJsonProvider.class);
 
 		/* bind services */
-		bind(HashService.class).to(Md5HashService.class);
+		bind(HashService.class).to(SHA512HashService.class);
 
 		// Route all requests through GuiceContainer
 		serve(this.securityFilterPath).with(GuiceContainer.class, params);
