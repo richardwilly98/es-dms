@@ -17,6 +17,7 @@ import com.github.richardwilly98.api.User;
 import com.github.richardwilly98.api.exception.ServiceException;
 import com.github.richardwilly98.inject.ProviderModule;
 import com.github.richardwilly98.rest.exception.RestServiceException;
+import com.github.richardwilly98.service.HashService;
 import com.github.richardwilly98.services.UserProvider;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
