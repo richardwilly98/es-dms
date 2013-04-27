@@ -7,16 +7,15 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.api.Role;
 import com.github.richardwilly98.api.User;
 import com.github.richardwilly98.api.services.UserService;
-import com.github.richardwilly98.services.UserProvider;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.inject.Inject;
 
-@Test
+@Guice( modules = ProviderModule.class)
 public class UserProviderTest {
 
 	private static Logger log = Logger.getLogger(UserProviderTest.class);
@@ -33,14 +32,17 @@ public class UserProviderTest {
 	public void closeServer() {
 	}
 
-	protected UserService getUserProvider() {
-		Injector injector = Guice.createInjector(new ProviderModule());
-		return injector.getInstance(UserProvider.class);
-	}
+	@Inject
+	UserService service;
+	
+//	protected UserService getUserProvider() {
+//		Injector injector = Guice.createInjector(new ProviderModule());
+//		return injector.getInstance(UserProvider.class);
+//	}
 
 	private String testCreateUser(String name, String description,
 			boolean disabled, String email, List<Role> roles) throws Throwable {
-		UserService provider = getUserProvider();
+//		UserService provider = getUserProvider();
 		User user = new User();
 		String id = String.valueOf(System.currentTimeMillis());
 		user.setId(id);
@@ -48,9 +50,9 @@ public class UserProviderTest {
 		user.setDescription(description);
 		user.setDisabled(disabled);
 		user.setEmail(email);
-		String newId = provider.create(user);
+		String newId = service.create(user);
 		Assert.assertEquals(id, newId);
-		User newUser = provider.get(newId);
+		User newUser = service.get(newId);
 		Assert.assertNotNull(newUser);
 		Assert.assertEquals(user.getName(), newUser.getName());
 		Assert.assertEquals(user.getDescription(), newUser.getDescription());
@@ -71,17 +73,21 @@ public class UserProviderTest {
 	@Test
 	public void testFindUser() throws Throwable {
 		log.info("Start testFindUser");
+
+		String username = "richard" + System.currentTimeMillis();
+		String id = testCreateUser(username, "", false, "", null);
+		Assert.assertNotNull(id);
+		List<User> users = service.getList(username);
+		// List should not be null
+		Assert.assertNotNull(users);
+		// List should have one item
+		Assert.assertEquals(users.size(), 1);
+		log.info("User found: " + users.get(0).getName());
 		
-		UserService provider = getUserProvider();
-		User user = provider.get("Richard");
-		
-		Assert.assertNotNull(user);
-		if (!(user == null) )log.info("User found: " + user.getName());
-		
-		user = provider.get("Danilo");
-		
-		//Assert.assertNotNull(user);
-		if (!(user == null))log.info("User found: " + user.getName());
+//		user = service.get("Danilo");
+//		
+//		//Assert.assertNotNull(user);
+//		if (!(user == null))log.info("User found: " + user.getName());
 	}
 
 	@Test
@@ -89,10 +95,10 @@ public class UserProviderTest {
 		log.info("Start testDeleteUser");
 		String id = testCreateUser("Richard", "Lead developer", false,
 				"richard@pippo.pippo", null);
-		UserService provider = getUserProvider();
-		User user = provider.get(id);
-		provider.delete(user);
-		user = provider.get(id);
+//		UserService provider = getUserProvider();
+		User user = service.get(id);
+		service.delete(user);
+		user = service.get(id);
 		Assert.assertNull(user);
 	}
 	
