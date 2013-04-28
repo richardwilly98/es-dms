@@ -75,9 +75,13 @@ public class EsRealm extends AuthorizingRealm {
 		}
 		
 		Set<String> roles = new HashSet<String>();
+		Set<String> permissions = new HashSet<String>();
 		roles.add("reader");
+		permissions.add("document:create");
+		permissions.add("document:delete");
 		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 		info.setRoles(roles);
+		info.setStringPermissions(permissions);
 		return info;
 //        //get the principal this realm cares about:
 //        String username = (String) getAvailablePrincipal(principals);

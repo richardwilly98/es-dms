@@ -1,24 +1,25 @@
 package com.github.richardwilly98.api;
 
-import java.util.List;
+import java.security.Principal;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class User extends Person {
+public class User extends Person implements Principal {
 	
-	List<Role> roles;
+	Set<Role> roles;
 	String hash;
 	
 	@JsonIgnore
 	String password;
 
-	public List<Role> getRoles() {
+	public Set<Role> getRoles() {
 		return roles;
 	}
-	public void setRoles(List<Role> roles) {
+	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
 	public String getHash() {
