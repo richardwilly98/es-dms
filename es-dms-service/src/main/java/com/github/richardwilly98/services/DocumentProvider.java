@@ -5,7 +5,9 @@ import static org.elasticsearch.index.query.QueryBuilders.fieldQuery;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.get.GetResponse;
@@ -81,8 +83,13 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 	
 	@Override
 	public List<Document> getList(String name) throws ServiceException {
+		return new ArrayList<Document>(getItems(name));
+	}
+	
+	@Override
+	public Set<Document> getItems(String name) throws ServiceException {
 		try {
-			List<Document> documents = new ArrayList<Document>();
+			Set<Document> documents = new HashSet<Document>();
 
 			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type).setQuery(QueryBuilders.queryString(name))

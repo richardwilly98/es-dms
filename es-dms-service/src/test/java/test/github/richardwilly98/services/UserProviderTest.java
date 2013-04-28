@@ -1,6 +1,7 @@
 package test.github.richardwilly98.services;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.testng.Assert;
@@ -41,8 +42,7 @@ public class UserProviderTest {
 //	}
 
 	private String testCreateUser(String name, String description,
-			boolean disabled, String email, List<Role> roles) throws Throwable {
-//		UserService provider = getUserProvider();
+			boolean disabled, String email, Set<Role> roles) throws Throwable {
 		User user = new User();
 		String id = String.valueOf(System.currentTimeMillis());
 		user.setId(id);

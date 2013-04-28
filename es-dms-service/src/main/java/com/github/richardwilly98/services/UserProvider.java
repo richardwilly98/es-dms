@@ -1,7 +1,9 @@
 package com.github.richardwilly98.services;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.get.GetResponse;
@@ -120,11 +122,16 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 
 	@Override
 	public List<User> getList(String name) throws ServiceException {
+		return new ArrayList<User>(getItems(name));
+	}
+	
+	@Override
+	public Set<User> getItems(String name) throws ServiceException {
 		try {
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("getList - %s", name));
 			}
-			List<User> users = new ArrayList<User>();
+			Set<User> users = new HashSet<User>();
 			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type).setQuery(QueryBuilders.queryString(name))
 					.execute().actionGet();

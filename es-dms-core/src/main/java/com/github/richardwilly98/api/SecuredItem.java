@@ -5,23 +5,23 @@ import java.util.Map;
 
 public class SecuredItem extends ItemBase {
 	
-	Map<String, Permission> permissions;
+	Map<String, Role> roles;
 	
 	Map<String, SecuredItem> attachments;
 	Map<String, Annotation> annotations;
 	Map<String, Comment> comments;
 	
-	public Map<String, Permission> getPermissions() {
-		return permissions;
+	public Map<String, Role> getRoles() {
+		return roles;
 	}
 	
-	public void setPermissions(Map<String, Permission> permissions) {
-		this.permissions = permissions;
+	public void setPermissions(Map<String, Role> roles) {
+		this.roles = roles;
 	}
 	
-	public void setPermission(String name, Permission permission){
-		if (permissions == null) permissions = new HashMap <String, Permission>();
-		this.permissions.put(name, permission);
+	public void setRole(String name, Role role){
+		if (roles == null) roles = new HashMap <String, Role>();
+		this.roles.put(name, role);
 	}
 	
 	public Map<String, SecuredItem> getAttachments() {
