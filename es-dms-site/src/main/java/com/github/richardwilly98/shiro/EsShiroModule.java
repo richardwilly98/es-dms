@@ -16,12 +16,14 @@ public class EsShiroModule extends ShiroWebModule {
 		this.securityFilterPath = securityFilterPath;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void configureShiroWeb() {
-
 		bindConstant().annotatedWith(Names.named("shiro.globalSessionTimeout")).to(30000L);
 		
 		bindRealm().to(EsRealm.class).asEagerSingleton();
+		
+		addFilterChain("/api/auth/*", config(SSL, "8443"));
 		addFilterChain(this.securityFilterPath, AUTHC);
 	}
 }

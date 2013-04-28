@@ -109,6 +109,12 @@
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
 				<version>2.0</version>
+				<configuration>
+                	<path>/${project.build.finalName}</path>
+                	<httpsPort>8443</httpsPort>
+                	<keystoreFile>${basedir}/.keystore</keystoreFile>
+                	<keystorePass>secret</keystorePass>
+            	</configuration>
 			</plugin>
 		</plugins>
 	</build>

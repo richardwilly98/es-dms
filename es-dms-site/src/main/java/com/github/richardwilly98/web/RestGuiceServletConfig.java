@@ -4,7 +4,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
 import com.github.richardwilly98.rest.EsJerseyServletModule;
-import com.github.richardwilly98.shiro.EsShiroModule;
+import com.github.richardwilly98.shiro.EsConfigModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
@@ -18,8 +18,8 @@ public class RestGuiceServletConfig extends GuiceServletContextListener {
 
 		String securityFilterPath = "/api/*";
 		return Guice.createInjector(new EsJerseyServletModule(
-				securityFilterPath), new EsShiroModule(servletContext,
-				securityFilterPath));
+				securityFilterPath), new EsConfigModule(servletContext,
+						securityFilterPath));
 
 	}
 

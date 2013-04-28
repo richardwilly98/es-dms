@@ -42,7 +42,7 @@ public class EsJerseyServletModule extends JerseyServletModule {
 	}
 
 	private void filters() {
-		 filter(this.securityFilterPath).through(GuiceShiroFilter.class);
+		 filter("/*").through(GuiceShiroFilter.class);
 //		 filter("/api/*").through(GuiceContainer.class);
 	}
 
