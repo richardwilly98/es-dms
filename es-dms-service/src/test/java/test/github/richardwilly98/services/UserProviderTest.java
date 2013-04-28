@@ -3,7 +3,6 @@ package test.github.richardwilly98.services;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -13,13 +12,9 @@ import org.testng.annotations.Test;
 
 import com.github.richardwilly98.api.Role;
 import com.github.richardwilly98.api.User;
-import com.github.richardwilly98.api.services.UserService;
-import com.google.inject.Inject;
 
 @Guice( modules = ProviderModule.class)
-public class UserProviderTest {
-
-	private static Logger log = Logger.getLogger(UserProviderTest.class);
+public class UserProviderTest extends ProviderTestBase {
 
 	@BeforeSuite
 	public void beforeSuite() throws Exception {
@@ -33,33 +28,16 @@ public class UserProviderTest {
 	public void closeServer() {
 	}
 
-	@Inject
-	UserService service;
-	
-//	protected UserService getUserProvider() {
-//		Injector injector = Guice.createInjector(new ProviderModule());
-//		return injector.getInstance(UserProvider.class);
-//	}
-
 	private String testCreateUser(String name, String description,
 			boolean disabled, String email, Set<Role> roles) throws Throwable {
-		User user = new User();
-		String id = String.valueOf(System.currentTimeMillis());
-		user.setId(id);
-		user.setName(name);
-		user.setDescription(description);
-		user.setDisabled(disabled);
-		user.setEmail(email);
-		String newId = service.create(user);
-		Assert.assertEquals(id, newId);
-		User newUser = service.get(newId);
-		Assert.assertNotNull(newUser);
-		Assert.assertEquals(user.getName(), newUser.getName());
-		Assert.assertEquals(user.getDescription(), newUser.getDescription());
-		Assert.assertEquals(user.isDisabled(), newUser.isDisabled());
-		Assert.assertEquals(user.getEmail(), newUser.getEmail());
-		Assert.assertEquals(user.getRoles(), newUser.getRoles());
-		return newId;
+		User user = createUser(name, description, disabled, email, roles);
+		Assert.assertNotNull(user);
+		Assert.assertEquals(name, user.getName());
+		Assert.assertEquals(description, user.getDescription());
+		Assert.assertEquals(disabled, user.isDisabled());
+		Assert.assertEquals(email, user.getEmail());
+		Assert.assertEquals(roles, user.getRoles());
+		return user.getId();
 	}
 
 	@Test
@@ -77,7 +55,7 @@ public class UserProviderTest {
 		String username = "richard" + System.currentTimeMillis();
 		String id = testCreateUser(username, "", false, "", null);
 		Assert.assertNotNull(id);
-		List<User> users = service.getList(username);
+		List<User> users = userService.getList(username);
 		// List should not be null
 		Assert.assertNotNull(users);
 		// List should have one item
@@ -96,9 +74,9 @@ public class UserProviderTest {
 		String id = testCreateUser("Richard", "Lead developer", false,
 				"richard@pippo.pippo", null);
 //		UserService provider = getUserProvider();
-		User user = service.get(id);
-		service.delete(user);
-		user = service.get(id);
+		User user = userService.get(id);
+		userService.delete(user);
+		user = userService.get(id);
 		Assert.assertNull(user);
 	}
 	

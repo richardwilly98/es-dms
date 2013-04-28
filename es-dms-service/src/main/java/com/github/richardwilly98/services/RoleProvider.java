@@ -5,9 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -37,9 +35,6 @@ public class RoleProvider extends ProviderBase<Role> implements RoleService {
 		if (!client.admin().indices().prepareExists(index).execute()
 				.actionGet().exists()) {
 			client.admin().indices().prepareCreate(index).execute()
-					.actionGet();
-			// Force index to be refreshed.
-			client.admin().indices().refresh(new RefreshRequest(index))
 					.actionGet();
 		}
 

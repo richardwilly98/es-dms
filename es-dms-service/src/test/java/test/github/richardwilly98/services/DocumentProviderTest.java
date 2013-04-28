@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.elasticsearch.common.Base64;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -19,18 +18,11 @@ import org.testng.annotations.Test;
 
 import com.github.richardwilly98.api.Document;
 import com.github.richardwilly98.api.File;
-import com.github.richardwilly98.services.DocumentProvider;
-import com.github.richardwilly98.api.services.DocumentService;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 
 /*
  * https://github.com/shairontoledo/elasticsearch-attachment-tests/blob/master/src/test/java/net/hashcode/esattach/AttachmentTest.java
  */
-@Test
-public class DocumentProviderTest {
-
-	private static Logger log = Logger.getLogger(DocumentProviderTest.class);
+public class DocumentProviderTest extends ProviderTestBase {
 
 	@BeforeSuite
 	public void beforeSuite() throws Exception {
@@ -44,27 +36,21 @@ public class DocumentProviderTest {
 	public void closeServer() {
 	}
 
-	protected DocumentService getDocumentProvider() {
-		Injector injector = Guice.createInjector(new ProviderModule());
-		return injector.getInstance(DocumentProvider.class);
-	}
-	
 	private void testCreateDocument(String name, String contentType, String path, String contentSearch) throws Throwable {
-		DocumentService provider = getDocumentProvider();
 		String id = String.valueOf(System.currentTimeMillis());
 		byte[] content = copyToBytesFromClasspath(path);
 		String encodedContent = Base64.encodeBytes(content);
 		int startCount = 0;
-		List<Document> documents = provider.getList(contentSearch);
+		List<Document> documents = documentService.getList(contentSearch);
 		startCount = documents.size();
 		log.info(String.format("startCount: %s", startCount));
 		Document document = new Document();
 		File file = new File(encodedContent, name, contentType);
 		document.setFile(file);
 		document.setId(id);
-		String newId = provider.create(document);
+		String newId = documentService.create(document);
 		log.info(String.format("New document created #%s", newId));
-		document = provider.get(newId);
+		document = documentService.get(newId);
 		Assert.assertNotNull(document);
 	}
 
@@ -99,15 +85,14 @@ public class DocumentProviderTest {
 	
 	@Test
 	public void testCreateDocumentWithAuthor() throws Throwable {
-		DocumentService provider = getDocumentProvider();
 		String id = String.valueOf(System.currentTimeMillis());
 		Map<String, Object> attributes = new HashMap<String, Object>();
 		attributes.put(Document.AUTHOR, "richard");
 		Document document = new Document(id, null, attributes);
 		document.setId(id);
-		String newId = provider.create(document);
+		String newId = documentService.create(document);
 		log.info(String.format("New document created #%s", newId));
-		document = provider.get(newId);
+		document = documentService.get(newId);
 		Assert.assertNotNull(document);
 		attributes = document.getAttributes();
 		Assert.assertTrue(attributes != null && attributes.size() == 1);
@@ -116,16 +101,15 @@ public class DocumentProviderTest {
 	
 	@Test
 	public void testCreateDocumentWithCreationDate() throws Throwable {
-		DocumentService provider = getDocumentProvider();
 		String id = String.valueOf(System.currentTimeMillis());
 		Map<String, Object> attributes = new HashMap<String, Object>();
 		DateTime now = new DateTime();
 		attributes.put(Document.CREATION_DATE, now.toString());
 		Document document = new Document(id, null, attributes);
 		document.setId(id);
-		String newId = provider.create(document);
+		String newId = documentService.create(document);
 		log.info(String.format("New document created #%s", newId));
-		document = provider.get(newId);
+		document = documentService.get(newId);
 		Assert.assertNotNull(document);
 		attributes = document.getAttributes();
 		Assert.assertTrue(attributes != null && attributes.size() == 1);
