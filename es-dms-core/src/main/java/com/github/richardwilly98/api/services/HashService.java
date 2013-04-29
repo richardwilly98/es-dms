@@ -1,4 +1,4 @@
-package com.github.richardwilly98.service;
+package com.github.richardwilly98.api.services;
 
 public interface HashService {
 	byte[] computeHash(byte[] text);

@@ -13,6 +13,7 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.realm.Realm;
 
+import com.github.richardwilly98.api.Credential;
 import com.github.richardwilly98.rest.exception.RestServiceException;
 
 @Path("/auth")
@@ -27,13 +28,13 @@ public class RestAuthencationService extends RestServiceBase {
 				throw new IllegalArgumentException("credential");
 			}
 			if (log.isTraceEnabled()) {
-				log.trace(String.format("login - %s", credential.getUsername()));
+				log.trace(String.format("login - %s", credential.getLogin()));
 			}
 			for (Realm realm : ((RealmSecurityManager) SecurityUtils.getSecurityManager()).getRealms())
 				log.trace("Realm: " + realm.getName());
 			
 			UsernamePasswordToken token = new UsernamePasswordToken(
-					credential.getUsername(), credential.getPassword());
+					credential.getLogin(), credential.getPassword());
 			SecurityUtils.getSubject().login(token);
 			token.clear();
 			return Response.ok().entity("AUTHENTICATED")

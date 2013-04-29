@@ -6,6 +6,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
+import com.github.richardwilly98.api.Session;
 import com.github.richardwilly98.api.User;
 
 public class EsSecurityContext implements SecurityContext {

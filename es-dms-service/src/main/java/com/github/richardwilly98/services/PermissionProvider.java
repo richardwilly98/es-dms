@@ -19,11 +19,11 @@ import com.google.inject.Inject;
 public class PermissionProvider extends ProviderBase<Permission> implements PermissionService {
 
 	private final static String index = "test-permissions";
-	private final static String type = "permissions";
+	private final static String type = "permission";
 
 	@Inject
 	PermissionProvider(Client client) {
-		super(client, PermissionProvider.index, PermissionProvider.type);
+		super(client, PermissionProvider.index, PermissionProvider.type, Permission.class);
 	}
 
 	@Override
@@ -40,25 +40,25 @@ public class PermissionProvider extends ProviderBase<Permission> implements Perm
 
 	}
 
-	@Override
-	public Permission get(String id) throws ServiceException {
-		try {
-			if (log.isTraceEnabled()) {
-				log.trace(String.format("get - %s", id));
-			}
-			GetResponse response = client.prepareGet(index, type, id)
-					.execute().actionGet();
-			if (! response.exists()) {
-				return null;
-			}
-			String json = response.getSourceAsString();
-			Permission permission = mapper.readValue(json, Permission.class);
-			return permission;
-		} catch (Throwable t) {
-			log.error("getPermission failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
-	}
+//	@Override
+//	public Permission get(String id) throws ServiceException {
+//		try {
+//			if (log.isTraceEnabled()) {
+//				log.trace(String.format("get - %s", id));
+//			}
+//			GetResponse response = client.prepareGet(index, type, id)
+//					.execute().actionGet();
+//			if (! response.exists()) {
+//				return null;
+//			}
+//			String json = response.getSourceAsString();
+//			Permission permission = mapper.readValue(json, Permission.class);
+//			return permission;
+//		} catch (Throwable t) {
+//			log.error("getPermission failed", t);
+//			throw new ServiceException(t.getLocalizedMessage());
+//		}
+//	}
 	
 	@Override
 	public List<Permission> getList(String name) throws ServiceException { 

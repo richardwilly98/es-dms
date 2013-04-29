@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class SecuredItem extends ItemBase {
 	
+	private static final long serialVersionUID = 1L;
 	Map<String, Role> roles;
 	
 	Map<String, SecuredItem> attachments;

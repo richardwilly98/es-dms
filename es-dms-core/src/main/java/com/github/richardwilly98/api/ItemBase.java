@@ -1,5 +1,6 @@
 package com.github.richardwilly98.api;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,8 +9,10 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 
 @JsonInclude(Include.NON_NULL)
-public abstract class ItemBase {
+public abstract class ItemBase implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	String id;
 	String name;
 	Boolean disabled;

@@ -2,6 +2,7 @@ package com.github.richardwilly98.api;
 
 public class Person extends ItemBase {
 	
+	private static final long serialVersionUID = 1L;
 	String city;
 	String email;
 

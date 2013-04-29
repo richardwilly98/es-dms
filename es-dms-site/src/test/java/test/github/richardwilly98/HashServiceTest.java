@@ -5,7 +5,7 @@ import org.junit.Assert;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
-import com.github.richardwilly98.service.HashService;
+import com.github.richardwilly98.api.services.HashService;
 import com.google.inject.Inject;
 
 @Guice( modules = ServiceModule.class)

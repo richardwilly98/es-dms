@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public class User extends Person implements Principal {
 	
+	private static final long serialVersionUID = 1L;
 	Set<Role> roles;
 	String hash;
 	

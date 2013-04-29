@@ -1,4 +1,4 @@
-package com.github.richardwilly98.service;
+package com.github.richardwilly98.services;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.crypto.hash.DefaultHashService;
@@ -6,6 +6,8 @@ import org.apache.shiro.crypto.hash.Hash;
 import org.apache.shiro.crypto.hash.HashRequest;
 import org.apache.shiro.crypto.hash.SimpleHashRequest;
 import org.apache.shiro.util.ByteSource;
+
+import com.github.richardwilly98.api.services.HashService;
 
 public class SHA512HashService implements HashService {
 

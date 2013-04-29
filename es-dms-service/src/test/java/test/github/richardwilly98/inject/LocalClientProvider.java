@@ -1,4 +1,4 @@
-package test.github.richardwilly98.services;
+package test.github.richardwilly98.inject;
 
 import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilder;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;

@@ -11,9 +11,6 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.api.Document;
@@ -23,18 +20,6 @@ import com.github.richardwilly98.api.File;
  * https://github.com/shairontoledo/elasticsearch-attachment-tests/blob/master/src/test/java/net/hashcode/esattach/AttachmentTest.java
  */
 public class DocumentProviderTest extends ProviderTestBase {
-
-	@BeforeSuite
-	public void beforeSuite() throws Exception {
-	}
-
-	@BeforeClass
-	public void setupServer() {
-	}
-
-	@AfterClass
-	public void closeServer() {
-	}
 
 	private void testCreateDocument(String name, String contentType, String path, String contentSearch) throws Throwable {
 		String id = String.valueOf(System.currentTimeMillis());

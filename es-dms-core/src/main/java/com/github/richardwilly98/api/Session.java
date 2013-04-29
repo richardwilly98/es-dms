@@ -1,16 +1,12 @@
-package com.github.richardwilly98.web;
+package com.github.richardwilly98.api;
 
-import java.io.Serializable;
 import java.util.Date;
 
-public class Session implements Serializable {
+public class Session extends ItemBase {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7014666663023117612L;
+	private static final long serialVersionUID = 1L;
 
-	private String sessionId; // id
+	//private String sessionId; // id
 	private String userId; // user
 	private boolean active; // session active?
 	private boolean secure; // session secure?
@@ -18,12 +14,6 @@ public class Session implements Serializable {
 	private Date createTime; // session create time
 	private Date lastAccessedTime; // session last use time
 
-	public String getSessionId() {
-		return sessionId;
-	}
-	public void setSessionId(String sessionId) {
-		this.sessionId = sessionId;
-	}
 	public String getUserId() {
 		return userId;
 	}

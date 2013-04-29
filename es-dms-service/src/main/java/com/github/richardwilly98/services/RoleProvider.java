@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -19,11 +18,11 @@ import com.google.inject.Inject;
 public class RoleProvider extends ProviderBase<Role> implements RoleService {
 
 	private final static String index = "test-roles";
-	private final static String type = "roles";
+	private final static String type = "role";
 
 	@Inject
 	RoleProvider(Client client) {
-		super(client, RoleProvider.index, RoleProvider.type);
+		super(client, RoleProvider.index, RoleProvider.type, Role.class);
 	}
 
 	@Override
@@ -40,25 +39,25 @@ public class RoleProvider extends ProviderBase<Role> implements RoleService {
 
 	}
 
-	@Override
-	public Role get(String id) throws ServiceException {
-		try {
-			if (log.isTraceEnabled()) {
-				log.trace(String.format("get - %s", id));
-			}
-			GetResponse response = client.prepareGet(index, type, id)
-					.execute().actionGet();
-			if (! response.exists()) {
-				return null;
-			}
-			String json = response.getSourceAsString();
-			Role role = mapper.readValue(json, Role.class);
-			return role;
-		} catch (Throwable t) {
-			log.error("getRole failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
-	}
+//	@Override
+//	public Role get(String id) throws ServiceException {
+//		try {
+//			if (log.isTraceEnabled()) {
+//				log.trace(String.format("get - %s", id));
+//			}
+//			GetResponse response = client.prepareGet(index, type, id)
+//					.execute().actionGet();
+//			if (! response.exists()) {
+//				return null;
+//			}
+//			String json = response.getSourceAsString();
+//			Role role = mapper.readValue(json, Role.class);
+//			return role;
+//		} catch (Throwable t) {
+//			log.error("getRole failed", t);
+//			throw new ServiceException(t.getLocalizedMessage());
+//		}
+//	}
 	
 	@Override
 	public List<Role> getList(String name) throws ServiceException { 

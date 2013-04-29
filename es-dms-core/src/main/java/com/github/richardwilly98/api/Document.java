@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Document extends SecuredItem {
 
+	private static final long serialVersionUID = 1L;
 	public final static String CREATION_DATE = "creation";
 	public final static String MODIFIED_DATE = "modified";
 	public final static String AUTHOR = "author";

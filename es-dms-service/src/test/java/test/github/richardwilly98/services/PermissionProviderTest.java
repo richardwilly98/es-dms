@@ -2,9 +2,12 @@ package test.github.richardwilly98.services;
 
 import org.apache.log4j.Logger;
 import org.testng.Assert;
+<<<<<<< HEAD
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeSuite;
+=======
+>>>>>>> Refactoring tests
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.api.Permission;
@@ -13,6 +16,7 @@ import com.github.richardwilly98.services.PermissionProvider;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
+<<<<<<< HEAD
 @Test
 public class PermissionProviderTest {
 
@@ -36,6 +40,11 @@ public class PermissionProviderTest {
 	}
 
 	private Permission testCreatePermission(String name, String description,
+=======
+public class PermissionProviderTest extends ProviderTestBase {
+
+	private String testCreatePermission(String name, String description,
+>>>>>>> Refactoring tests
 			boolean disabled, Object property) throws Throwable {
 		PermissionService provider = getPermissionProvider();
 		Permission permission = new Permission();

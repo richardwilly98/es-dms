@@ -4,10 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.api.Permission;
@@ -15,20 +11,7 @@ import com.github.richardwilly98.api.Role;
 import com.github.richardwilly98.api.services.RoleService;
 import com.google.inject.Inject;
 
-@Guice( modules = ProviderModule.class)
 public class RoleProviderTest extends ProviderTestBase {
-
-	@BeforeSuite
-	public void beforeSuite() throws Exception {
-	}
-
-	@BeforeClass
-	public void setupServer() {
-	}
-
-	@AfterClass
-	public void closeServer() {
-	}
 
 	@Inject
 	RoleService roleService;

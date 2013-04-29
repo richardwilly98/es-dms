@@ -31,7 +31,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 
 	@Inject
 	DocumentProvider(Client client) {
-		super(client, DocumentProvider.index, DocumentProvider.type);
+		super(client, DocumentProvider.index, DocumentProvider.type, Document.class);
 	}
 
 	/* (non-Javadoc)
@@ -155,7 +155,6 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}
-
 
 //	/* (non-Javadoc)
 //	 * @see com.github.richardwilly98.services.IDocumentService#createDocument(com.github.richardwilly98.Document)

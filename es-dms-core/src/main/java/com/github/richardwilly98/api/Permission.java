@@ -2,6 +2,7 @@ package com.github.richardwilly98.api;
 
 public class Permission extends ItemBase{
 	
+	private static final long serialVersionUID = 1L;
 	String access;
 	Object property;	//property access permission is applied to
 	

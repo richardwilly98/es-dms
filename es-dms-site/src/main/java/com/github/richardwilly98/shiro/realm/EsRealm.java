@@ -20,7 +20,7 @@ import org.apache.shiro.util.ByteSource;
 
 import com.github.richardwilly98.api.User;
 import com.github.richardwilly98.api.exception.ServiceException;
-import com.github.richardwilly98.service.HashService;
+import com.github.richardwilly98.api.services.HashService;
 import com.github.richardwilly98.services.UserProvider;
 import com.google.inject.Inject;
 
