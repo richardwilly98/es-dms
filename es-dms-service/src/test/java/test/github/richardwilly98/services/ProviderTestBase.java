@@ -112,10 +112,8 @@ abstract class ProviderTestBase {
 
 	private void createPermissions() {
 		try {
-			permissions.add(createPermission("document:create",
-					"Create document", false, null));
-			permissions.add(createPermission("document:delete",
-					"Delete document", false, null));
+			permissions.add(createPermission("document:create","Create document", false));
+			permissions.add(createPermission("document:delete","Delete document", false));
 			for (Permission permission : permissions) {
 				permissionService.create(permission);
 			}
@@ -135,15 +133,15 @@ abstract class ProviderTestBase {
 	}
 
 	Permission createPermission(String name, String description,
-			boolean disabled, Object property) throws ServiceException {
-		Assert.assertTrue(!(name == null || name.isEmpty()));
+			boolean disabled) throws ServiceException {
+		Assert.assertTrue(! (name == null || name.isEmpty()));
+
 		Permission permission = new Permission();
 		String id = String.valueOf(name);
 		permission.setId(id);
 		permission.setName(name);
 		permission.setDescription(description);
 		permission.setDisabled(disabled);
-		permission.setProperty(property);
 		try {
 			Permission newPermission = permissionService.create(permission);
 			Assert.assertNotNull(newPermission);
