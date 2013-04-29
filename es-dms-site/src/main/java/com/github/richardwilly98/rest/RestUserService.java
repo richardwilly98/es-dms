@@ -105,8 +105,7 @@ public class RestUserService extends RestServiceBase {
 				user.setHash(encodedHash);
 				user.setPassword(null);
 			}
-			String id = getProvider().create(user);
-			user.setId(id);
+			user = getProvider().create(user);
 			return Response.status(Status.CREATED).entity(user).build();
 		} catch (ServiceException e) {
 			throw new RestServiceException(e.getLocalizedMessage());

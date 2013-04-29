@@ -18,7 +18,7 @@ public interface BaseService <I>{
 	public abstract List<I> search(String criteria)
 			throws ServiceException;
 
-	public abstract String create(I item)
+	public abstract I create(I item)
 			throws ServiceException;
 
 	public abstract void delete(I item)

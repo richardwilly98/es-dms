@@ -136,8 +136,7 @@ public class EsRealm extends AuthorizingRealm {
 				user.setDescription("System administrator");
 				user.setHash(computeBase64Hash(password));
 				user.setEmail("admin@admin");
-				String id = provider.create(user);
-				user.setId(id);
+				user = provider.create(user);
 				return user;
 			}
 		} catch (ServiceException ex) {

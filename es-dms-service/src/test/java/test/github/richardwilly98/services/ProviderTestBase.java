@@ -105,18 +105,19 @@ abstract class ProviderTestBase {
 
 	Permission createPermission(String name, String description,
 			boolean disabled, Object property) throws ServiceException {
+		Assert.assertTrue(! (name == null || name.isEmpty()));
 		Permission permission = new Permission();
-		String id = String.valueOf(System.currentTimeMillis());
+		String id = String.valueOf(name);
 		permission.setId(id);
 		permission.setName(name);
 		permission.setDescription(description);
 		permission.setDisabled(disabled);
 		permission.setProperty(property);
 		try {
-			String newId;
-			newId = permissionService.create(permission);
-			Assert.assertEquals(id, newId);
-			return permissionService.get(newId);
+			Permission newPermission = permissionService.create(permission);
+			Assert.assertNotNull(newPermission);
+			Assert.assertEquals(id, newPermission.getId());
+			return newPermission;
 		} catch (ServiceException e) {
 			log.error("createPermission failed", e);
 			throw e;
@@ -125,17 +126,19 @@ abstract class ProviderTestBase {
 
 	User createUser(String name, String description, boolean disabled,
 			String email, Set<Role> roles) throws ServiceException {
+		Assert.assertTrue(! (name == null || name.isEmpty()));
 		User user = new User();
-		String id = String.valueOf(System.currentTimeMillis());
+		String id = String.valueOf(name);
 		user.setId(id);
 		user.setName(name);
 		user.setDescription(description);
 		user.setDisabled(disabled);
 		user.setEmail(email);
 		try {
-			String newId = userService.create(user);
-			Assert.assertEquals(id, newId);
-			return userService.get(newId);
+			User newUser = userService.create(user);
+			Assert.assertNotNull(newUser);
+			Assert.assertEquals(id, newUser.getId());
+			return newUser;
 		} catch (ServiceException e) {
 			log.error("createPermission failed", e);
 			throw e;
@@ -148,17 +151,19 @@ abstract class ProviderTestBase {
 													 */
 			boolean disabled, Map<String, Permission> permissions)
 			throws ServiceException {
+		Assert.assertTrue(! (name == null || name.isEmpty()));
 		Role role = new Role();
-		String id = String.valueOf(System.currentTimeMillis());
+		String id = String.valueOf(name);
 		role.setId(id);
 		role.setName(name);
 		role.setDescription(description);
 		role.setDisabled(disabled);
 		role.setPermissions(permissions);
 		try {
-			String newId = roleService.create(role);
-			Assert.assertEquals(id, newId);
-			return roleService.get(newId);
+			Role newRole = roleService.create(role);
+			Assert.assertNotNull(newRole);
+			Assert.assertEquals(id, newRole.getId());
+			return newRole;
 		} catch (ServiceException e) {
 			log.error("createPermission failed", e);
 			throw e;

@@ -65,7 +65,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	// }
 
 	@Override
-	public String create(T item) throws ServiceException {
+	public T create(T item) throws ServiceException {
 		try {
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("create - %s", item));
@@ -80,7 +80,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			log.trace(String.format("Index: %s - Type: %s - Id: %s",
 					response.getIndex(), response.getType(), response.getId()));
 			refreshIndex();
-			return response.getId();
+			return get(response.getId());
 		} catch (Throwable t) {
 			log.error("create failed", t);
 			throw new ServiceException(t.getLocalizedMessage());

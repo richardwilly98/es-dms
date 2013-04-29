@@ -48,10 +48,9 @@ public class DocumentProviderTest extends ProviderTestBase {
 		File file = new File(encodedContent, name, contentType);
 		document.setFile(file);
 		document.setId(id);
-		String newId = documentService.create(document);
-		log.info(String.format("New document created #%s", newId));
-		document = documentService.get(newId);
-		Assert.assertNotNull(document);
+		Document newDocument = documentService.create(document);
+		Assert.assertNotNull(newDocument);
+		log.info(String.format("New document created #%s", newDocument.getId()));
 	}
 
 	@Test
@@ -90,10 +89,10 @@ public class DocumentProviderTest extends ProviderTestBase {
 		attributes.put(Document.AUTHOR, "richard");
 		Document document = new Document(id, null, attributes);
 		document.setId(id);
-		String newId = documentService.create(document);
-		log.info(String.format("New document created #%s", newId));
-		document = documentService.get(newId);
-		Assert.assertNotNull(document);
+		Document newDocument = documentService.create(document);
+		Assert.assertNotNull(newDocument);
+		log.info(String.format("New document created #%s", newDocument.getId()));
+//		document = documentService.get(newId);
 		attributes = document.getAttributes();
 		Assert.assertTrue(attributes != null && attributes.size() == 1);
 		Assert.assertTrue(attributes.containsKey(Document.AUTHOR) && attributes.get(Document.AUTHOR).equals("richard"));
@@ -107,10 +106,9 @@ public class DocumentProviderTest extends ProviderTestBase {
 		attributes.put(Document.CREATION_DATE, now.toString());
 		Document document = new Document(id, null, attributes);
 		document.setId(id);
-		String newId = documentService.create(document);
-		log.info(String.format("New document created #%s", newId));
-		document = documentService.get(newId);
-		Assert.assertNotNull(document);
+		Document newDocument = documentService.create(document);
+		Assert.assertNotNull(newDocument);
+		log.info(String.format("New document created #%s", newDocument.getId()));
 		attributes = document.getAttributes();
 		Assert.assertTrue(attributes != null && attributes.size() == 1);
 		Assert.assertTrue(attributes.containsKey(Document.CREATION_DATE));

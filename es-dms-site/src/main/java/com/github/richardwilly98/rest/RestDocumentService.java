@@ -117,8 +117,7 @@ public class RestDocumentService extends RestServiceBase {
 			log.trace(String.format("create - %s", document));
 		}
 		try {
-			String id = getProvider().create(document);
-			document.setId(id);
+			document = getProvider().create(document);
 			return Response.status(Status.CREATED).entity(document).build();
 		} catch (ServiceException e) {
 			log.error("create failed", e);
@@ -197,9 +196,8 @@ public class RestDocumentService extends RestServiceBase {
 			attributes.put(Document.CREATION_DATE, now.toString());
 			attributes.put(Document.AUTHOR, getCurrentUser());
 			Document document = new Document(null, file, attributes);
-			String id = getProvider().create(document);
-			log.debug(String.format("New document uploaded %s", id));
-			document.setId(id);
+			document = getProvider().create(document);
+			log.debug(String.format("New document uploaded %s", document.getId()));
 			document.setFile(null);
 			return Response.ok(document).build();
 		} catch (Throwable t) {
@@ -245,11 +243,10 @@ public class RestDocumentService extends RestServiceBase {
 			attributes.put(Document.AUTHOR, getCurrentUser());
 			Document document = new Document(null, file, attributes);
 
-			String id = getProvider().create(document);
-			log.debug(String.format("New document uploaded %s", id));
-			document.setId(id);
+			document = getProvider().create(document);
+			log.debug(String.format("New document uploaded %s", document.getId()));
 			document.setFile(null);
-			return Response.status(200).entity(document).build();
+			return Response.ok(document).build();
 		} catch (Throwable t) {
 			log.error("upload failed", t);
 			throw new RestServiceException(t.getLocalizedMessage());
