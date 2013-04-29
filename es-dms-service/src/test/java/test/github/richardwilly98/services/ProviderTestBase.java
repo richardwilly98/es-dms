@@ -181,6 +181,7 @@ abstract class ProviderTestBase {
 													 */
 			boolean disabled, Map<String, Permission> permissions)
 			throws ServiceException {
+		log.trace("Preparing to create permission: " + name);
 		Assert.assertTrue(!(name == null || name.isEmpty()));
 		Role role = new Role();
 		String id = String.valueOf(name);
