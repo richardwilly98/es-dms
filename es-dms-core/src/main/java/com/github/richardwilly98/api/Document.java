@@ -1,6 +1,5 @@
 package com.github.richardwilly98.api;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,8 +15,6 @@ public class Document extends SecuredItem {
 	@JsonProperty("file")
 	File file;
 	
-	Map<String, Object> attributes = new HashMap<String, Object>();
-	
 	public Document() {
 		super();
 	}
@@ -32,7 +29,7 @@ public class Document extends SecuredItem {
 		}
 		this.id = id;
 		this.file = file;
-		this.attributes = attributes;
+		this.attributes.putAll(attributes);
 	}
 
 	public File getFile() {
@@ -41,14 +38,5 @@ public class Document extends SecuredItem {
 	
 	public void setFile(File file) {
 		this.file = file;
-	}
-	
-	public Map<String, Object> getAttributes() {
-		return attributes;
-	}
-	
-	public void setAttribute(String name, Object attribute){
-		if (this.attributes == null) this.attributes = new HashMap<String, Object>();
-		this.attributes.put(name, attribute);
 	}
 }

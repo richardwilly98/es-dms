@@ -36,7 +36,7 @@ public class PermissionProviderTest {
 	}
 
 	private Permission testCreatePermission(String name, String description,
-			boolean disabled, Object property) throws Throwable {
+			boolean disabled) throws Throwable {
 		PermissionService provider = getPermissionProvider();
 		Permission permission = new Permission();
 		String id = name; //String.valueOf(System.currentTimeMillis());
@@ -44,7 +44,6 @@ public class PermissionProviderTest {
 		permission.setName(name);
 		permission.setDescription(description);
 		permission.setDisabled(disabled);
-		permission.setProperty(property);
 		
 		Permission aPermission = provider.create(permission);
 		Assert.assertEquals(id, aPermission.getId());
@@ -54,7 +53,6 @@ public class PermissionProviderTest {
 		Assert.assertEquals(permission.getName(), newPermission.getName());
 		Assert.assertEquals(permission.getDescription(), newPermission.getDescription());
 		Assert.assertEquals(permission.isDisabled(), newPermission.isDisabled());
-		Assert.assertEquals(permission.getProperty(), newPermission.getProperty());
 		
 		return newPermission;
 	}
@@ -63,41 +61,41 @@ public class PermissionProviderTest {
 	public void testCreatePermission() throws Throwable {
 		log.info("Start testCreatePermission");
 		//content permissions
-		testCreatePermission("profile:write", "write, create and edit document metadata", false,"profile");
-		testCreatePermission("content:write", "write, create and edit document content", true, "content");
-		testCreatePermission("profile:read", "read", true, "profile");
-		testCreatePermission("content:read", "read", true, "content");
-		testCreatePermission("access:read", "access control read", true, "access");
-		testCreatePermission("access:write", "access control write", true, "access");
-		testCreatePermission("profile:todelete", "mark profile as to delete", true, "profile");
-		testCreatePermission("content:todelete", "mark content as to delete", true, "content");
-		testCreatePermission("profile:delete", "delete", true, "profile");
-		testCreatePermission("content:delete", "delete", true, "content");
+		testCreatePermission("profile:write", "write, create and edit document metadata", false);
+		testCreatePermission("content:write", "write, create and edit document content", true);
+		testCreatePermission("profile:read", "read", true);
+		testCreatePermission("content:read", "read", true);
+		testCreatePermission("access:read", "access control read", true);
+		testCreatePermission("access:write", "access control write", true);
+		testCreatePermission("profile:todelete", "mark profile as to delete", true);
+		testCreatePermission("content:todelete", "mark content as to delete", true);
+		testCreatePermission("profile:delete", "delete", true);
+		testCreatePermission("content:delete", "delete", true);
 		//user permissions
-		testCreatePermission("user:create", "create", true, "user-management");
-		testCreatePermission("user:update", "user data update", true, "user-management");
-		testCreatePermission("user:add", "user access update", true, "user-management");
-		testCreatePermission("user:remove", "user access update", true, "user-management");
-		testCreatePermission("user:disable", "user access update", true, "user-management");
-		testCreatePermission("user:delete", "delete", true, "user-management");
+		testCreatePermission("user:create", "create", true);
+		testCreatePermission("user:update", "user data update", true);
+		testCreatePermission("user:add", "user access update", true);
+		testCreatePermission("user:remove", "user access update", true);
+		testCreatePermission("user:disable", "user access update", true);
+		testCreatePermission("user:delete", "delete", true);
 		//group permissions
-		testCreatePermission("group:create", "create group", false, "group");
-		testCreatePermission("group:update", "group data update", true, "group-management");
-		testCreatePermission("group:add", "group access update", true, "group-management");
-		testCreatePermission("group:remove", "groupaccess update", true, "group-management");
-		testCreatePermission("group:disable", "group access update", true, "group-management");
-		testCreatePermission("group:delete", "delete group", false, "group");
+		testCreatePermission("group:create", "create group", false);
+		testCreatePermission("group:update", "group data update", true);
+		testCreatePermission("group:add", "group access update", true);
+		testCreatePermission("group:remove", "groupaccess update", true);
+		testCreatePermission("group:disable", "group access update", true);
+		testCreatePermission("group:delete", "delete group", false);
 		
-		testCreatePermission("group:add-user", "add user to group", false, "group-management");
-		testCreatePermission("group:remove-user", "remove user from group", false, "group-management");
+		testCreatePermission("group:add-user", "add user to group", false);
+		testCreatePermission("group:remove-user", "remove user from group", false);
 	}
 	
 	@Test
 	public void testFindPermission() throws Throwable {
 		log.info("Start testFindPermission");
 		
-		Permission p = testCreatePermission("group:add-user", "add user to group", false, "group-management");
-		p = testCreatePermission("group:remove-user", "remove user from group", false, "group-management");
+		Permission p = testCreatePermission("group:add-user", "add user to group", false);
+		p = testCreatePermission("group:remove-user", "remove user from group", false);
 		
 		PermissionService provider = getPermissionProvider();
 		Permission permission = provider.get("group:add-user");
@@ -114,7 +112,7 @@ public class PermissionProviderTest {
 	@Test
 	public void testDeletePermission() throws Throwable {
 		log.info("Start testDeletePermission");
-		Permission p = testCreatePermission("write-annotation", "write", false, "annotation");
+		Permission p = testCreatePermission("write-annotation", "write", false);
 		PermissionService provider = getPermissionProvider();
 		Permission permission = provider.get(p.getId());
 		provider.delete(permission);
