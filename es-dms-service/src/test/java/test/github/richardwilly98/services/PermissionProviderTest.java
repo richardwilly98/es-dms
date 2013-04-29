@@ -1,71 +1,36 @@
 package test.github.richardwilly98.services;
 
-import org.apache.log4j.Logger;
 import org.testng.Assert;
-<<<<<<< HEAD
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeSuite;
-=======
->>>>>>> Refactoring tests
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.api.Permission;
-import com.github.richardwilly98.api.services.PermissionService;
-import com.github.richardwilly98.services.PermissionProvider;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 
-<<<<<<< HEAD
-@Test
-public class PermissionProviderTest {
-
-	private static Logger log = Logger.getLogger(UserProviderTest.class);
-
-	@BeforeSuite
-	public void beforeSuite() throws Exception {
-	}
-
-	@BeforeClass
-	public void setupServer() {
-	}
-
-	@AfterClass
-	public void closeServer() {
-	}
-
-	protected PermissionService getPermissionProvider() {
-		Injector injector = Guice.createInjector(new ProviderModule());
-		return injector.getInstance(PermissionProvider.class);
-	}
-
-	private Permission testCreatePermission(String name, String description,
-=======
 public class PermissionProviderTest extends ProviderTestBase {
 
 	private String testCreatePermission(String name, String description,
->>>>>>> Refactoring tests
 			boolean disabled, Object property) throws Throwable {
-		PermissionService provider = getPermissionProvider();
-		Permission permission = new Permission();
-		String id = name; //String.valueOf(System.currentTimeMillis());
-		permission.setId(id);
-		permission.setName(name);
-		permission.setDescription(description);
-		permission.setDisabled(disabled);
-		permission.setProperty(property);
+		Permission permission = createPermission(name, description,
+				disabled, property);
+//				Permission permission = new Permission();
+//		String id = name; //String.valueOf(System.currentTimeMillis());
+//		permission.setId(id);
+//		permission.setName(name);
+//		permission.setDescription(description);
+//		permission.setDisabled(disabled);
+//		permission.setProperty(property);
+		Assert.assertNotNull(permission);
 		
-		Permission aPermission = provider.create(permission);
-		Assert.assertEquals(id, aPermission.getId());
+//		Permission aPermission = permissionService.create(permission);
+//		Assert.assertEquals(id, aPermission.getId());
 		
-		Permission newPermission = provider.get(aPermission.getId());
-		Assert.assertNotNull(newPermission);
-		Assert.assertEquals(permission.getName(), newPermission.getName());
-		Assert.assertEquals(permission.getDescription(), newPermission.getDescription());
-		Assert.assertEquals(permission.isDisabled(), newPermission.isDisabled());
-		Assert.assertEquals(permission.getProperty(), newPermission.getProperty());
+//		Permission newPermission = permissionService.get(aPermission.getId());
+		Assert.assertNotNull(permission);
+		Assert.assertEquals(name, permission.getName());
+		Assert.assertEquals(description, permission.getDescription());
+		Assert.assertEquals(disabled, permission.isDisabled());
+		Assert.assertEquals(property, permission.getProperty());
 		
-		return newPermission;
+		return permission.getId();
 	}
 
 	@Test
@@ -105,16 +70,15 @@ public class PermissionProviderTest extends ProviderTestBase {
 	public void testFindPermission() throws Throwable {
 		log.info("Start testFindPermission");
 		
-		Permission p = testCreatePermission("group:add-user", "add user to group", false, "group-management");
-		p = testCreatePermission("group:remove-user", "remove user from group", false, "group-management");
+		Permission p = createPermission("group:add-user", "add user to group", false, "group-management");
+		p = createPermission("group:remove-user", "remove user from group", false, "group-management");
 		
-		PermissionService provider = getPermissionProvider();
-		Permission permission = provider.get("group:add-user");
+		Permission permission = permissionService.get("group:add-user");
 		
 		Assert.assertNotNull(permission);
 		if (!(permission == null) )log.info("permission found: " + permission.getName());
 		
-		permission = provider.get("group:remove-user");
+		permission = permissionService.get("group:remove-user");
 		
 		Assert.assertNotNull(permission);
 		if (!(permission == null))log.info("permission found: " + permission.getName());
@@ -123,11 +87,10 @@ public class PermissionProviderTest extends ProviderTestBase {
 	@Test
 	public void testDeletePermission() throws Throwable {
 		log.info("Start testDeletePermission");
-		Permission p = testCreatePermission("write-annotation", "write", false, "annotation");
-		PermissionService provider = getPermissionProvider();
-		Permission permission = provider.get(p.getId());
-		provider.delete(permission);
-		permission = provider.get(p.getId());
+		Permission p = createPermission("write-annotation", "write", false, "annotation");
+		Permission permission = permissionService.get(p.getId());
+		permissionService.delete(permission);
+		permission = permissionService.get(p.getId());
 		Assert.assertNull(permission);
 	}
 }

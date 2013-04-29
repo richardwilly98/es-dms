@@ -13,9 +13,6 @@ import com.google.inject.Inject;
 
 public class RoleProviderTest extends ProviderTestBase {
 
-	@Inject
-	RoleService roleService;
-
 	private String testCreateRole(String name, String description, /*Set<Permission> permissions,*/Map<String, Permission> permissions, boolean disabled) throws Throwable {
 		Role role = createRole(name, description, disabled, permissions);
 		Assert.assertNotNull(role);
