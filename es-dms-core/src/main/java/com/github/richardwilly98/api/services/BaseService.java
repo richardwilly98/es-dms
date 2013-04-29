@@ -24,6 +24,9 @@ public interface BaseService <I>{
 	public abstract void delete(I item)
 			throws ServiceException;
 	
+	public abstract I update(I item)
+			throws ServiceException;
+
 	public abstract boolean disabled(I item)
 			throws ServiceException;
 

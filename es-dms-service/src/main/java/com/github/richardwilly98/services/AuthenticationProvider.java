@@ -35,18 +35,6 @@ public class AuthenticationProvider extends ProviderBase<Session> implements
 	}
 
 	@Override
-	protected String generateUniqueId(Session session) {
-		return super.generateUniqueId(session);
-	}
-
-	protected void createIndex() {
-		if (!client.admin().indices().prepareExists(index).execute()
-				.actionGet().exists()) {
-			client.admin().indices().prepareCreate(index).execute().actionGet();
-		}
-	}
-
-	@Override
 	public Session get(String id) throws ServiceException {
 		try {
 			if (log.isTraceEnabled()) {
@@ -115,6 +103,15 @@ public class AuthenticationProvider extends ProviderBase<Session> implements
 		Session session = get(token);
 		if (session != null) {
 			delete(session);
+		}
+	}
+
+	@Override
+	public void validate(String token) throws ServiceException {
+		Session session = get(token);
+		if (session != null) {
+			session.setLastAccessedTime(new Date());
+			create(session);
 		}
 	}
 

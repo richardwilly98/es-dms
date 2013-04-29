@@ -46,46 +46,11 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 			Document document = mapper.readValue(json, Document.class);
 			return document;
 		} catch (Throwable t) {
-			log.error("getDocument failed", t);
+			log.error("get failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.github.richardwilly98.services.IDocumentService#getDocuments(java.lang.String)
-	 */
-//	@Override
-//	public List<Document> getDocuments(String name) throws ServiceException {
-//		try {
-//			List<Document> documents = new ArrayList<Document>();
-//
-//			SearchResponse searchResponse = client.prepareSearch(index)
-//					.setTypes(type).setQuery(QueryBuilders.queryString(name))
-//					.addHighlightedField("file").execute().actionGet();
-//			log.debug("totalHits: " + searchResponse.getHits().totalHits());
-//			for (SearchHit hit : searchResponse.getHits().hits()) {
-//				log.debug(String.format("HighlightFields: %s", hit
-//						.getHighlightFields().size()));
-//				for (String key : hit.getHighlightFields().keySet()) {
-//					log.debug(String.format("Highlight key: %s", key));
-//				}
-//				String json = hit.getSourceAsString();
-//				Document document = mapper.readValue(json, Document.class);
-//				documents.add(document);
-//			}
-//
-//			return documents;
-//		} catch (Throwable t) {
-//			log.error("getDocuments failed", t);
-//			throw new ServiceException(t.getLocalizedMessage());
-//		}
-//	}
-	
-	@Override
-	public List<Document> getList(String name) throws ServiceException {
-		return new ArrayList<Document>(getItems(name));
-	}
-	
 	@Override
 	public Set<Document> getItems(String name) throws ServiceException {
 		try {
@@ -108,7 +73,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 
 			return documents;
 		} catch (Throwable t) {
-			log.error("getList failed", t);
+			log.error("getItems failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}
@@ -156,61 +121,6 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 		}
 	}
 
-//	/* (non-Javadoc)
-//	 * @see com.github.richardwilly98.services.IDocumentService#createDocument(com.github.richardwilly98.Document)
-//	 */
-//	@Override
-//	public String create(Document document) throws ServiceException {
-//		try {
-//			if (document.getId() == null) {
-//				document.setId(generateUniqueId(document));
-//			}
-//			String json;
-//			json = mapper.writeValueAsString(document);
-////			log.trace(json);
-//			IndexResponse response = client.prepareIndex(index, type)
-//					.setId(document.getId()).setSource(json).execute()
-//					.actionGet();
-//			log.trace(String.format("Index: %s - Type: %s - Id: %s",
-//					response.getIndex(), response.getType(), response.getId()));
-//			client.admin().indices().refresh(new RefreshRequest(index))
-//					.actionGet();
-//			return response.getId();
-//		} catch (Throwable t) {
-//			log.error("createDocument failed", t);
-//			throw new ServiceException(t.getLocalizedMessage());
-//		}
-//	}
-
-	@Override
-	protected String generateUniqueId(Document document) {
-		return super.generateUniqueId(document);
-	}
-
-//	private XContentBuilder getMapping() throws IOException {
-//		XContentBuilder mapping = jsonBuilder()
-//				.startObject()
-//					.startObject(type)
-//						.startObject("properties")
-//							.startObject("file")
-//								.field("type", "attachment")
-//								.startObject("fields")
-//									.startObject("file")
-//										.field("term_vector", "with_positions_offsets")
-//										.field("store", "yes")
-//									.endObject()
-//								.endObject()
-//					// .startObject("filename").field("type", "string").endObject()
-//					// .startObject("contentType").field("type",
-//					// "string").endObject()
-//							.endObject()
-//						.endObject()
-//					.endObject()
-//				.endObject();
-//		log.info(String.format("Mapping: %s", mapping.string()));
-//		return mapping;
-//	}
-	
 	private String getMapping() {
 		try {
 			return copyToStringFromClasspath(DOCUMENT_MAPPING_JSON);
@@ -220,6 +130,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 		}
 	}
 
+	@Override
 	protected void createIndex() {
 		if (!client.admin().indices().prepareExists(index).execute()
 				.actionGet().exists()) {

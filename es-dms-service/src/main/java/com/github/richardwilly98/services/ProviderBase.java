@@ -33,14 +33,14 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 
 	final String index;
 	final String type;
-	final Class<T> typeParameterClass;
+	final Class<T> clazz;
 
 	@Inject
-	ProviderBase(Client client, String index, String type, Class<T> typeParameterClass) {
+	ProviderBase(Client client, String index, String type, Class<T> clazz) {
 		this.client = client;
 		this.index = index;
 		this.type = type;
-		this.typeParameterClass = typeParameterClass;
+		this.clazz = clazz;
 		createIndex();
 		refreshIndex();
 	}
@@ -57,7 +57,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 				return null;
 			}
 			String json = response.getSourceAsString();
-			T item = mapper.readValue(json, typeParameterClass);
+			T item = mapper.readValue(json, clazz);
 			return item;
 		} catch (Throwable t) {
 			log.error("getUser failed", t);
@@ -84,7 +84,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			for (SearchHit hit : searchResponse.getHits().hits()) {
 				String json = hit.getSourceAsString();
 				try {
-					T item = mapper.readValue(json, typeParameterClass);
+					T item = mapper.readValue(json, clazz);
 					items.add(item);
 				} catch (Throwable t) {
 					log.error("Json processing exception.", t);
@@ -109,7 +109,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			log.debug("totalHits: " + searchResponse.getHits().totalHits());
 			for (SearchHit hit : searchResponse.getHits().hits()) {
 				String json = hit.getSourceAsString();
-				T item = mapper.readValue(json, typeParameterClass);
+				T item = mapper.readValue(json, clazz);
 				items.add(item);
 			}
 
@@ -145,6 +145,11 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	}
 
 	@Override
+	public T update(T item) throws ServiceException {
+		return create(item);
+	}
+	
+	@Override
 	public void delete(T item) throws ServiceException {
 		try {
 			if (log.isTraceEnabled()) {
@@ -178,7 +183,12 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		return UUID.randomUUID().toString();
 	}
 
-	protected abstract void createIndex();
+	protected void createIndex() {
+		if (!client.admin().indices().prepareExists(index).execute()
+				.actionGet().exists()) {
+			client.admin().indices().prepareCreate(index).execute().actionGet();
+		}
+	}
 
 	/*
 	 * Force index to be refreshed.

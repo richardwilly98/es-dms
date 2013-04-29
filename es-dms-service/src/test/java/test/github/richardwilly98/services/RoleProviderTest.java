@@ -8,8 +8,6 @@ import org.testng.annotations.Test;
 
 import com.github.richardwilly98.api.Permission;
 import com.github.richardwilly98.api.Role;
-import com.github.richardwilly98.api.services.RoleService;
-import com.google.inject.Inject;
 
 public class RoleProviderTest extends ProviderTestBase {
 

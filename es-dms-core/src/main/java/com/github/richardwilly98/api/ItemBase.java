@@ -25,7 +25,7 @@ public abstract class ItemBase implements Serializable {
 	}
 	
 	public ItemBase(String id) {
-		this(id, new HashMap<String, Object>());
+		this(id, null);
 	}
 	
 	public ItemBase(String id, Map<String, Object> properties) {
@@ -71,7 +71,6 @@ public abstract class ItemBase implements Serializable {
 	}
 	
 	public void setProperties(String name, Object property){
-//		if (this.properties == null) this.properties = new HashMap<String, Object>();
 		this.properties.put(name, property);
 	}
 }

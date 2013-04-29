@@ -86,10 +86,8 @@ abstract class ProviderTestBase {
 		try {
 			for (User user : users.values()) {
 				String password = user.getPassword();
-				log.trace("Before password: " + user.getPassword());
 				userService.create(user);
 				user.setPassword(password);
-				log.trace("After password: " + user.getPassword());
 			}
 		} catch (ServiceException ex) {
 			Assert.fail("createUsers failed", ex);
@@ -158,7 +156,8 @@ abstract class ProviderTestBase {
 	}
 
 	User createUser(String name, String description, boolean disabled,
-			String email, String password, Set<Role> roles) throws ServiceException {
+			String email, String password, Set<Role> roles)
+			throws ServiceException {
 		User user = new User();
 		String id = String.valueOf(System.currentTimeMillis());
 		user.setId(id);
