@@ -5,10 +5,17 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
 public class Role extends ItemBase {
 
 	private static final long serialVersionUID = 1L;
+//	@JsonIgnore
 	final Set<String> scopes;
+//	@JsonIgnore
 	final Map<String, Permission> permissions;
 
 	public Role() {

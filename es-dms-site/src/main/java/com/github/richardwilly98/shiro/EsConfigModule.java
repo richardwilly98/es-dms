@@ -18,7 +18,7 @@ public class EsConfigModule extends AbstractModule {
 	
 	@Override
 	protected void configure() {
-        install(new EsShiroModule(servletContext, securityFilterPath));
+        install(new EsShiroWebModule(servletContext, securityFilterPath));
 		install(new ShiroAopModule());
     }
 

@@ -6,15 +6,15 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import com.github.richardwilly98.api.Session;
+import com.github.richardwilly98.api.ISession;
 import com.github.richardwilly98.api.User;
 
 public class EsSecurityContext implements SecurityContext {
 
 	private final User user;
-	private final Session session;
+	private final ISession session;
 
-	public EsSecurityContext(Session session, User user) {
+	public EsSecurityContext(ISession session, User user) {
 		this.session = session;
 		this.user = user;
 	}

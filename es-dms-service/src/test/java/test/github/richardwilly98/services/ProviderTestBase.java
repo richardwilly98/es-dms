@@ -1,13 +1,12 @@
 package test.github.richardwilly98.services;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.elasticsearch.client.Client;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -37,10 +36,27 @@ abstract class ProviderTestBase {
 
 	Logger log = Logger.getLogger(this.getClass());
 	final static Map<String, User> users = new HashMap<String, User>();
-	final static List<Permission> permissions = new ArrayList<Permission>();
+	final static Set<Permission> permissions = new HashSet<Permission>();
 	final static Set<Role> roles = new HashSet<Role>();
 
 	static {
+		Permission permission = new Permission();
+		permission.setId("document:create");
+		permission.setName(permission.getId());
+		permission.setDisabled(false);
+		permission.setDescription("Create document");
+		permissions.add(permission);
+		permission = new Permission();
+		permission.setId("document:delete");
+		permission.setName(permission.getId());
+		permission.setDisabled(false);
+		permission.setDescription("Delete document");
+		permissions.add(permission);
+
+//		Role role = new Role();
+//		role.setName("");
+//		role.setPermissions(permissions);
+		
 		User user = new User();
 		user.setId("richard.louapre@gmail.com");
 		user.setEmail(user.getId());
@@ -48,7 +64,7 @@ abstract class ProviderTestBase {
 		user.setDisabled(false);
 		user.setCity("Jersey City");
 		user.setPassword("secret");
-		users.put(user.getEmail(), user);
+		users.put(user.getLogin(), user);
 		user = new User();
 		user.setId("danilo.sandron@gmail.com");
 		user.setEmail(user.getId());
@@ -56,9 +72,11 @@ abstract class ProviderTestBase {
 		user.setDisabled(false);
 		user.setCity("Bankok");
 		user.setPassword("segreto");
-		users.put(user.getEmail(), user);
+		users.put(user.getLogin(), user);
 	}
 
+	@Inject Client client;
+	
 	@Inject
 	AuthenticationService authenticationService;
 
@@ -79,6 +97,11 @@ abstract class ProviderTestBase {
 		log.info("** beforeSuite **");
 		createPermissions();
 		createRoles();
+//		if (!client.admin().indices().prepareExists("users").execute()
+//				.actionGet().exists()) {
+//			client.admin().indices().prepareDelete("users").execute().actionGet();
+//		}
+
 		createUsers();
 	}
 
@@ -157,7 +180,7 @@ abstract class ProviderTestBase {
 			String email, String password, Set<Role> roles)
 			throws ServiceException {
 		User user = new User();
-		String id = String.valueOf(System.currentTimeMillis());
+		String id = String.valueOf(email);
 		user.setId(id);
 		user.setName(name);
 		user.setDescription(description);
@@ -170,7 +193,7 @@ abstract class ProviderTestBase {
 			Assert.assertEquals(id, newUser.getId());
 			return newUser;
 		} catch (ServiceException e) {
-			log.error("createPermission failed", e);
+			log.error("createUser failed", e);
 			throw e;
 		}
 	}
@@ -196,7 +219,7 @@ abstract class ProviderTestBase {
 			Assert.assertEquals(id, newRole.getId());
 			return newRole;
 		} catch (ServiceException e) {
-			log.error("createPermission failed", e);
+			log.error("createRole failed", e);
 			throw e;
 		}
 	}

@@ -5,10 +5,12 @@ import org.junit.Assert;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
+import test.github.richardwilly98.inject.ProviderModule;
+
 import com.github.richardwilly98.api.services.HashService;
 import com.google.inject.Inject;
 
-@Guice( modules = ServiceModule.class)
+@Guice( modules = ProviderModule.class)
 public class HashServiceTest {
 
 	private static Logger log = Logger.getLogger(HashServiceTest.class);

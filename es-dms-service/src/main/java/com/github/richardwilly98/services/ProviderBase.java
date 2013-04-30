@@ -14,6 +14,7 @@ import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -51,9 +52,9 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("get - %s", id));
 			}
-			GetResponse response = client.prepareGet(index, type, id)
-					.execute().actionGet();
-			if (! response.exists()) {
+			GetResponse response = client.prepareGet(index, type, id).execute()
+					.actionGet();
+			if (!response.exists()) {
 				return null;
 			}
 			String json = response.getSourceAsString();
@@ -104,8 +105,9 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			List<T> items = new ArrayList<T>();
 
 			SearchResponse searchResponse = client.prepareSearch(index)
-					.setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH).setQuery(new QueryStringQueryBuilder(criteria))
-					.execute().actionGet();
+					.setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH)
+					.setQuery(new QueryStringQueryBuilder(criteria)).execute()
+					.actionGet();
 			log.debug("totalHits: " + searchResponse.getHits().totalHits());
 			for (SearchHit hit : searchResponse.getHits().hits()) {
 				String json = hit.getSourceAsString();
@@ -146,9 +148,24 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 
 	@Override
 	public T update(T item) throws ServiceException {
-		return create(item);
+		try {
+			if (log.isTraceEnabled()) {
+				log.trace(String.format("create - %s", item));
+			}
+			String json;
+			json = mapper.writeValueAsString(item);
+			UpdateResponse response = client
+					.prepareUpdate(index, type, item.getId()).setDoc(json)
+					.execute().actionGet();
+			refreshIndex();
+			T updatedItem = get(response.getId());
+			return updatedItem;
+		} catch (Throwable t) {
+			log.error("create failed", t);
+			throw new ServiceException(t.getLocalizedMessage());
+		}
 	}
-	
+
 	@Override
 	public void delete(T item) throws ServiceException {
 		try {
@@ -169,14 +186,11 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 
 	@Override
 	public boolean disabled(T item) throws ServiceException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public void disable(T item, boolean b) throws ServiceException {
-		// TODO Auto-generated method stub
-
 	}
 
 	protected String generateUniqueId(T item) {
@@ -190,9 +204,6 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		}
 	}
 
-	/*
-	 * Force index to be refreshed.
-	 */
 	protected void refreshIndex() {
 		client.admin().indices().refresh(new RefreshRequest(index)).actionGet();
 	}

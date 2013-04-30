@@ -1,5 +1,6 @@
 package com.github.richardwilly98.services;
 
+import org.apache.shiro.util.ByteSource;
 import org.elasticsearch.client.Client;
 
 import com.github.richardwilly98.api.User;
@@ -27,8 +28,10 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 				user.setId(generateUniqueId(user));
 			}
 			if (user.getPassword() != null) {
-				String encodedHash = hashService.toBase64(user.getPassword().getBytes());
-				log.trace("From service - hash: " + encodedHash);
+//				String encodedHash = hashService.toBase64(user.getPassword().getBytes());
+				String encodedHash = hashService.toBase64(ByteSource.Util.bytes(user.getPassword().toCharArray()).getBytes());
+//				return service.toBase64(ByteSource.Util.bytes(password).getBytes());
+				log.trace("From service - hash: " + encodedHash + " for login " + user.getLogin());
 				user.setHash(encodedHash);
 				user.setPassword(null);
 			}

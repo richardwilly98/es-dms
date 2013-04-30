@@ -4,14 +4,13 @@ import javax.servlet.ServletContext;
 
 import org.apache.shiro.guice.web.ShiroWebModule;
 
-import com.github.richardwilly98.shiro.realm.EsRealm;
 import com.google.inject.name.Names;
 
-public class EsShiroModule extends ShiroWebModule {
+public class EsShiroWebModule extends ShiroWebModule {
 
 	private final String securityFilterPath;
 	
-	public EsShiroModule(ServletContext servletContext, String securityFilterPath) {
+	public EsShiroWebModule(ServletContext servletContext, String securityFilterPath) {
 		super(servletContext);
 		this.securityFilterPath = securityFilterPath;
 	}

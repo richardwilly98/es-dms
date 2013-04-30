@@ -35,4 +35,12 @@ public class User extends Person implements Principal {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+	@JsonIgnore
+	public String getLogin() {
+		return email;
+	}
+	@Override
+	public String toString() {
+		return getId() + " - " + getLogin();
+	}
 }
