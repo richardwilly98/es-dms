@@ -36,6 +36,7 @@ public class User extends Person implements Principal {
 			this.roles.addAll(roles);
 		}
 	}
+	
 	public String getHash() {
 		return hash;
 	}
@@ -56,6 +57,10 @@ public class User extends Person implements Principal {
 			roles.add(role);
 		}
 	}
+	public void removeRole (Role role){
+		if (role != null) roles.remove(role);
+	}
+	
 	@Override
 	public String toString() {
 		return getLogin() + " - " + getName();
