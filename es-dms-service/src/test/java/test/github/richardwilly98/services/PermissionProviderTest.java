@@ -18,7 +18,7 @@ import com.google.inject.Injector;
 @Test
 public class PermissionProviderTest {
 
-	private static Logger log = Logger.getLogger(UserProviderTest.class);
+	private static Logger log = Logger.getLogger(PermissionProviderTest.class);
 
 	@BeforeSuite
 	public void beforeSuite() throws Exception {
@@ -40,15 +40,12 @@ public class PermissionProviderTest {
 	private Permission testCreatePermission(String name, String description,
 			boolean disabled) throws Throwable {
 		PermissionService provider = getPermissionProvider();
-		Permission permission = new Permission();
-		String id = name; //String.valueOf(System.currentTimeMillis());
-		permission.setId(id);
-		permission.setName(name);
+		Permission permission = new Permission(name);
 		permission.setDescription(description);
 		permission.setDisabled(disabled);
 		
 		Permission aPermission = provider.create(permission);
-		Assert.assertEquals(id, aPermission.getId());
+		Assert.assertEquals(permission.getId(), aPermission.getId());
 		
 		Permission newPermission = provider.get(aPermission.getId());
 		Assert.assertNotNull(newPermission);
@@ -96,8 +93,8 @@ public class PermissionProviderTest {
 	public void testFindPermission() throws Throwable {
 		log.info("Start testFindPermission");
 		
-		Permission p = testCreatePermission("group:add-user", "add user to group", false);
-		p = testCreatePermission("group:remove-user", "remove user from group", false);
+		testCreatePermission("group:add-user", "add user to group", false);
+		testCreatePermission("group:remove-user", "remove user from group", false);
 		
 		PermissionService provider = getPermissionProvider();
 		Permission permission = provider.get("group:add-user");

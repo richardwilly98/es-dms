@@ -40,23 +40,45 @@ abstract class ProviderTestBase {
 	final static Set<Role> roles = new HashSet<Role>();
 
 	static {
-		Permission permission = new Permission();
-		permission.setId("document:create");
-		permission.setName(permission.getId());
-		permission.setDisabled(false);
-		permission.setDescription("Create document");
-		permissions.add(permission);
-		permission = new Permission();
-		permission.setId("document:delete");
-		permission.setName(permission.getId());
-		permission.setDisabled(false);
-		permission.setDescription("Delete document");
-		permissions.add(permission);
-
-//		Role role = new Role();
-//		role.setName("");
-//		role.setPermissions(permissions);
+		Permission permissionCreateDocument = new Permission("document:create");
+//		permissionCreateDocument.setId("document:create");
+//		permissionCreateDocument.setName(permissionCreateDocument.getId());
+//		permissionCreateDocument.setDisabled(false);
+		permissionCreateDocument.setDescription("Create document");
+		permissions.add(permissionCreateDocument);
 		
+		Permission permissionDeleteDocument = new Permission("document:delete");
+//		permissionDeleteDocument.setId("document:delete");
+//		permissionDeleteDocument.setName(permissionDeleteDocument.getId());
+//		permissionDeleteDocument.setDisabled(false);
+		permissionDeleteDocument.setDescription("Delete document");
+		permissions.add(permissionDeleteDocument);
+		
+		Permission permissionReadDocument = new Permission("document:read");
+//		permissionReadDocument.setId("document:read");
+//		permissionReadDocument.setName(permissionReadDocument.getId());
+//		permissionReadDocument.setDisabled(false);
+		permissionReadDocument.setDescription("Read document");
+		permissions.add(permissionReadDocument);
+
+		Role collaboratorRole = new Role();
+		collaboratorRole.setId("collaborator");
+		collaboratorRole.setName(collaboratorRole.getId());
+		collaboratorRole.setDescription("Collaborator");
+		collaboratorRole.setDisabled(false);
+		collaboratorRole.setPermissions(permissions);
+		roles.add(collaboratorRole);
+		
+		Role readerRole = new Role();
+		readerRole.setId("reader");
+		readerRole.setName(readerRole.getId());
+		readerRole.setDescription("Reader");
+		readerRole.setDisabled(false);
+		Set<Permission> ps = new HashSet<Permission>();
+		ps.add(permissionReadDocument);
+		readerRole.setPermissions(ps);
+		roles.add(readerRole);
+
 		User user = new User();
 		user.setId("richard.louapre@gmail.com");
 		user.setEmail(user.getId());
@@ -64,6 +86,8 @@ abstract class ProviderTestBase {
 		user.setDisabled(false);
 		user.setCity("Jersey City");
 		user.setPassword("secret");
+		user.addRole(readerRole);
+		
 		users.put(user.getLogin(), user);
 		user = new User();
 		user.setId("danilo.sandron@gmail.com");
@@ -72,6 +96,7 @@ abstract class ProviderTestBase {
 		user.setDisabled(false);
 		user.setCity("Bankok");
 		user.setPassword("segreto");
+		user.addRole(collaboratorRole);
 		users.put(user.getLogin(), user);
 	}
 
@@ -119,12 +144,6 @@ abstract class ProviderTestBase {
 
 	private void createRoles() {
 		try {
-			Map<String, Permission> p = new HashMap<String, Permission>();
-			for (Permission permission : permissions) {
-				p.put(permission.getName(), permission);
-			}
-
-			roles.add(createRole("collaborator", "Collaborator", false, p));
 			for (Role role : roles) {
 				roleService.create(role);
 			}
@@ -135,8 +154,6 @@ abstract class ProviderTestBase {
 
 	private void createPermissions() {
 		try {
-			permissions.add(createPermission("document:create","Create document", false));
-			permissions.add(createPermission("document:delete","Delete document", false));
 			for (Permission permission : permissions) {
 				permissionService.create(permission);
 			}
@@ -202,7 +219,7 @@ abstract class ProviderTestBase {
 													 * Set<Permission>
 													 * permissions,
 													 */
-			boolean disabled, Map<String, Permission> permissions)
+			boolean disabled, Set<Permission> permissions)
 			throws ServiceException {
 		log.trace("Preparing to create permission: " + name);
 		Assert.assertTrue(!(name == null || name.isEmpty()));
