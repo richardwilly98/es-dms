@@ -97,6 +97,9 @@ public class EsSessionDAO extends AbstractSessionDAO {
 	protected Session doReadSession(Serializable sessionId) {
 		try {
 			ISession session = service.get(sessionId.toString());
+			if (session == null) {
+				return null;
+			}
 			return new EsSession(session);
 		} catch (ServiceException ex) {
 			log.error("doReadSession failed", ex);

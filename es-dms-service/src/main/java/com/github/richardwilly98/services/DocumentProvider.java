@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
@@ -34,6 +35,18 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 		super(client, DocumentProvider.index, DocumentProvider.type, Document.class);
 	}
 
+	@RequiresPermissions(CREATE_PERMISSION)
+	@Override
+	public Document create(Document item) throws ServiceException {
+		return super.create(item);
+	}
+
+	@RequiresPermissions(DELETE_PERMISSION)
+	@Override
+	public void delete(Document item) throws ServiceException {
+		super.delete(item);
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.github.richardwilly98.services.IDocumentService#getDocument(java.lang.String)
 	 */

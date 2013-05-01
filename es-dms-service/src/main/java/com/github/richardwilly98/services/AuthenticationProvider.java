@@ -11,8 +11,10 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
@@ -23,8 +25,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.api.Credential;
 import com.github.richardwilly98.api.ISession;
 import com.github.richardwilly98.api.Session;
+import com.github.richardwilly98.api.User;
 import com.github.richardwilly98.api.exception.ServiceException;
 import com.github.richardwilly98.api.services.AuthenticationService;
+import com.github.richardwilly98.api.services.UserService;
 import com.google.inject.Inject;
 
 public class AuthenticationProvider implements AuthenticationService {
@@ -35,34 +39,37 @@ public class AuthenticationProvider implements AuthenticationService {
 
 	private final static String index = "system";
 	private final static String type = "session";
+	
 	private final static ObjectMapper mapper = new ObjectMapper();
 	private final Client client;
 	private final org.apache.shiro.mgt.SecurityManager securityManager;
+	private final UserService userService;
 
 	@Inject
 	AuthenticationProvider(final Client client,
-			final org.apache.shiro.mgt.SecurityManager securityManager) {
+			final org.apache.shiro.mgt.SecurityManager securityManager,
+			final UserService userService) {
 		this.client = client;
 		this.securityManager = securityManager;
+		this.userService = userService;
 		SecurityUtils.setSecurityManager(securityManager);
+		createIndex();
+		refreshIndex();
 	}
 
 	@Override
 	public ISession get(String id) throws ServiceException {
 		try {
-			if (log.isTraceEnabled()) {
-				log.trace(String.format("get - %s", id));
-			}
 			GetResponse response = client.prepareGet(index, type, id).execute()
 					.actionGet();
 			if (!response.exists()) {
 				return null;
 			}
 			String json = response.getSourceAsString();
-			Session permission = mapper.readValue(json, Session.class);
+			ISession permission = mapper.readValue(json, Session.class);
 			return permission;
 		} catch (Throwable t) {
-			log.error("getPermission failed", t);
+			log.error("get failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}
@@ -84,7 +91,7 @@ public class AuthenticationProvider implements AuthenticationService {
 
 	@Override
 	public String login(Credential credential) throws ServiceException {
-		String login = credential.getLogin();
+		String login = credential.getUsername();
 		char[] password = credential.getPassword().toCharArray();
 		try {
 			UsernamePasswordToken token = new UsernamePasswordToken(login,
@@ -100,16 +107,17 @@ public class AuthenticationProvider implements AuthenticationService {
 			}
 			token.clear();
 			// Create subject for the current principal
-			Subject subject = new Subject.Builder().principals(info.getPrincipals()).buildSubject();
+			Subject subject = new Subject.Builder().principals(
+					info.getPrincipals()).buildSubject();
 			// Create session
-			org.apache.shiro.session.Session session = subject.getSession(true);
+			org.apache.shiro.session.Session session = subject
+					.getSession(true);
 			if (session == null) {
-				throw new ServiceException(String.format("Unable to create session for ", login));
+				throw new ServiceException(String.format(
+						"Unable to create session for ", login));
 			}
 			session.setAttribute(ES_DMS_LOGIN_ATTRIBUTE, login);
-			for (Object key : session.getAttributeKeys()) {
-				log.debug("Attribute key - " + key);
-			}
+            ThreadContext.bind(subject);
 			return session.getId().toString();
 		} catch (AuthenticationException aEx) {
 			String message = String.format("Authentication failed for %s",
@@ -123,22 +131,44 @@ public class AuthenticationProvider implements AuthenticationService {
 	public void logout(String token) throws ServiceException {
 		Subject subject = getSubjectBySessionId(token);
 		if (subject != null) {
-//			securityManager.logout(subject);
 			subject.logout();
 		}
 	}
 
 	// gets or creates a session with the given sessionId
-	public Subject getSubjectBySessionId(String sessionId) {
+	private Subject getSubjectBySessionId(String sessionId)
+			throws ServiceException {
 		Subject subject = null;
 		try {
-			// newSessionId.set(sessionId);
 			subject = new Subject.Builder(securityManager).sessionId(sessionId)
 					.buildSubject();
 			subject.getSession(true);
 		} finally {
-			// newSessionId.remove();
 		}
+		return subject;
+	}
+
+	private Subject getSubjectByPrincipal(PrincipalCollection principals) {
+		Subject currentUser = new Subject.Builder().principals(principals)
+				.buildSubject();
+		return currentUser;
+	}
+
+	private PrincipalCollection getPrincipals(String token)
+			throws ServiceException {
+		User user = null;
+		ISession session = get(token);
+		if (session != null) {
+			String login = session.getUserId();
+			user = userService.get(login);
+		}
+		SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user, "", "");
+		return info.getPrincipals();
+	}
+
+	private Subject getSubjectFromSessionId(String token)
+			throws ServiceException {
+		Subject subject = getSubjectByPrincipal(getPrincipals(token));
 		return subject;
 	}
 
@@ -147,7 +177,7 @@ public class AuthenticationProvider implements AuthenticationService {
 		ISession session = get(token);
 		if (session != null) {
 			session.setLastAccessTime(new Date());
-			create(session);
+			update(session);
 		}
 	}
 
@@ -224,11 +254,43 @@ public class AuthenticationProvider implements AuthenticationService {
 
 	}
 
+	private void createIndex() {
+		if (!client.admin().indices().prepareExists(index).execute()
+				.actionGet().exists()) {
+			client.admin().indices().prepareCreate(index).execute().actionGet();
+		}
+	}
+
 	private void refreshIndex() {
 		client.admin().indices().refresh(new RefreshRequest(index)).actionGet();
 	}
 
 	private String generateUniqueId() {
 		return UUID.randomUUID().toString();
+	}
+
+	@Override
+	public boolean hasRole(String token, String role) throws ServiceException {
+		Subject subject = getSubjectFromSessionId(token);
+		if (subject != null) {
+			return subject.hasRole(role);
+		}
+		return false;
+	}
+
+	@Override
+	public boolean hasPermission(String token, String permission)
+			throws ServiceException {
+		Subject subject = getSubjectFromSessionId(token);
+		if (subject != null) {
+			try {
+				subject.checkPermission(permission);
+				return true;
+			} catch (AuthorizationException aEx) {
+				log.warn("checkPermission failed " + aEx.getLocalizedMessage());
+				return false;
+			}
+		}
+		return false;
 	}
 }

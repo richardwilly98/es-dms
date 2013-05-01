@@ -14,4 +14,10 @@ public interface AuthenticationService extends BaseService <ISession> {
 	
 	public abstract void validate(String token)
 			throws ServiceException;
+	
+	public boolean hasRole(String token, String role)
+			throws ServiceException;
+
+	public boolean hasPermission(String token, String permission)
+			throws ServiceException;
 }

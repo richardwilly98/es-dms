@@ -3,9 +3,19 @@ package com.github.richardwilly98.rest;
 import org.apache.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
 
+import com.github.richardwilly98.api.services.AuthenticationService;
+import com.google.inject.Inject;
+
 abstract class RestServiceBase {
 
 	Logger log = Logger.getLogger(this.getClass());
+	
+	final AuthenticationService authenticationService;
+
+	@Inject
+	public RestServiceBase(AuthenticationService authenticationService) {
+		this.authenticationService = authenticationService; 
+	}
 	
 	private String currentUser;
 

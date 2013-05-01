@@ -18,6 +18,8 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 
+import com.github.richardwilly98.api.Permission;
+import com.github.richardwilly98.api.Role;
 import com.github.richardwilly98.api.User;
 import com.github.richardwilly98.api.exception.ServiceException;
 import com.github.richardwilly98.api.services.HashService;
@@ -44,58 +46,28 @@ public class EsRealm extends AuthorizingRealm {
 		return (token instanceof UsernamePasswordToken);
 	}
 
-	// protected SimpleAccount getAccount(String username) {
-	// //just create a dummy. A real app would construct one based on EIS
-	// access.
-	// SimpleAccount account = new SimpleAccount(username,
-	// "sha256EncodedPasswordFromDatabase", getName());
-	// //simulate some roles and permissions:
-	// account.addRole("user");
-	// account.addRole("admin");
-	// //most applications would assign permissions to Roles instead of users
-	// directly because this is much more
-	// //flexible (it is easier to configure roles and then change role-to-user
-	// assignments than it is to maintain
-	// // permissions for each user).
-	// // But these next lines assign permissions directly to this trivial
-	// account object just for simulation's sake:
-	// account.addStringPermission("blogEntry:edit"); //this user is allowed to
-	// 'edit' _any_ blogEntry
-	// //fine-grained instance level permission:
-	// account.addStringPermission("printer:print:laserjet2000"); //allowed to
-	// 'print' to the 'printer' identified
-	// //by the id 'laserjet2000'
-	//
-	// return account;
-	// }
-
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(
 			PrincipalCollection principals) {
 		log.debug("*** doGetAuthorizationInfo ***");
-		Collection<User> principalsList = principals.byType(User.class);
+		Collection<User> principalList = principals.byType(User.class);
 		if (principals.isEmpty()) {
-			throw new AuthorizationException("Empty principals list!");
+			throw new AuthorizationException("Empty principal list!");
 		}
 
-		for (User userPrincipal : principalsList) {
-			log.debug(userPrincipal);
-		}
-
+		User principal = principalList.iterator().next();
 		Set<String> roles = new HashSet<String>();
 		Set<String> permissions = new HashSet<String>();
-		roles.add("reader");
-		permissions.add("document:create");
-		permissions.add("document:delete");
+		for(Role role : principal.getRoles()) {
+			roles.add(role.getId());
+			for(Permission permission : role.getPermissions()) {
+				permissions.add(permission.getId());
+			}
+		}
 		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 		info.setRoles(roles);
 		info.setStringPermissions(permissions);
 		return info;
-		// //get the principal this realm cares about:
-		// String username = (String) getAvailablePrincipal(principals);
-		//
-		// //call the underlying EIS for the account data:
-		// return getAccount(username);
 	}
 
 	@Override
@@ -122,8 +94,10 @@ public class EsRealm extends AuthorizingRealm {
 			log.trace("hash: " + hash);
 		}
 		if (hash.equals(user.getHash())) {
+//			SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(
+//					upToken.getUsername(), upToken.getPassword(), getName());
 			SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(
-					upToken.getUsername(), upToken.getPassword(), getName());
+					user, upToken.getPassword(), getName());
 			return info;
 		} else {
 			throw new AuthenticationException(String.format(

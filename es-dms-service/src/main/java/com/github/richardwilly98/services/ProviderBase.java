@@ -31,7 +31,6 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 
 	final static ObjectMapper mapper = new ObjectMapper();
 	final Client client;
-
 	final String index;
 	final String type;
 	final Class<T> clazz;

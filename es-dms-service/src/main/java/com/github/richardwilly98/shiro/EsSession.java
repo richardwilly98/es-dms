@@ -34,7 +34,7 @@ public class EsSession extends SimpleSession implements ISession {
 
 	@Override
 	public String getUserId() {
-		return null;
+		return session.getUserId();
 	}
 
 	@Override

@@ -15,33 +15,25 @@ import javax.ws.rs.core.Response.Status;
 
 import com.github.richardwilly98.api.User;
 import com.github.richardwilly98.api.exception.ServiceException;
+import com.github.richardwilly98.api.services.AuthenticationService;
 import com.github.richardwilly98.api.services.HashService;
-import com.github.richardwilly98.inject.ProviderModule;
+import com.github.richardwilly98.api.services.UserService;
 import com.github.richardwilly98.rest.exception.RestServiceException;
-import com.github.richardwilly98.services.UserProvider;
-import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 
 @Path("/users")
 public class RestUserService extends RestServiceBase {
 
-	private final HashService service;
-	private UserProvider provider;
+	private final HashService hashService;
+	private final UserService userService;
 
 	@Inject
-	public RestUserService(final HashService service) {
-		this.service = service;
+	public RestUserService(AuthenticationService authenticationService, final HashService hashService, final UserService userService) {
+		super(authenticationService);
+		this.hashService = hashService;
+		this.userService = userService;
 	}
 	
-	private UserProvider getProvider() {
-		if (provider == null) {
-			Injector injector = Guice.createInjector(new ProviderModule());
-			provider = injector.getInstance(UserProvider.class);
-		}
-		return provider;
-	}
-
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("/{id}")
@@ -50,7 +42,7 @@ public class RestUserService extends RestServiceBase {
 			log.trace(String.format("get - %s", id));
 		}
 		try {
-			User user = getProvider().get(id);
+			User user = userService.get(id);
 			return Response.ok(user).build();
 		} catch (ServiceException e) {
 			throw new RestServiceException(e.getLocalizedMessage());
@@ -65,8 +57,8 @@ public class RestUserService extends RestServiceBase {
 			log.trace(String.format("get - %s", id));
 		}
 		try {
-			User user = getProvider().get(id);
-			getProvider().delete(user);
+			User user = userService.get(id);
+			userService.delete(user);
 			return Response.ok().build();
 		} catch (ServiceException e) {
 			throw new RestServiceException(e.getLocalizedMessage());
@@ -81,7 +73,7 @@ public class RestUserService extends RestServiceBase {
 			log.trace(String.format("find - %s", name));
 		}
 		try {
-			List<User> users= getProvider().getList(name); 
+			List<User> users= userService.getList(name); 
 			return  Response.ok(users).build();
 		} catch (ServiceException e) {
 			throw new RestServiceException(e.getLocalizedMessage());
@@ -100,12 +92,12 @@ public class RestUserService extends RestServiceBase {
 		}
 		try {
 			if (user.getPassword() != null) {
-				String encodedHash = service.toBase64(user.getPassword().getBytes());
+				String encodedHash = hashService.toBase64(user.getPassword().getBytes());
 				log.trace("From service - hash: " + encodedHash);
 				user.setHash(encodedHash);
 				user.setPassword(null);
 			}
-			user = getProvider().create(user);
+			user = userService.create(user);
 			return Response.status(Status.CREATED).entity(user).build();
 		} catch (ServiceException e) {
 			throw new RestServiceException(e.getLocalizedMessage());

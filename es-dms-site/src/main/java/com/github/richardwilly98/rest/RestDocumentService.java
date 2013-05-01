@@ -26,12 +26,10 @@ import org.joda.time.DateTime;
 import com.github.richardwilly98.api.Document;
 import com.github.richardwilly98.api.File;
 import com.github.richardwilly98.api.exception.ServiceException;
+import com.github.richardwilly98.api.services.AuthenticationService;
 import com.github.richardwilly98.api.services.DocumentService;
-import com.github.richardwilly98.inject.ProviderModule;
 import com.github.richardwilly98.rest.exception.RestServiceException;
-import com.github.richardwilly98.services.DocumentProvider;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import com.google.inject.Inject;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataParam;
@@ -39,14 +37,12 @@ import com.sun.jersey.multipart.FormDataParam;
 @Path("/documents")
 public class RestDocumentService extends RestServiceBase {
 
-	private DocumentService provider;
+	private final DocumentService documentService;
 
-	private DocumentService getProvider() {
-		if (provider == null) {
-			Injector injector = Guice.createInjector(new ProviderModule());
-			provider = injector.getInstance(DocumentProvider.class);
-		}
-		return provider;
+	@Inject
+	public RestDocumentService(AuthenticationService authenticationService, DocumentService documentService) {
+		super(authenticationService);
+		this.documentService = documentService;
 	}
 
 	@GET
@@ -57,7 +53,7 @@ public class RestDocumentService extends RestServiceBase {
 			log.trace(String.format("get - %s", id));
 		}
 		try {
-			return getProvider().get(id);
+			return documentService.get(id);
 		} catch (ServiceException e) {
 			log.error("get document failed", e);
 			throw new RestServiceException(e.getLocalizedMessage());
@@ -80,7 +76,7 @@ public class RestDocumentService extends RestServiceBase {
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("search - %s", criteria));
 			}
-			List<Document> documents = getProvider().search(criteria);
+			List<Document> documents = documentService.search(criteria);
 			return Response.status(Status.OK).entity(documents).build();
 		} catch (ServiceException e) {
 			log.error("search failed", e);
@@ -97,7 +93,7 @@ public class RestDocumentService extends RestServiceBase {
 			log.trace(String.format("find - %s", name));
 		}
 		try {
-			List<Document> documents = getProvider().getList(name);
+			List<Document> documents = documentService.getList(name);
 			return Response.status(Status.OK).entity(documents).build();
 		} catch (ServiceException e) {
 			log.error("find failed", e);
@@ -117,7 +113,7 @@ public class RestDocumentService extends RestServiceBase {
 			log.trace(String.format("create - %s", document));
 		}
 		try {
-			document = getProvider().create(document);
+			document = documentService.create(document);
 			return Response.status(Status.CREATED).entity(document).build();
 		} catch (ServiceException e) {
 			log.error("create failed", e);
@@ -134,8 +130,8 @@ public class RestDocumentService extends RestServiceBase {
 			log.trace(String.format("get - %s", id));
 		}
 		try {
-			Document document = getProvider().get(id);
-			getProvider().delete(document);
+			Document document = documentService.get(id);
+			documentService.delete(document);
 			return Response.ok().build();
 		} catch (ServiceException e) {
 			throw new RestServiceException(e.getLocalizedMessage());
@@ -196,7 +192,7 @@ public class RestDocumentService extends RestServiceBase {
 			attributes.put(Document.CREATION_DATE, now.toString());
 			attributes.put(Document.AUTHOR, getCurrentUser());
 			Document document = new Document(null, file, attributes);
-			document = getProvider().create(document);
+			document = documentService.create(document);
 			log.debug(String.format("New document uploaded %s", document.getId()));
 			document.setFile(null);
 			return Response.ok(document).build();
@@ -243,7 +239,7 @@ public class RestDocumentService extends RestServiceBase {
 			attributes.put(Document.AUTHOR, getCurrentUser());
 			Document document = new Document(null, file, attributes);
 
-			document = getProvider().create(document);
+			document = documentService.create(document);
 			log.debug(String.format("New document uploaded %s", document.getId()));
 			document.setFile(null);
 			return Response.ok(document).build();
