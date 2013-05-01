@@ -1,7 +1,5 @@
 package com.github.richardwilly98.inject;
 
-import org.apache.shiro.session.mgt.eis.SessionDAO;
-
 import com.github.richardwilly98.api.services.AuthenticationService;
 import com.github.richardwilly98.api.services.DocumentService;
 import com.github.richardwilly98.api.services.HashService;
@@ -14,7 +12,6 @@ import com.github.richardwilly98.services.PermissionProvider;
 import com.github.richardwilly98.services.RoleProvider;
 import com.github.richardwilly98.services.SHA512HashService;
 import com.github.richardwilly98.services.UserProvider;
-import com.github.richardwilly98.shiro.EsSessionDAO;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 

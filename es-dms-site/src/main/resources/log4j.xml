@@ -65,6 +65,12 @@
         <appender-ref ref="STDOUT" />
     </logger>
          
+    <logger name="org.apache.shiro" additivity="false">
+        <level value="trace" />
+        <!-- appender-ref ref="SW_ROLLING_FILE" /-->
+        <appender-ref ref="STDOUT" />
+    </logger>
+    
     <!-- ** -->
      
     <root>

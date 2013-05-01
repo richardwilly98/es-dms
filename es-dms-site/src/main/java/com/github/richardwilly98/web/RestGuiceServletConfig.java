@@ -20,7 +20,6 @@ public class RestGuiceServletConfig extends GuiceServletContextListener {
 
 	@Override
 	protected Injector getInjector() {
-		log.debug("*** getInjector() ***");
 		String securityFilterPath = "/api/*";
 		return Guice.createInjector(new EsJerseyServletModule(
 				securityFilterPath), new EsConfigModule(servletContext,

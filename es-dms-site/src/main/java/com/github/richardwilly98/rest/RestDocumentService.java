@@ -19,7 +19,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.common.Base64;
 import org.joda.time.DateTime;
 
@@ -121,7 +120,6 @@ public class RestDocumentService extends RestServiceBase {
 		}
 	}
 
-	@RequiresPermissions("document:delete")
 	@DELETE
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("/{id}")
@@ -164,7 +162,6 @@ public class RestDocumentService extends RestServiceBase {
 	//
 	// }
 
-	@RequiresPermissions("document:create")
 	@POST
 	@Path("/upload")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)

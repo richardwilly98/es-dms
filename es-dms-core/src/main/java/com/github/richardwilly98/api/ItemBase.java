@@ -82,4 +82,8 @@ public abstract class ItemBase implements Serializable {
 		}
 
 	}
+	@Override
+	public String toString() {
+		return getClass().getName() + " - " + getId();
+	}
 }

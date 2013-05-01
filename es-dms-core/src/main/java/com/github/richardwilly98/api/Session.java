@@ -75,5 +75,9 @@ public class Session implements ISession {
 	public void setTimeout(long timeout) {
 		this.timeout = timeout;
 	}
+	@Override
+	public String toString() {
+		return getId() + " -  " + getUserId();
+	}
 
 }

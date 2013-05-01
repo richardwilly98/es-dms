@@ -119,6 +119,7 @@ public class EsRealm extends AuthorizingRealm {
 			accountCreated = true;
 			if (users.size() == 0) {
 				User user = new User();
+				user.setId(username);
 				user.setName(username);
 				user.setDescription("System administrator");
 				user.setHash(computeBase64Hash(password));

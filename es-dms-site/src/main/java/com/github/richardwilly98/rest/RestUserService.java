@@ -28,12 +28,13 @@ public class RestUserService extends RestServiceBase {
 	private final UserService userService;
 
 	@Inject
-	public RestUserService(AuthenticationService authenticationService, final HashService hashService, final UserService userService) {
+	public RestUserService(AuthenticationService authenticationService,
+			final HashService hashService, final UserService userService) {
 		super(authenticationService);
 		this.hashService = hashService;
 		this.userService = userService;
 	}
-	
+
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("/{id}")
@@ -73,8 +74,8 @@ public class RestUserService extends RestServiceBase {
 			log.trace(String.format("find - %s", name));
 		}
 		try {
-			List<User> users= userService.getList(name); 
-			return  Response.ok(users).build();
+			List<User> users = userService.getList(name);
+			return Response.ok(users).build();
 		} catch (ServiceException e) {
 			throw new RestServiceException(e.getLocalizedMessage());
 		}
@@ -92,7 +93,8 @@ public class RestUserService extends RestServiceBase {
 		}
 		try {
 			if (user.getPassword() != null) {
-				String encodedHash = hashService.toBase64(user.getPassword().getBytes());
+				String encodedHash = hashService.toBase64(user.getPassword()
+						.getBytes());
 				log.trace("From service - hash: " + encodedHash);
 				user.setHash(encodedHash);
 				user.setPassword(null);

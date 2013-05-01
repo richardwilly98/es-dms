@@ -109,6 +109,7 @@ public class AuthenticationProvider implements AuthenticationService {
 			// Create subject for the current principal
 			Subject subject = new Subject.Builder().principals(
 					info.getPrincipals()).buildSubject();
+			log.trace("subject.getPrincipal(): " + subject.getPrincipal());
 			// Create session
 			org.apache.shiro.session.Session session = subject
 					.getSession(true);
@@ -118,6 +119,8 @@ public class AuthenticationProvider implements AuthenticationService {
 			}
 			session.setAttribute(ES_DMS_LOGIN_ATTRIBUTE, login);
             ThreadContext.bind(subject);
+            Subject currentUser = SecurityUtils.getSubject();
+            log.trace("currentUser.getPrincipal(): " + currentUser.getPrincipal());
 			return session.getId().toString();
 		} catch (AuthenticationException aEx) {
 			String message = String.format("Authentication failed for %s",
@@ -230,14 +233,15 @@ public class AuthenticationProvider implements AuthenticationService {
 			}
 			String json;
 			json = mapper.writeValueAsString(session);
+			client.prepareDelete(index, type, session.getId());
 			UpdateResponse response = client
-					.prepareUpdate(index, type, session.getId()).setDoc(json)
+					.prepareUpdate(index, type, session.getId()).setDoc(json).setRetryOnConflict(5)
 					.execute().actionGet();
-			refreshIndex();
+//			refreshIndex();
 			ISession updatedSession = get(response.getId());
 			return updatedSession;
 		} catch (Throwable t) {
-			log.error("create failed", t);
+			log.error("update failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}

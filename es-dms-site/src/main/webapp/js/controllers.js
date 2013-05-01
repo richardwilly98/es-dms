@@ -88,7 +88,7 @@ simpleApp.controller('userEditController', function ($scope, $rootScope, $http, 
 	  
 	$scope.incompleteTest = function() {
 		if ($scope.newUser) {
-			if (!$scope.username.length || !$scope.pw1.length || !$scope.pw2.length) {
+			if (!$scope.user.name.length || !$scope.pw1.length || !$scope.pw2.length) {
 				$scope.incomplete = true;
 			} else {
 				$scope.incomplete = false;
@@ -123,16 +123,22 @@ simpleApp.controller('simpleController', function ($scope, userService) {
     };
 });
 
-simpleApp.controller('loginController', function ($scope, authenticationService, authService, sharedService) {
+simpleApp.controller('loginController', function ($scope, /*$cookieStore,*/ authenticationService, authService, sharedService) {
 
     $scope.shouldBeOpen = true;
 
     $scope.login = function() {
     	console.log('loginController - login');
     	authenticationService.login($scope.username, $scope.password, function(data) {
-    		console.log(data);
-    		if (data === 'AUTHENTICATED') {
+    		console.log('data: ' + data);
+//    		var response = JSON.parse(data);
+//    		console.log('response: ' + response);
+    		if (data.status === 'AUTHENTICATED') {
         		authService.loginConfirmed();
+        		var token = data.token;
+        		console.log(token);
+//        		$cookieStore.put('_ES_DMS_TICKET', unescape(token))
+//        		console.log('Cookie ES_DMS_TICKET: ' + $cookieStore.get('_ES_DMS_TICKET'));
         		$scope.shouldBeOpen = false;
         		sharedService.prepForBroadcast({logout: true});
     		}
