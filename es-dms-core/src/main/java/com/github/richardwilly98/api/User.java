@@ -1,6 +1,7 @@
 package com.github.richardwilly98.api;
 
 import java.security.Principal;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -13,15 +14,27 @@ public class User extends Person implements Principal {
 	private static final long serialVersionUID = 1L;
 	Set<Role> roles;
 	String hash;
-	
 	@JsonIgnore
 	String password;
+
+	public User() {
+	}
+	
+	@JsonIgnore
+	public String getLogin() {
+		return email;
+	}
 
 	public Set<Role> getRoles() {
 		return roles;
 	}
 	public void setRoles(Set<Role> roles) {
-		this.roles = roles;
+		if (roles != null) {
+			if (this.roles == null) {
+				this.roles = new HashSet<Role>();
+			}
+			this.roles.addAll(roles);
+		}
 	}
 	public String getHash() {
 		return hash;
@@ -35,12 +48,16 @@ public class User extends Person implements Principal {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	@JsonIgnore
-	public String getLogin() {
-		return email;
+	public void addRole(Role role) {
+		if (role != null) {
+			if (this.roles == null) {
+				this.roles = new HashSet<Role>();
+			}
+			roles.add(role);
+		}
 	}
 	@Override
 	public String toString() {
-		return getId() + " - " + getLogin();
+		return getLogin() + " - " + getName();
 	}
 }

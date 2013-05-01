@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public abstract class ItemBase implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	String id;
 	String name;
 	Boolean disabled;
@@ -76,8 +76,10 @@ public abstract class ItemBase implements Serializable {
 		this.attributes.put(name, attribute);
 	}
 
-	public void setAttributes(Map<String, Object> attributes){
-		this.attributes.putAll(attributes);
+	public void setAttributes(Map<String, Object> attributes) {
+		if (attributes != null) {
+			this.attributes.putAll(attributes);
+		}
 
 	}
 }

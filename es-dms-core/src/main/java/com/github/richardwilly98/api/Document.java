@@ -30,7 +30,7 @@ public class Document extends SecuredItem {
 		}
 		this.id = id;
 		this.file = file;
-		this.attributes.putAll(attributes);
+		setAttributes(attributes);
 	}
 
 	public File getFile() {
