@@ -10,8 +10,11 @@ import test.github.richardwilly98.inject.ProviderModule;
 
 import com.github.richardwilly98.api.Permission;
 import com.github.richardwilly98.api.Role;
+import com.github.richardwilly98.api.User;
 import com.github.richardwilly98.api.services.RoleService;
+import com.github.richardwilly98.api.services.UserService;
 import com.github.richardwilly98.services.RoleProvider;
+import com.github.richardwilly98.services.UserProvider;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -36,6 +39,11 @@ public class RoleProviderTest extends ProviderTestBase {
 	protected RoleService getRoleProvider() {
 		Injector injector = Guice.createInjector(new ProviderModule());
 		return injector.getInstance(RoleProvider.class);
+	}
+	
+	protected UserService getUserProvider() {
+		Injector injector = Guice.createInjector(new ProviderModule());
+		return injector.getInstance(UserProvider.class);
 	}
 
 	@Test
@@ -108,23 +116,27 @@ public class RoleProviderTest extends ProviderTestBase {
 		permissions.add(createPermission("content:add", "content:add", true));
 		permissions.add(createPermission("content:remove", "content:remove", true));
 		permissions.add(createPermission("profile:todelete", "profile:todelete", true));
-		testCreateRole("Writer", "writer", permissions, false);
+		testCreateRole("writer", "writer", permissions, false);
 		log.info("Writer permissions count: " + permissions.size());
 		
-		role = provider.get("Writer");
+		role = provider.get("writer");
 		
 		Assert.assertNotNull(role);
 		if (!(role == null))log.info("Role found: " + role.getName());
 	}
-//	
-//	@Test
-//	public void testAddUserRole() throws Throwable {
-//		log.info("Start testAddUserRole");
-//		UserService provider = getUserProvider();
-//		User user = provider.get("Richard");
-//		
-//		
-//	}
+	
+	@Test
+	public void testAddRoletoUser() throws Throwable {
+		log.info("Start testAddRoletoUser");
+		UserService uprovider = getUserProvider();
+		User user = uprovider.get("richard.louapre@gmail.com");
+		if (user == null) log.error("Failed to retrieve user richard.louapre@gmail.com!!");
+		
+		RoleService rprovider = getRoleProvider();
+		Role role = rprovider.get("collaborator");
+		if (role == null) log.error("Failed to retrieve role collaborator!!");
+		
+	}
 //
 //	@Test
 //	public void testDeleteUser() throws Throwable {
