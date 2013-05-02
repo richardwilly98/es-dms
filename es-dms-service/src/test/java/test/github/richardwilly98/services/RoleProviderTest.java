@@ -6,17 +6,9 @@ import java.util.Set;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import test.github.richardwilly98.inject.ProviderModule;
-
 import com.github.richardwilly98.api.Permission;
 import com.github.richardwilly98.api.Role;
 import com.github.richardwilly98.api.User;
-import com.github.richardwilly98.api.services.RoleService;
-import com.github.richardwilly98.api.services.UserService;
-import com.github.richardwilly98.services.RoleProvider;
-import com.github.richardwilly98.services.UserProvider;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 
 public class RoleProviderTest extends ProviderTestBase {
 
@@ -36,16 +28,6 @@ public class RoleProviderTest extends ProviderTestBase {
 		return role.getId();
 	}
 	
-	protected RoleService getRoleProvider() {
-		Injector injector = Guice.createInjector(new ProviderModule());
-		return injector.getInstance(RoleProvider.class);
-	}
-	
-	protected UserService getUserProvider() {
-		Injector injector = Guice.createInjector(new ProviderModule());
-		return injector.getInstance(UserProvider.class);
-	}
-
 	@Test
 	public void testCreateRole() throws Throwable {
 		log.info("Start testCreateRole");
@@ -105,8 +87,7 @@ public class RoleProviderTest extends ProviderTestBase {
 		testCreateRole("Proof-Reader", "reader", permissions, false);
 		log.info("Proof-Reader permissions count: " + permissions.size());
 		
-		RoleService provider = getRoleProvider();
-		Role role = provider.get("Proof-Reader");
+		Role role = roleService.get("Proof-Reader");
 		
 		Assert.assertNotNull(role);
 		if (!(role == null) )log.info("Role found: " + role.getName());
@@ -119,7 +100,7 @@ public class RoleProviderTest extends ProviderTestBase {
 		testCreateRole("writer", "writer", permissions, false);
 		log.info("Writer permissions count: " + permissions.size());
 		
-		role = provider.get("writer");
+		role = roleService.get("Writer");
 		
 		Assert.assertNotNull(role);
 		if (!(role == null))log.info("Role found: " + role.getName());
@@ -128,45 +109,12 @@ public class RoleProviderTest extends ProviderTestBase {
 	@Test
 	public void testAddRoletoUser() throws Throwable {
 		log.info("Start testAddRoletoUser");
-		UserService uprovider = getUserProvider();
-		User user = uprovider.get("richard.louapre@gmail.com");
+		User user = userService.get("richard.louapre@gmail.com");
 		if (user == null) log.error("Failed to retrieve user richard.louapre@gmail.com!!");
 		
-		RoleService rprovider = getRoleProvider();
-		Role role = rprovider.get("collaborator");
+		Role role = roleService.get("collaborator");
 		if (role == null) log.error("Failed to retrieve role collaborator!!");
 		
 	}
-//
-//	@Test
-//	public void testDeleteUser() throws Throwable {
-//		log.info("Start testDeleteUser");
-//		String id = testCreateUser("Richard", "Lead developer", false,
-//				"richard@pippo.pippo", null);
-//		UserService provider = getUserProvider();
-//		User user = provider.get(id);
-//		provider.delete(user);
-//		user = provider.get(id);
-//		Assert.assertNull(user);
-//	}
-//	
-//	@Test
-//	public void testListUser() throws Throwable {
-//		String id1 = testCreateUser("Danilo1", "Lead developer", false,
-//				"richard@pippo.pippo", null);
-//		String id2 = testCreateUser("Danilo2", "Mezza calzetta", true, "danilo@pippo.pippo", null);
-//		UserService provider = getUserProvider();
-//		List<User> users = provider.getList("Danilo");
-//		Assert.assertNotNull(users);
-//		int found = 0;
-//		log.debug(String.format("id1 %s", id1));
-//		log.debug(String.format("id2 %s", id2));
-//		for (User user : users) {
-//			log.debug(String.format("User %s", user.getId()));
-//			if (id1.equals(user.getId()) || id2.equals(user.getId())) {
-//				found++;
-//			}
-//		}
-//		Assert.assertEquals(found, 2);
-//	}
+
 }
