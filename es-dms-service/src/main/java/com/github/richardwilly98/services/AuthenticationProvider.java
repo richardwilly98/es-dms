@@ -93,9 +93,10 @@ public class AuthenticationProvider implements AuthenticationService {
 	public String login(Credential credential) throws ServiceException {
 		String login = credential.getUsername();
 		char[] password = credential.getPassword().toCharArray();
+		boolean rememberMe = credential.isRememberMe();
 		try {
 			UsernamePasswordToken token = new UsernamePasswordToken(login,
-					password);
+					password, rememberMe);
 			AuthenticationInfo info = securityManager.authenticate(token);
 			if (info instanceof SimpleAuthenticationInfo) {
 				PrincipalCollection principals = ((SimpleAuthenticationInfo) info)

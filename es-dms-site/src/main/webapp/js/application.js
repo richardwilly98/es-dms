@@ -133,8 +133,8 @@ simpleApp.factory('documentService', function ($resource) {
 
 simpleApp.factory('authenticationService', function ($http) {
 	return {
-		login: function(username, password, callback) {
-			var payload = {username: username, password: password};
+		login: function(username, password, rememberMe, callback) {
+			var payload = {username: username, password: password, rememberMe: rememberMe};
 			var config = {
 					headers: {'Content-Type':'application/json; charset=UTF-8'}
 			};

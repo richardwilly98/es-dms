@@ -5,7 +5,9 @@ import javax.servlet.ServletContext;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
+import org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter;
 
+import com.google.inject.Key;
 import com.google.inject.Scopes;
 import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.name.Names;
@@ -31,7 +33,8 @@ public class EsShiroWebModule extends ShiroWebModule {
 		bind(EsSessionDAO.class);
 		
 		addFilterChain("/api/auth/*", config(SSL, "8443"));
-		addFilterChain(this.securityFilterPath, AUTHC);
+//		addFilterChain(this.securityFilterPath, AUTHC);
+		addFilterChain(this.securityFilterPath, Key.get(EsAuthenticationFilter.class));
 	}
 	
 	@Override

@@ -129,7 +129,7 @@ simpleApp.controller('loginController', function ($scope, /*$cookieStore,*/ auth
 
     $scope.login = function() {
     	console.log('loginController - login');
-    	authenticationService.login($scope.username, $scope.password, function(data) {
+    	authenticationService.login($scope.username, $scope.password, $scope.rememberMe, function(data) {
     		console.log('data: ' + data);
 //    		var response = JSON.parse(data);
 //    		console.log('response: ' + response);
