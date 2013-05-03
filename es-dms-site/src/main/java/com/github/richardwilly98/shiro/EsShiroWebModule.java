@@ -5,7 +5,6 @@ import javax.servlet.ServletContext;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
-import org.apache.shiro.web.filter.authc.PassThruAuthenticationFilter;
 
 import com.google.inject.Key;
 import com.google.inject.Scopes;
@@ -28,7 +27,6 @@ public class EsShiroWebModule extends ShiroWebModule {
 		bindConstant().annotatedWith(Names.named("shiro.loginUrl")).to("/#/login");
 		
 		bindRealm().to(EsRealm.class).asEagerSingleton();
-//		bind(SessionDAO.class).to(EsSessionDAO.class);
 		bind(SessionDAO.class).to(EsSessionDAO.class);
 		bind(EsSessionDAO.class);
 		
@@ -51,11 +49,5 @@ public class EsShiroWebModule extends ShiroWebModule {
 		bind(EsWebSessionManager.class);
 		
 	}
-	
-//    @Override
-//    protected void bindWebSecurityManager(AnnotatedBindingBuilder<? super WebSecurityManager> bind) {
-//        bind.to(DefaultWebSecurityManager.class);
-//    }
-	
 	
 }

@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.UserFilter;
@@ -25,12 +26,14 @@ public class EsAuthenticationFilter extends UserFilter {
 	
 	private final AuthenticationService authenticationService;
 	private final UserService userService;
+//	private final SecurityManager securityManager;
 	
 	@Inject
-	public EsAuthenticationFilter(AuthenticationService authenticationService, UserService userService) {
+	public EsAuthenticationFilter(AuthenticationService authenticationService, UserService userService/*, SecurityManager securityManager*/) {
 		log.debug("*** Constructor ***");
 		this.authenticationService = authenticationService;
 		this.userService = userService;
+//		this.securityManager = securityManager;
 	}
 	
 	@Override
@@ -43,6 +46,7 @@ public class EsAuthenticationFilter extends UserFilter {
 				if (RestAuthencationService.ES_DMS_TICKET.equals(cookie.getName())) {
 					String token = cookie.getValue();
 					try {
+//						Subject subject = new Subject.Builder(securityManager).sessionId(sessionId).buildSubject();
 						Subject subject = getSubjectFromSessionId(token);
 						log.debug("Subject principal: " + subject.getPrincipal());
 						return subject;

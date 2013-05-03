@@ -14,17 +14,26 @@ public class User extends Person implements Principal {
 	private static final long serialVersionUID = 1L;
 	Set<Role> roles;
 	String hash;
+	
 	@JsonIgnore
 	String password;
+
+	@JsonIgnore
+	String login;
 
 	public User() {
 	}
 	
-	@JsonIgnore
 	public String getLogin() {
-		return email;
+		return login;
+//		return email;
 	}
 
+	@Override
+	public void setEmail(String email) {
+		login = email;
+		super.setEmail(email);
+	}
 	public Set<Role> getRoles() {
 		return roles;
 	}
@@ -63,6 +72,6 @@ public class User extends Person implements Principal {
 	
 	@Override
 	public String toString() {
-		return getLogin() + " - " + getName();
+		return getId() + " - " + getName();
 	}
 }

@@ -16,8 +16,7 @@ public abstract class ItemBase implements Serializable {
 	String name;
 	Boolean disabled;
 	String description;
-
-	final Map<String, Object> attributes;
+	Map<String, Object> attributes;
 
 	protected ItemBase() {
 		this(null);
@@ -30,9 +29,6 @@ public abstract class ItemBase implements Serializable {
 	public ItemBase(String id, Map<String, Object> attributes) {
 		this.disabled = false;
 		this.id = id;
-		if (attributes == null) {
-			attributes = new HashMap<String, Object>();
-		}
 		this.attributes = attributes;
 	}
 
@@ -73,11 +69,19 @@ public abstract class ItemBase implements Serializable {
 	}
 
 	public void setAttribute(String name, Object attribute) {
-		this.attributes.put(name, attribute);
+		if (name != null && !name.isEmpty()) {
+			if (this.attributes == null) {
+				this.attributes = new HashMap<String, Object>();
+			}
+			this.attributes.put(name, attribute);
+		}
 	}
 
 	public void setAttributes(Map<String, Object> attributes) {
 		if (attributes != null) {
+			if (this.attributes == null) {
+				this.attributes = new HashMap<String, Object>();
+			}
 			this.attributes.putAll(attributes);
 		}
 
