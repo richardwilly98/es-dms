@@ -5,7 +5,9 @@ import com.github.richardwilly98.api.exception.ServiceException;
 
 public interface DocumentService extends BaseService <Document> {
 	
+	public static final String READ_PERMISSION = "document:read";
 	public static final String CREATE_PERMISSION = "document:create";
+	public static final String EDIT_PERMISSION = "document:edit";
 	public static final String DELETE_PERMISSION = "document:delete";
 	
 	public abstract void checkin(Document document)

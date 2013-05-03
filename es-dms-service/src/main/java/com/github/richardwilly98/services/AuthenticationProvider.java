@@ -48,7 +48,7 @@ public class AuthenticationProvider implements AuthenticationService {
 	@Inject
 	AuthenticationProvider(final Client client,
 			final org.apache.shiro.mgt.SecurityManager securityManager,
-			final UserService userService) {
+			final UserService userService) throws ServiceException {
 		this.client = client;
 		this.securityManager = securityManager;
 		this.userService = userService;

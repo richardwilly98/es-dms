@@ -36,13 +36,13 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	final Class<T> clazz;
 
 	@Inject
-	ProviderBase(Client client, String index, String type, Class<T> clazz) {
+	ProviderBase(Client client, String index, String type, Class<T> clazz) throws ServiceException {
 		this.client = client;
 		this.index = index;
 		this.type = type;
 		this.clazz = clazz;
 		createIndex();
-		refreshIndex();
+//		refreshIndex();
 	}
 
 	@Override
@@ -196,10 +196,16 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		return UUID.randomUUID().toString();
 	}
 
-	protected void createIndex() {
+	protected void createIndex() throws ServiceException {
 		if (!client.admin().indices().prepareExists(index).execute()
 				.actionGet().exists()) {
 			client.admin().indices().prepareCreate(index).execute().actionGet();
+			refreshIndex();
+		}
+		log.debug("Exists type " + type + " in index " + index + ": " + client.admin().indices().prepareTypesExists(index).setTypes(type).execute().actionGet().exists());
+		if (!client.admin().indices().prepareTypesExists(index).setTypes(type).execute().actionGet().exists()) {
+			loadInitialData();
+			refreshIndex();
 		}
 	}
 
@@ -207,4 +213,6 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		client.admin().indices().refresh(new RefreshRequest(index)).actionGet();
 	}
 
+	protected void loadInitialData() throws ServiceException {
+	}
 }

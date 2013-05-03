@@ -16,7 +16,7 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 	private final HashService hashService;
 
 	@Inject
-	UserProvider(Client client, HashService service) {
+	UserProvider(Client client, HashService service) throws ServiceException {
 		super(client, UserProvider.index, UserProvider.type, User.class);
 		this.hashService = service;
 	}

@@ -31,7 +31,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 	private final static String type = "document";
 
 	@Inject
-	DocumentProvider(Client client) {
+	DocumentProvider(Client client) throws ServiceException {
 		super(client, DocumentProvider.index, DocumentProvider.type, Document.class);
 	}
 
