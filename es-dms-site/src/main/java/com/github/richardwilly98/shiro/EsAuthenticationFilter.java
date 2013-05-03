@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
-import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.UserFilter;
@@ -26,14 +25,12 @@ public class EsAuthenticationFilter extends UserFilter {
 	
 	private final AuthenticationService authenticationService;
 	private final UserService userService;
-//	private final SecurityManager securityManager;
 	
 	@Inject
-	public EsAuthenticationFilter(AuthenticationService authenticationService, UserService userService/*, SecurityManager securityManager*/) {
+	public EsAuthenticationFilter(AuthenticationService authenticationService, UserService userService) {
 		log.debug("*** Constructor ***");
 		this.authenticationService = authenticationService;
 		this.userService = userService;
-//		this.securityManager = securityManager;
 	}
 	
 	@Override

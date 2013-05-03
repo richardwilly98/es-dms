@@ -23,21 +23,25 @@ import com.github.richardwilly98.api.Role;
 import com.github.richardwilly98.api.User;
 import com.github.richardwilly98.api.exception.ServiceException;
 import com.github.richardwilly98.api.services.HashService;
+import com.github.richardwilly98.api.services.RoleService;
+import com.github.richardwilly98.api.services.UserService;
 import com.github.richardwilly98.services.UserProvider;
 import com.google.inject.Inject;
 
 public class EsRealm extends AuthorizingRealm {
 
 	private final HashService hashService;
-	private final UserProvider provider;
+	private final UserService userService;
+	private final RoleService roleService;
 	private static boolean accountCreated = false;
 
 	private static Logger log = Logger.getLogger(EsRealm.class);
 
 	@Inject
-	public EsRealm(final UserProvider provider, final HashService hashService) {
-		this.provider = provider;
+	public EsRealm(final UserService userService, final HashService hashService, final RoleService roleService) {
+		this.userService = userService;
 		this.hashService = hashService;
+		this.roleService = roleService;
 	}
 
 	@Override
@@ -115,7 +119,7 @@ public class EsRealm extends AuthorizingRealm {
 			return null;
 		}
 		try {
-			List<User> users = provider.getList("*");
+			List<User> users = userService.getList("*");
 			accountCreated = true;
 			if (users.size() == 0) {
 				User user = new User();
@@ -123,8 +127,9 @@ public class EsRealm extends AuthorizingRealm {
 				user.setName(username);
 				user.setDescription("System administrator");
 				user.setHash(computeBase64Hash(password));
-				user.setEmail("admin@admin");
-				user = provider.create(user);
+				Role role = roleService.get(RoleService.ADMINISTRATOR_ROLE);
+				user.addRole(role);
+				user = userService.create(user);
 				return user;
 			}
 		} catch (ServiceException ex) {
@@ -135,7 +140,7 @@ public class EsRealm extends AuthorizingRealm {
 
 	private User getPrincipal(String login) {
 		try {
-			return provider.get(login);
+			return userService.get(login);
 		} catch (ServiceException ex) {
 			log.error("getPrincipal failed", ex);
 		}

@@ -56,6 +56,7 @@ public class EsJerseyServletModule extends JerseyServletModule {
 		bind(RestAuthencationService.class);
 		bind(RestDocumentService.class);
 		bind(RestUserService.class);
+		bind(RestRoleService.class);
 
 		/* bind jackson converters for JAXB/JSON serialization */
 		bind(MessageBodyReader.class).to(JacksonJsonProvider.class);

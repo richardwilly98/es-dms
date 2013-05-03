@@ -6,6 +6,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -106,4 +107,28 @@ public class RestUserService extends RestServiceBase {
 		}
 	}
 
+	@PUT
+	@Path("/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response update(@PathParam("id") String id, User user) {
+		if (user == null) {
+			throw new IllegalArgumentException("user");
+		}
+		if (log.isTraceEnabled()) {
+			log.trace(String.format("update - %s", user));
+		}
+		try {
+			if (user.getPassword() != null) {
+				String encodedHash = hashService.toBase64(user.getPassword()
+						.getBytes());
+				log.trace("From service - hash: " + encodedHash);
+				user.setHash(encodedHash);
+				user.setPassword(null);
+			}
+			user = userService.update(user);
+			return Response.ok(user).build();
+		} catch (ServiceException e) {
+			throw new RestServiceException(e.getLocalizedMessage());
+		}
+	}
 }
