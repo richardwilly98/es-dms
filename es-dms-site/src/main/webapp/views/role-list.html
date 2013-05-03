@@ -2,20 +2,35 @@
     <h2>Roles</h2>
 	<form class="form-search">
 		<input type="text" data-ng-model="criteria" />
-		<button type="button" class="btn btn-primary" data-ng-click="search()">Search</button>
+		<button type="button" class="btn btn-primary" data-ng-click="find()">Search</button>
 	</form>
 
-    <ul>
-        <li data-ng-repeat="user in users | filter: filter.name | orderBy: 'name'">{{
-            user.name }} - {{ user.city }}</li>
-    </ul>
+    <table class="table table-condensed">
+    	<thead>
+    		<tr>
+    			<th>Id</th>
+    			<th>Name</th>
+    			<th>Actions</th>
+    		</tr>
+    	</thead>
+    	<tbody>
+    		<tr data-ng-repeat="role in roles | filter: filter.name | orderBy: 'name'">
+    			<td>{{ role.id }}</td>
+    			<td>{{ role.name }}</td>
+    			<td>
+    				<button class="btn btn-primary" data-ng-click="edit(role.id)" data-toggle="modal" href="#editModal">
+    					<i class="icon-pencil icon-white"></i> Edit
+    				</button>
+    			</td>
+    		</tr>
+    	</tbody>
+    </table>
     <br />
-    Customer Name:<br />
-    <input type="text" data-ng-model="newCustomer.name" />
-    <br />
-    Customer City:<br />
-    <input type="text" data-ng-model="newCustomer.city" />
-    <br />
-    <button data-ng-click="addCustomer()">
-        Add Customer</button>
+
+	<button class="btn btn-success" ng-click="edit('new')" data-toggle="modal" href="#editModal">
+        <i class="icon-user icon-white"></i>&nbsp;New Role
+	</button>
+	
+	<div class="modal hide fade" ng-include="'views/edit-role.html'" id="editModal"></div>
+
 </div>

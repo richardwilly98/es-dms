@@ -1,0 +1,36 @@
+<div data-ng-controller="roleEditController">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+		<h3 data-ng-show="newRole">New role</h3>
+		<h3 data-ng-hide="newRole">Edit Role: {{ role.name }}</h3>
+	</div>
+	<div class="modal-body">
+		<form class="form-horizontal">
+			<div class="control-group">
+        		<label class="control-label">Id:</label>
+        		<div class="controls">
+          			<input type="text" ng-model="role.id" ng-disabled="!newRole" placeholder="Id" autofocus="autofocus" />
+        		</div>
+      		</div>				
+			<div class="control-group">
+        		<label class="control-label">Name:</label>
+        		<div class="controls">
+          			<input type="text" ng-model="role.name" placeholder="Name" />
+        		</div>
+      		</div>				
+      		
+			<div class="control-group">
+				<div class="controls">
+      				<label class="checkbox">
+						<input type="checkbox" value="disabled" data-ng-model="role.disabled"/> Disabled
+					</label>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn" data-dismiss="modal">Close</button>
+		<button class="btn btn-primary" data-dismiss="modal" ng-click="save()">Save</button>
+	</div>
+</div>

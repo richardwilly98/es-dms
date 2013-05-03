@@ -25,6 +25,15 @@
           			<input type="text" ng-model="user.city" placeholder="City" />
         		</div>
       		</div>
+			<div class="control-group">
+        		<label class="control-label">Roles:</label>
+        		<div class="controls">
+        			<select multiple="multiple">
+        				<option data-ng-repeat="role in user.roles">{{
+            				role.id }}</option>
+        			</select>
+        		</div>
+      		</div>
       		
       		<legend ng-hide="newUser">Change Password</legend>
 			<div class="control-group{{pwError && ' error' || ''}}">

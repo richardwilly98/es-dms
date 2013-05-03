@@ -127,6 +127,46 @@ simpleApp.factory('userService', function ($rootScope, $resource) {
 	};
 });
 
+simpleApp.factory('roleService', function ($rootScope, $resource) {
+	var resource = $resource('api/roles/:verb/:name', {}, {});
+	var roles = [];
+	var editedRole = null;
+	
+	return {
+		find: function(criteria) {
+			roles = resource.query({ verb: 'find', name: criteria });
+			return roles;
+		},
+		edit: function(id) {
+			console.log('edit role: ' + id);
+			if (id == 'new') {
+				editedRole = null;
+			} else {
+				editedRole = id;
+			}
+			$rootScope.$broadcast('role:edit');
+		},
+		currentRole: function() {
+			if (editedRole) {
+				for (i in roles) {
+					if (roles[i].id == editedRole) {
+						return roles[i];
+					}
+				}
+			} else {
+				return {};
+			}
+		},
+		save: function(role) {
+			console.log('save role: ' + role);
+			resource.save(role);
+			if (!editedRole) {
+				roles.push(role);
+			}
+		}
+	};
+});
+
 simpleApp.factory('documentService', function ($resource) {
     return $resource('api/documents/:verb/:name', {}, {});
 });

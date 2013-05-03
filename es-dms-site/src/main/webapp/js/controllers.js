@@ -32,6 +32,33 @@ simpleApp.controller('userController', function ($scope, userService) {
     };
 });
 
+simpleApp.controller('roleController', function ($scope, roleService) {
+    $scope.roles = [];
+    var currentRole = null;
+    
+    init();
+
+    function init() {
+    }
+
+    $scope.find = function() {
+    	$scope.roles = roleService.find($scope.criteria);
+    };
+    
+    $scope.edit = function(id) {
+    	roleService.edit(id);
+    };
+    
+    $scope.add = function () {
+//        var user = new userService();
+//        user.name = $scope.name;
+//        user.city = $scope.city;
+//        user.email = $scope.email
+//        user.$save(); 
+//        $scope.user.push(user);
+    };
+});
+
 simpleApp.controller('userEditController', function ($scope, $rootScope, $http, userService) {
 	$scope.user = null;
 	$scope.newUser = false;
@@ -48,6 +75,7 @@ simpleApp.controller('userEditController', function ($scope, $rootScope, $http, 
 	    	$scope.user = editUser;
 	    	$scope.newUser = false;
 	    	//$scope.uid = editUser.id;
+	    	$scope.user.roles = [{id: 'reader', name: 'Reader'}, {id: 'writer', name: 'Writer'}];
 	    } else {
 	    	$scope.newUser = true;
 	    	$scope.incomplete = true;
@@ -99,7 +127,23 @@ simpleApp.controller('userEditController', function ($scope, $rootScope, $http, 
 	};
 });
 
-simpleApp.controller('roleController', function ($scope) {
+simpleApp.controller('roleEditController', function ($scope, $rootScope, roleService) {
+	$scope.role = {};
+	$rootScope.$on('role:edit', function() {
+		var editRole = roleService.currentRole();
+	    if (editRole.id) {
+	    	$scope.role = editRole;
+	    	$scope.newRole = false;
+	    } else {
+	    	$scope.newRole = true;
+	    	$scope.incomplete = true;
+	    	$scope.role = {};
+	    }
+	});
+	
+	$scope.save = function() {
+		roleService.save($scope.role);
+	};
 });
 
 simpleApp.controller('simpleController', function ($scope, userService) {
