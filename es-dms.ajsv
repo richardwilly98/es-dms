@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--AgileJ Ltd. (http://www.agilej.com)-->
+<ajsv>
+    <diagram creationDate="2013-May-04 10:54" filterScript="" licenseGrade="evaluation" licenseeName="anon" licenseeOrganization="unknown" version="1.7.15.v20130416-2121">
+        <class className="com.github.richardwilly98.api.ISession" project="es-dms-core" xLocation="-1938" yLocation="1256"/>
+        <class className="com.github.richardwilly98.api.Group" project="es-dms-core" xLocation="-1852" yLocation="907"/>
+        <class className="com.github.richardwilly98.api.Document" project="es-dms-core" xLocation="-1355" yLocation="78"/>
+        <class className="com.github.richardwilly98.api.File" project="es-dms-core" xLocation="-1934" yLocation="77"/>
+        <class className="com.github.richardwilly98.api.Annotation" project="es-dms-core" xLocation="1185" yLocation="1130"/>
+        <class className="com.github.richardwilly98.api.Comment" project="es-dms-core" xLocation="1193" yLocation="1403"/>
+        <class className="com.github.richardwilly98.api.Permission" project="es-dms-core" xLocation="-1439" yLocation="2263"/>
+        <class className="com.github.richardwilly98.api.Session" project="es-dms-core" xLocation="-1919" yLocation="1806"/>
+        <class className="com.github.richardwilly98.api.ItemBase" project="es-dms-core" xLocation="-840" yLocation="845"/>
+        <class className="com.github.richardwilly98.api.Project" project="es-dms-core" xLocation="1669" yLocation="553"/>
+        <class className="com.github.richardwilly98.api.Folder" project="es-dms-core" xLocation="1210" yLocation="554"/>
+        <class className="com.github.richardwilly98.api.Person" project="es-dms-core" xLocation="363" yLocation="1818"/>
+        <class className="com.github.richardwilly98.api.User" project="es-dms-core" xLocation="-162" yLocation="1841"/>
+        <class className="com.github.richardwilly98.api.SecuredItem" project="es-dms-core" xLocation="312" yLocation="965"/>
+        <class className="com.github.richardwilly98.api.Credential" project="es-dms-core" xLocation="2531" yLocation="1008"/>
+        <class className="com.github.richardwilly98.api.Role" project="es-dms-core" xLocation="-814" yLocation="1857"/>
+        <class className="com.github.richardwilly98.api.exception.ServiceException" project="es-dms-core" xLocation="3328" yLocation="353"/>
+        <class className="com.github.richardwilly98.api.services.PermissionService" project="es-dms-core" xLocation="2360" yLocation="1936"/>
+        <class className="com.github.richardwilly98.api.services.HashService" project="es-dms-core" xLocation="1904" yLocation="1938"/>
+        <class className="com.github.richardwilly98.api.services.AuthenticationService" project="es-dms-core" xLocation="3224" yLocation="1075"/>
+        <class className="com.github.richardwilly98.api.services.DocumentService" project="es-dms-core" xLocation="2262" yLocation="98"/>
+        <class className="com.github.richardwilly98.api.services.UserService" project="es-dms-core" xLocation="3186" yLocation="1943"/>
+        <class className="com.github.richardwilly98.api.services.RoleService" project="es-dms-core" xLocation="3599" yLocation="1923"/>
+        <class className="com.github.richardwilly98.api.services.BaseService" project="es-dms-core" xLocation="3935" yLocation="1118"/>
+        <class className="com.github.richardwilly98.api.services.PersonService" project="es-dms-core" xLocation="2829" yLocation="1949"/>
+    </diagram>
+</ajsv>
