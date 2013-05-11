@@ -111,10 +111,13 @@ public class RoleProviderTest extends ProviderTestBase {
 		log.info("Start testAddRoletoUser");
 		User user = userService.get("richard.louapre@gmail.com");
 		if (user == null) log.error("Failed to retrieve user richard.louapre@gmail.com!!");
+		Assert.assertNotNull(user);
 		
 		Role role = roleService.get("collaborator");
 		if (role == null) log.error("Failed to retrieve role collaborator!!");
+		Assert.assertNotNull(role);
 		
+		for (Role r :user.getRoles()) log.info(r.getId());
 	}
 
 }

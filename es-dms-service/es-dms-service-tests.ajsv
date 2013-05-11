@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--AgileJ Ltd. (http://www.agilej.com)-->
+<ajsv>
+    <diagram creationDate="2013-May-04 11:44" filterScript="" licenseGrade="evaluation" licenseeName="anon" licenseeOrganization="unknown" version="1.7.15.v20130416-2121">
+        <class className="test.github.richardwilly98.HashServiceTest" project="es-dms-service" xLocation="-1753" yLocation="795"/>
+        <class className="test.github.richardwilly98.inject.ProviderModule" project="es-dms-service" xLocation="-8" yLocation="684"/>
+        <class className="test.github.richardwilly98.inject.LocalClientProvider" project="es-dms-service" xLocation="-72" yLocation="1010"/>
+        <class className="test.github.richardwilly98.services.DocumentProviderTest" project="es-dms-service" xLocation="-684" yLocation="80"/>
+        <class className="test.github.richardwilly98.services.UserProviderTest" project="es-dms-service" xLocation="-621" yLocation="445"/>
+        <class className="test.github.richardwilly98.services.ProviderTestBase" project="es-dms-service" xLocation="-1753" yLocation="47"/>
+        <class className="test.github.richardwilly98.services.AuthenticationProviderTest" project="es-dms-service" xLocation="-853" yLocation="1649"/>
+        <class className="test.github.richardwilly98.services.RoleProviderTest" project="es-dms-service" xLocation="-630" yLocation="805"/>
+        <class className="test.github.richardwilly98.services.PermissionProviderTest" project="es-dms-service" xLocation="-688" yLocation="1225"/>
+    </diagram>
+</ajsv>
