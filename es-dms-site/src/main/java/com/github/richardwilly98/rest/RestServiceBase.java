@@ -2,6 +2,7 @@ package com.github.richardwilly98.rest;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 
 import com.github.richardwilly98.api.services.AuthenticationService;
 import com.google.inject.Inject;
@@ -20,12 +21,15 @@ abstract class RestServiceBase {
 	private String currentUser;
 
 	protected void isAuthenticated() {
-		log.debug("Principal: " + SecurityUtils.getSubject().getPrincipal());
-		if (SecurityUtils.getSubject().getPrincipal() == null) {
+		log.debug("*** isAuthenticated ***");
+		Subject currentSubject = SecurityUtils.getSubject();
+		log.debug("currentSubject.isAuthenticated(): " + currentSubject.isAuthenticated());
+		log.debug("Principal: " + currentSubject.getPrincipal());
+		if (currentSubject.getPrincipal() == null) {
 			throw new UnauthorizedException("Unauthorize request", "/documents");
 		} else {
 			if (currentUser == null) {
-				currentUser = SecurityUtils.getSubject().getPrincipal().toString();
+				currentUser = currentSubject.getPrincipal().toString();
 			}
 		}
 	}

@@ -30,9 +30,13 @@ public class EsShiroWebModule extends ShiroWebModule {
 		bind(SessionDAO.class).to(EsSessionDAO.class);
 		bind(EsSessionDAO.class);
 		
-		addFilterChain("/api/auth/*", config(SSL, "8443"));
-//		addFilterChain(this.securityFilterPath, AUTHC);
-		addFilterChain(this.securityFilterPath, Key.get(EsAuthenticationFilter.class));
+		addFilterChain("/api/auth/**", config(SSL, "8443"));
+		addFilterChain("/api/**", Key.get(EsAuthenticationFilter.class));
+//		addFilterChain(this.securityFilterPath, Key.get(EsAuthenticationFilter.class));
+		
+//		addFilterChain("/api/auth/**", ANON, config(SSL, "8443"));
+//		addFilterChain("/api/users/**", Key.get(EsAuthenticationFilter.class));
+//		addFilterChain("/api/documents/**", Key.get(EsAuthenticationFilter.class));
 	}
 	
 	@Override

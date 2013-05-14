@@ -64,8 +64,13 @@ public class EsRealm extends AuthorizingRealm {
 		Set<String> permissions = new HashSet<String>();
 		for(Role role : principal.getRoles()) {
 			roles.add(role.getId());
-			for(Permission permission : role.getPermissions()) {
-				permissions.add(permission.getId());
+			try {
+				role = roleService.get(role.getId());
+				for(Permission permission : role.getPermissions()) {
+					permissions.add(permission.getId());
+				}
+			} catch (ServiceException ex) {
+				log.error(String.format("Cannot get role from id [%s]", role.getId()), ex);
 			}
 		}
 		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
