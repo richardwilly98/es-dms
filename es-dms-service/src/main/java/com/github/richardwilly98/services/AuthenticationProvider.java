@@ -83,6 +83,12 @@ public class AuthenticationProvider implements AuthenticationService {
 	public Set<ISession> getItems(String name) throws ServiceException {
 		throw new UnsupportedOperationException();
 	}
+	
+	@Override
+	public Set<ISession> getItems() throws ServiceException {
+		throw new UnsupportedOperationException();
+	}
+
 
 	@Override
 	public List<ISession> search(String criteria) throws ServiceException {

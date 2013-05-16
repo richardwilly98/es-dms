@@ -12,6 +12,8 @@ public interface BaseService<I> {
 	public abstract List<I> getList(String name) throws ServiceException;
 
 	public abstract Set<I> getItems(String name) throws ServiceException;
+	
+	public abstract Set<I> getItems() throws ServiceException;
 
 	public abstract List<I> search(String criteria) throws ServiceException;
 

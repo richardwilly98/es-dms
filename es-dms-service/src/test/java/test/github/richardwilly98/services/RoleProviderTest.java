@@ -117,7 +117,81 @@ public class RoleProviderTest extends ProviderTestBase {
 		if (role == null) log.error("Failed to retrieve role collaborator!!");
 		Assert.assertNotNull(role);
 		
+		log.info("Roles for user: " + user.getName());
 		for (Role r :user.getRoles()) log.info(r.getId());
+		
+		user.removeRole(role);
+		for (Role r :user.getRoles()) log.info(r.getId());
+		
+		user.addRole(role);
+		for (Role r :user.getRoles()) log.info(r.getId());
+		log.info("End of testAddRoletoUser");
+	}
+	
+	@Test
+	public void testDeleteRole() throws Throwable {
+		
+		log.info("Start testDeleteRole");
+		
+		Set<Permission> permissions = new HashSet<Permission>();
+		
+		log.info("Creating roles - ");
+		permissions.add(createPermission("profile:read", "profile:read", true));
+		permissions.add(createPermission("content:read", "content:read", true));
+		permissions.add(createPermission("annotation:read", "annotation:read", true));
+		permissions.add(createPermission("annotation:write", "annotation:write", true));
+		permissions.add(createPermission("comment:read", "comment:read", true));
+		permissions.add(createPermission("comment:write", "comment:write", true));
+		permissions.add(createPermission("content:todelete", "content:todelete", true));
+		testCreateRole("Proof-Reader", "reader", permissions, false);
+
+		permissions.add(createPermission("profile:write", "profile:write", true));
+		permissions.add(createPermission("content:write", "content:write", true));
+		permissions.add(createPermission("content:add", "content:add", true));
+		permissions.add(createPermission("content:remove", "content:remove", true));
+		permissions.add(createPermission("profile:todelete", "profile:todelete", true));
+		testCreateRole("Writer", "writer", permissions, false);
+
+		permissions.add(createPermission("user:add", "user:add", true));
+		permissions.add(createPermission("user:remove", "user:remove", true));
+		permissions.add(createPermission("group:add", "group:add", true));
+		permissions.add(createPermission("group:remove", "group:remove", true));
+		permissions.add(createPermission("role:add", "role:add", true));
+		permissions.add(createPermission("role:remove", "role:remove", true));
+		testCreateRole("Editor", "Editor", permissions, false);
+
+		permissions.add(createPermission("milestone:add", "milestone:add", true));
+		permissions.add(createPermission("milestone:remove", "milestone:remove", true));
+		permissions.add(createPermission("task:assign", "task:assign", true));
+		testCreateRole("Coordinator", "coordinator", permissions, false);
+		
+		log.info("Roles created..");
+		
+		Role role = roleService.get("collaborator");
+		if (role == null) log.error("Failed to retrieve role collaborator!!");
+		Assert.assertNotNull(role);
+		
+		Set<Role>  roles = roleService.getItems();
+		log.info("List of available roles: ");
+		for (Role r :roles) log.info(r.getId());
+		
+		log.info("Deleting role: " + role.getId());
+		roleService.delete(role);
+		
+		log.info("List of remaining roles: ");
+		for (Role r :roles) log.info(r.getId());
+		
+		log.info("Obtaining role: writer");
+		role = roleService.get("writer");
+		Assert.assertNotNull(role);
+		
+		log.info("Deleting role: " + role.getId());
+		roleService.delete(role);
+		
+		log.info("List of remaining roles: ");
+		for (Role r :roles) log.info(r.getId());
+		
+		log.info("End of testDeleteRole");
 	}
 
 }
