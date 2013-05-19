@@ -62,7 +62,7 @@ public class AuthenticationProvider implements AuthenticationService {
 		try {
 			GetResponse response = client.prepareGet(index, type, id).execute()
 					.actionGet();
-			if (!response.exists()) {
+			if (!response.isExists()) {
 				return null;
 			}
 			String json = response.getSourceAsString();
@@ -267,7 +267,7 @@ public class AuthenticationProvider implements AuthenticationService {
 
 	private void createIndex() {
 		if (!client.admin().indices().prepareExists(index).execute()
-				.actionGet().exists()) {
+				.actionGet().isExists()) {
 			client.admin().indices().prepareCreate(index).execute().actionGet();
 		}
 	}

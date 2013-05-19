@@ -53,7 +53,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			}
 			GetResponse response = client.prepareGet(index, type, id).execute()
 					.actionGet();
-			if (!response.exists()) {
+			if (!response.isExists()) {
 				return null;
 			}
 			String json = response.getSourceAsString();
@@ -227,12 +227,12 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 
 	protected void createIndex() throws ServiceException {
 		if (!client.admin().indices().prepareExists(index).execute()
-				.actionGet().exists()) {
+				.actionGet().isExists()) {
 			client.admin().indices().prepareCreate(index).execute().actionGet();
 			refreshIndex();
 		}
-		log.debug("Exists type " + type + " in index " + index + ": " + client.admin().indices().prepareTypesExists(index).setTypes(type).execute().actionGet().exists());
-		if (!client.admin().indices().prepareTypesExists(index).setTypes(type).execute().actionGet().exists()) {
+		log.debug("Exists type " + type + " in index " + index + ": " + client.admin().indices().prepareTypesExists(index).setTypes(type).execute().actionGet().isExists());
+		if (!client.admin().indices().prepareTypesExists(index).setTypes(type).execute().actionGet().isExists()) {
 			loadInitialData();
 			refreshIndex();
 		}

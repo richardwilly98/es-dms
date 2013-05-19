@@ -146,13 +146,13 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 	@Override
 	protected void createIndex() {
 		if (!client.admin().indices().prepareExists(index).execute()
-				.actionGet().exists()) {
+				.actionGet().isExists()) {
 			client.admin().indices().prepareCreate(index).execute()
 					.actionGet();
 			PutMappingResponse mappingResponse = client.admin().indices().preparePutMapping(index)
 					.setType(type).setSource(getMapping()).execute()
 					.actionGet();
-			log.debug(String.format("Mapping response acknowledged: %s", mappingResponse.acknowledged()));
+			log.debug(String.format("Mapping response acknowledged: %s", mappingResponse.isAcknowledged()));
 		}
 
 	}
