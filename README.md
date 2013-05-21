@@ -26,7 +26,7 @@ This project contains 3 modules:
 
   This module contains the services implemented for Elasticsearch
 
-3. es-dmi-site
+3. es-dms-site
 
   This module contains the web application. It is using AngularJS as Javascript MVVM framework. REST services are provided using Jersey.
 

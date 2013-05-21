@@ -23,7 +23,7 @@ public class PermissionProvider extends ProviderBase<Permission> implements Perm
 	@Override
 	protected void loadInitialData() throws ServiceException {
 		Permission permission = new Permission(DocumentService.CREATE_PERMISSION);
-		create(permission);
+		super.create(permission);
 		permission = new Permission(DocumentService.DELETE_PERMISSION);
 		create(permission);
 		permission = new Permission(DocumentService.EDIT_PERMISSION);

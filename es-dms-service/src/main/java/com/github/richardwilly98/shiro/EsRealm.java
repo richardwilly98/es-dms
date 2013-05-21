@@ -25,7 +25,6 @@ import com.github.richardwilly98.api.exception.ServiceException;
 import com.github.richardwilly98.api.services.HashService;
 import com.github.richardwilly98.api.services.RoleService;
 import com.github.richardwilly98.api.services.UserService;
-import com.github.richardwilly98.services.UserProvider;
 import com.google.inject.Inject;
 
 public class EsRealm extends AuthorizingRealm {

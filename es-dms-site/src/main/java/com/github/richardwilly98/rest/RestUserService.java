@@ -83,8 +83,9 @@ public class RestUserService extends RestServiceBase {
 	}
 
 	@POST
-	@Path("/")
+//	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces({ MediaType.APPLICATION_JSON })
 	public Response create(User user) {
 		if (user == null) {
 			throw new IllegalArgumentException("user");

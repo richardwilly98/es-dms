@@ -9,13 +9,13 @@ import org.apache.shiro.util.ByteSource;
 
 import com.github.richardwilly98.api.services.HashService;
 
-public class SHA512HashService implements HashService {
+public class SHA512HashProvider implements HashService {
 
-	private static Logger log = Logger.getLogger(SHA512HashService.class);
+	private static Logger log = Logger.getLogger(SHA512HashProvider.class);
 	
 	private final DefaultHashService service;
 
-	public SHA512HashService() {
+	public SHA512HashProvider() {
 		super();
 		service = new DefaultHashService();
 		if (log.isTraceEnabled()) {

@@ -75,7 +75,7 @@ simpleApp.controller('userEditController', function ($scope, $rootScope, $http, 
 	    	$scope.user = editUser;
 	    	$scope.newUser = false;
 	    	//$scope.uid = editUser.id;
-	    	$scope.user.roles = [{id: 'reader', name: 'Reader'}, {id: 'writer', name: 'Writer'}];
+//	    	$scope.user.roles = [{id: 'reader', name: 'Reader'}, {id: 'writer', name: 'Writer'}];
 	    } else {
 	    	$scope.newUser = true;
 	    	$scope.incomplete = true;

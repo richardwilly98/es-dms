@@ -29,7 +29,6 @@ public class EsAuthenticationFilter extends UserFilter {
 	
 	@Inject
 	public EsAuthenticationFilter(AuthenticationService authenticationService, UserService userService) {
-		log.trace("*** Constructor ***");
 		this.authenticationService = authenticationService;
 		this.userService = userService;
 	}
@@ -37,10 +36,12 @@ public class EsAuthenticationFilter extends UserFilter {
 	@Override
 	protected Subject getSubject(ServletRequest request,
 			ServletResponse response) {
-		log.trace("*** getSubject ***");
+		if (log.isTraceEnabled()) {
+			log.trace("Start getSubject");
+		}
 		if (request == null) {
 			log.warn("Request is null");
-			return null;
+			return new Subject.Builder().buildSubject();
 		}
 		if (request instanceof HttpServletRequest) {
 			HttpServletRequest httpRequest = (HttpServletRequest) request;
@@ -52,26 +53,26 @@ public class EsAuthenticationFilter extends UserFilter {
 			for(Cookie cookie : httpRequest.getCookies()) {
 				if (RestAuthencationService.ES_DMS_TICKET.equals(cookie.getName())) {
 					String token = cookie.getValue();
-					log.debug(String.format("Find cookie %s: %s", RestAuthencationService.ES_DMS_TICKET, token));
+					log.debug(String.format("Find cookie %s: [%s]", RestAuthencationService.ES_DMS_TICKET, token));
 					try {
-//						Subject subject = new Subject.Builder(securityManager).sessionId(sessionId).buildSubject();
 						Subject subject = getSubjectFromSessionId(token);
 						log.debug("Subject principal: " + subject.getPrincipal() + " - authenticated: " + subject.isAuthenticated());
 						ThreadContext.bind(subject);
 						return subject;
-					} catch (ServiceException ex) {
-						log.error("getSubject failed", ex);
+					} catch (Throwable t) {
+						log.error("getSubject failed", t);
 					}
 				}
-//				log.debug(cookie.getName() + " - " + cookie.getValue());
 			}
 		}
-		return null;
+		return new Subject.Builder().buildSubject();
 	}
 
 	private PrincipalCollection getPrincipals(String token)
 			throws ServiceException {
-		log.trace("*** getPrincipals ***");
+		if (log.isTraceEnabled()) {
+			log.trace(String.format("Start getPrincipals - %s", token));
+		}
 		User user = null;
 		ISession session = authenticationService.get(token);
 		if (session != null) {
@@ -83,7 +84,9 @@ public class EsAuthenticationFilter extends UserFilter {
 	}
 
 	private Subject getSubjectByPrincipal(String token, PrincipalCollection principals) {
-		log.trace("*** getSubjectByPrincipal ***");
+		if (log.isTraceEnabled()) {
+			log.trace(String.format("Start getSubjectByPrincipal - %s - %s", token, principals));
+		}
 		Subject currentUser = new Subject.Builder().principals(principals).sessionId(token).authenticated(true)
 				.buildSubject();
 		return currentUser;
@@ -91,7 +94,9 @@ public class EsAuthenticationFilter extends UserFilter {
 
 	private Subject getSubjectFromSessionId(String token)
 			throws ServiceException {
-		log.trace("*** getSubjectFromSessionId ***");
+		if (log.isTraceEnabled()) {
+			log.trace(String.format("Start getSubjectFromSessionId - %s", token));
+		}
 		Subject subject = getSubjectByPrincipal(token, getPrincipals(token));
 		return subject;
 	}

@@ -9,12 +9,9 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 
 public class EsShiroModule extends ShiroModule {
 
-//	@Inject
-//	AuthenticationService service;
-	
 	@Override
 	protected void configureShiro() {
-		bindRealm().to(EsRealm.class);
+		bindRealm().to(EsRealm.class).asEagerSingleton();
 		bind(SessionDAO.class).to(EsSessionDAO.class);
 		bind(EsSessionDAO.class);
 	}

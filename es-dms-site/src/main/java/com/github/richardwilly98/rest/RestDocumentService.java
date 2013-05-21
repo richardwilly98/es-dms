@@ -101,7 +101,7 @@ public class RestDocumentService extends RestServiceBase {
 	}
 
 	@POST
-	@Path("/")
+//	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response create(Document document) {
 		isAuthenticated();

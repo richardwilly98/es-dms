@@ -1,4 +1,4 @@
-package com.github.richardwilly98.rest;
+package test.github.richardwilly98.rest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,11 +9,16 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import org.apache.shiro.guice.web.GuiceShiroFilter;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 
-import com.github.richardwilly98.inject.ProviderModule;
+import test.github.richardwilly98.inject.TestProviderModule;
+
+import com.github.richardwilly98.rest.RestAuthencationService;
+import com.github.richardwilly98.rest.RestDocumentService;
+import com.github.richardwilly98.rest.RestRoleService;
+import com.github.richardwilly98.rest.RestUserService;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
-public class EsJerseyServletModule extends JerseyServletModule {
+public class TestEsJerseyServletModule extends JerseyServletModule {
 
 	private static final String JERSEY_API_CONTAINER_FILTER_POST_REPLACE_FILTER = "com.sun.jersey.api.container.filter.PostReplaceFilter";
 	private static final String JERSEY_SPI_CONTAINER_CONTAINER_REQUEST_FILTERS = "com.sun.jersey.spi.container.ContainerRequestFilters";
@@ -22,7 +27,7 @@ public class EsJerseyServletModule extends JerseyServletModule {
 
 	private final String securityFilterPath;
 	
-	public EsJerseyServletModule(String securityFilterPath) {
+	public TestEsJerseyServletModule(String securityFilterPath) {
 		this.securityFilterPath = securityFilterPath;
 
 		params.put(JERSEY_API_JSON_POJO_MAPPING_FEATURE, "true");
@@ -42,7 +47,7 @@ public class EsJerseyServletModule extends JerseyServletModule {
 	 */
 	private void install() {
 		/* bind services */
-		install(new ProviderModule());
+		install(new TestProviderModule());
 	}
 
 	private void filters() {
@@ -51,12 +56,6 @@ public class EsJerseyServletModule extends JerseyServletModule {
 	}
 
 	private void bindings() {
-//		final Map<String, String> params = new HashMap<String, String>();
-//
-//		params.put(JERSEY_API_JSON_POJO_MAPPING_FEATURE, "true");
-//		params.put(JERSEY_SPI_CONTAINER_CONTAINER_REQUEST_FILTERS,
-//				JERSEY_API_CONTAINER_FILTER_POST_REPLACE_FILTER);
-
 		/* bind the REST resources */
 		bind(RestAuthencationService.class);
 		bind(RestDocumentService.class);
@@ -68,8 +67,8 @@ public class EsJerseyServletModule extends JerseyServletModule {
 		bind(MessageBodyWriter.class).to(JacksonJsonProvider.class);
 
 		// Route all requests through GuiceContainer
-		serve(this.securityFilterPath).with(GuiceContainer.class, params);
-//		serve("/*").with(GuiceContainer.class, params);
+//		serve(this.securityFilterPath).with(GuiceContainer.class, params);
+		serve("/*").with(GuiceContainer.class, params);
 	}
 
 }

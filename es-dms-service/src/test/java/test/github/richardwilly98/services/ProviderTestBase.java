@@ -16,6 +16,7 @@ import org.testng.annotations.Test;
 
 import test.github.richardwilly98.inject.ProviderModule;
 
+import com.github.richardwilly98.api.Credential;
 import com.github.richardwilly98.api.Permission;
 import com.github.richardwilly98.api.Role;
 import com.github.richardwilly98.api.User;
@@ -35,9 +36,11 @@ import com.google.inject.Inject;
 abstract class ProviderTestBase {
 
 	Logger log = Logger.getLogger(this.getClass());
+	final static Credential adminCredential = new Credential("admin", "secret");
 	final static Map<String, User> users = new HashMap<String, User>();
 	final static Set<Permission> permissions = new HashSet<Permission>();
 	final static Set<Role> roles = new HashSet<Role>();
+	static String adminToken;
 
 	static {
 		Permission permissionCreateDocument = new Permission("document:create");
@@ -120,16 +123,19 @@ abstract class ProviderTestBase {
 	@BeforeSuite(alwaysRun = true)
 	public void beforeSuite() {
 		log.info("** beforeSuite **");
-		createPermissions();
+		createAdminUser();
+	    createPermissions();
 		createRoles();
-//		if (!client.admin().indices().prepareExists("users").execute()
-//				.actionGet().exists()) {
-//			client.admin().indices().prepareDelete("users").execute().actionGet();
-//		}
-
 		createUsers();
 	}
 
+	private void createAdminUser() {
+		try {
+			adminToken = authenticationService.login(adminCredential);
+		} catch (ServiceException ex) {
+			Assert.fail("createAdminUser failed", ex);
+		}
+	}
 	private void createUsers() {
 		try {
 			for (User user : users.values()) {

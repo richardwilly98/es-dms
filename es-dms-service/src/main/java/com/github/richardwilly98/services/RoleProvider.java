@@ -1,5 +1,6 @@
 package com.github.richardwilly98.services;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.client.Client;
 
 import com.github.richardwilly98.api.Permission;
@@ -26,7 +27,7 @@ public class RoleProvider extends ProviderBase<Role> implements RoleService {
 		role.setId("reader");
 		role.setName("Reader");
 		role.addPermission(new Permission(DocumentService.READ_PERMISSION));
-		create(role);
+		super.create(role);
 		role = new Role();
 		role.setId("writer");
 		role.setName("Writer");
@@ -34,7 +35,7 @@ public class RoleProvider extends ProviderBase<Role> implements RoleService {
 		role.addPermission(new Permission(DocumentService.EDIT_PERMISSION));
 		role.addPermission(new Permission(DocumentService.CREATE_PERMISSION));
 		role.addPermission(new Permission(DocumentService.DELETE_PERMISSION));
-		create(role);
+		super.create(role);
 		role = new Role();
 		role.setId(ADMINISTRATOR_ROLE);
 		role.setName("Administrator");
@@ -48,6 +49,19 @@ public class RoleProvider extends ProviderBase<Role> implements RoleService {
 		role.addPermission(new Permission(RoleService.EDIT_PERMISSION));
 		role.addPermission(new Permission(RoleService.CREATE_PERMISSION));
 		role.addPermission(new Permission(RoleService.DELETE_PERMISSION));
-		create(role);
+		super.create(role);
 	}
+
+	@RequiresPermissions(CREATE_PERMISSION)
+	@Override
+	public Role create(Role item) throws ServiceException {
+		return super.create(item);
+	}
+
+	@RequiresPermissions(DELETE_PERMISSION)
+	@Override
+	public void delete(Role item) throws ServiceException {
+		super.delete(item);
+	}
+	
 }

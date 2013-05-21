@@ -1,6 +1,9 @@
 package com.github.richardwilly98.rest;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import javax.ws.rs.Consumes;
+import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -30,15 +33,13 @@ public class RestAuthencationService extends RestServiceBase {
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response login(Credential credential) {
 		try {
-			if (credential == null) {
-				throw new IllegalArgumentException("credential");
-			}
+			checkNotNull(credential);
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("login - %s", credential.getUsername()));
 			}
 			String token = authenticationService.login(credential);
 			if (log.isTraceEnabled()) {
-				log.trace(String.format("Create cookie ES_DMS_TICKET - %s", token));
+				log.trace(String.format("Create cookie %s: [%s]", ES_DMS_TICKET, token));
 			}
 			return Response.ok().entity(new AuthenticationResponse("AUTHENTICATED", token))
 					.cookie(new NewCookie(ES_DMS_TICKET, token, "/", null, 1, "", 30000, false)).build();
@@ -50,15 +51,15 @@ public class RestAuthencationService extends RestServiceBase {
 
 	@GET
 	@Path("/logout")
-	public Response logout() {
+	public Response logout(@CookieParam(value = ES_DMS_TICKET) String token) {
 		try {
 			if (log.isTraceEnabled()) {
-				log.trace("logout");
+				log.trace(String.format("logout: %s", token));
 			}
 //			if (SecurityUtils.getSubject() != null) {
 //				SecurityUtils.getSubject().logout();
 //			}
-//			authenticationService.logout("token");
+			authenticationService.logout(token);
 			return Response
 					.ok()
 					.cookie(new NewCookie(ES_DMS_TICKET, "", "/", "", "", -1,

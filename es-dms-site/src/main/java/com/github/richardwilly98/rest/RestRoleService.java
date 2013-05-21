@@ -79,7 +79,7 @@ public class RestRoleService extends RestServiceBase {
 	}
 
 	@POST
-	@Path("/")
+//	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response create(Role role) {
 		if (role == null) {

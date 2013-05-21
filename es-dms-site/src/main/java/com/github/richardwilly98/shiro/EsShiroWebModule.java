@@ -32,22 +32,11 @@ public class EsShiroWebModule extends ShiroWebModule {
 		
 		addFilterChain("/api/auth/**", config(SSL, "8443"));
 		addFilterChain("/api/**", Key.get(EsAuthenticationFilter.class));
-//		addFilterChain(this.securityFilterPath, Key.get(EsAuthenticationFilter.class));
-		
-//		addFilterChain("/api/auth/**", ANON, config(SSL, "8443"));
-//		addFilterChain("/api/users/**", Key.get(EsAuthenticationFilter.class));
-//		addFilterChain("/api/documents/**", Key.get(EsAuthenticationFilter.class));
 	}
 	
 	@Override
 	protected void bindSessionManager(
 			AnnotatedBindingBuilder<SessionManager> bind) {
-
-//		bind.to(DefaultWebSessionManager.class);
-//		bindConstant().annotatedWith(Names.named("shiro.globalSessionTimeout")).to(30000L);
-//		bind(DefaultWebSessionManager.class);
-//		bind(Cookie.class).toInstance(new SimpleCookie("ES_DMS_TICKET"));
-		
 		bind.to(EsWebSessionManager.class).in(Scopes.SINGLETON);
 		bindConstant().annotatedWith(Names.named("shiro.globalSessionTimeout")).to(30000L);
 		bind(EsWebSessionManager.class);
