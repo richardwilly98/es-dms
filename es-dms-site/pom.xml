@@ -94,45 +94,15 @@
 			<version>2.5</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- dependency>
-			<groupId>com.sun.jersey.jersey-test-framework</groupId>
-			<artifactId>jersey-test-framework-inmemory</artifactId>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-grizzly2</artifactId>
 			<version>${jersey.version}</version>
-			<scope>test</scope>
-		</dependency -->
-                <dependency>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-grizzly2</artifactId>
-                    <version>${jersey.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
-                    <artifactId>jersey-test-framework-grizzly2</artifactId>
-                    <version>${jersey.version}</version>
-                    <scope>test</scope>
-                </dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-server</artifactId>
-			<version>${jetty.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-servlet</artifactId>
-			<version>${jetty.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-webapp</artifactId>
-			<version>${jetty.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-http-spi</artifactId>
-			<version>${jetty.version}</version>
+			<groupId>com.sun.jersey.jersey-test-framework</groupId>
+			<artifactId>jersey-test-framework-grizzly2</artifactId>
+			<version>${jersey.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -151,11 +121,11 @@
 				<artifactId>tomcat7-maven-plugin</artifactId>
 				<version>2.0</version>
 				<configuration>
-                	<path>/${project.build.finalName}</path>
-                	<httpsPort>8443</httpsPort>
-                	<keystoreFile>${basedir}/.keystore</keystoreFile>
-                	<keystorePass>secret</keystorePass>
-            	</configuration>
+					<path>/${project.build.finalName}</path>
+					<httpsPort>8443</httpsPort>
+					<keystoreFile>${basedir}/.keystore</keystoreFile>
+					<keystorePass>secret</keystorePass>
+				</configuration>
 			</plugin>
 		</plugins>
 		<testResources>
