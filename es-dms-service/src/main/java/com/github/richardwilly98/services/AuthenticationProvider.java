@@ -126,8 +126,10 @@ public class AuthenticationProvider implements AuthenticationService {
 			}
 			session.setAttribute(ES_DMS_LOGIN_ATTRIBUTE, login);
             ThreadContext.bind(subject);
-            Subject currentUser = SecurityUtils.getSubject();
-            log.trace("currentUser.getPrincipal(): " + currentUser.getPrincipal());
+            if (log.isTraceEnabled()) {
+                Subject currentUser = SecurityUtils.getSubject();
+                log.trace("currentUser.getPrincipal(): " + currentUser.getPrincipal());
+            }
 			return session.getId().toString();
 		} catch (AuthenticationException aEx) {
 			String message = String.format("Authentication failed for %s",
