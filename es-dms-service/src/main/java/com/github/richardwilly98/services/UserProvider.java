@@ -21,6 +21,7 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 		this.hashService = service;
 	}
 
+//	@RequiresPermissions(CREATE_PERMISSION)
 	@Override
 	public User create(User user) throws ServiceException {
 		try {
@@ -28,10 +29,10 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 				user.setId(generateUniqueId(user));
 			}
 			if (user.getPassword() != null) {
-//				String encodedHash = hashService.toBase64(user.getPassword().getBytes());
 				String encodedHash = hashService.toBase64(ByteSource.Util.bytes(user.getPassword().toCharArray()).getBytes());
-//				return service.toBase64(ByteSource.Util.bytes(password).getBytes());
-				log.trace("From service - hash: " + encodedHash + " for login " + user.getLogin());
+				if (log.isTraceEnabled()) {
+					log.trace(String.format("From service - hash: %s for login %s", encodedHash, user.getLogin()));
+				}
 				user.setHash(encodedHash);
 				user.setPassword(null);
 			}
