@@ -5,7 +5,7 @@ import javax.ws.rs.core.MediaType;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import test.github.richardwilly98.web.TestUser;
+import test.github.richardwilly98.api.TestUser;
 
 import com.github.richardwilly98.api.Credential;
 import com.github.richardwilly98.api.User;
@@ -25,20 +25,9 @@ public class TestRestAuthenticationService extends GuiceAndJerseyTestBase {
 		try {
 			String password = "secret1";
 			String login = "user1@gmail.com";
+			ClientResponse response;
 			log.debug("Resource: " + resource());
-			User user = new TestUser();
-			user.setId(login);
-			user.setName(login);
-			user.setEmail(login);
-			user.setPassword(password);
-			ClientResponse response = resource()
-					.path("users")
-					.type(MediaType.APPLICATION_JSON)
-					.post(ClientResponse.class, mapper.writeValueAsString(user));
-			log.debug("body: " + response.getEntity(String.class));
-			log.debug("status: " + response.getStatus());
-			Assert.assertTrue(response.getStatus() == Status.CREATED
-					.getStatusCode());
+			createUser(login, password);
 			WebResource webResource = resource().path("auth").path("login");
 			boolean rememberMe = true;
 			Credential credential = new Credential(login, password, rememberMe);
@@ -52,6 +41,23 @@ public class TestRestAuthenticationService extends GuiceAndJerseyTestBase {
 			log.error("testLogin fail", t);
 			Assert.fail();
 		}
+	}
+
+	private void createUser(String login, String password) throws Throwable {
+		User user = new TestUser();
+		user.setId(login);
+		user.setName(login);
+		user.setEmail(login);
+		user.setPassword(password);
+		ClientResponse response = resource().path("users")
+				.type(MediaType.APPLICATION_JSON)
+				.post(ClientResponse.class, mapper.writeValueAsString(user));
+		if (log.isTraceEnabled()) {
+			log.trace(String.format("body: %s", response.getEntity(String.class)));
+			log.trace(String.format("status: %s", response.getStatus()));
+		}
+		Assert.assertTrue(response.getStatus() == Status.CREATED
+				.getStatusCode());
 	}
 
 	// @Test
