@@ -1,0 +1,8 @@
+cluster.name: es-dms-site
+node.name: es-dms-client
+node.master: false
+node.data: false
+node.client: true
+http.enabled: true
+discovery.zen.ping.multicast.enabled: true
+discovery.zen.ping.unicast.hosts: "localhost:9300"
