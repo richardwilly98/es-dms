@@ -2,6 +2,7 @@ package com.github.richardwilly98.shiro;
 
 import javax.servlet.ServletContext;
 
+import org.apache.log4j.Logger;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
@@ -14,6 +15,7 @@ import com.google.inject.name.Names;
 public class EsShiroWebModule extends ShiroWebModule {
 
 	private final String securityFilterPath;
+	private final Logger log = Logger.getLogger(this.getClass());
 	
 	public EsShiroWebModule(ServletContext servletContext, String securityFilterPath) {
 		super(servletContext);
@@ -23,7 +25,6 @@ public class EsShiroWebModule extends ShiroWebModule {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void configureShiroWeb() {
-		
 		bindConstant().annotatedWith(Names.named("shiro.loginUrl")).to("/#/login");
 		
 		bindRealm().to(EsRealm.class).asEagerSingleton();
