@@ -22,6 +22,7 @@
 		<elasticsearch.version>0.90.0</elasticsearch.version>
 		<guava.version>13.0.1</guava.version>
 		<slf4j.version>1.7.5</slf4j.version>
+		<mycila.version>2.9.ga</mycila.version>
 	</properties>
 
 	<dependencies>
@@ -72,6 +73,11 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.mycila</groupId>
+			<artifactId>mycila-guice</artifactId>
+			<version>${mycila.version}</version>
 		</dependency>
 	</dependencies>
 	<modules>
