@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
@@ -27,7 +29,7 @@ import com.github.richardwilly98.api.services.BaseService;
 
 abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 
-	Logger log = Logger.getLogger(this.getClass());
+	final protected Logger log = Logger.getLogger(this.getClass());
 
 	final static ObjectMapper mapper = new ObjectMapper();
 	final Client client;
@@ -41,8 +43,6 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		this.index = index;
 		this.type = type;
 		this.clazz = clazz;
-		createIndex();
-//		refreshIndex();
 	}
 
 	@Override
@@ -225,14 +225,23 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		return UUID.randomUUID().toString();
 	}
 
-	protected void createIndex() throws ServiceException {
+	@PostConstruct
+	private void createIndex() throws ServiceException {
 		if (!client.admin().indices().prepareExists(index).execute()
 				.actionGet().isExists()) {
 			client.admin().indices().prepareCreate(index).execute().actionGet();
 			refreshIndex();
 		}
-		log.debug("Exists type " + type + " in index " + index + ": " + client.admin().indices().prepareTypesExists(index).setTypes(type).execute().actionGet().isExists());
+		log.info("Exists type " + type + " in index " + index + ": " + client.admin().indices().prepareTypesExists(index).setTypes(type).execute().actionGet().isExists());
 		if (!client.admin().indices().prepareTypesExists(index).setTypes(type).execute().actionGet().isExists()) {
+			String mapping = getMapping();
+			if (mapping != null) {
+				log.debug(String.format("Create mapping %s", mapping));
+				PutMappingResponse mappingResponse = client.admin().indices().preparePutMapping(index)
+						.setType(type).setSource(mapping).execute()
+						.actionGet();
+				log.info(String.format("Mapping response acknowledged: %s", mappingResponse.isAcknowledged()));
+			}
 			loadInitialData();
 			refreshIndex();
 		}
@@ -242,6 +251,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		client.admin().indices().refresh(new RefreshRequest(index)).actionGet();
 	}
 
-	protected void loadInitialData() throws ServiceException {
-	}
+	protected abstract void loadInitialData() throws ServiceException;
+	
+	protected abstract String getMapping();
 }

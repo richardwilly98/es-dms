@@ -44,4 +44,9 @@ public class PermissionProvider extends ProviderBase<Permission> implements Perm
 		create(permission);
 	}
 
+	@Override
+	protected String getMapping() {
+		return null;
+	}
+
 }

@@ -63,5 +63,10 @@ public class RoleProvider extends ProviderBase<Role> implements RoleService {
 	public void delete(Role item) throws ServiceException {
 		super.delete(item);
 	}
+
+	@Override
+	protected String getMapping() {
+		return null;
+	}
 	
 }

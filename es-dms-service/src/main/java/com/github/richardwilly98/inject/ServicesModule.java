@@ -13,7 +13,6 @@ import com.github.richardwilly98.services.RoleProvider;
 import com.github.richardwilly98.services.SHA512HashProvider;
 import com.github.richardwilly98.services.UserProvider;
 import com.google.inject.AbstractModule;
-import com.google.inject.Scopes;
 
 public class ServicesModule extends AbstractModule {
 
@@ -21,16 +20,12 @@ public class ServicesModule extends AbstractModule {
 	protected void configure() {
 
 		bind(HashService.class).to(SHA512HashProvider.class)
-				.in(Scopes.SINGLETON);
-		bind(AuthenticationService.class).to(AuthenticationProvider.class).in(
-				Scopes.SINGLETON);
-		bind(UserService.class).to(UserProvider.class).in(Scopes.SINGLETON);
-		bind(DocumentService.class).to(DocumentProvider.class).in(
-				Scopes.SINGLETON);
-		bind(PermissionService.class).to(PermissionProvider.class).in(
-				Scopes.SINGLETON);
-		bind(RoleService.class).to(RoleProvider.class).in(Scopes.SINGLETON);
-
+				.asEagerSingleton();
+		bind(AuthenticationService.class).to(AuthenticationProvider.class).asEagerSingleton();
+		bind(PermissionService.class).to(PermissionProvider.class).asEagerSingleton();
+		bind(RoleService.class).to(RoleProvider.class).asEagerSingleton();
+		bind(UserService.class).to(UserProvider.class).asEagerSingleton();
+		bind(DocumentService.class).to(DocumentProvider.class).asEagerSingleton();
 	}
 
 }

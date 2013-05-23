@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -34,6 +33,34 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 	DocumentProvider(Client client) throws ServiceException {
 		super(client, DocumentProvider.index, DocumentProvider.type, Document.class);
 	}
+
+	@Override
+	protected void loadInitialData() throws ServiceException {
+	}
+
+	@Override
+	protected String getMapping() {
+		try {
+			return copyToStringFromClasspath(DOCUMENT_MAPPING_JSON);
+		} catch (IOException ioEx) {
+			log.error("getMapping failed", ioEx);
+			return null;
+		}
+	}
+
+//	@Override
+//	protected void createIndex() {
+//		if (!client.admin().indices().prepareExists(index).execute()
+//				.actionGet().isExists()) {
+//			client.admin().indices().prepareCreate(index).execute()
+//					.actionGet();
+//			PutMappingResponse mappingResponse = client.admin().indices().preparePutMapping(index)
+//					.setType(type).setSource(getMapping()).execute()
+//					.actionGet();
+//			log.debug(String.format("Mapping response acknowledged: %s", mappingResponse.isAcknowledged()));
+//		}
+//
+//	}
 
 	@RequiresPermissions(CREATE_PERMISSION)
 	@Override
@@ -134,29 +161,6 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 		}
 	}
 
-	private String getMapping() {
-		try {
-			return copyToStringFromClasspath(DOCUMENT_MAPPING_JSON);
-		} catch (IOException ioEx) {
-			log.error("getMapping failed", ioEx);
-			return null;
-		}
-	}
-
-	@Override
-	protected void createIndex() {
-		if (!client.admin().indices().prepareExists(index).execute()
-				.actionGet().isExists()) {
-			client.admin().indices().prepareCreate(index).execute()
-					.actionGet();
-			PutMappingResponse mappingResponse = client.admin().indices().preparePutMapping(index)
-					.setType(type).setSource(getMapping()).execute()
-					.actionGet();
-			log.debug(String.format("Mapping response acknowledged: %s", mappingResponse.isAcknowledged()));
-		}
-
-	}
-
 	@Override
 	public void checkin(Document document) throws ServiceException {
 		// TODO Auto-generated method stub
@@ -196,4 +200,5 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 			}
 		document.setDisabled(b);
 	}
+
 }
