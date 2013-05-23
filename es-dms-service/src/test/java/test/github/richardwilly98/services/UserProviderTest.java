@@ -28,6 +28,9 @@ public class UserProviderTest extends ProviderTestBase {
 	@Test
 	public void testCreateUser() throws Throwable {
 		log.info("Start testCreateUser");
+
+		// Make sure to be login with user having sufficient permission
+		loginAdminUser();
 		testCreateUser("Richard", "Lead developer", false,
 				"richard@pippo.pippo", "qwerty", null);
 		testCreateUser("Danilo", "Mezza calzetta", true, "danilo@pippo.pippo",

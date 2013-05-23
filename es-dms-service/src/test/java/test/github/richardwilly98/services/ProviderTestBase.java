@@ -9,10 +9,10 @@ import org.apache.log4j.Logger;
 import org.elasticsearch.client.Client;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Guice;
-import org.testng.annotations.Test;
 
 import test.github.richardwilly98.inject.ProviderModule;
 
@@ -31,12 +31,12 @@ import com.google.inject.Inject;
 /*
  * Base class for all test providers
  */
-@Test
 @Guice(modules = ProviderModule.class)
-abstract class ProviderTestBase {
+public class ProviderTestBase {
 
 	final protected Logger log = Logger.getLogger(this.getClass());
-	final static Credential adminCredential = new Credential(UserService.DEFAULT_ADMIN_LOGIN, UserService.DEFAULT_ADMIN_PASSWORD);
+	final static Credential adminCredential = new Credential(
+			UserService.DEFAULT_ADMIN_LOGIN, UserService.DEFAULT_ADMIN_PASSWORD);
 	final static Map<String, User> users = new HashMap<String, User>();
 	final static Set<Permission> permissions = new HashSet<Permission>();
 	final static Set<Role> roles = new HashSet<Role>();
@@ -44,23 +44,14 @@ abstract class ProviderTestBase {
 
 	static {
 		Permission permissionCreateDocument = new Permission("document:create");
-//		permissionCreateDocument.setId("document:create");
-//		permissionCreateDocument.setName(permissionCreateDocument.getId());
-//		permissionCreateDocument.setDisabled(false);
 		permissionCreateDocument.setDescription("Create document");
 		permissions.add(permissionCreateDocument);
-		
+
 		Permission permissionDeleteDocument = new Permission("document:delete");
-//		permissionDeleteDocument.setId("document:delete");
-//		permissionDeleteDocument.setName(permissionDeleteDocument.getId());
-//		permissionDeleteDocument.setDisabled(false);
 		permissionDeleteDocument.setDescription("Delete document");
 		permissions.add(permissionDeleteDocument);
-		
+
 		Permission permissionReadDocument = new Permission("document:read");
-//		permissionReadDocument.setId("document:read");
-//		permissionReadDocument.setName(permissionReadDocument.getId());
-//		permissionReadDocument.setDisabled(false);
 		permissionReadDocument.setDescription("Read document");
 		permissions.add(permissionReadDocument);
 
@@ -71,7 +62,7 @@ abstract class ProviderTestBase {
 		collaboratorRole.setDisabled(false);
 		collaboratorRole.setPermissions(permissions);
 		roles.add(collaboratorRole);
-		
+
 		Role readerRole = new Role();
 		readerRole.setId("reader");
 		readerRole.setName(readerRole.getId());
@@ -90,7 +81,7 @@ abstract class ProviderTestBase {
 		user.setCity("Jersey City");
 		user.setPassword("secret");
 		user.addRole(readerRole);
-		
+
 		users.put(user.getLogin(), user);
 		user = new User();
 		user.setId("danilo.sandron@gmail.com");
@@ -103,8 +94,9 @@ abstract class ProviderTestBase {
 		users.put(user.getLogin(), user);
 	}
 
-	@Inject Client client;
-	
+	@Inject
+	Client client;
+
 	@Inject
 	AuthenticationService authenticationService;
 
@@ -120,27 +112,40 @@ abstract class ProviderTestBase {
 	@Inject
 	PermissionService permissionService;
 
-	@BeforeSuite(alwaysRun = true)
+	@BeforeSuite
 	public void beforeSuite() {
 		log.info("** beforeSuite **");
-		createAdminUser();
-	    createPermissions();
+		loginAdminUser();
+		createPermissions();
 		createRoles();
 		createUsers();
 	}
 
-	private void createAdminUser() {
+	@AfterSuite
+	public void tearDownSuite() throws Exception {
+		log.info("*** tearDownSuite ***");
+		tearDownElasticsearch();
+	}
+
+	private void tearDownElasticsearch() throws Exception {
+		log.info("*** tearDownElasticsearch ***");
+		client.admin().indices().prepareDelete().execute().actionGet();
+		client.close();
+	}
+
+	protected void loginAdminUser() {
 		try {
 			adminToken = authenticationService.login(adminCredential);
 		} catch (ServiceException ex) {
 			Assert.fail("createAdminUser failed", ex);
 		}
 	}
+	
 	private void createUsers() {
 		try {
 			for (User user : users.values()) {
 				String password = user.getPassword();
-				userService.create(user);
+				createUser(user);
 				user.setPassword(password);
 			}
 		} catch (ServiceException ex) {
@@ -151,7 +156,7 @@ abstract class ProviderTestBase {
 	private void createRoles() {
 		try {
 			for (Role role : roles) {
-				roleService.create(role);
+				createRole(role);
 			}
 		} catch (ServiceException ex) {
 			Assert.fail("createRoles failed", ex);
@@ -161,7 +166,7 @@ abstract class ProviderTestBase {
 	private void createPermissions() {
 		try {
 			for (Permission permission : permissions) {
-				permissionService.create(permission);
+				createPermission(permission);
 			}
 		} catch (ServiceException ex) {
 			Assert.fail("createPermissions failed", ex);
@@ -178,20 +183,12 @@ abstract class ProviderTestBase {
 		log.info("** closeServer **");
 	}
 
-	Permission createPermission(String name, String description,
-			boolean disabled) throws ServiceException {
-		Assert.assertTrue(! (name == null || name.isEmpty()));
-
-		Permission permission = new Permission();
-		String id = String.valueOf(name);
-		permission.setId(id);
-		permission.setName(name);
-		permission.setDescription(description);
-		permission.setDisabled(disabled);
+	protected Permission createPermission(Permission permission)
+			throws ServiceException {
 		try {
 			Permission newPermission = permissionService.create(permission);
 			Assert.assertNotNull(newPermission);
-			Assert.assertEquals(id, newPermission.getId());
+			Assert.assertEquals(permission.getId(), newPermission.getId());
 			return newPermission;
 		} catch (ServiceException e) {
 			log.error("createPermission failed", e);
@@ -199,8 +196,33 @@ abstract class ProviderTestBase {
 		}
 	}
 
-	User createUser(String name, String description, boolean disabled,
-			String email, String password, Set<Role> roles)
+	protected Permission createPermission(String name, String description,
+			boolean disabled) throws ServiceException {
+		Assert.assertTrue(!(name == null || name.isEmpty()));
+
+		Permission permission = new Permission();
+		String id = String.valueOf(name);
+		permission.setId(id);
+		permission.setName(name);
+		permission.setDescription(description);
+		permission.setDisabled(disabled);
+		return createPermission(permission);
+	}
+
+	protected User createUser(User user) throws ServiceException {
+		try {
+			User newUser = userService.create(user);
+			Assert.assertNotNull(newUser);
+			Assert.assertEquals(user.getId(), newUser.getId());
+			return newUser;
+		} catch (ServiceException e) {
+			log.error("createUser failed", e);
+			throw e;
+		}
+	}
+
+	protected User createUser(String name, String description,
+			boolean disabled, String email, String password, Set<Role> roles)
 			throws ServiceException {
 		User user = new User();
 		String id = String.valueOf(email);
@@ -210,21 +232,22 @@ abstract class ProviderTestBase {
 		user.setDisabled(disabled);
 		user.setEmail(email);
 		user.setPassword(password);
+		return createUser(user);
+	}
+
+	protected Role createRole(Role role) throws ServiceException {
 		try {
-			User newUser = userService.create(user);
-			Assert.assertNotNull(newUser);
-			Assert.assertEquals(id, newUser.getId());
-			return newUser;
+			Role newRole = roleService.create(role);
+			Assert.assertNotNull(newRole);
+			Assert.assertEquals(role.getId(), newRole.getId());
+			return newRole;
 		} catch (ServiceException e) {
-			log.error("createUser failed", e);
+			log.error("createRole failed", e);
 			throw e;
 		}
 	}
 
-	Role createRole(String name, String description, /*
-													 * Set<Permission>
-													 * permissions,
-													 */
+	protected Role createRole(String name, String description,
 			boolean disabled, Set<Permission> permissions)
 			throws ServiceException {
 		log.trace("Preparing to create permission: " + name);
@@ -236,14 +259,6 @@ abstract class ProviderTestBase {
 		role.setDescription(description);
 		role.setDisabled(disabled);
 		role.setPermissions(permissions);
-		try {
-			Role newRole = roleService.create(role);
-			Assert.assertNotNull(newRole);
-			Assert.assertEquals(id, newRole.getId());
-			return newRole;
-		} catch (ServiceException e) {
-			log.error("createRole failed", e);
-			throw e;
-		}
+		return createRole(role);
 	}
 }

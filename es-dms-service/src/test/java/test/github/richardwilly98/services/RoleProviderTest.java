@@ -31,6 +31,9 @@ public class RoleProviderTest extends ProviderTestBase {
 	@Test
 	public void testCreateRole() throws Throwable {
 		log.info("Start testCreateRole");
+
+		// Make sure to be login with user having sufficient permission
+		loginAdminUser();
 		
 		Set<Permission> permissions = new HashSet<Permission>();
 		

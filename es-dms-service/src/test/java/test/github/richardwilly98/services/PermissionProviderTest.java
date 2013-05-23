@@ -5,7 +5,6 @@ import org.testng.annotations.Test;
 
 import com.github.richardwilly98.api.Permission;
 
-@Test
 public class PermissionProviderTest extends ProviderTestBase {
 
 	private Permission testCreatePermission(String name, String description,
@@ -29,6 +28,10 @@ public class PermissionProviderTest extends ProviderTestBase {
 	@Test
 	public void testCreatePermission() throws Throwable {
 		log.info("Start testCreatePermission");
+
+		// Make sure to be login with user having sufficient permission
+		loginAdminUser();
+
 		//content permissions
 		testCreatePermission("profile:write", "write, create and edit document metadata", false);
 		testCreatePermission("content:write", "write, create and edit document content", true);
