@@ -1,5 +1,7 @@
 package com.github.richardwilly98.rest;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -79,12 +81,9 @@ public class RestRoleService extends RestServiceBase {
 	}
 
 	@POST
-//	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response create(Role role) {
-		if (role == null) {
-			throw new IllegalArgumentException("role");
-		}
+		checkNotNull(role);
 		if (log.isTraceEnabled()) {
 			log.trace(String.format("create - %s", role));
 		}

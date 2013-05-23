@@ -1,5 +1,7 @@
 package com.github.richardwilly98.rest;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -93,9 +95,7 @@ public class RestUserService extends RestServiceBase {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response create(User user) {
-		if (user == null) {
-			throw new IllegalArgumentException("user");
-		}
+		checkNotNull(user);
 		if (log.isTraceEnabled()) {
 			log.trace(String.format("create - %s", user));
 		}
