@@ -25,15 +25,15 @@
         </filter>
     </appender>
      
-    <appender name="SW_ROLLING_FILE"
+    <appender name="ROLLING_FILE"
         class="org.apache.log4j.RollingFileAppender">
-        <param name="File" value="/users/codyburleson/dev/sw.log" />
-        <param name="Append" value="true" />
-        <param name="MaxFileSize" value="500KB" />
+        <param name="File" value="${project.build.directory}/es-dms-site.log" />
+        <param name="Append" value="false" />
+        <param name="MaxFileSize" value="5MB" />
         <param name="MaxBackupIndex" value="5" />
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern"
-                value="[%d{ISO8601}] %-5p %m%n" />
+                value="[%d{ISO8601}] %-5p [%c] %m %n" />
         </layout>
     </appender>
  
@@ -61,13 +61,13 @@
  
     <logger name="test.github.richardwilly98" additivity="false">
         <level value="trace" />
-        <!-- appender-ref ref="SW_ROLLING_FILE" /-->
+        <appender-ref ref="ROLLING_FILE" />
         <appender-ref ref="STDOUT" />
     </logger>
 
     <logger name="com.github.richardwilly98" additivity="false">
         <level value="trace" />
-        <!-- appender-ref ref="SW_ROLLING_FILE" /-->
+        <appender-ref ref="ROLLING_FILE" />
         <appender-ref ref="STDOUT" />
     </logger>
          

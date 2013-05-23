@@ -9,6 +9,7 @@ import test.github.richardwilly98.api.TestUser;
 
 import com.github.richardwilly98.api.Credential;
 import com.github.richardwilly98.api.User;
+import com.github.richardwilly98.api.services.UserService;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.WebResource;
@@ -20,6 +21,23 @@ public class TestRestAuthenticationService extends GuiceAndJerseyTestBase {
 	}
 
 	@Test
+	public void testGetUsers() throws Throwable {
+		log.debug("*** testGetUsers ***");
+		try {
+			ClientResponse response;
+			log.debug("Resource: " + resource());
+			response = resource().path("users")
+					.path(UserService.DEFAULT_ADMIN_LOGIN).cookie(adminCookie)
+					.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+			log.debug("status: " + response.getStatus());
+			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+		} catch (Throwable t) {
+			log.error("testGetUsers fail", t);
+			Assert.fail();
+		}
+	}
+
+	@Test()
 	public void testLogin() throws Throwable {
 		log.debug("*** testLogin ***");
 		try {
@@ -34,7 +52,6 @@ public class TestRestAuthenticationService extends GuiceAndJerseyTestBase {
 			response = webResource.type(MediaType.APPLICATION_JSON)
 					.post(ClientResponse.class,
 							mapper.writeValueAsString(credential));
-			log.debug("body: " + response.getEntity(String.class));
 			log.debug("status: " + response.getStatus());
 			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
 		} catch (Throwable t) {
@@ -43,21 +60,55 @@ public class TestRestAuthenticationService extends GuiceAndJerseyTestBase {
 		}
 	}
 
-	private void createUser(String login, String password) throws Throwable {
+	@Test()
+	public void testCreateDelete() throws Throwable {
+		log.debug("*** testCreateDelete ***");
+		try {
+			String password = "secret1";
+			String login = "user-create-delete@gmail.com";
+			User user = createUser(login, password);
+			Assert.assertNotNull(user);
+			deleteUser(user.getId());
+			user = getUser(user.getId());
+			Assert.assertNull(user);
+		} catch (Throwable t) {
+			log.error("testCreateDelete fail", t);
+			Assert.fail();
+		}
+	}
+
+	private User createUser(String login, String password) throws Throwable {
 		User user = new TestUser();
 		user.setId(login);
 		user.setName(login);
 		user.setEmail(login);
 		user.setPassword(password);
-		ClientResponse response = resource().path("users")
+		ClientResponse response = resource().path("users").cookie(adminCookie)
 				.type(MediaType.APPLICATION_JSON)
 				.post(ClientResponse.class, mapper.writeValueAsString(user));
-		if (log.isTraceEnabled()) {
-			log.trace(String.format("body: %s", response.getEntity(String.class)));
-			log.trace(String.format("status: %s", response.getStatus()));
-		}
+		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.CREATED
 				.getStatusCode());
+		return response.getEntity(User.class);
+	}
+
+	private User getUser(String id) throws Throwable {
+		ClientResponse response = resource().path("users").path(id)
+				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
+				.get(ClientResponse.class);
+		log.debug(String.format("status: %s", response.getStatus()));
+		if (response.getStatus() == Status.OK.getStatusCode()) {
+			return response.getEntity(User.class);
+		}
+		return null;
+	}
+
+	private void deleteUser(String id) throws Throwable {
+		ClientResponse response = resource().path("users").path(id)
+				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
+				.delete(ClientResponse.class);
+		log.debug(String.format("status: %s", response.getStatus()));
+		Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
 	}
 
 	// @Test

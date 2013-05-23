@@ -10,7 +10,6 @@ public class TestUser extends User {
 	@JsonProperty(value = "password")
 	@Override
 	public String getPassword() {
-		// TODO Auto-generated method stub
 		return super.getPassword();
 	}
 }

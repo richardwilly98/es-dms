@@ -4,7 +4,7 @@ import org.elasticsearch.client.Client;
 
 import com.google.inject.AbstractModule;
 
-public class EsLocalClientModule extends AbstractModule {
+public class TestEsClientModule extends AbstractModule {
 
 	@Override
 	protected void configure() {

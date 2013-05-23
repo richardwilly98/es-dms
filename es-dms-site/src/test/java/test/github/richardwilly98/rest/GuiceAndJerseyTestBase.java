@@ -1,5 +1,6 @@
 package test.github.richardwilly98.rest;
 
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 
@@ -13,26 +14,30 @@ import test.github.richardwilly98.web.TestRestGuiceServletConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.api.Credential;
+import com.github.richardwilly98.api.services.UserService;
 import com.github.richardwilly98.rest.RestAuthencationService;
 import com.google.inject.servlet.GuiceFilter;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 
 public abstract class GuiceAndJerseyTestBase extends JerseyTest {
 
-	Logger log = Logger.getLogger(this.getClass());
-	final static Credential adminCredential = new Credential("admin", "secret");
+	final protected Logger log = Logger.getLogger(this.getClass());
+	final static Credential adminCredential = new Credential(
+			UserService.DEFAULT_ADMIN_LOGIN, UserService.DEFAULT_ADMIN_PASSWORD);
 	final static ObjectMapper mapper = new ObjectMapper();
-	static String adminToken;
+	protected String adminToken;
+	protected Cookie adminCookie;
 
 	// Fire up jersey with Guice
 	private static final AppDescriptor APP_DESCRIPTOR = new WebAppDescriptor.Builder(
-			"com.github.richardwilly98.rest")
+			/*"com.github.richardwilly98.rest"*/)
 			.contextListenerClass(TestRestGuiceServletConfig.class)
 			.filterClass(GuiceFilter.class)
 			.contextPath("es-dms-site")
@@ -54,12 +59,15 @@ public abstract class GuiceAndJerseyTestBase extends JerseyTest {
 	//
 	@BeforeSuite
 	public void initTestContainer() throws Exception {
-		setUp();
-		createAdminUser();
+		super.setUp();
+		client().setFollowRedirects(false);
+		client().addFilter(new LoggingFilter());
+		loginAdminUser();
 	}
 
-	private void createAdminUser() {
+	private void loginAdminUser() {
 		try {
+			log.debug("*** loginAdminUser ***");
 			WebResource webResource = resource().path("auth").path("login");
 			ObjectMapper mapper = new ObjectMapper();
 			ClientResponse response = webResource
@@ -75,11 +83,13 @@ public abstract class GuiceAndJerseyTestBase extends JerseyTest {
 				if (RestAuthencationService.ES_DMS_TICKET.equals(cookie
 						.getName())) {
 					adminToken = cookie.getValue();
+					adminCookie = new Cookie(cookie.getName(), cookie.getValue());
 				}
 			}
 			Assert.assertNotNull(adminToken);
+			Assert.assertNotNull(adminCookie);
 		} catch (Throwable t) {
-			Assert.fail("createAdminUser failed", t);
+			Assert.fail("loginAdminUser failed", t);
 		}
 
 	}

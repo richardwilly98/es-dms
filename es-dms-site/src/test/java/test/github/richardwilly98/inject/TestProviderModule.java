@@ -7,18 +7,19 @@ import com.github.richardwilly98.inject.ServicesModule;
 import com.github.richardwilly98.shiro.EsShiroModule;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
+import com.mycila.inject.jsr250.Jsr250;
 
 public class TestProviderModule extends AbstractModule {
 
 	@Override
 	protected void configure() {
 
-	    install(new EsLocalClientModule());
+	    install(new TestEsClientModule());
 		install(new ServicesModule());
 		install(new ShiroAopModule());
 //		install(new EsShiroModule());
 
-		Injector injector = com.google.inject.Guice.createInjector(new EsLocalClientModule(), new ServicesModule(), new EsShiroModule());
+		Injector injector = Jsr250.createInjector(new TestEsClientModule(), new ServicesModule(), new EsShiroModule());
 	    org.apache.shiro.mgt.SecurityManager securityManager = injector.getInstance(org.apache.shiro.mgt.SecurityManager.class);
 	    SecurityUtils.setSecurityManager(securityManager);
 	}
