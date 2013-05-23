@@ -49,7 +49,7 @@ public class RestAuthencationService extends RestServiceBase {
 		}
 	}
 
-	@GET
+	@POST
 	@Path("/logout")
 	public Response logout(@CookieParam(value = ES_DMS_TICKET) String token) {
 		try {
