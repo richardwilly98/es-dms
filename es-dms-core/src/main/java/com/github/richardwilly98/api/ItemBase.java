@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.google.common.base.Objects;
 
 @JsonInclude(Include.NON_NULL)
 public abstract class ItemBase implements Serializable {
@@ -86,8 +87,10 @@ public abstract class ItemBase implements Serializable {
 		}
 
 	}
+
 	@Override
 	public String toString() {
-		return getClass().getName() + " - " + getId();
+		return Objects.toStringHelper(this).add("id", id).add("name", name)
+				.add("description", description).toString();
 	}
 }
