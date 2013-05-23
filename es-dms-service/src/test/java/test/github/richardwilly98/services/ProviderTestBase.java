@@ -35,8 +35,8 @@ import com.google.inject.Inject;
 @Guice(modules = ProviderModule.class)
 abstract class ProviderTestBase {
 
-	Logger log = Logger.getLogger(this.getClass());
-	final static Credential adminCredential = new Credential("admin", "secret");
+	final protected Logger log = Logger.getLogger(this.getClass());
+	final static Credential adminCredential = new Credential(UserService.DEFAULT_ADMIN_LOGIN, UserService.DEFAULT_ADMIN_PASSWORD);
 	final static Map<String, User> users = new HashMap<String, User>();
 	final static Set<Permission> permissions = new HashSet<Permission>();
 	final static Set<Role> roles = new HashSet<Role>();
