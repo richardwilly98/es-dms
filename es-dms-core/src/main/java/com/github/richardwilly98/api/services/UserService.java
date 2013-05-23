@@ -10,4 +10,7 @@ public interface UserService extends BaseService <User>{
 
 	public static final String ADD_PERMISSION = "user:add";
 	public static final String REMOVE_PERMISSION = "user:remove";
+	
+	public static final String DEFAULT_ADMIN_LOGIN = "admin";
+	public static final String DEFAULT_ADMIN_PASSWORD = "secret";
 }
