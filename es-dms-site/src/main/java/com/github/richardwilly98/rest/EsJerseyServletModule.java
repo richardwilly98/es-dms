@@ -10,6 +10,8 @@ import org.apache.shiro.guice.web.GuiceShiroFilter;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 
 import com.github.richardwilly98.inject.ProviderModule;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
@@ -17,7 +19,6 @@ public class EsJerseyServletModule extends JerseyServletModule {
 
 	private static final String JERSEY_API_CONTAINER_FILTER_POST_REPLACE_FILTER = "com.sun.jersey.api.container.filter.PostReplaceFilter";
 	private static final String JERSEY_SPI_CONTAINER_CONTAINER_REQUEST_FILTERS = "com.sun.jersey.spi.container.ContainerRequestFilters";
-	private static final String JERSEY_API_JSON_POJO_MAPPING_FEATURE = "com.sun.jersey.api.json.POJOMappingFeature";
 	private final Map<String, String> params = new HashMap<String, String>();
 
 	private final String securityFilterPath;
@@ -25,9 +26,11 @@ public class EsJerseyServletModule extends JerseyServletModule {
 	public EsJerseyServletModule(String securityFilterPath) {
 		this.securityFilterPath = securityFilterPath;
 
-		params.put(JERSEY_API_JSON_POJO_MAPPING_FEATURE, "true");
+		params.put(JSONConfiguration.FEATURE_POJO_MAPPING, "true");
 		params.put(JERSEY_SPI_CONTAINER_CONTAINER_REQUEST_FILTERS,
 				JERSEY_API_CONTAINER_FILTER_POST_REPLACE_FILTER);
+		/* bind dynamically the REST resources */
+		params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.github.richardwilly98.rest");
 	}
 	
 	@Override
@@ -51,18 +54,6 @@ public class EsJerseyServletModule extends JerseyServletModule {
 	}
 
 	private void bindings() {
-//		final Map<String, String> params = new HashMap<String, String>();
-//
-//		params.put(JERSEY_API_JSON_POJO_MAPPING_FEATURE, "true");
-//		params.put(JERSEY_SPI_CONTAINER_CONTAINER_REQUEST_FILTERS,
-//				JERSEY_API_CONTAINER_FILTER_POST_REPLACE_FILTER);
-
-		/* bind the REST resources */
-		bind(RestAuthencationService.class);
-		bind(RestDocumentService.class);
-		bind(RestUserService.class);
-		bind(RestRoleService.class);
-
 		/* bind jackson converters for JAXB/JSON serialization */
 		bind(MessageBodyReader.class).to(JacksonJsonProvider.class);
 		bind(MessageBodyWriter.class).to(JacksonJsonProvider.class);
