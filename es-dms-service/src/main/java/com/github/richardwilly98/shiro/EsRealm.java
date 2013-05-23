@@ -2,7 +2,6 @@ package com.github.richardwilly98.shiro;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -32,7 +31,7 @@ public class EsRealm extends AuthorizingRealm {
 	private final HashService hashService;
 	private final UserService userService;
 	private final RoleService roleService;
-	private static boolean accountCreated = false;
+//	private static boolean accountCreated = false;
 
 	private static Logger log = Logger.getLogger(EsRealm.class);
 
@@ -88,10 +87,10 @@ public class EsRealm extends AuthorizingRealm {
 		}
 
 		User user = getPrincipal(upToken.getUsername());
-		if (user == null) {
-			user = shouldCreateAccount(upToken.getUsername(),
-					upToken.getPassword());
-		}
+//		if (user == null) {
+//			user = shouldCreateAccount(upToken.getUsername(),
+//					upToken.getPassword());
+//		}
 		if (user == null) {
 			throw new AuthenticationException(String.format(
 					"Login name [%s] not found!", upToken.getUsername()));
@@ -118,29 +117,29 @@ public class EsRealm extends AuthorizingRealm {
 		return hashService.toBase64(ByteSource.Util.bytes(password).getBytes());
 	}
 
-	private User shouldCreateAccount(String username, char[] password) {
-		if (accountCreated) {
-			return null;
-		}
-		try {
-			List<User> users = userService.getList("*");
-			accountCreated = true;
-			if (users.size() == 0) {
-				User user = new User();
-				user.setId(username);
-				user.setName(username);
-				user.setDescription("System administrator");
-				user.setHash(computeBase64Hash(password));
-				Role role = roleService.get(RoleService.ADMINISTRATOR_ROLE);
-				user.addRole(role);
-				user = userService.create(user);
-				return user;
-			}
-		} catch (ServiceException ex) {
-			log.error("shouldCreateAccount failed", ex);
-		}
-		return null;
-	}
+//	private User shouldCreateAccount(String username, char[] password) {
+//		if (accountCreated) {
+//			return null;
+//		}
+//		try {
+//			List<User> users = userService.getList("*");
+//			accountCreated = true;
+//			if (users.size() == 0) {
+//				User user = new User();
+//				user.setId(username);
+//				user.setName(username);
+//				user.setDescription("System administrator");
+//				user.setHash(computeBase64Hash(password));
+//				Role role = roleService.get(RoleService.ADMINISTRATOR_ROLE);
+//				user.addRole(role);
+//				user = userService.create(user);
+//				return user;
+//			}
+//		} catch (ServiceException ex) {
+//			log.error("shouldCreateAccount failed", ex);
+//		}
+//		return null;
+//	}
 
 	private User getPrincipal(String login) {
 		try {
