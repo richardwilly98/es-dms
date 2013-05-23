@@ -117,6 +117,7 @@ public class RestUserService extends RestServiceBase {
 	@PUT
 	@Path("/{id}")
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces({ MediaType.APPLICATION_JSON })
 	public Response update(@PathParam("id") String id, User user) {
 		if (user == null) {
 			throw new IllegalArgumentException("user");
