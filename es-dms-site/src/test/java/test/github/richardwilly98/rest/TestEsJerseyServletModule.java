@@ -20,7 +20,6 @@ public class TestEsJerseyServletModule extends JerseyServletModule {
 
 	private static final String JERSEY_API_CONTAINER_FILTER_POST_REPLACE_FILTER = "com.sun.jersey.api.container.filter.PostReplaceFilter";
 	private static final String JERSEY_SPI_CONTAINER_CONTAINER_REQUEST_FILTERS = "com.sun.jersey.spi.container.ContainerRequestFilters";
-//	private static final String JERSEY_API_JSON_POJO_MAPPING_FEATURE = "com.sun.jersey.api.json.POJOMappingFeature";
 	private final Map<String, String> params = new HashMap<String, String>();
 
 	private final String securityFilterPath;
@@ -56,7 +55,7 @@ public class TestEsJerseyServletModule extends JerseyServletModule {
 		bind(MessageBodyWriter.class).to(JacksonJsonProvider.class);
 
 		// Route all requests through GuiceContainer
-		serve("/api/*").with(GuiceContainer.class, params);
+//		serve("/api/*").with(GuiceContainer.class, params);
 	}
 
 	private void filters() {

@@ -21,11 +21,6 @@ public class TestRestGuiceServletConfig extends GuiceServletContextListener {
 	@Override
 	protected Injector getInjector() {
 		String securityFilterPath = "/api/*";
-		// return Guice.createInjector(
-		// new TestEsJerseyServletModule(securityFilterPath),
-		// new EsConfigModule(servletContext, securityFilterPath),
-		// ShiroWebModule.guiceFilterModule());
-
 		return Guice.createInjector(new TestEsJerseyServletModule(
 				securityFilterPath), new TestEsShiroWebModule(servletContext,
 				securityFilterPath));

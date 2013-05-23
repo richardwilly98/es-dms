@@ -36,8 +36,7 @@ public abstract class GuiceAndJerseyTestBase extends JerseyTest {
 	protected Cookie adminCookie;
 
 	// Fire up jersey with Guice
-	private static final AppDescriptor APP_DESCRIPTOR = new WebAppDescriptor.Builder(
-			/*"com.github.richardwilly98.rest"*/)
+	private static final AppDescriptor APP_DESCRIPTOR = new WebAppDescriptor.Builder()
 			.contextListenerClass(TestRestGuiceServletConfig.class)
 			.filterClass(GuiceFilter.class)
 			.contextPath("es-dms-site")
@@ -70,20 +69,17 @@ public abstract class GuiceAndJerseyTestBase extends JerseyTest {
 			log.debug("*** loginAdminUser ***");
 			WebResource webResource = resource().path("auth").path("login");
 			ObjectMapper mapper = new ObjectMapper();
-			ClientResponse response = webResource
-			// .type(MediaType.APPLICATION_JSON).entity(credential)
-			// .post(ClientResponse.class);
-					.type(MediaType.APPLICATION_JSON).post(
-							ClientResponse.class,
-							mapper.writeValueAsString(adminCredential));
-			log.debug("body: " + response.getEntity(String.class));
+			ClientResponse response = webResource.type(
+					MediaType.APPLICATION_JSON).post(ClientResponse.class,
+					mapper.writeValueAsString(adminCredential));
 			log.debug("status: " + response.getStatus());
 			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
 			for (NewCookie cookie : response.getCookies()) {
 				if (RestAuthencationService.ES_DMS_TICKET.equals(cookie
 						.getName())) {
 					adminToken = cookie.getValue();
-					adminCookie = new Cookie(cookie.getName(), cookie.getValue());
+					adminCookie = new Cookie(cookie.getName(),
+							cookie.getValue());
 				}
 			}
 			Assert.assertNotNull(adminToken);
@@ -91,11 +87,24 @@ public abstract class GuiceAndJerseyTestBase extends JerseyTest {
 		} catch (Throwable t) {
 			Assert.fail("loginAdminUser failed", t);
 		}
+	}
 
+	private void logoutAdminUser() {
+		try {
+			log.debug("*** logoutAdminUser ***");
+			WebResource webResource = resource().path("auth").path("logout");
+			ClientResponse response = webResource.cookie(adminCookie).post(
+					ClientResponse.class);
+			log.debug("status: " + response.getStatus());
+			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+		} catch (Throwable t) {
+			Assert.fail("logoutAdminUser failed", t);
+		}
 	}
 
 	@AfterSuite
 	public void tearDownTestContainer() throws Exception {
-		tearDown();
+		logoutAdminUser();
+		super.tearDown();
 	}
 }

@@ -37,6 +37,8 @@ public class TestEsShiroWebModule extends ShiroWebModule {
 		bind(EsSessionDAO.class);
 		
 		addFilterChain("/auth/**", ANON);
+//		addFilterChain("/auth/**", SSL);
+
 		addFilterChain("/**", Key.get(EsAuthenticationFilter.class));
 	}
 	
