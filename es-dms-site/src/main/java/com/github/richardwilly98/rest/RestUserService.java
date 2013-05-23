@@ -45,6 +45,9 @@ public class RestUserService extends RestServiceBase {
 		}
 		try {
 			User user = userService.get(id);
+			if (user == null) {
+				return Response.status(Status.NOT_FOUND).build();
+			}
 			return Response.ok(user).build();
 		} catch (ServiceException e) {
 			throw new RestServiceException(e.getLocalizedMessage());
@@ -56,10 +59,13 @@ public class RestUserService extends RestServiceBase {
 	@Path("/{id}")
 	public Response delete(@PathParam("id") String id) {
 		if (log.isTraceEnabled()) {
-			log.trace(String.format("get - %s", id));
+			log.trace(String.format("delete - %s", id));
 		}
 		try {
 			User user = userService.get(id);
+			if (user == null) {
+				return Response.status(Status.NOT_FOUND).build();
+			}
 			userService.delete(user);
 			return Response.ok().build();
 		} catch (ServiceException e) {

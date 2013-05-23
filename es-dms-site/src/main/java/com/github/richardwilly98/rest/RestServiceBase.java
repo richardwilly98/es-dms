@@ -7,9 +7,12 @@ import org.apache.shiro.subject.Subject;
 import com.github.richardwilly98.api.services.AuthenticationService;
 import com.google.inject.Inject;
 
+/*
+ * CRUD methods MUST follow http response status code from http://www.restapitutorial.com/lessons/httpmethods.html
+ */
 abstract class RestServiceBase {
 
-	Logger log = Logger.getLogger(this.getClass());
+	protected final Logger log = Logger.getLogger(this.getClass());
 
 	final AuthenticationService authenticationService;
 
