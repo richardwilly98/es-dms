@@ -17,7 +17,6 @@ import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Guice;
-import org.testng.annotations.Test;
 
 import test.github.richardwilly98.inject.TestEsClientModule;
 import test.github.richardwilly98.web.TestRestGuiceServletConfig;
@@ -37,9 +36,8 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 /*
  * TODO: Investigate why SSL does not work.
  */
-@Test
 @Guice(modules = TestEsClientModule.class)
-public abstract class GuiceAndJettyTestBase {
+public class GuiceAndJettyTestBase {
 
 	protected final Logger log = Logger.getLogger(this.getClass());
 	protected final static Credential adminCredential = new Credential(
