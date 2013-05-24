@@ -5,7 +5,6 @@ import org.apache.shiro.util.ByteSource;
 import org.elasticsearch.client.Client;
 
 import com.github.richardwilly98.api.Role;
-import com.github.richardwilly98.api.Settings;
 import com.github.richardwilly98.api.User;
 import com.github.richardwilly98.api.exception.ServiceException;
 import com.github.richardwilly98.api.services.BootstrapService;
@@ -16,7 +15,6 @@ import com.google.inject.Inject;
 
 public class UserProvider extends ProviderBase<User> implements UserService {
 
-//	private final static String index = "users";
 	private final static String type = "user";
 	private final HashService hashService;
 	private final RoleService roleService;

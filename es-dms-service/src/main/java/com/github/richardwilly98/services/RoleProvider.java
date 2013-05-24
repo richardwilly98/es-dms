@@ -5,7 +5,6 @@ import org.elasticsearch.client.Client;
 
 import com.github.richardwilly98.api.Permission;
 import com.github.richardwilly98.api.Role;
-import com.github.richardwilly98.api.Settings;
 import com.github.richardwilly98.api.exception.ServiceException;
 import com.github.richardwilly98.api.services.BootstrapService;
 import com.github.richardwilly98.api.services.DocumentService;
@@ -15,7 +14,6 @@ import com.google.inject.Inject;
 
 public class RoleProvider extends ProviderBase<Role> implements RoleService {
 
-//	private final static String index = "test-roles";
 	private final static String type = "role";
 
 	@Inject

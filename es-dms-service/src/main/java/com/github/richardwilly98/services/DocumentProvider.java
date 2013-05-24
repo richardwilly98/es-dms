@@ -19,7 +19,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 
 import com.github.richardwilly98.api.Document;
-import com.github.richardwilly98.api.Settings;
 import com.github.richardwilly98.api.exception.ServiceException;
 import com.github.richardwilly98.api.services.BootstrapService;
 import com.github.richardwilly98.api.services.DocumentService;
@@ -28,7 +27,6 @@ import com.google.inject.Inject;
 public class DocumentProvider extends ProviderBase<Document> implements DocumentService {
 
 	private static final String DOCUMENT_MAPPING_JSON = "/com/github/richardwilly98/services/document-mapping.json";
-//	private final static String index = "test-documents";
 	private final static String type = "document";
 
 	@Inject
