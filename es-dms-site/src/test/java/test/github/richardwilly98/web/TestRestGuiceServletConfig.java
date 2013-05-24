@@ -31,5 +31,10 @@ public class TestRestGuiceServletConfig extends GuiceServletContextListener {
 		servletContext = servletContextEvent.getServletContext();
 		super.contextInitialized(servletContextEvent);
 	}
+	
+	 @Override
+	public void contextDestroyed(ServletContextEvent servletContextEvent) {
+		super.contextDestroyed(servletContextEvent);
+	}
 
 }

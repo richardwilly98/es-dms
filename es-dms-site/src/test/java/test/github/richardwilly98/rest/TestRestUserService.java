@@ -1,5 +1,6 @@
 package test.github.richardwilly98.rest;
 
+import java.net.URI;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -16,7 +17,9 @@ import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.GenericType;
 
 //public class TestRestAuthenticationService extends GuiceAndJerseyTestBase {
-public class TestRestUserService extends GuiceAndJettyTestBase {
+public class TestRestUserService extends GuiceAndJettyTestBase<User> {
+
+	private static final String USERS_PATH = "users";
 
 	public TestRestUserService() throws Exception {
 		super();
@@ -28,7 +31,7 @@ public class TestRestUserService extends GuiceAndJettyTestBase {
 		try {
 			ClientResponse response;
 			log.debug("Resource: " + resource());
-			response = resource().path("users").path("find")
+			response = resource().path(USERS_PATH).path("find")
 					.path(UserService.DEFAULT_ADMIN_LOGIN).cookie(adminCookie)
 					.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 			log.debug("status: " + response.getStatus());
@@ -51,14 +54,14 @@ public class TestRestUserService extends GuiceAndJettyTestBase {
 			String login = "user-" + System.currentTimeMillis();
 			User user1 = createUser(login, password);
 			Assert.assertNotNull(user1);
-			User user2 = getUser(user1.getId());
-			Assert.assertEquals(user1.getId(), user2.getId());
+			User user2 = getItem(user1.getId(), User.class, USERS_PATH);
+			Assert.assertEquals(user1.getName(), user2.getName());
 			String newName = "user-2-" + System.currentTimeMillis();
 			user2.setName(newName);
-			User user3 = updateUser(user2);
+			User user3 = updateItem(user2, User.class, USERS_PATH);
 			Assert.assertEquals(newName, user3.getName());
-			deleteUser(user1.getId());
-			user2 = getUser(user1.getId());
+			deleteItem(user1.getId(), USERS_PATH);
+			user2 = getItem(user1.getId(), User.class, USERS_PATH);
 			Assert.assertNull(user2);
 		} catch (Throwable t) {
 			log.error("testCreateRetrieveDeleteUpdate fail", t);
@@ -72,56 +75,15 @@ public class TestRestUserService extends GuiceAndJettyTestBase {
 		user.setName(login);
 		user.setEmail(login);
 		user.setPassword(password);
-		ClientResponse response = resource().path("users").cookie(adminCookie)
+		ClientResponse response = resource().path(USERS_PATH).cookie(adminCookie)
 				.type(MediaType.APPLICATION_JSON)
 				.post(ClientResponse.class, user);
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.CREATED
 				.getStatusCode());
-		return response.getEntity(User.class);
+		URI uri = response.getLocation();
+		Assert.assertNotNull(uri);
+		return getItem(uri, User.class);
 	}
-
-	protected User updateUser(User user) throws Throwable {
-		ClientResponse response = resource().path("users").path(user.getId()).cookie(adminCookie)
-				.type(MediaType.APPLICATION_JSON)
-				.put(ClientResponse.class, user);
-		log.debug(String.format("status: %s", response.getStatus()));
-		Assert.assertTrue(response.getStatus() == Status.OK
-				.getStatusCode());
-		return response.getEntity(User.class);
-	}
-
-	protected User getUser(String id) throws Throwable {
-		ClientResponse response = resource().path("users").path(id)
-				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
-				.get(ClientResponse.class);
-		log.debug(String.format("status: %s", response.getStatus()));
-		if (response.getStatus() == Status.OK.getStatusCode()) {
-			return response.getEntity(User.class);
-		}
-		return null;
-	}
-
-	protected void deleteUser(String id) throws Throwable {
-		ClientResponse response = resource().path("users").path(id)
-				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
-				.delete(ClientResponse.class);
-		log.debug(String.format("status: %s", response.getStatus()));
-		Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-	}
-
-	// @Test
-	// public void testFindDocuments() throws Throwable {
-	// log.debug("*** testFindDocuments ***");
-	// ClientConfig clientConfig = new DefaultClientConfig();
-	// clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING,
-	// Boolean.TRUE);
-	// Client client = Client.create(clientConfig);
-	// WebResource webResource = client
-	// .resource("http://localhost:8080/api/documents/search/*");
-	// ClientResponse response = webResource.get(ClientResponse.class);
-	// log.debug("body: " + response.getEntity(String.class));
-	// log.debug("status: " + response.getStatus());
-	// }
 
 }

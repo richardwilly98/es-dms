@@ -23,6 +23,7 @@ import test.github.richardwilly98.web.TestRestGuiceServletConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.api.Credential;
+import com.github.richardwilly98.api.ItemBase;
 import com.github.richardwilly98.api.services.UserService;
 import com.github.richardwilly98.rest.RestAuthencationService;
 import com.google.inject.Inject;
@@ -37,7 +38,7 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
  * TODO: Investigate why SSL does not work.
  */
 @Guice(modules = TestEsClientModule.class)
-public class GuiceAndJettyTestBase {
+public class GuiceAndJettyTestBase<T extends ItemBase> {
 
 	protected final Logger log = Logger.getLogger(this.getClass());
 	protected final static Credential adminCredential = new Credential(
@@ -51,7 +52,8 @@ public class GuiceAndJettyTestBase {
 	private static final int HTTP_PORT = 8081;
 	private static final int HTTPS_PORT = 50443;
 
-	@Inject org.elasticsearch.client.Client client;
+	@Inject
+	org.elasticsearch.client.Client client;
 
 	GuiceAndJettyTestBase() throws Exception {
 		server = new Server(HTTP_PORT);
@@ -60,6 +62,46 @@ public class GuiceAndJettyTestBase {
 		restClient = Client.create(new DefaultClientConfig(
 				JacksonJaxbJsonProvider.class));
 		// securedClient = createSecuredClient();
+	}
+
+	protected T getItem(String id, Class<T> type, String path) throws Throwable {
+		ClientResponse response = resource().path(path).path(id)
+				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
+				.get(ClientResponse.class);
+		log.debug(String.format("status: %s", response.getStatus()));
+		if (response.getStatus() == Status.OK.getStatusCode()) {
+			return response.getEntity(type);
+		}
+		return null;
+	}
+
+	protected T getItem(URI uri, Class<T> type) throws Throwable {
+		log.debug(String.format("getItem - %s", uri));
+		ClientResponse response = client().resource(uri).cookie(adminCookie)
+				.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		log.debug(String.format("status: %s", response.getStatus()));
+		if (response.getStatus() == Status.OK.getStatusCode()) {
+			return response.getEntity(type);
+		}
+		return null;
+	}
+
+	protected T updateItem(ItemBase item, Class<T> type, String path)
+			throws Throwable {
+		ClientResponse response = resource().path(path).path(item.getId())
+				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
+				.put(ClientResponse.class, item);
+		log.debug(String.format("status: %s", response.getStatus()));
+		Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+		return response.getEntity(type);
+	}
+
+	protected void deleteItem(String id, String path) throws Throwable {
+		ClientResponse response = resource().path(path).path(id)
+				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
+				.delete(ClientResponse.class);
+		log.debug(String.format("status: %s", response.getStatus()));
+		Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
 	}
 
 	// private Client createSecuredClient() throws Exception {
@@ -211,7 +253,7 @@ public class GuiceAndJettyTestBase {
 		server.stop();
 		tearDownElasticsearch();
 	}
-	
+
 	private void tearDownElasticsearch() throws Exception {
 		log.info("*** tearDownElasticsearch ***");
 		client.admin().indices().prepareDelete().execute().actionGet();
