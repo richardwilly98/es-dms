@@ -1,4 +1,4 @@
-package com.github.richardwilly98.inject;
+package com.github.richardwilly98.es;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
