@@ -3,7 +3,9 @@ package com.github.richardwilly98.services;
 import org.elasticsearch.client.Client;
 
 import com.github.richardwilly98.api.Permission;
+import com.github.richardwilly98.api.Settings;
 import com.github.richardwilly98.api.exception.ServiceException;
+import com.github.richardwilly98.api.services.BootstrapService;
 import com.github.richardwilly98.api.services.DocumentService;
 import com.github.richardwilly98.api.services.PermissionService;
 import com.github.richardwilly98.api.services.RoleService;
@@ -12,12 +14,12 @@ import com.google.inject.Inject;
 
 public class PermissionProvider extends ProviderBase<Permission> implements PermissionService {
 
-	private final static String index = "system";
+//	private final static String index = "system";
 	private final static String type = "permission";
 
 	@Inject
-	PermissionProvider(Client client) throws ServiceException {
-		super(client, PermissionProvider.index, PermissionProvider.type, Permission.class);
+	PermissionProvider(Client client, BootstrapService bootstrapService) throws ServiceException {
+		super(client, bootstrapService, null, PermissionProvider.type, Permission.class);
 	}
 
 	@Override

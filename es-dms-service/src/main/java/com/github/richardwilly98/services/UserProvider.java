@@ -5,8 +5,10 @@ import org.apache.shiro.util.ByteSource;
 import org.elasticsearch.client.Client;
 
 import com.github.richardwilly98.api.Role;
+import com.github.richardwilly98.api.Settings;
 import com.github.richardwilly98.api.User;
 import com.github.richardwilly98.api.exception.ServiceException;
+import com.github.richardwilly98.api.services.BootstrapService;
 import com.github.richardwilly98.api.services.HashService;
 import com.github.richardwilly98.api.services.RoleService;
 import com.github.richardwilly98.api.services.UserService;
@@ -14,14 +16,14 @@ import com.google.inject.Inject;
 
 public class UserProvider extends ProviderBase<User> implements UserService {
 
-	private final static String index = "users";
+//	private final static String index = "users";
 	private final static String type = "user";
 	private final HashService hashService;
 	private final RoleService roleService;
 
 	@Inject
-	UserProvider(Client client, HashService hashService, RoleService roleService) throws ServiceException {
-		super(client, UserProvider.index, UserProvider.type, User.class);
+	UserProvider(Client client, BootstrapService bootstrapService, HashService hashService, RoleService roleService) throws ServiceException {
+		super(client, bootstrapService, null, UserProvider.type, User.class);
 		this.hashService = hashService;
 		this.roleService = roleService;
 	}

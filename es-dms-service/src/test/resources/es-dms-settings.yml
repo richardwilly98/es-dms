@@ -1,0 +1,4 @@
+library: es-dms
+es:
+	host: locahost
+	port: 9300

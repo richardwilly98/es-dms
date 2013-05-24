@@ -5,7 +5,9 @@ import org.elasticsearch.client.Client;
 
 import com.github.richardwilly98.api.Permission;
 import com.github.richardwilly98.api.Role;
+import com.github.richardwilly98.api.Settings;
 import com.github.richardwilly98.api.exception.ServiceException;
+import com.github.richardwilly98.api.services.BootstrapService;
 import com.github.richardwilly98.api.services.DocumentService;
 import com.github.richardwilly98.api.services.RoleService;
 import com.github.richardwilly98.api.services.UserService;
@@ -13,12 +15,12 @@ import com.google.inject.Inject;
 
 public class RoleProvider extends ProviderBase<Role> implements RoleService {
 
-	private final static String index = "test-roles";
+//	private final static String index = "test-roles";
 	private final static String type = "role";
 
 	@Inject
-	RoleProvider(Client client) throws ServiceException {
-		super(client, RoleProvider.index, RoleProvider.type, Role.class);
+	RoleProvider(Client client, BootstrapService bootstrapService) throws ServiceException {
+		super(client, bootstrapService, null, RoleProvider.type, Role.class);
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.github.richardwilly98.services;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -24,8 +26,10 @@ import org.elasticsearch.search.SearchHit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.api.ItemBase;
+import com.github.richardwilly98.api.Settings;
 import com.github.richardwilly98.api.exception.ServiceException;
 import com.github.richardwilly98.api.services.BaseService;
+import com.github.richardwilly98.api.services.BootstrapService;
 
 abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 
@@ -33,14 +37,24 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 
 	final static ObjectMapper mapper = new ObjectMapper();
 	final Client client;
+	final Settings settings;
 	final String index;
 	final String type;
 	final Class<T> clazz;
 
 	@Inject
-	ProviderBase(Client client, String index, String type, Class<T> clazz) throws ServiceException {
+	ProviderBase(Client client, BootstrapService bootstrapService, String index, String type, Class<T> clazz) throws ServiceException {
+		checkNotNull(client);
+		checkNotNull(bootstrapService);
+		checkNotNull(type);
+		checkNotNull(clazz);
 		this.client = client;
-		this.index = index;
+		this.settings = bootstrapService.loadSettings();
+		if (index != null) {
+			this.index = index;
+		} else {
+			this.index = settings.getLibrary();
+		}
 		this.type = type;
 		this.clazz = clazz;
 	}
