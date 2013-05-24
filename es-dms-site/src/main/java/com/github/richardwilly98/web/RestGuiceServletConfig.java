@@ -8,9 +8,9 @@ import org.apache.shiro.guice.web.ShiroWebModule;
 
 import com.github.richardwilly98.rest.EsJerseyServletModule;
 import com.github.richardwilly98.shiro.EsConfigModule;
-import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
+import com.mycila.inject.jsr250.Jsr250;
 
 public class RestGuiceServletConfig extends GuiceServletContextListener {
 
@@ -21,7 +21,7 @@ public class RestGuiceServletConfig extends GuiceServletContextListener {
 	@Override
 	protected Injector getInjector() {
 		String securityFilterPath = "/api/*";
-		return Guice.createInjector(new EsJerseyServletModule(
+		return Jsr250.createInjector(new EsJerseyServletModule(
 				securityFilterPath), new EsConfigModule(servletContext,
 				securityFilterPath), ShiroWebModule.guiceFilterModule());
 	}
