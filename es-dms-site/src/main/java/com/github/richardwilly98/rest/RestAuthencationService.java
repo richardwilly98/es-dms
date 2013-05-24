@@ -17,9 +17,12 @@ import com.github.richardwilly98.api.services.AuthenticationService;
 import com.github.richardwilly98.rest.exception.RestServiceException;
 import com.google.inject.Inject;
 
-@Path("/auth")
+@Path(RestAuthencationService.AUTH_PATH)
 public class RestAuthencationService extends RestServiceBase<Session> {
 
+	public static final String LOGOUT_PATH = "logout";
+	public static final String LOGIN_PATH = "login";
+	public static final String AUTH_PATH = "auth";
 	public static final String ES_DMS_TICKET = "ES_DMS_TICKET";
 
 	@Inject
@@ -28,7 +31,7 @@ public class RestAuthencationService extends RestServiceBase<Session> {
 	}
 
 	@POST
-	@Path("/login")
+	@Path(LOGIN_PATH)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response login(Credential credential) {
@@ -50,22 +53,19 @@ public class RestAuthencationService extends RestServiceBase<Session> {
 	}
 
 	@POST
-	@Path("/logout")
+	@Path(LOGOUT_PATH)
 	public Response logout(@CookieParam(value = ES_DMS_TICKET) String token) {
 		try {
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("logout: %s", token));
 			}
-//			if (SecurityUtils.getSubject() != null) {
-//				SecurityUtils.getSubject().logout();
-//			}
 			authenticationService.logout(token);
 			return Response
 					.ok()
 					.cookie(new NewCookie(ES_DMS_TICKET, "", "/", "", "", -1,
 							false)).build();
 		} catch (Throwable t) {
-			log.error("login failed", t);
+			log.error("logout failed", t);
 			throw new RestServiceException(t.getLocalizedMessage());
 		}
 	}

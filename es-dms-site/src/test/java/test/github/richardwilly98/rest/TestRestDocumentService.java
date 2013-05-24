@@ -8,12 +8,10 @@ import java.net.URI;
 
 import javax.ws.rs.core.MediaType;
 
-import org.elasticsearch.common.Base64;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.api.Document;
-import com.github.richardwilly98.api.File;
 import com.github.richardwilly98.rest.RestDocumentService;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
@@ -23,9 +21,6 @@ import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.file.StreamDataBodyPart;
 
 public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
-
-	private static final String UPLOAD_PATH = "upload";
-	private static final String DOCUMENTS_PATH = RestDocumentService.DOCUMENTS_PATH;
 
 	public TestRestDocumentService() throws Exception {
 		super();
@@ -41,31 +36,19 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			Assert.assertNotNull(document);
 			log.debug("New document: " + document);
 			Assert.assertEquals(document.getName(), name);
-			// User user2 = getUser(user1.getId());
-			// Assert.assertEquals(user1.getId(), user2.getId());
-			// String newName = "user-2-" + System.currentTimeMillis();
-			// user2.setName(newName);
-			// User user3 = updateUser(user2);
-			// Assert.assertEquals(newName, user3.getName());
-			// deleteUser(user1.getId());
-			// user2 = getUser(user1.getId());
-			// Assert.assertNull(user2);
+			 Document document2 = getItem(document.getId(), Document.class, RestDocumentService.DOCUMENTS_PATH);
+			 Assert.assertEquals(document.getId(), document.getId());
+			 String newName = "document-" + System.currentTimeMillis();
+			 document2.setName(newName);
+			 Document document3 = updateItem(document2, Document.class, RestDocumentService.DOCUMENTS_PATH);
+			 Assert.assertEquals(newName, document3.getName());
+			 deleteItem(document.getId(), RestDocumentService.DOCUMENTS_PATH);
+			 document2 = getItem(document.getId(), Document.class, RestDocumentService.DOCUMENTS_PATH);
+			 Assert.assertNull(document2);
 		} catch (Throwable t) {
 			log.error("testCreateDocument fail", t);
 			Assert.fail();
 		}
-	}
-
-	private Document getDocument(String name, String contentType, String path)
-			throws Throwable {
-		String id = String.valueOf(System.currentTimeMillis());
-		byte[] content = copyToBytesFromClasspath(path);
-		String encodedContent = Base64.encodeBytes(content);
-		Document document = new Document();
-		File file = new File(encodedContent, name, contentType);
-		document.setFile(file);
-		document.setId(id);
-		return document;
 	}
 
 	protected Document createDocument(String name, String contentType,
@@ -82,8 +65,8 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 		mp.bodyPart(p);
 		mp.bodyPart(streamData);
 
-		ClientResponse response = resource().path(DOCUMENTS_PATH)
-				.path(UPLOAD_PATH).cookie(adminCookie)
+		ClientResponse response = resource().path(RestDocumentService.DOCUMENTS_PATH)
+				.path(RestDocumentService.UPLOAD_PATH).cookie(adminCookie)
 				.type(MediaType.MULTIPART_FORM_DATA)
 				.post(ClientResponse.class, mp);
 		log.debug(String.format("status: %s", response.getStatus()));

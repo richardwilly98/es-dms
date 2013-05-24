@@ -35,6 +35,8 @@ import com.google.inject.Inject;
  */
 public abstract class RestServiceBase<T extends ItemBase> {
 
+	public static final String FIND_PATH = "find";
+	
 	protected final Logger log = Logger.getLogger(getClass());
 	protected final AuthenticationService authenticationService;
 	protected final BaseService<T> service;
@@ -152,7 +154,7 @@ public abstract class RestServiceBase<T extends ItemBase> {
 
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
-	@Path("find/{name}")
+	@Path(FIND_PATH + "/{name}")
 	public Response find(@PathParam("name") String name) {
 		if (log.isTraceEnabled()) {
 			log.trace(String.format("find - %s", name));

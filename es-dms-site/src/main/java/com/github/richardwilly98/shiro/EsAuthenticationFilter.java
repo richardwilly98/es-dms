@@ -28,7 +28,7 @@ public class EsAuthenticationFilter extends UserFilter {
 	private final UserService userService;
 	
 	@Inject
-	public EsAuthenticationFilter(AuthenticationService authenticationService, UserService userService) {
+	public EsAuthenticationFilter(final AuthenticationService authenticationService, final UserService userService) {
 		this.authenticationService = authenticationService;
 		this.userService = userService;
 	}

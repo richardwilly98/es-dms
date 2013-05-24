@@ -3,28 +3,29 @@ package com.github.richardwilly98.api.services;
 import java.util.List;
 import java.util.Set;
 
+import com.github.richardwilly98.api.ItemBase;
 import com.github.richardwilly98.api.exception.ServiceException;
 
-public interface BaseService<I> {
+public interface BaseService<T extends ItemBase> {
 
-	public abstract I get(String id) throws ServiceException;
+	public abstract T get(String id) throws ServiceException;
 
-	public abstract List<I> getList(String name) throws ServiceException;
+	public abstract List<T> getList(String name) throws ServiceException;
 
-	public abstract Set<I> getItems(String name) throws ServiceException;
+	public abstract Set<T> getItems(String name) throws ServiceException;
 	
-	public abstract Set<I> getItems() throws ServiceException;
+	public abstract Set<T> getItems() throws ServiceException;
 
-	public abstract List<I> search(String criteria) throws ServiceException;
+	public abstract List<T> search(String criteria) throws ServiceException;
 
-	public abstract I create(I item) throws ServiceException;
+	public abstract T create(T item) throws ServiceException;
 
-	public abstract void delete(I item) throws ServiceException;
+	public abstract void delete(T item) throws ServiceException;
 
-	public abstract I update(I item) throws ServiceException;
+	public abstract T update(T item) throws ServiceException;
 
-	public abstract boolean disabled(I item) throws ServiceException;
+	public abstract boolean disabled(T item) throws ServiceException;
 
-	public abstract void disable(I item, boolean b) throws ServiceException;
+	public abstract void disable(T item, boolean b) throws ServiceException;
 	
 }

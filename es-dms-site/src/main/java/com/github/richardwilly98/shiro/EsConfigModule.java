@@ -11,7 +11,7 @@ public class EsConfigModule extends AbstractModule {
 
 	private final ServletContext servletContext;
 	private final String securityFilterPath;
-	private final Logger log = Logger.getLogger(this.getClass());
+	private final Logger log = Logger.getLogger(getClass());
 
 	public EsConfigModule(ServletContext servletContext,
 			String securityFilterPath) {

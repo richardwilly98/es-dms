@@ -33,7 +33,7 @@ import com.github.richardwilly98.api.services.BootstrapService;
 
 abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 
-	final protected Logger log = Logger.getLogger(this.getClass());
+	final protected Logger log = Logger.getLogger(getClass());
 
 	final static ObjectMapper mapper = new ObjectMapper();
 	final Client client;
@@ -43,7 +43,8 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	final Class<T> clazz;
 
 	@Inject
-	ProviderBase(Client client, BootstrapService bootstrapService, String index, String type, Class<T> clazz) throws ServiceException {
+	ProviderBase(final Client client, final BootstrapService bootstrapService,
+			final String index, final String type, final Class<T> clazz) throws ServiceException {
 		checkNotNull(client);
 		checkNotNull(bootstrapService);
 		checkNotNull(type);
@@ -111,7 +112,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}
-	
+
 	@Override
 	public Set<T> getItems() throws ServiceException {
 		try {
@@ -119,7 +120,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 				log.trace(String.format("get all items in List"));
 			}
 			Set<T> items = new HashSet<T>();
-			
+
 			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type).setQuery(QueryBuilders.queryString("*"))
 					.execute().actionGet();
@@ -133,7 +134,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 					log.error("Json processing exception.", t);
 				}
 			}
-			
+
 			return items;
 		} catch (Throwable t) {
 			log.error("getItems failed", t);
@@ -246,15 +247,23 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			client.admin().indices().prepareCreate(index).execute().actionGet();
 			refreshIndex();
 		}
-		log.info("Exists type " + type + " in index " + index + ": " + client.admin().indices().prepareTypesExists(index).setTypes(type).execute().actionGet().isExists());
-		if (!client.admin().indices().prepareTypesExists(index).setTypes(type).execute().actionGet().isExists()) {
+		log.info("Exists type "
+				+ type
+				+ " in index "
+				+ index
+				+ ": "
+				+ client.admin().indices().prepareTypesExists(index)
+						.setTypes(type).execute().actionGet().isExists());
+		if (!client.admin().indices().prepareTypesExists(index).setTypes(type)
+				.execute().actionGet().isExists()) {
 			String mapping = getMapping();
 			if (mapping != null) {
 				log.debug(String.format("Create mapping %s", mapping));
-				PutMappingResponse mappingResponse = client.admin().indices().preparePutMapping(index)
-						.setType(type).setSource(mapping).execute()
-						.actionGet();
-				log.info(String.format("Mapping response acknowledged: %s", mappingResponse.isAcknowledged()));
+				PutMappingResponse mappingResponse = client.admin().indices()
+						.preparePutMapping(index).setType(type)
+						.setSource(mapping).execute().actionGet();
+				log.info(String.format("Mapping response acknowledged: %s",
+						mappingResponse.isAcknowledged()));
 			}
 			loadInitialData();
 			refreshIndex();
@@ -266,6 +275,6 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	}
 
 	protected abstract void loadInitialData() throws ServiceException;
-	
+
 	protected abstract String getMapping();
 }

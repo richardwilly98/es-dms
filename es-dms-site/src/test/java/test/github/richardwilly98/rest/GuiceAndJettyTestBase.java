@@ -40,7 +40,7 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 @Guice(modules = TestEsClientModule.class)
 public class GuiceAndJettyTestBase<T extends ItemBase> {
 
-	protected final Logger log = Logger.getLogger(this.getClass());
+	protected final Logger log = Logger.getLogger(getClass());
 	protected final static Credential adminCredential = new Credential(
 			UserService.DEFAULT_ADMIN_LOGIN, UserService.DEFAULT_ADMIN_PASSWORD);
 	private final Server server;
