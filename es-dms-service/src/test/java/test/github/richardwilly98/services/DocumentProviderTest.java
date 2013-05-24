@@ -130,7 +130,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		String id = String.valueOf(System.currentTimeMillis());
 		Map<String, Object> attributes = new HashMap<String, Object>();
 		attributes.put(Document.AUTHOR, "richard");
-		Document document = new Document(id, null, attributes);
+		Document document = new Document(id, id, null, attributes);
 		document.setId(id);
 		Document newDocument = documentService.create(document);
 		Assert.assertNotNull(newDocument);
@@ -148,7 +148,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		Map<String, Object> attributes = new HashMap<String, Object>();
 		DateTime now = new DateTime();
 		attributes.put(Document.CREATION_DATE, now.toString());
-		Document document = new Document(id, null, attributes);
+		Document document = new Document(id, id, null, attributes);
 		document.setId(id);
 		Document newDocument = documentService.create(document);
 		Assert.assertNotNull(newDocument);

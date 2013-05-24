@@ -21,14 +21,15 @@ public class Document extends SecuredItem {
 	}
 	
 	public Document(String id, File file) {
-		this(id, file, null);
+		this(id, null, file, null);
 	}
 	
-	public Document(String id, File file, Map<String, Object> attributes) {
+	public Document(String id, String name, File file, Map<String, Object> attributes) {
 		if (file == null) {
 			file = new File();
 		}
 		this.id = id;
+		this.name = name;
 		this.file = file;
 		setAttributes(attributes);
 	}
