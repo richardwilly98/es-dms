@@ -34,7 +34,7 @@ public class EsSessionDAO extends AbstractSessionDAO {
 				log.warn("Session id is null.");
 				return;
 			}
-			ISession s = service.get(session.getId().toString());
+			com.github.richardwilly98.api.Session s = service.get(session.getId().toString());
 			if (s != null) {
 				if (session.getAttribute(AuthenticationProvider.ES_DMS_LOGIN_ATTRIBUTE) != null) {
 					s.setUserId(session.getAttribute(AuthenticationProvider.ES_DMS_LOGIN_ATTRIBUTE).toString());
@@ -49,7 +49,7 @@ public class EsSessionDAO extends AbstractSessionDAO {
 	@Override
 	public void delete(Session session) {
 		try {
-			ISession s = service.get(session.getId().toString());
+			com.github.richardwilly98.api.Session s = service.get(session.getId().toString());
 			if (s != null) {
 				service.delete(s);
 			}
@@ -61,7 +61,7 @@ public class EsSessionDAO extends AbstractSessionDAO {
 	@Override
 	public Collection<Session> getActiveSessions() {
 		try {
-			Set<com.github.richardwilly98.api.ISession> sessions = service
+			Set<com.github.richardwilly98.api.Session> sessions = service
 					.getItems("active:true");
 			Set<Session> activeSessions = new HashSet<Session>();
 			for (com.github.richardwilly98.api.ISession session : sessions) {
@@ -79,7 +79,7 @@ public class EsSessionDAO extends AbstractSessionDAO {
 		try {
 			Serializable sessionId = generateSessionId(session);
 			assignSessionId(session, sessionId);
-			ISession s = new com.github.richardwilly98.api.Session();
+			com.github.richardwilly98.api.Session s = new com.github.richardwilly98.api.Session();
 			s.setId(sessionId.toString());
 			s.setCreateTime(session.getStartTimestamp());
 			s.setLastAccessTime(session.getLastAccessTime());

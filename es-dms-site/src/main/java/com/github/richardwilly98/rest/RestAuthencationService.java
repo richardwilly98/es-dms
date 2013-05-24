@@ -12,18 +12,19 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
 import com.github.richardwilly98.api.Credential;
+import com.github.richardwilly98.api.Session;
 import com.github.richardwilly98.api.services.AuthenticationService;
 import com.github.richardwilly98.rest.exception.RestServiceException;
 import com.google.inject.Inject;
 
 @Path("/auth")
-public class RestAuthencationService extends RestServiceBase {
+public class RestAuthencationService extends RestServiceBase<Session> {
 
 	public static final String ES_DMS_TICKET = "ES_DMS_TICKET";
 
 	@Inject
 	public RestAuthencationService(AuthenticationService authenticationService) {
-		super(authenticationService);
+		super(authenticationService, authenticationService);
 	}
 
 	@POST

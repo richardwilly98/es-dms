@@ -2,7 +2,7 @@ package com.github.richardwilly98.api;
 
 import java.util.Date;
 
-public class Session implements ISession {
+public class Session extends ItemBase implements ISession {
 
 	private static final long serialVersionUID = 1L;
 

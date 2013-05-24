@@ -58,7 +58,7 @@ public class AuthenticationProvider implements AuthenticationService {
 	}
 
 	@Override
-	public ISession get(String id) throws ServiceException {
+	public Session get(String id) throws ServiceException {
 		try {
 			GetResponse response = client.prepareGet(index, type, id).execute()
 					.actionGet();
@@ -66,7 +66,7 @@ public class AuthenticationProvider implements AuthenticationService {
 				return null;
 			}
 			String json = response.getSourceAsString();
-			ISession permission = mapper.readValue(json, Session.class);
+			Session permission = mapper.readValue(json, Session.class);
 			return permission;
 		} catch (Throwable t) {
 			log.error("get failed", t);
@@ -75,23 +75,23 @@ public class AuthenticationProvider implements AuthenticationService {
 	}
 
 	@Override
-	public List<ISession> getList(String name) throws ServiceException {
+	public List<Session> getList(String name) throws ServiceException {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Set<ISession> getItems(String name) throws ServiceException {
+	public Set<Session> getItems(String name) throws ServiceException {
 		throw new UnsupportedOperationException();
 	}
 	
 	@Override
-	public Set<ISession> getItems() throws ServiceException {
+	public Set<Session> getItems() throws ServiceException {
 		throw new UnsupportedOperationException();
 	}
 
 
 	@Override
-	public List<ISession> search(String criteria) throws ServiceException {
+	public List<Session> search(String criteria) throws ServiceException {
 		throw new UnsupportedOperationException();
 	}
 
@@ -186,7 +186,7 @@ public class AuthenticationProvider implements AuthenticationService {
 
 	@Override
 	public void validate(String token) throws ServiceException {
-		ISession session = get(token);
+		Session session = get(token);
 		if (session != null) {
 			session.setLastAccessTime(new Date());
 			update(session);
@@ -194,7 +194,7 @@ public class AuthenticationProvider implements AuthenticationService {
 	}
 
 	@Override
-	public ISession create(ISession item) throws ServiceException {
+	public Session create(Session item) throws ServiceException {
 		try {
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("create - %s", item));
@@ -209,7 +209,7 @@ public class AuthenticationProvider implements AuthenticationService {
 			log.trace(String.format("Index: %s - Type: %s - Id: %s",
 					response.getIndex(), response.getType(), response.getId()));
 			refreshIndex();
-			ISession newSession = get(response.getId());
+			Session newSession = get(response.getId());
 			return newSession;
 		} catch (Throwable t) {
 			log.error("create failed", t);
@@ -218,7 +218,7 @@ public class AuthenticationProvider implements AuthenticationService {
 	}
 
 	@Override
-	public void delete(ISession session) throws ServiceException {
+	public void delete(Session session) throws ServiceException {
 		try {
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("delete - %s", session));
@@ -235,7 +235,7 @@ public class AuthenticationProvider implements AuthenticationService {
 	}
 
 	@Override
-	public ISession update(ISession session) throws ServiceException {
+	public Session update(Session session) throws ServiceException {
 		try {
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("update - %s", session));
@@ -247,7 +247,7 @@ public class AuthenticationProvider implements AuthenticationService {
 					.prepareUpdate(index, type, session.getId()).setDoc(json).setRetryOnConflict(5)
 					.execute().actionGet();
 //			refreshIndex();
-			ISession updatedSession = get(response.getId());
+			Session updatedSession = get(response.getId());
 			return updatedSession;
 		} catch (Throwable t) {
 			log.error("update failed", t);
@@ -256,13 +256,13 @@ public class AuthenticationProvider implements AuthenticationService {
 	}
 
 	@Override
-	public boolean disabled(ISession session) throws ServiceException {
+	public boolean disabled(Session session) throws ServiceException {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public void disable(ISession session, boolean b) throws ServiceException {
+	public void disable(Session session, boolean b) throws ServiceException {
 		// TODO Auto-generated method stub
 
 	}

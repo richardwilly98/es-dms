@@ -1,10 +1,10 @@
 package com.github.richardwilly98.api.services;
 
 import com.github.richardwilly98.api.Credential;
-import com.github.richardwilly98.api.ISession;
+import com.github.richardwilly98.api.Session;
 import com.github.richardwilly98.api.exception.ServiceException;
 
-public interface AuthenticationService extends BaseService <ISession> {
+public interface AuthenticationService extends BaseService <Session> {
 	
 	public abstract String login(Credential credential)
 			throws ServiceException;

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -33,30 +32,19 @@ import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataParam;
 
-@Path("/documents")
-public class RestDocumentService extends RestServiceBase {
+@Path(RestDocumentService.DOCUMENTS_PATH)
+public class RestDocumentService extends RestServiceBase<Document> {
 
+	public static final String UPLOAD_PATH = "upload";
+	public static final String DOCUMENTS_PATH = "documents";
 	private final DocumentService documentService;
 
 	@Inject
-	public RestDocumentService(AuthenticationService authenticationService, DocumentService documentService) {
-		super(authenticationService);
+	public RestDocumentService(
+			final AuthenticationService authenticationService,
+			final DocumentService documentService) {
+		super(authenticationService, documentService);
 		this.documentService = documentService;
-	}
-
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	@Path("/{id}")
-	public Document get(@PathParam("id") String id) {
-		if (log.isTraceEnabled()) {
-			log.trace(String.format("get - %s", id));
-		}
-		try {
-			return documentService.get(id);
-		} catch (ServiceException e) {
-			log.error("get document failed", e);
-			throw new RestServiceException(e.getLocalizedMessage());
-		}
 	}
 
 	@GET
@@ -83,87 +71,8 @@ public class RestDocumentService extends RestServiceBase {
 		}
 	}
 
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	@Path("/find/{name}")
-	public Response find(@PathParam("name") String name) {
-		isAuthenticated();
-		if (log.isTraceEnabled()) {
-			log.trace(String.format("find - %s", name));
-		}
-		try {
-			List<Document> documents = documentService.getList(name);
-			return Response.status(Status.OK).entity(documents).build();
-		} catch (ServiceException e) {
-			log.error("find failed", e);
-			throw new RestServiceException(e.getLocalizedMessage());
-		}
-	}
-
 	@POST
-//	@Path("/")
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response create(Document document) {
-		isAuthenticated();
-		if (document == null) {
-			throw new IllegalArgumentException("document");
-		}
-		if (log.isTraceEnabled()) {
-			log.trace(String.format("create - %s", document));
-		}
-		try {
-			document = documentService.create(document);
-			return Response.status(Status.CREATED).entity(document).build();
-		} catch (ServiceException e) {
-			log.error("create failed", e);
-			throw new RestServiceException(e.getLocalizedMessage());
-		}
-	}
-
-	@DELETE
-	@Produces({ MediaType.APPLICATION_JSON })
-	@Path("/{id}")
-	public Response delete(@PathParam("id") String id) {
-		if (log.isTraceEnabled()) {
-			log.trace(String.format("get - %s", id));
-		}
-		try {
-			Document document = documentService.get(id);
-			documentService.delete(document);
-			return Response.ok().build();
-		} catch (ServiceException e) {
-			throw new RestServiceException(e.getLocalizedMessage());
-		}
-	}
-
-	// @POST
-	// @Path("/upload")
-	// @Consumes(MediaType.MULTIPART_FORM_DATA)
-	// public Response upload(FormDataMultiPart multiPart) {
-	// if (log.isTraceEnabled()) {
-	// log.trace(String.format("upload - %s", multiPart));
-	// }
-	// try {
-	// for (String key : multiPart.getFields().keySet()) {
-	// // log.debug(String.format("Key: %s - class: %s", key, multiPart
-	// // .getField(key).getValue()));
-	// try {
-	// log.debug(String.format("Key: %s - %s", key,
-	// multiPart.getField(key).getEntityAs(String.class)));
-	// }
-	// catch (Throwable t) {
-	// log.error("", t);
-	// }
-	// }
-	// } catch (Throwable t) {
-	// log.error("upload failed", t);
-	// }
-	// return Response.status(200).build();
-	//
-	// }
-
-	@POST
-	@Path("/upload")
+	@Path(UPLOAD_PATH)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response upload(@FormDataParam("name") String name,
@@ -188,11 +97,8 @@ public class RestDocumentService extends RestServiceBase {
 			DateTime now = new DateTime();
 			attributes.put(Document.CREATION_DATE, now.toString());
 			attributes.put(Document.AUTHOR, getCurrentUser());
-			Document document = new Document(null, file, attributes);
-			document = documentService.create(document);
-			log.debug(String.format("New document uploaded %s", document.getId()));
-			document.setFile(null);
-			return Response.ok(document).build();
+			Document document = new Document(null, name, file, attributes);
+			return create(document);
 		} catch (Throwable t) {
 			log.error("upload failed", t);
 			throw new RestServiceException(t.getLocalizedMessage());
@@ -212,12 +118,6 @@ public class RestDocumentService extends RestServiceBase {
 			@FormDataParam("file") FormDataBodyPart body) {
 		try {
 			isAuthenticated();
-			// log.debug("Principal: " +
-			// SecurityUtils.getSubject().getPrincipal());
-			// if (! SecurityUtils.getSubject().hasRole("writer")) {
-			// return Response.status(Status.UNAUTHORIZED).build();
-			// }
-
 			FormDataContentDisposition fileDetail = body
 					.getFormDataContentDisposition();
 			if (log.isTraceEnabled()) {
@@ -234,12 +134,8 @@ public class RestDocumentService extends RestServiceBase {
 			DateTime now = new DateTime();
 			attributes.put(Document.CREATION_DATE, now.toString());
 			attributes.put(Document.AUTHOR, getCurrentUser());
-			Document document = new Document(null, file, attributes);
-
-			document = documentService.create(document);
-			log.debug(String.format("New document uploaded %s", document.getId()));
-			document.setFile(null);
-			return Response.ok(document).build();
+			Document document = new Document(null, name, file, attributes);
+			return create(document);
 		} catch (Throwable t) {
 			log.error("upload failed", t);
 			throw new RestServiceException(t.getLocalizedMessage());
@@ -258,7 +154,8 @@ public class RestDocumentService extends RestServiceBase {
 			int read = 0;
 			byte[] bytes = new byte[1024];
 
-//			out = new FileOutputStream(new java.io.File(uploadedFileLocation));
+			// out = new FileOutputStream(new
+			// java.io.File(uploadedFileLocation));
 			while ((read = uploadedInputStream.read(bytes)) != -1) {
 				out.write(bytes, 0, read);
 			}
