@@ -1,5 +1,6 @@
 package com.github.richardwilly98.rest;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -89,8 +90,13 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			isAuthenticated();
 			filename = System.getProperty("java.io.tmpdir")
 					+ System.currentTimeMillis() + fileDetail.getFileName();
-			writeToFile(uploadedInputStream, filename);
-			String encodedContent = Base64.encodeFromFile(filename);
+			String encodedContent;
+			if (fileDetail.getSize() > 16 * 1024 * 1024) {
+				writeToFile(uploadedInputStream, filename);
+				encodedContent = Base64.encodeFromFile(filename);
+			} else {
+				encodedContent = Base64.encodeBytes(toByteArray(uploadedInputStream));
+			}
 			File file = new File(encodedContent, fileDetail.getFileName(),
 					fileDetail.getType());
 			Map<String, Object> attributes = new HashMap<String, Object>();
@@ -164,6 +170,26 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		} catch (IOException ex) {
 			log.error("writeToFile failed", ex);
 		}
+	}
+
+	private byte[] toByteArray(InputStream is) {
+		try {
+			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+			int nRead;
+			byte[] data = new byte[16384];
+
+			while ((nRead = is.read(data, 0, data.length)) != -1) {
+				buffer.write(data, 0, nRead);
+			}
+
+			buffer.flush();
+
+			return buffer.toByteArray();
+		} catch (IOException ex) {
+			log.error("toByteArray failed", ex);
+		}
+		return null;
 	}
 
 	private void deleteFile(String name) {
