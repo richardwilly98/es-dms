@@ -1,5 +1,7 @@
 package com.github.richardwilly98.api;
 
+import com.google.common.base.Objects;
+
 public class Settings {
 
 	private String library;
@@ -28,5 +30,11 @@ public class Settings {
 
 	public void setEsPort(int esPort) {
 		this.esPort = esPort;
+	}
+	
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this).add("library", library).add("esPort", esPort)
+				.add("esHost", esHost).toString();
 	}
 }
