@@ -9,6 +9,7 @@ public class ProviderModule extends AbstractModule {
 	@Override
 	protected void configure() {
 
+		install(new BootstrapModule());
 		install(new EsClientModule());
 		install(new ServicesModule());
 		install(new ShiroAopModule());
