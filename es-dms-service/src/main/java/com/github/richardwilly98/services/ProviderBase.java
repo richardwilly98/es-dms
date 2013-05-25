@@ -12,6 +12,8 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.get.GetResponse;
@@ -27,6 +29,7 @@ import org.elasticsearch.search.SearchHit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.api.ItemBase;
 import com.github.richardwilly98.api.Settings;
+import com.github.richardwilly98.api.User;
 import com.github.richardwilly98.api.exception.ServiceException;
 import com.github.richardwilly98.api.services.BaseService;
 import com.github.richardwilly98.api.services.BootstrapService;
@@ -60,6 +63,37 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		this.clazz = clazz;
 	}
 
+	private String currentUser;
+
+	protected void isAuthenticated() throws ServiceException {
+		try {
+			log.debug("*** isAuthenticated ***");
+			Subject currentSubject = SecurityUtils.getSubject();
+			log.debug("currentSubject.isAuthenticated(): "
+					+ currentSubject.isAuthenticated());
+			log.debug("Principal: " + currentSubject.getPrincipal());
+			if (currentSubject.getPrincipal() == null) {
+				throw new ServiceException("Unauthorize request");
+			} else {
+				if (currentUser == null) {
+//					currentUser = currentSubject.getPrincipal().toString();
+					if (currentSubject.getPrincipal() instanceof User) {
+						currentUser = ((User)currentSubject.getPrincipal()).getId();
+					}
+				}
+			}
+		} catch (Throwable t) {
+			throw new ServiceException();
+		}
+	}
+
+	protected String getCurrentUser() throws ServiceException {
+		if (currentUser == null) {
+			isAuthenticated();
+		}
+		return currentUser;
+	}
+
 	@Override
 	public T get(String id) throws ServiceException {
 		try {
@@ -72,10 +106,11 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 				return null;
 			}
 			String json = response.getSourceAsString();
+			log.trace(String.format("get - %s - return - %s", id, json));
 			T item = mapper.readValue(json, clazz);
 			return item;
 		} catch (Throwable t) {
-			log.error("getUser failed", t);
+			log.error("get failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}
@@ -189,22 +224,28 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		}
 	}
 
+	// TODO: Must improve the update to avoid 2 update API calls
 	@Override
 	public T update(T item) throws ServiceException {
 		try {
 			if (log.isTraceEnabled()) {
-				log.trace(String.format("create - %s", item));
+				log.trace(String.format("update - %s", item));
 			}
 			String json;
 			json = mapper.writeValueAsString(item);
+			log.trace(String.format("before update json - %s", json));
 			UpdateResponse response = client
+					.prepareUpdate(index, type, item.getId()).setScript("ctx._source.remove('attributes');")
+					.execute().actionGet();
+			response = client
 					.prepareUpdate(index, type, item.getId()).setDoc(json)
 					.execute().actionGet();
 			refreshIndex();
 			T updatedItem = get(response.getId());
+			log.trace(String.format("after update json - %s", mapper.writeValueAsString(updatedItem)));
 			return updatedItem;
 		} catch (Throwable t) {
-			log.error("create failed", t);
+			log.error("update failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}

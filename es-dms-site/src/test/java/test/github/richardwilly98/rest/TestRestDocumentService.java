@@ -5,6 +5,8 @@ import static org.elasticsearch.common.io.Streams.copyToBytesFromClasspath;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
@@ -36,17 +38,78 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			Assert.assertNotNull(document);
 			log.debug("New document: " + document);
 			Assert.assertEquals(document.getName(), name);
-			 Document document2 = getItem(document.getId(), Document.class, RestDocumentService.DOCUMENTS_PATH);
-			 Assert.assertEquals(document.getId(), document.getId());
-			 String newName = "document-" + System.currentTimeMillis();
-			 document2.setName(newName);
-			 Document document3 = updateItem(document2, Document.class, RestDocumentService.DOCUMENTS_PATH);
-			 Assert.assertEquals(newName, document3.getName());
-			 deleteItem(document.getId(), RestDocumentService.DOCUMENTS_PATH);
-			 document2 = getItem(document.getId(), Document.class, RestDocumentService.DOCUMENTS_PATH);
-			 Assert.assertNull(document2);
+			Document document2 = getItem(document.getId(), Document.class,
+					RestDocumentService.DOCUMENTS_PATH);
+			Assert.assertEquals(document.getId(), document.getId());
+			String newName = "document-" + System.currentTimeMillis();
+			document2.setName(newName);
+			Document document3 = updateItem(document2, Document.class,
+					RestDocumentService.DOCUMENTS_PATH);
+			Assert.assertEquals(newName, document3.getName());
+			deleteItem(document.getId(), RestDocumentService.DOCUMENTS_PATH);
+			document2 = getItem(document.getId(), Document.class,
+					RestDocumentService.DOCUMENTS_PATH);
+			Assert.assertNull(document2);
 		} catch (Throwable t) {
 			log.error("testCreateDocument fail", t);
+			Assert.fail();
+		}
+	}
+
+	@Test
+	public void testCheckoutCheckinDocument() throws Throwable {
+		log.debug("*** testCheckoutCheckinDocument ***");
+		try {
+			String name = "test-attachment.html";
+			Document document = createDocument(name, "text/html",
+					"/test/github/richardwilly98/services/test-attachment.html");
+			Assert.assertNotNull(document);
+			log.debug("New document: " + document);
+			
+			ClientResponse response = resource()
+					.path(RestDocumentService.DOCUMENTS_PATH)
+					.path(document.getId()).path("checkout").cookie(adminCookie)
+					.type(MediaType.APPLICATION_JSON)
+					.post(ClientResponse.class);
+			log.debug(String.format("status: %s", response.getStatus()));
+			Assert.assertTrue(response.getStatus() == Status.NO_CONTENT
+					.getStatusCode());
+
+			Document document2 = getItem(document.getId(), Document.class,
+					RestDocumentService.DOCUMENTS_PATH);
+			Map<String, Object> attributes = document2.getAttributes();
+			Assert.assertNotNull(attributes.get(Document.STATUS));
+			Assert.assertTrue(attributes.get(Document.STATUS).equals(Document.DocumentStatus.LOCKED.getStatusCode()));
+			Assert.assertNotNull(attributes.get(Document.LOCKED_BY));
+			Assert.assertTrue(attributes.get(Document.LOCKED_BY).equals(adminCredential.getUsername()));
+			Assert.assertNotNull(attributes.get(Document.MODIFIED_DATE));
+
+			response = resource()
+					.path(RestDocumentService.DOCUMENTS_PATH)
+					.path(document.getId()).path("checkout").cookie(adminCookie)
+					.type(MediaType.APPLICATION_JSON)
+					.post(ClientResponse.class);
+			log.debug(String.format("status: %s", response.getStatus()));
+			Assert.assertTrue(response.getStatus() == Status.CONFLICT
+					.getStatusCode());
+			
+			response = resource()
+					.path(RestDocumentService.DOCUMENTS_PATH)
+					.path(document.getId()).path("checkin").cookie(adminCookie)
+					.type(MediaType.APPLICATION_JSON)
+					.post(ClientResponse.class);
+			log.debug(String.format("status: %s", response.getStatus()));
+			Assert.assertTrue(response.getStatus() == Status.NO_CONTENT
+					.getStatusCode());
+
+			document2 = getItem(document.getId(), Document.class,
+					RestDocumentService.DOCUMENTS_PATH);
+			
+			attributes = document2.getAttributes();
+			Assert.assertFalse(attributes.containsKey(Document.STATUS));
+			Assert.assertFalse(attributes.containsKey(Document.LOCKED_BY));
+		} catch (Throwable t) {
+			log.error("testCheckoutCheckinDocument fail", t);
 			Assert.fail();
 		}
 	}
@@ -65,7 +128,8 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 		mp.bodyPart(p);
 		mp.bodyPart(streamData);
 
-		ClientResponse response = resource().path(RestDocumentService.DOCUMENTS_PATH)
+		ClientResponse response = resource()
+				.path(RestDocumentService.DOCUMENTS_PATH)
 				.path(RestDocumentService.UPLOAD_PATH).cookie(adminCookie)
 				.type(MediaType.MULTIPART_FORM_DATA)
 				.post(ClientResponse.class, mp);

@@ -142,6 +142,38 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		}
 	}
 
+	@POST
+	@Path("{id}/checkout")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response checkout(@PathParam("id") String id) {
+		try {
+			Document document = service.get(id);
+			documentService.checkout(document);
+			return Response.noContent().build();
+		} catch (Throwable t) {
+			log.error("checkout failed", t);
+			return Response.status(Status.CONFLICT).build();
+			// throw new RestServiceException(t.getLocalizedMessage());
+		}
+	}
+
+	@POST
+	@Path("{id}/checkin")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response checkin(@PathParam("id") String id) {
+		try {
+			Document document = service.get(id);
+			documentService.checkin(document);
+			return Response.noContent().build();
+		} catch (Throwable t) {
+			log.error("checkin failed", t);
+			return Response.status(Status.CONFLICT).build();
+			// throw new RestServiceException(t.getLocalizedMessage());
+		}
+	}
+
 	/*
 	 * Save uploaded file to temp location
 	 */
