@@ -17,6 +17,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.joda.time.DateTime;
 
 import com.github.richardwilly98.api.Document;
 import com.github.richardwilly98.api.exception.ServiceException;
@@ -163,14 +164,26 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 
 	@Override
 	public void checkin(Document document) throws ServiceException {
-		// TODO Auto-generated method stub
-		
+		document.removeAttribute(Document.STATUS);
+		DateTime now = new DateTime();
+		document.setAttribute(Document.MODIFIED_DATE, now.toString());
+		document.removeAttribute(Document.LOCKED_BY);
+		document = update(document);
 	}
 
 	@Override
 	public void checkout(Document document) throws ServiceException {
-		// TODO Auto-generated method stub
-		
+		if (document.getAttributes().containsKey(Document.STATUS)) {
+			if (document.getAttributes().get(Document.STATUS)
+					.equals(Document.DocumentStatus.LOCKED.getStatusCode())) {
+				throw new ServiceException(String.format("Document %s already locked.", document.getId()));
+			}
+		}
+		document.setAttribute(Document.STATUS, Document.DocumentStatus.LOCKED.getStatusCode());
+		DateTime now = new DateTime();
+		document.setAttribute(Document.MODIFIED_DATE, now.toString());
+		document.setAttribute(Document.LOCKED_BY, getCurrentUser());
+		update(document);
 	}
 	
 	@Override

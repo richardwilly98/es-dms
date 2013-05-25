@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 public class Document extends SecuredItem {
 
 	private static final long serialVersionUID = 1L;
@@ -12,19 +11,21 @@ public class Document extends SecuredItem {
 	public final static String MODIFIED_DATE = "modified";
 	public final static String AUTHOR = "author";
 	public final static String STATUS = "status";
-	
+	public final static String LOCKED_BY = "lockedBy";
+
 	@JsonProperty("file")
 	File file;
-	
+
 	public Document() {
 		super();
 	}
-	
+
 	public Document(String id, File file) {
 		this(id, null, file, null);
 	}
-	
-	public Document(String id, String name, File file, Map<String, Object> attributes) {
+
+	public Document(String id, String name, File file,
+			Map<String, Object> attributes) {
 		if (file == null) {
 			file = new File();
 		}
@@ -37,8 +38,23 @@ public class Document extends SecuredItem {
 	public File getFile() {
 		return file;
 	}
-	
+
 	public void setFile(File file) {
 		this.file = file;
+	}
+
+	public enum DocumentStatus {
+		AVAILABLE("A"), LOCKED("L"), DELETED("D");
+
+		private String statusCode;
+
+		private DocumentStatus(String s) {
+			statusCode = s;
+		}
+
+		public String getStatusCode() {
+			return statusCode;
+		}
+
 	}
 }

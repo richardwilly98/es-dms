@@ -87,10 +87,16 @@ public abstract class ItemBase implements Serializable {
 		}
 
 	}
+	
+	public void removeAttribute(String name) {
+		if (attributes != null) {
+			this.attributes.remove(name);
+		}
+	}
 
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this).add("id", id).add("name", name)
-				.add("description", description).toString();
+				.add("description", description).add("attributes", attributes).toString();
 	}
 }
