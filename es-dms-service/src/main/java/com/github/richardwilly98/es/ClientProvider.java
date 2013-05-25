@@ -11,12 +11,10 @@ import com.google.inject.Provider;
 
 public class ClientProvider implements Provider<Client> {
 
-//	final BootstrapService bootstrapService;
 	final Settings settings;
 	
 	@Inject
 	public ClientProvider(final BootstrapService bootstrapService) {
-//		this.bootstrapService = bootstrapService;
 		this.settings = bootstrapService.loadSettings();
 	}
 	@Override
