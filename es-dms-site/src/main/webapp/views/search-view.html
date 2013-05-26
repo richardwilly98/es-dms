@@ -12,4 +12,25 @@
 					<br/>
 				</li>
 			</ul>
+			<br/>
+		    <table class="table table-condensed">
+		    	<thead>
+		    		<tr>
+		    			<th>Id</th>
+		    			<th>Name</th>
+		    			<th>Actions</th>
+		    		</tr>
+		    	</thead>
+		    	<tbody>
+		    		<tr data-ng-repeat="document in documents">
+		    			<td>{{ document.id }}</td>
+		    			<td>{{ document.name }}</td>
+		    			<td>
+		    				<button class="btn btn-primary" data-ng-click="edit(document.id)" data-toggle="modal" href="#editModal">
+		    					<i class="icon-pencil icon-white"></i> Edit
+		    				</button>
+		    			</td>
+		    		</tr>
+		    	</tbody>
+		    </table>			
 		</div>
