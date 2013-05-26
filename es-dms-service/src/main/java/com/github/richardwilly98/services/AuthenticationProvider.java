@@ -66,8 +66,8 @@ public class AuthenticationProvider implements AuthenticationService {
 				return null;
 			}
 			String json = response.getSourceAsString();
-			Session permission = mapper.readValue(json, Session.class);
-			return permission;
+			Session session = mapper.readValue(json, Session.class);
+			return session;
 		} catch (Throwable t) {
 			log.error("get failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
@@ -237,11 +237,7 @@ public class AuthenticationProvider implements AuthenticationService {
 	@Override
 	public Session update(Session session) throws ServiceException {
 		try {
-			if (log.isTraceEnabled()) {
-				log.trace(String.format("update - %s", session));
-			}
-			String json;
-			json = mapper.writeValueAsString(session);
+			String json = mapper.writeValueAsString(session);
 			client.prepareDelete(index, type, session.getId());
 			UpdateResponse response = client
 					.prepareUpdate(index, type, session.getId()).setDoc(json).setRetryOnConflict(5)
