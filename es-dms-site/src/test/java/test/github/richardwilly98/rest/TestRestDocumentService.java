@@ -5,7 +5,6 @@ import static org.elasticsearch.common.io.Streams.copyToBytesFromClasspath;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
@@ -114,7 +113,38 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 		}
 	}
 
-	protected Document createDocument(String name, String contentType,
+	@Test(enabled = false)
+	public void testDownloadDocument() throws Throwable {
+		log.debug("*** testDownloadDocument ***");
+		try {
+			String name = "test-attachment.html";
+			Document document = createDocument(name, "text/html",
+					"/test/github/richardwilly98/services/test-attachment.html");
+			Assert.assertNotNull(document);
+			log.debug("New document: " + document);
+			
+			ClientResponse response = resource()
+					.path(RestDocumentService.DOCUMENTS_PATH)
+					.path(document.getId()).path("download").cookie(adminCookie)
+//					.type(MediaType.APPLICATION_JSON)
+					.get(ClientResponse.class);
+			log.debug(String.format("status: %s", response.getStatus()));
+			Assert.assertTrue(response.getStatus() == Status.OK
+					.getStatusCode());
+			
+			log.debug("Content type: " + response.getType().getType());
+			InputStream stream = response.getEntityInputStream();
+			Assert.assertNotNull(stream);
+			
+//			Assert.assertFalse(attributes.containsKey(Document.STATUS));
+//			Assert.assertFalse(attributes.containsKey(Document.LOCKED_BY));
+		} catch (Throwable t) {
+			log.error("testDownloadDocument fail", t);
+			Assert.fail();
+		}
+	}
+
+	private Document createDocument(String name, String contentType,
 			String path) throws Throwable {
 		String id = String.valueOf(System.currentTimeMillis());
 		byte[] content = copyToBytesFromClasspath(path);

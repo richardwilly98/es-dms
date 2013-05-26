@@ -1,5 +1,8 @@
 package com.github.richardwilly98.rest;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,6 +20,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.elasticsearch.common.Base64;
@@ -30,6 +34,7 @@ import com.github.richardwilly98.api.services.DocumentService;
 import com.github.richardwilly98.rest.exception.RestServiceException;
 import com.google.inject.Inject;
 import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataParam;
 
@@ -177,6 +182,27 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			log.error("checkin failed", t);
 			return Response.status(Status.CONFLICT).build();
 			// throw new RestServiceException(t.getLocalizedMessage());
+		}
+	}
+
+	@GET
+	@Path("{id}/download")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response download(@PathParam("id") String id) {
+		try {
+			Document document = service.get(id);
+			checkNotNull(document);
+			checkNotNull(document.getFile());
+			ResponseBuilder rb = new ResponseBuilderImpl();
+			rb.type(document.getFile().getContentType());
+			InputStream stream = new ByteArrayInputStream(
+					Base64.decode(document.getFile().getContent()));
+			rb.entity(stream);
+			rb.status(Status.OK);
+			return rb.build();
+		} catch (Throwable t) {
+			log.error("download failed", t);
+			return Response.status(Status.NOT_FOUND).build();
 		}
 	}
 
