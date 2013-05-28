@@ -106,7 +106,6 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 				return null;
 			}
 			String json = response.getSourceAsString();
-			log.trace(String.format("get - %s - return - %s", id, json));
 			T item = mapper.readValue(json, clazz);
 			return item;
 		} catch (Throwable t) {
