@@ -25,14 +25,17 @@ import com.github.richardwilly98.api.services.BootstrapService;
 import com.github.richardwilly98.api.services.DocumentService;
 import com.google.inject.Inject;
 
-public class DocumentProvider extends ProviderBase<Document> implements DocumentService {
+public class DocumentProvider extends ProviderBase<Document> implements
+		DocumentService {
 
 	private static final String DOCUMENT_MAPPING_JSON = "/com/github/richardwilly98/services/document-mapping.json";
 	private final static String type = "document";
 
 	@Inject
-	DocumentProvider(Client client, BootstrapService bootstrapService) throws ServiceException {
-		super(client, bootstrapService, null, DocumentProvider.type, Document.class);
+	DocumentProvider(Client client, BootstrapService bootstrapService)
+			throws ServiceException {
+		super(client, bootstrapService, null, DocumentProvider.type,
+				Document.class);
 	}
 
 	@Override
@@ -49,23 +52,28 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 		}
 	}
 
-//	@Override
-//	protected void createIndex() {
-//		if (!client.admin().indices().prepareExists(index).execute()
-//				.actionGet().isExists()) {
-//			client.admin().indices().prepareCreate(index).execute()
-//					.actionGet();
-//			PutMappingResponse mappingResponse = client.admin().indices().preparePutMapping(index)
-//					.setType(type).setSource(getMapping()).execute()
-//					.actionGet();
-//			log.debug(String.format("Mapping response acknowledged: %s", mappingResponse.isAcknowledged()));
-//		}
-//
-//	}
+	// @Override
+	// protected void createIndex() {
+	// if (!client.admin().indices().prepareExists(index).execute()
+	// .actionGet().isExists()) {
+	// client.admin().indices().prepareCreate(index).execute()
+	// .actionGet();
+	// PutMappingResponse mappingResponse =
+	// client.admin().indices().preparePutMapping(index)
+	// .setType(type).setSource(getMapping()).execute()
+	// .actionGet();
+	// log.debug(String.format("Mapping response acknowledged: %s",
+	// mappingResponse.isAcknowledged()));
+	// }
+	//
+	// }
 
 	@RequiresPermissions(CREATE_PERMISSION)
 	@Override
 	public Document create(Document item) throws ServiceException {
+		DateTime now = new DateTime();
+		item.setAttribute(Document.CREATION_DATE, now.toString());
+		item.setAttribute(Document.AUTHOR, getCurrentUser());
 		return super.create(item);
 	}
 
@@ -74,23 +82,26 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 	public void delete(Document item) throws ServiceException {
 		super.delete(item);
 	}
-	
-	/* (non-Javadoc)
-	 * @see com.github.richardwilly98.services.IDocumentService#getDocument(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.richardwilly98.services.BaseService#get(java.lang.String)
 	 */
-	@Override
-	public Document get(String id) throws ServiceException {
-		try {
-			GetResponse response = client.prepareGet(index, type, id)
-					.execute().actionGet();
-			String json = response.getSourceAsString();
-			Document document = mapper.readValue(json, Document.class);
-			return document;
-		} catch (Throwable t) {
-			log.error("get failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
-	}
+//	@Override
+//	public Document get(String id) throws ServiceException {
+//		try {
+//			GetResponse response = client.prepareGet(index, type, id).execute()
+//					.actionGet();
+//			String json = response.getSourceAsString();
+//			log.trace("get - " + id + " -> " + json);
+//			Document document = mapper.readValue(json, Document.class);
+//			return document;
+//		} catch (Throwable t) {
+//			log.error("get failed", t);
+//			throw new ServiceException(t.getLocalizedMessage());
+//		}
+//	}
 
 	@Override
 	public Set<Document> getItems(String name) throws ServiceException {
@@ -118,9 +129,12 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see com.github.richardwilly98.services.IDocumentService#contentSearch(java.lang.String)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.github.richardwilly98.services.BaseService#search(java.lang.String)
 	 */
 	@Override
 	public List<Document> search(String criteria) throws ServiceException {
@@ -128,7 +142,8 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 			List<Document> documents = new ArrayList<Document>();
 
 			SearchResponse searchResponse = client.prepareSearch(index)
-					.setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH).setQuery(fieldQuery("file", criteria))
+					.setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH)
+					.setQuery(fieldQuery("file", criteria))
 					.addHighlightedField("file").execute().actionGet();
 			log.debug("totalHits: " + searchResponse.getHits().totalHits());
 			for (SearchHit hit : searchResponse.getHits().hits()) {
@@ -141,7 +156,8 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 					if (log.isTraceEnabled()) {
 						log.trace(String.format("Highlight key: %s", key));
 					}
-					for(Text text : hit.getHighlightFields().get(key).fragments()) {
+					for (Text text : hit.getHighlightFields().get(key)
+							.fragments()) {
 						log.debug(String.format("Fragment: %s", text));
 						highlight = text.toString();
 					}
@@ -176,41 +192,43 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 		if (document.getAttributes().containsKey(Document.STATUS)) {
 			if (document.getAttributes().get(Document.STATUS)
 					.equals(Document.DocumentStatus.LOCKED.getStatusCode())) {
-				throw new ServiceException(String.format("Document %s already locked.", document.getId()));
+				throw new ServiceException(String.format(
+						"Document %s already locked.", document.getId()));
 			}
 		}
-		document.setAttribute(Document.STATUS, Document.DocumentStatus.LOCKED.getStatusCode());
+		document.setAttribute(Document.STATUS,
+				Document.DocumentStatus.LOCKED.getStatusCode());
 		DateTime now = new DateTime();
 		document.setAttribute(Document.MODIFIED_DATE, now.toString());
 		document.setAttribute(Document.LOCKED_BY, getCurrentUser());
 		update(document);
 	}
-	
+
 	@Override
 	public boolean disabled(Document document) throws ServiceException {
 		try {
 			if (document == null) {
 				throw new IllegalArgumentException("document is null");
 			}
-				//
-			} catch (Throwable t) {
-				log.error("getDocuments failed", t);
-				throw new ServiceException(t.getLocalizedMessage());
-			}
+			//
+		} catch (Throwable t) {
+			log.error("getDocuments failed", t);
+			throw new ServiceException(t.getLocalizedMessage());
+		}
 		return document.isDisabled();
 	}
-	
+
 	@Override
 	public void disable(Document document, boolean b) throws ServiceException {
 		try {
 			if (document == null) {
 				throw new IllegalArgumentException("document is null");
 			}
-				//
-			} catch (Throwable t) {
-				log.error("getDocuments failed", t);
-				throw new ServiceException(t.getLocalizedMessage());
-			}
+			//
+		} catch (Throwable t) {
+			log.error("getDocuments failed", t);
+			throw new ServiceException(t.getLocalizedMessage());
+		}
 		document.setDisabled(b);
 	}
 
