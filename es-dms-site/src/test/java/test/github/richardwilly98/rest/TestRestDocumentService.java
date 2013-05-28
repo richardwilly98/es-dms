@@ -16,6 +16,7 @@ import com.github.richardwilly98.api.Document;
 import com.github.richardwilly98.rest.RestDocumentService;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
+import com.sun.jersey.core.header.ContentDisposition;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
@@ -113,7 +114,7 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 		}
 	}
 
-	@Test(enabled = false)
+	@Test()
 	public void testDownloadDocument() throws Throwable {
 		log.debug("*** testDownloadDocument ***");
 		try {
@@ -151,18 +152,22 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 		InputStream is = new ByteArrayInputStream(content);
 
 		// Filename of the sent stream is not relevant for this test.
-		StreamDataBodyPart streamData = new StreamDataBodyPart("file", is, name);
-		FormDataMultiPart mp = new FormDataMultiPart();
-		FormDataBodyPart p = new FormDataBodyPart(FormDataContentDisposition
-				.name("name").build(), name);
-		mp.bodyPart(p);
-		mp.bodyPart(streamData);
+//		StreamDataBodyPart streamData = new StreamDataBodyPart("file", is, name);
+		FormDataMultiPart form = new FormDataMultiPart();
+		form.field("name", name);
+//		FormDataBodyPart p = new FormDataBodyPart(FormDataContentDisposition
+//				.name("name").build(), name);
+//		p.contentDisposition(ContentDisposition.type(contentType).fileName(name).size(content.length).build()); 
+//		mp.bodyPart(p);
+		FormDataBodyPart p = new FormDataBodyPart("file", is, MediaType.valueOf(contentType));
+		form.bodyPart(p);
+//		mp.bodyPart(streamData);
 
 		ClientResponse response = resource()
 				.path(RestDocumentService.DOCUMENTS_PATH)
 				.path(RestDocumentService.UPLOAD_PATH).cookie(adminCookie)
 				.type(MediaType.MULTIPART_FORM_DATA)
-				.post(ClientResponse.class, mp);
+				.post(ClientResponse.class, form);
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.CREATED
 				.getStatusCode());

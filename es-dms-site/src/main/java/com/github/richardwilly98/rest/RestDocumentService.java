@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,8 @@ import com.github.richardwilly98.api.services.AuthenticationService;
 import com.github.richardwilly98.api.services.DocumentService;
 import com.github.richardwilly98.rest.exception.RestServiceException;
 import com.google.inject.Inject;
+import com.sun.jersey.core.header.ContentDisposition;
+import com.sun.jersey.core.header.ContentDisposition.ContentDispositionBuilder;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
 import com.sun.jersey.multipart.FormDataBodyPart;
@@ -82,32 +85,37 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response upload(@FormDataParam("name") String name,
-			@FormDataParam("date") String date,
 			@FormDataParam("file") InputStream uploadedInputStream,
-			@FormDataParam("file") FormDataContentDisposition fileDetail) {
+			@FormDataParam("file") FormDataBodyPart body /*
+														 * ,
+														 * 
+														 * @FormDataParam("file")
+														 * FormDataContentDisposition
+														 * fileDetail
+														 */) {
+		checkNotNull(body);
+		checkNotNull(body.getContentDisposition());
+		String filename = body.getContentDisposition().getFileName();
+		long size = body.getContentDisposition().getSize();
+		String contentType = body.getMediaType().toString();
 		if (log.isTraceEnabled()) {
-			log.trace(String.format("upload - %s - %s - %s - %s - %s", name,
-					date, fileDetail.getFileName(), fileDetail.getSize(),
-					fileDetail.getType()));
+			log.trace(String.format("upload - %s - %s - %s - %s", name,
+					filename, size, contentType));
 		}
-		String filename = null;
 		try {
 			isAuthenticated();
-			filename = System.getProperty("java.io.tmpdir")
-					+ System.currentTimeMillis() + fileDetail.getFileName();
 			String encodedContent;
-			if (fileDetail.getSize() > 16 * 1024 * 1024) {
-				writeToFile(uploadedInputStream, filename);
-				encodedContent = Base64.encodeFromFile(filename);
+			if (size > 16 * 1024 * 1024) {
+				String path = System.getProperty("java.io.tmpdir")
+						+ System.currentTimeMillis() + filename;
+				writeToFile(uploadedInputStream, path);
+				encodedContent = Base64.encodeFromFile(path);
 			} else {
-				encodedContent = Base64.encodeBytes(toByteArray(uploadedInputStream));
+				encodedContent = Base64
+						.encodeBytes(toByteArray(uploadedInputStream));
 			}
-			File file = new File(encodedContent, fileDetail.getFileName(),
-					fileDetail.getType());
+			File file = new File(encodedContent, filename, contentType);
 			Map<String, Object> attributes = new HashMap<String, Object>();
-			DateTime now = new DateTime();
-			attributes.put(Document.CREATION_DATE, now.toString());
-			attributes.put(Document.AUTHOR, getCurrentUser());
 			Document document = new Document(null, name, file, attributes);
 			return create(document);
 		} catch (Throwable t) {
@@ -193,12 +201,19 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			Document document = service.get(id);
 			checkNotNull(document);
 			checkNotNull(document.getFile());
+			ContentDispositionBuilder contentDisposition = ContentDisposition.type("attachment");
+			
+			contentDisposition.fileName(document.getFile().getName());
+			if (document.getFile().getDate() != null) {
+				contentDisposition.creationDate(document.getFile().getDate().toDate());
+			}
 			ResponseBuilder rb = new ResponseBuilderImpl();
 			rb.type(document.getFile().getContentType());
 			InputStream stream = new ByteArrayInputStream(
 					Base64.decode(document.getFile().getContent()));
 			rb.entity(stream);
 			rb.status(Status.OK);
+			rb.header("Content-Disposition", contentDisposition.build());
 			return rb.build();
 		} catch (Throwable t) {
 			log.error("download failed", t);
