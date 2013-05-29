@@ -27,7 +27,6 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.richardwilly98.api.Document;
 import com.github.richardwilly98.api.ItemBase;
 import com.github.richardwilly98.api.Settings;
 import com.github.richardwilly98.api.User;
@@ -45,6 +44,8 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	final String index;
 	final String type;
 	final Class<T> clazz;
+
+	private String currentUser;
 
 	@Inject
 	ProviderBase(final Client client, final BootstrapService bootstrapService,
@@ -64,8 +65,6 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		this.clazz = clazz;
 	}
 
-	private String currentUser;
-
 	protected void isAuthenticated() throws ServiceException {
 		try {
 			log.debug("*** isAuthenticated ***");
@@ -77,7 +76,6 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 				throw new ServiceException("Unauthorize request");
 			} else {
 				if (currentUser == null) {
-//					currentUser = currentSubject.getPrincipal().toString();
 					if (currentSubject.getPrincipal() instanceof User) {
 						currentUser = ((User)currentSubject.getPrincipal()).getId();
 					}

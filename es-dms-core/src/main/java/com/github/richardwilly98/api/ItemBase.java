@@ -47,7 +47,6 @@ public class ItemBase implements Serializable {
 
 	@JsonProperty("attributes")
 	private void deserialize(Map<String, Object> attributes) {
-		log.debug("*** deserialize *** -> " + attributes);
 		this.attributes = attributes;
 	}
 	
@@ -112,9 +111,6 @@ public class ItemBase implements Serializable {
 	}
 
 	public void removeAttribute(String name) {
-//		if (attributes != null) {
-//			this.attributes.remove(name);
-//		}
 		updateAttribute(name, null, false);
 	}
 

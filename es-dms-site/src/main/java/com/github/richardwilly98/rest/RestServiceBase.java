@@ -61,7 +61,7 @@ public abstract class RestServiceBase<T extends ItemBase> {
 			log.debug("Principal: " + currentSubject.getPrincipal());
 			if (currentSubject.getPrincipal() == null) {
 				throw new UnauthorizedException("Unauthorize request",
-						"/documents");
+						url.getPath());
 			} else {
 				if (currentUser == null) {
 					currentUser = currentSubject.getPrincipal().toString();

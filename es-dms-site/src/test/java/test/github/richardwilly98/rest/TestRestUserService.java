@@ -80,7 +80,7 @@ public class TestRestUserService extends GuiceAndJettyTestBase<User> {
 		log.trace(json);
 		ClientResponse response = resource().path(RestUserService.USERS_PATH).cookie(adminCookie)
 				.type(MediaType.APPLICATION_JSON)
-				.post(ClientResponse.class, json);
+				.post(ClientResponse.class, user);
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.CREATED
 				.getStatusCode());
