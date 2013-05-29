@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
@@ -52,29 +51,22 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		}
 	}
 
-	// @Override
-	// protected void createIndex() {
-	// if (!client.admin().indices().prepareExists(index).execute()
-	// .actionGet().isExists()) {
-	// client.admin().indices().prepareCreate(index).execute()
-	// .actionGet();
-	// PutMappingResponse mappingResponse =
-	// client.admin().indices().preparePutMapping(index)
-	// .setType(type).setSource(getMapping()).execute()
-	// .actionGet();
-	// log.debug(String.format("Mapping response acknowledged: %s",
-	// mappingResponse.isAcknowledged()));
-	// }
-	//
-	// }
-
+	private SimpleDocument updateModifiedDate(Document document) {
+		SimpleDocument sd = new SimpleDocument(document);
+		DateTime now = new DateTime();
+		sd.setReadOnlyAttribute(Document.MODIFIED_DATE, now.toString());
+		return sd;
+	}
+	
 	@RequiresPermissions(CREATE_PERMISSION)
 	@Override
 	public Document create(Document item) throws ServiceException {
+//		SimpleDocument sd = updateModifiedDate(item);
+		SimpleDocument sd = new SimpleDocument(item);
 		DateTime now = new DateTime();
-		item.setAttribute(Document.CREATION_DATE, now.toString());
-		item.setAttribute(Document.AUTHOR, getCurrentUser());
-		return super.create(item);
+		sd.setReadOnlyAttribute(Document.CREATION_DATE, now.toString());
+		sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
+		return super.create(sd);
 	}
 
 	@RequiresPermissions(DELETE_PERMISSION)
@@ -82,26 +74,6 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	public void delete(Document item) throws ServiceException {
 		super.delete(item);
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.github.richardwilly98.services.BaseService#get(java.lang.String)
-	 */
-//	@Override
-//	public Document get(String id) throws ServiceException {
-//		try {
-//			GetResponse response = client.prepareGet(index, type, id).execute()
-//					.actionGet();
-//			String json = response.getSourceAsString();
-//			log.trace("get - " + id + " -> " + json);
-//			Document document = mapper.readValue(json, Document.class);
-//			return document;
-//		} catch (Throwable t) {
-//			log.error("get failed", t);
-//			throw new ServiceException(t.getLocalizedMessage());
-//		}
-//	}
 
 	@Override
 	public Set<Document> getItems(String name) throws ServiceException {
@@ -180,28 +152,48 @@ public class DocumentProvider extends ProviderBase<Document> implements
 
 	@Override
 	public void checkin(Document document) throws ServiceException {
-		document.removeAttribute(Document.STATUS);
-		DateTime now = new DateTime();
-		document.setAttribute(Document.MODIFIED_DATE, now.toString());
-		document.removeAttribute(Document.LOCKED_BY);
-		document = update(document);
+//		SimpleDocument sd = updateModifiedDate(document);
+		SimpleDocument sd = new SimpleDocument(document);
+//		DateTime now = new DateTime();
+		sd.removeReadOnlyAttribute(Document.STATUS);
+//		sd.setReadOnlyAttribute(Document.MODIFIED_DATE, now.toString());
+		sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
+		sd.removeReadOnlyAttribute(Document.LOCKED_BY);
+		//document.removeAttribute(Document.LOCKED_BY);
+		document = update(sd);
+//		document.removeAttribute(Document.STATUS);
+//		DateTime now = new DateTime();
+//		document.setAttribute(Document.MODIFIED_DATE, now.toString());
+//		document.removeAttribute(Document.LOCKED_BY);
+//		document = update(document);
 	}
 
 	@Override
+	public Document update(Document item) throws ServiceException {
+		SimpleDocument document = updateModifiedDate(item);
+		return super.update(document);
+	}
+	
+	@Override
 	public void checkout(Document document) throws ServiceException {
-		if (document.getAttributes().containsKey(Document.STATUS)) {
+		SimpleDocument sd = new SimpleDocument(document);
+		if (document.getAttributes() != null && document.getAttributes().containsKey(Document.STATUS)) {
 			if (document.getAttributes().get(Document.STATUS)
 					.equals(Document.DocumentStatus.LOCKED.getStatusCode())) {
 				throw new ServiceException(String.format(
 						"Document %s already locked.", document.getId()));
 			}
 		}
-		document.setAttribute(Document.STATUS,
-				Document.DocumentStatus.LOCKED.getStatusCode());
-		DateTime now = new DateTime();
-		document.setAttribute(Document.MODIFIED_DATE, now.toString());
-		document.setAttribute(Document.LOCKED_BY, getCurrentUser());
-		update(document);
+		sd.setReadOnlyAttribute(Document.STATUS, Document.DocumentStatus.LOCKED.getStatusCode());
+//		document.setAttribute(Document.STATUS,
+//				Document.DocumentStatus.LOCKED.getStatusCode());
+//		DateTime now = new DateTime();
+//		sd.setReadOnlyAttribute(Document.MODIFIED_DATE, now.toString());
+//		document.setAttribute(Document.MODIFIED_DATE, now.toString());
+		sd.setReadOnlyAttribute(Document.LOCKED_BY, getCurrentUser());
+//		document.setAttribute(Document.LOCKED_BY, getCurrentUser());
+		update(sd);
+//		update(document);
 	}
 
 	@Override

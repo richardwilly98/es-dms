@@ -72,7 +72,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 
 	@Test
 	public void testCannotCreateDocument() throws Throwable {
-		log.info("Start testCannotCreateDocument");
+		log.info("*** testCannotCreateDocument ***");
 		User user = null;
 		for (User u : users.values()) {
 			for (Role role : u.getRoles()) {
@@ -127,44 +127,49 @@ public class DocumentProviderTest extends ProviderTestBase {
 
 	@Test
 	public void testCreateDocumentWithAuthor() throws Throwable {
+		log.info("*** testCreateDocumentWithAuthor ***");
+		loginAdminUser();
 		String id = String.valueOf(System.currentTimeMillis());
 		String name = "document-" + id;
 		Map<String, Object> attributes = new HashMap<String, Object>();
-		attributes.put(Document.AUTHOR, "richard");
 		Document document = new Document(id, name, null, attributes);
 		document.setId(id);
 		Document newDocument = documentService.create(document);
 		Assert.assertNotNull(newDocument);
-		log.info(String.format("New document created #%s", newDocument.getId()));
-		// document = documentService.get(newId);
-		attributes = document.getAttributes();
-		Assert.assertTrue(attributes != null && attributes.size() == 1);
-		Assert.assertTrue(attributes.containsKey(Document.AUTHOR)
-				&& attributes.get(Document.AUTHOR).equals("richard"));
+		log.info(String.format("New document created %s", newDocument));
+		attributes = newDocument.getAttributes();
+		Assert.assertTrue(attributes != null && attributes.size() > 1);
+		Assert.assertTrue(attributes.containsKey(Document.AUTHOR));
+		String author = attributes.get(Document.AUTHOR).toString();
+		Assert.assertTrue(!author.isEmpty());
+		// Test ignore set read-only attribute
+		newDocument.setAttribute(Document.AUTHOR, author + "-" + System.currentTimeMillis());
+		Document updatedDocument = documentService.update(newDocument);
+		Assert.assertTrue(updatedDocument.getAttributes().get(Document.AUTHOR).toString().equals(author));
 	}
 
 	@Test
 	public void testCreateDocumentWithCreationDate() throws Throwable {
+		log.info("*** testCreateDocumentWithCreationDate ***");
+		loginAdminUser();
 		String id = String.valueOf(System.currentTimeMillis());
 		String name = "document-" + id;
 		Map<String, Object> attributes = new HashMap<String, Object>();
-		DateTime now = new DateTime();
-		attributes.put(Document.CREATION_DATE, now.toString());
 		Document document = new Document(id, name, null, attributes);
 		document.setId(id);
 		Document newDocument = documentService.create(document);
 		Assert.assertNotNull(newDocument);
-		log.info(String.format("New document created #%s", newDocument.getId()));
-		loginAdminUser();
+		log.info(String.format("New document created %s", newDocument));
+		attributes = newDocument.getAttributes();
 
-		Assert.assertTrue(attributes != null && attributes.size() == 1);
+		Assert.assertTrue(attributes != null && attributes.size() > 1);
 		Assert.assertTrue(attributes.containsKey(Document.CREATION_DATE));
 		log.info(attributes.get(Document.CREATION_DATE));
 		DateTimeFormatter formatter = ISODateTimeFormat
 				.dateOptionalTimeParser();
 		DateTime newDate = formatter.parseDateTime(attributes.get(
 				Document.CREATION_DATE).toString());
-		Assert.assertEquals(now, newDate);
+		log.info(String.format("Attribute %s - %s", Document.CREATION_DATE, newDate));
 	}
 
 	@Test
@@ -174,22 +179,17 @@ public class DocumentProviderTest extends ProviderTestBase {
 		String id = String.valueOf(System.currentTimeMillis());
 		String name = "document-" + id;
 		Map<String, Object> attributes = new HashMap<String, Object>();
-//		DateTime now = new DateTime();
-//		attributes.put(Document.CREATION_DATE, now.toString());
 		Document document = new Document(id, name, null, attributes);
 		document.setId(id);
 		Document newDocument = documentService.create(document);
 		Assert.assertNotNull(newDocument);
-		log.info(String.format("New document created #%s", newDocument.getId()));
+		log.info(String.format("New document created %s", newDocument));
 		log.debug(String.format("Checkout document %s", newDocument.getId()));
 		documentService.checkout(newDocument);
 		newDocument = documentService.get(newDocument.getId());
+		log.trace(String.format("Document checked-out %s", newDocument));
+		
 		attributes = newDocument.getAttributes();
-		if (log.isTraceEnabled()) {
-			for (String key : attributes.keySet()) {
-				log.debug(String.format("Attribute: %s - %s", key, attributes.get(key)));
-			}
-		}
 		Assert.assertNotNull(attributes.get(Document.STATUS));
 		Assert.assertTrue(attributes.get(Document.STATUS).equals(Document.DocumentStatus.LOCKED.getStatusCode()));
 		Assert.assertNotNull(attributes.get(Document.LOCKED_BY));
@@ -199,12 +199,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		log.debug(String.format("Checkin document %s", newDocument.getId()));
 		documentService.checkin(newDocument);
 		newDocument = documentService.get(newDocument.getId());
-		attributes = newDocument.getAttributes();
-		if (log.isTraceEnabled()) {
-			for (String key : attributes.keySet()) {
-				log.debug(String.format("Attribute: %s - %s", key, attributes.get(key)));
-			}
-		}
+		log.trace(String.format("Document checked-in %s", newDocument));
 		Assert.assertFalse(attributes.containsKey(Document.STATUS));
 		Assert.assertFalse(attributes.containsKey(Document.LOCKED_BY));
 	}

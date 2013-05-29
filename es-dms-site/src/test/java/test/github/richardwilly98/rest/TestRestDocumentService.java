@@ -16,13 +16,11 @@ import com.github.richardwilly98.api.Document;
 import com.github.richardwilly98.rest.RestDocumentService;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
-import com.sun.jersey.core.header.ContentDisposition;
-import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
-import com.sun.jersey.multipart.file.StreamDataBodyPart;
 
 public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
+//public class TestRestDocumentService extends GuiceAndJerseyTestBase<Document> {
 
 	public TestRestDocumentService() throws Exception {
 		super();
@@ -38,16 +36,16 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			Assert.assertNotNull(document);
 			log.debug("New document: " + document);
 			Assert.assertEquals(document.getName(), name);
-			Document document2 = getItem(document.getId(), Document.class,
+			Document document2 = get(document.getId(), Document.class,
 					RestDocumentService.DOCUMENTS_PATH);
 			Assert.assertEquals(document.getId(), document.getId());
 			String newName = "document-" + System.currentTimeMillis();
 			document2.setName(newName);
-			Document document3 = updateItem(document2, Document.class,
+			Document document3 = update(document2, Document.class,
 					RestDocumentService.DOCUMENTS_PATH);
 			Assert.assertEquals(newName, document3.getName());
-			deleteItem(document.getId(), RestDocumentService.DOCUMENTS_PATH);
-			document2 = getItem(document.getId(), Document.class,
+			delete(document.getId(), RestDocumentService.DOCUMENTS_PATH);
+			document2 = get(document.getId(), Document.class,
 					RestDocumentService.DOCUMENTS_PATH);
 			Assert.assertNull(document2);
 		} catch (Throwable t) {
@@ -75,8 +73,9 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			Assert.assertTrue(response.getStatus() == Status.NO_CONTENT
 					.getStatusCode());
 
-			Document document2 = getItem(document.getId(), Document.class,
+			Document document2 = get(document.getId(), Document.class,
 					RestDocumentService.DOCUMENTS_PATH);
+			log.debug("Checked-out document: " + document);
 			Map<String, Object> attributes = document2.getAttributes();
 			Assert.assertNotNull(attributes.get(Document.STATUS));
 			Assert.assertTrue(attributes.get(Document.STATUS).equals(Document.DocumentStatus.LOCKED.getStatusCode()));
@@ -102,7 +101,7 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			Assert.assertTrue(response.getStatus() == Status.NO_CONTENT
 					.getStatusCode());
 
-			document2 = getItem(document.getId(), Document.class,
+			document2 = get(document.getId(), Document.class,
 					RestDocumentService.DOCUMENTS_PATH);
 			
 			attributes = document2.getAttributes();
@@ -173,7 +172,7 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 				.getStatusCode());
 		URI uri = response.getLocation();
 		Assert.assertNotNull(uri);
-		return getItem(uri, Document.class);
+		return get(uri, Document.class);
 	}
 
 	// @Test
