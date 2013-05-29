@@ -193,10 +193,22 @@ simpleApp.factory('documentService', function ($resource) {
 			var doc = new documentResource.get({'id': id})
 			doc.$checkin({'id': id});
 		},
+		delete: function(id) {
+			console.log('delete document: ' + id);
+			var doc = new documentResource.get({'id': id})
+			doc.$delete({'id': id});
+		},
 		getDocument: function(id) {
 			for (i in documents) {
 				if (documents[i].id == id) {
 					return documents[i];
+				}
+			}
+		},
+		getIndexOf: function(id) {
+			for (i in documents) {
+				if (documents[i].id == id) {
+					return i;
 				}
 			}
 		}

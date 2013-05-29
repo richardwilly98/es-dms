@@ -18,33 +18,43 @@
 		    		<tr>
 		    			<th>Id</th>
 		    			<th>Name</th>
-		    			<th>Actions</th>
+		    			<th>Author</th>
 		    			<th>Status</th>
+		    			<th></th>
 		    		</tr>
 		    	</thead>
 		    	<tbody>
 		    		<tr data-ng-repeat="document in documents">
 		    			<td>{{ document.id }}</td>
 		    			<td>{{ document.name }}</td>
-		    			<td>
-		    				<div data-ng-switch="document.attributes.status">
-		    					<div data-ng-switch-when="A" >
-				    				<button class="btn btn-primary" data-ng-click="edit(document.id)" data-toggle="modal" href="#editModal">
-				    					<i class="icon-pencil icon-white"></i> Edit
-				    				</button>
-				    				<button class="btn btn-primary" data-ng-click="checkout(document.id)" data-toggle="modal" href="#editModal">
-				    					<i class="icon-pencil icon-white"></i> Check-Out
-				    				</button>
-		    					</div>
-		    					<div data-ng-switch-when="L" >
-				    				<button class="btn btn-primary" data-ng-click="checkin(document.id)" data-toggle="modal" href="#editModal">
-				    					<i class="icon-pencil icon-white"></i> Check-In
-				    				</button>
-		    					</div>
-		    				</div>
-		    			</td>
+		    			<td>{{ document.attributes.author }}</td>
 		    			<td>{{ document.attributes.status }}</td>
+		    			<td>
+		    				<div data-ng-switch="document.attributes.status" class="btn-group">
+			    				<a class="btn btn-success dropdown-toggle" data-toggle="dropdown" href="#">
+	    							Action
+	    							<span class="caret"></span>
+	  							</a>
+	  							<ul data-ng-switch-when="A" class="dropdown-menu">
+	  								<li><a href="api/documents/{{ document.id }}/download" target="_blank">View</a></li>
+	  								<li><a data-ng-click="checkout(document.id)">Check-Out</a></li>
+	  								<li><a data-ng-click="delete(document.id)">Delete</a></li>
+	  							</ul>
+	  							<ul data-ng-switch-when="L" class="dropdown-menu">
+	  								<li><a href="api/documents/{{ document.id }}/download" target="_blank">View</a></li>
+	  								<li><a data-ng-click="checkin(document.id)">Check-In</a></li>
+	  							</ul>
+			    			</div>
+		    			</td>
 		    		</tr>
 		    	</tbody>
 		    </table>			
 		</div>
+		
+		<div class="modal fade hide" id="viewDocument" tabindex="-1" role="dialog" data-remote="api/documents/1bde98d9-752f-4a94-acec-49b1562173b2/download">
+			<div class="modal-body">
+			</div>
+			<div class="modal-footer">
+    			<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+  			</div>
+  		</div>

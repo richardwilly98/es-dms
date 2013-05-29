@@ -229,6 +229,14 @@ simpleApp.controller('documentController', function ($scope, documentService) {
     		document.attributes.status = 'A';
     	}
     };
+
+    $scope.delete = function(id) {
+    	documentService.delete(id);
+    	var index = documentService.getIndexOf(id);
+    	if (index) {
+    		$scope.documents.splice(index, 1);
+    	}
+    };
 });
 
 simpleApp.controller('AlertDemoCtrl', function ($scope) {
@@ -252,6 +260,7 @@ simpleApp.controller('newDocumentController', function ($scope) {
 	$scope.alert = {};
 	$scope.newDocument = {};
     $scope.uploadComplete = function (content, completed) {
+    	console.log('uploadComplete ' + content + ' - ' + completed);
         if (completed && content.length > 0)
         {
         	var response = JSON.parse(content);
