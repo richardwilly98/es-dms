@@ -31,9 +31,8 @@ public class EsRealm extends AuthorizingRealm {
 	private final HashService hashService;
 	private final UserService userService;
 	private final RoleService roleService;
-//	private static boolean accountCreated = false;
 
-	private static Logger log = Logger.getLogger(EsRealm.class);
+	private final static Logger log = Logger.getLogger(EsRealm.class);
 
 	@Inject
 	public EsRealm(final UserService userService, final HashService hashService, final RoleService roleService) {
@@ -44,14 +43,14 @@ public class EsRealm extends AuthorizingRealm {
 
 	@Override
 	public boolean supports(AuthenticationToken token) {
-		log.debug("*** supports ***");
+		log.trace("*** supports ***");
 		return (token instanceof UsernamePasswordToken);
 	}
 
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(
 			PrincipalCollection principals) {
-		log.debug("*** doGetAuthorizationInfo ***");
+		log.trace("*** doGetAuthorizationInfo ***");
 		Collection<User> principalList = principals.byType(User.class);
 		if (principals.isEmpty()) {
 			throw new AuthorizationException("Empty principal list!");
@@ -80,17 +79,13 @@ public class EsRealm extends AuthorizingRealm {
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(
 			AuthenticationToken token) throws AuthenticationException {
-		log.debug("*** doGetAuthenticationInfo ***");
+		log.trace("*** doGetAuthenticationInfo ***");
 		UsernamePasswordToken upToken = (UsernamePasswordToken) token;
 		if (log.isTraceEnabled()) {
 			log.trace(String.format("authenticate - %s", upToken.getUsername()));
 		}
 
 		User user = getPrincipal(upToken.getUsername());
-//		if (user == null) {
-//			user = shouldCreateAccount(upToken.getUsername(),
-//					upToken.getPassword());
-//		}
 		if (user == null) {
 			throw new AuthenticationException(String.format(
 					"Login name [%s] not found!", upToken.getUsername()));
@@ -101,8 +96,6 @@ public class EsRealm extends AuthorizingRealm {
 			log.trace("hash: " + hash);
 		}
 		if (hash.equals(user.getHash())) {
-//			SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(
-//					upToken.getUsername(), upToken.getPassword(), getName());
 			SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(
 					user, upToken.getPassword(), getName());
 			return info;
@@ -116,30 +109,6 @@ public class EsRealm extends AuthorizingRealm {
 	private String computeBase64Hash(char[] password) {
 		return hashService.toBase64(ByteSource.Util.bytes(password).getBytes());
 	}
-
-//	private User shouldCreateAccount(String username, char[] password) {
-//		if (accountCreated) {
-//			return null;
-//		}
-//		try {
-//			List<User> users = userService.getList("*");
-//			accountCreated = true;
-//			if (users.size() == 0) {
-//				User user = new User();
-//				user.setId(username);
-//				user.setName(username);
-//				user.setDescription("System administrator");
-//				user.setHash(computeBase64Hash(password));
-//				Role role = roleService.get(RoleService.ADMINISTRATOR_ROLE);
-//				user.addRole(role);
-//				user = userService.create(user);
-//				return user;
-//			}
-//		} catch (ServiceException ex) {
-//			log.error("shouldCreateAccount failed", ex);
-//		}
-//		return null;
-//	}
 
 	private User getPrincipal(String login) {
 		try {

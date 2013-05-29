@@ -231,7 +231,6 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			}
 			String json;
 			json = mapper.writeValueAsString(item);
-			log.trace(String.format("before update json - %s", json));
 			UpdateResponse response = client
 					.prepareUpdate(index, type, item.getId()).setScript("ctx._source.remove('attributes');")
 					.execute().actionGet();
@@ -240,7 +239,6 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 					.execute().actionGet();
 			refreshIndex();
 			T updatedItem = get(response.getId());
-			log.trace(String.format("after update json - %s", mapper.writeValueAsString(updatedItem)));
 			return updatedItem;
 		} catch (Throwable t) {
 			log.error("update failed", t);
