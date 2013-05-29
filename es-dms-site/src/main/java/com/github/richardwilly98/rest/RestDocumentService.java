@@ -33,6 +33,7 @@ import com.github.richardwilly98.api.exception.ServiceException;
 import com.github.richardwilly98.api.services.AuthenticationService;
 import com.github.richardwilly98.api.services.DocumentService;
 import com.github.richardwilly98.rest.exception.RestServiceException;
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.sun.jersey.core.header.ContentDisposition;
 import com.sun.jersey.core.header.ContentDisposition.ContentDispositionBuilder;
@@ -86,16 +87,13 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response upload(@FormDataParam("name") String name,
 			@FormDataParam("file") InputStream uploadedInputStream,
-			@FormDataParam("file") FormDataBodyPart body /*
-														 * ,
-														 * 
-														 * @FormDataParam("file")
-														 * FormDataContentDisposition
-														 * fileDetail
-														 */) {
+			@FormDataParam("file") FormDataBodyPart body) {
 		checkNotNull(body);
 		checkNotNull(body.getContentDisposition());
 		String filename = body.getContentDisposition().getFileName();
+		if (Strings.isNullOrEmpty(name)) {
+			name = filename;
+		}
 		String path = null;
 		long size = body.getContentDisposition().getSize();
 		String contentType = body.getMediaType().toString();
@@ -105,22 +103,16 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		}
 		try {
 			isAuthenticated();
-//			String encodedContent;
 			byte[] content;
 			if (size > 16 * 1024 * 1024) {
 				path = System.getProperty("java.io.tmpdir")
 						+ System.currentTimeMillis() + filename;
 				writeToFile(uploadedInputStream, path);
-//				encodedContent = Base64.encodeFromFile(path);
-//				Path path = Paths.get(path);
 				content = Files.readAllBytes(Paths.get(path));
 			} else {
-//				encodedContent = Base64
-//						.encodeBytes(toByteArray(uploadedInputStream));
 				content = toByteArray(uploadedInputStream);
 			}
 			File file = new File(content, filename, contentType);
-//			File file = new File(encodedContent, filename, contentType);
 			Map<String, Object> attributes = new HashMap<String, Object>();
 			Document document = new Document(null, name, file, attributes);
 			return create(document);
@@ -152,11 +144,10 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			}
 			byte[] content = body.getEntityAs(byte[].class);
 			String contentType = body.getMediaType().toString();
-//			String encodedContent = Base64.encodeBytes(content);
-//			File file = new File(encodedContent, fileDetail.getFileName(),
-//					contentType);
-			File file = new File(content, fileDetail.getFileName(),
-			contentType);
+			// String encodedContent = Base64.encodeBytes(content);
+			// File file = new File(encodedContent, fileDetail.getFileName(),
+			// contentType);
+			File file = new File(content, fileDetail.getFileName(), contentType);
 			Map<String, Object> attributes = new HashMap<String, Object>();
 			DateTime now = new DateTime();
 			attributes.put(Document.CREATION_DATE, now.toString());
@@ -209,16 +200,18 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			Document document = service.get(id);
 			checkNotNull(document);
 			checkNotNull(document.getFile());
-			ContentDispositionBuilder contentDisposition = ContentDisposition.type("attachment");
-			
+			ContentDispositionBuilder contentDisposition = ContentDisposition
+					.type("attachment");
+
 			contentDisposition.fileName(document.getFile().getName());
 			if (document.getFile().getDate() != null) {
-				contentDisposition.creationDate(document.getFile().getDate().toDate());
+				contentDisposition.creationDate(document.getFile().getDate()
+						.toDate());
 			}
 			ResponseBuilder rb = new ResponseBuilderImpl();
 			rb.type(document.getFile().getContentType());
-			InputStream stream = new ByteArrayInputStream(
-					document.getFile().getContent());
+			InputStream stream = new ByteArrayInputStream(document.getFile()
+					.getContent());
 			rb.entity(stream);
 			rb.status(Status.OK);
 			rb.header("Content-Disposition", contentDisposition.build());
