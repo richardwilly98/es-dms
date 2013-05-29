@@ -54,14 +54,14 @@ public class TestRestUserService extends GuiceAndJettyTestBase<User> {
 			String login = "user-" + System.currentTimeMillis();
 			User user1 = createUser(login, password);
 			Assert.assertNotNull(user1);
-			User user2 = getItem(user1.getId(), User.class, RestUserService.USERS_PATH);
+			User user2 = get(user1.getId(), User.class, RestUserService.USERS_PATH);
 			Assert.assertEquals(user1.getName(), user2.getName());
 			String newName = "user-2-" + System.currentTimeMillis();
 			user2.setName(newName);
-			User user3 = updateItem(user2, User.class, RestUserService.USERS_PATH);
+			User user3 = update(user2, User.class, RestUserService.USERS_PATH);
 			Assert.assertEquals(newName, user3.getName());
-			deleteItem(user1.getId(), RestUserService.USERS_PATH);
-			user2 = getItem(user1.getId(), User.class, RestUserService.USERS_PATH);
+			delete(user1.getId(), RestUserService.USERS_PATH);
+			user2 = get(user1.getId(), User.class, RestUserService.USERS_PATH);
 			Assert.assertNull(user2);
 		} catch (Throwable t) {
 			log.error("testCreateRetrieveDeleteUpdate fail", t);
@@ -70,20 +70,23 @@ public class TestRestUserService extends GuiceAndJettyTestBase<User> {
 	}
 
 	protected User createUser(String login, String password) throws Throwable {
-		User user = new TestUser();
+		log.debug(String.format("*** createUser - %s - %s ***", login, password));
+		TestUser user = new TestUser();
 		user.setId(login);
 		user.setName(login);
 		user.setEmail(login);
 		user.setPassword(password);
+		String json = mapper.writeValueAsString(user);
+		log.trace(json);
 		ClientResponse response = resource().path(RestUserService.USERS_PATH).cookie(adminCookie)
 				.type(MediaType.APPLICATION_JSON)
-				.post(ClientResponse.class, user);
+				.post(ClientResponse.class, json);
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.CREATED
 				.getStatusCode());
 		URI uri = response.getLocation();
 		Assert.assertNotNull(uri);
-		return getItem(uri, User.class);
+		return get(uri, User.class);
 	}
 
 }

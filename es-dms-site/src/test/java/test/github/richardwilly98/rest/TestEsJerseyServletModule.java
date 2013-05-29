@@ -7,12 +7,11 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.shiro.guice.web.GuiceShiroFilter;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 
 import test.github.richardwilly98.inject.TestProviderModule;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 
@@ -27,11 +26,12 @@ public class TestEsJerseyServletModule extends JerseyServletModule {
 	public TestEsJerseyServletModule(String securityFilterPath) {
 		this.securityFilterPath = securityFilterPath;
 
-		params.put(JSONConfiguration.FEATURE_POJO_MAPPING, "true");
+//		params.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE.toString());
 		params.put(JERSEY_SPI_CONTAINER_CONTAINER_REQUEST_FILTERS,
 				JERSEY_API_CONTAINER_FILTER_POST_REPLACE_FILTER);
 		/* bind the REST resources */
-		params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.github.richardwilly98.rest");
+//		params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.github.richardwilly98.rest");
+		params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.github.richardwilly98.rest;com.fasterxml.jackson.jaxrs");
 	}
 	
 	@Override

@@ -1,21 +1,30 @@
 package test.github.richardwilly98.rest;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.net.URI;
+
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider;
+import org.junit.Before;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Guice;
 
+import test.github.richardwilly98.inject.TestEsClientModule;
 import test.github.richardwilly98.web.TestRestGuiceServletConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.api.Credential;
+import com.github.richardwilly98.api.ItemBase;
 import com.github.richardwilly98.api.services.UserService;
 import com.github.richardwilly98.rest.RestAuthencationService;
+import com.google.inject.Inject;
 import com.google.inject.servlet.GuiceFilter;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
@@ -26,10 +35,11 @@ import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 
-public abstract class GuiceAndJerseyTestBase extends JerseyTest {
+//@Guice(modules = TestEsClientModule.class)
+public class GuiceAndJerseyTestBase<T extends ItemBase> extends JerseyTest {
 
 	final protected Logger log = Logger.getLogger(this.getClass());
-	final static Credential adminCredential = new Credential(
+	protected final static Credential adminCredential = new Credential(
 			UserService.DEFAULT_ADMIN_LOGIN, UserService.DEFAULT_ADMIN_PASSWORD);
 	final static ObjectMapper mapper = new ObjectMapper();
 	protected String adminToken;
@@ -49,6 +59,9 @@ public abstract class GuiceAndJerseyTestBase extends JerseyTest {
 		super(APP_DESCRIPTOR);
 	}
 
+//	@Inject
+	org.elasticsearch.client.Client client;
+
 	// @Override
 	// protected TestContainerFactory getTestContainerFactory()
 	// throws TestContainerException {
@@ -56,8 +69,10 @@ public abstract class GuiceAndJerseyTestBase extends JerseyTest {
 	// super.getTestContainerFactory());
 	// }
 	//
-	@BeforeSuite
+	
+//	@BeforeSuite
 	public void initTestContainer() throws Exception {
+		log.debug("*** initTestContainer ***");
 		super.setUp();
 		client().setFollowRedirects(false);
 		client().addFilter(new LoggingFilter());
@@ -67,44 +82,111 @@ public abstract class GuiceAndJerseyTestBase extends JerseyTest {
 	private void loginAdminUser() {
 		try {
 			log.debug("*** loginAdminUser ***");
+			adminCookie = login(adminCredential);
+			Assert.assertNotNull(adminCookie);
+			adminToken = adminCookie.getValue();
+			Assert.assertNotNull(adminToken);
+		} catch (Throwable t) {
+			log.error("loginAdminUser failed", t);
+			Assert.fail("loginAdminUser failed", t);
+		}
+	}
+
+	protected Cookie login(Credential credential) {
+		try {
+			log.debug("*** login ***");
 			WebResource webResource = resource().path("auth").path("login");
-			ObjectMapper mapper = new ObjectMapper();
+			log.debug(webResource);
 			ClientResponse response = webResource.type(
 					MediaType.APPLICATION_JSON).post(ClientResponse.class,
-					mapper.writeValueAsString(adminCredential));
+					credential);
 			log.debug("status: " + response.getStatus());
 			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
 			for (NewCookie cookie : response.getCookies()) {
 				if (RestAuthencationService.ES_DMS_TICKET.equals(cookie
 						.getName())) {
-					adminToken = cookie.getValue();
-					adminCookie = new Cookie(cookie.getName(),
-							cookie.getValue());
+					return new Cookie(cookie.getName(), cookie.getValue());
 				}
 			}
-			Assert.assertNotNull(adminToken);
-			Assert.assertNotNull(adminCookie);
 		} catch (Throwable t) {
-			Assert.fail("loginAdminUser failed", t);
+			log.error("login failed", t);
+			Assert.fail("login failed", t);
 		}
+		return null;
+	}
+
+	protected void logout(Cookie cookie) {
+		log.debug("*** logout ***");
+		checkNotNull(cookie);
+		WebResource webResource = resource().path("auth").path("logout");
+		ClientResponse response = webResource.cookie(cookie).post(
+				ClientResponse.class);
+		log.debug("status: " + response.getStatus());
+		Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
 	}
 
 	private void logoutAdminUser() {
 		try {
 			log.debug("*** logoutAdminUser ***");
-			WebResource webResource = resource().path("auth").path("logout");
-			ClientResponse response = webResource.cookie(adminCookie).post(
-					ClientResponse.class);
-			log.debug("status: " + response.getStatus());
-			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+			logout(adminCookie);
 		} catch (Throwable t) {
 			Assert.fail("logoutAdminUser failed", t);
 		}
 	}
 
-	@AfterSuite
+//	@AfterSuite
 	public void tearDownTestContainer() throws Exception {
+		log.debug("*** tearDownTestContainer ***");
 		logoutAdminUser();
 		super.tearDown();
+		tearDownElasticsearch();
 	}
+
+	private void tearDownElasticsearch() throws Exception {
+		log.info("*** tearDownElasticsearch ***");
+		client.admin().indices().prepareDelete().execute().actionGet();
+		client.close();
+	}
+
+	protected T getItem(String id, Class<T> type, String path) throws Throwable {
+		ClientResponse response = resource().path(path).path(id)
+				.cookie(adminCookie).type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+				.get(ClientResponse.class);
+		log.debug(String.format("status: %s", response.getStatus()));
+		if (response.getStatus() == Status.OK.getStatusCode()) {
+			return response.getEntity(type);
+		}
+		return null;
+	}
+
+	protected T getItem(URI uri, Class<T> type) throws Throwable {
+		log.debug(String.format("getItem - %s", uri));
+		ClientResponse response = client().resource(uri).cookie(adminCookie)
+				.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		log.debug(String.format("status: %s", response.getStatus()));
+//		log.debug(String.format("get - body: %s", response.getEntity(String.class)));
+		if (response.getStatus() == Status.OK.getStatusCode()) {
+			return response.getEntity(type);
+		}
+		return null;
+	}
+
+	protected T updateItem(ItemBase item, Class<T> type, String path)
+			throws Throwable {
+		ClientResponse response = resource().path(path).path(item.getId())
+				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
+				.put(ClientResponse.class, item);
+		log.debug(String.format("status: %s", response.getStatus()));
+		Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+		return response.getEntity(type);
+	}
+
+	protected void deleteItem(String id, String path) throws Throwable {
+		ClientResponse response = resource().path(path).path(id)
+				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
+				.delete(ClientResponse.class);
+		log.debug(String.format("status: %s", response.getStatus()));
+		Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+	}
+
 }
