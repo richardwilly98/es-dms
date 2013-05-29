@@ -8,7 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,6 +95,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		checkNotNull(body);
 		checkNotNull(body.getContentDisposition());
 		String filename = body.getContentDisposition().getFileName();
+		String path = null;
 		long size = body.getContentDisposition().getSize();
 		String contentType = body.getMediaType().toString();
 		if (log.isTraceEnabled()) {
@@ -106,7 +106,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			isAuthenticated();
 			String encodedContent;
 			if (size > 16 * 1024 * 1024) {
-				String path = System.getProperty("java.io.tmpdir")
+				path = System.getProperty("java.io.tmpdir")
 						+ System.currentTimeMillis() + filename;
 				writeToFile(uploadedInputStream, path);
 				encodedContent = Base64.encodeFromFile(path);
@@ -122,8 +122,8 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			log.error("upload failed", t);
 			throw new RestServiceException(t.getLocalizedMessage());
 		} finally {
-			if (filename != null) {
-				deleteFile(filename);
+			if (path != null) {
+				deleteFile(path);
 			}
 		}
 	}
