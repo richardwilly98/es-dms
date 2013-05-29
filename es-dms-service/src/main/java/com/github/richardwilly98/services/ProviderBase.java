@@ -27,6 +27,7 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.richardwilly98.api.Document;
 import com.github.richardwilly98.api.ItemBase;
 import com.github.richardwilly98.api.Settings;
 import com.github.richardwilly98.api.User;
@@ -267,15 +268,6 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		}
 	}
 
-	@Override
-	public boolean disabled(T item) throws ServiceException {
-		return false;
-	}
-
-	@Override
-	public void disable(T item, boolean b) throws ServiceException {
-	}
-
 	protected String generateUniqueId(T item) {
 		return UUID.randomUUID().toString();
 	}
@@ -308,6 +300,28 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			loadInitialData();
 			refreshIndex();
 		}
+	}
+
+	public boolean disabled(T item) throws ServiceException {
+		try {
+			checkNotNull(item);
+			//
+		} catch (Throwable t) {
+			log.error("disabled failed", t);
+			throw new ServiceException(t.getLocalizedMessage());
+		}
+		return item.isDisabled();
+	}
+
+	public void disable(T item, boolean b) throws ServiceException {
+		try {
+			checkNotNull(item);
+			//
+		} catch (Throwable t) {
+			log.error("disable failed", t);
+			throw new ServiceException(t.getLocalizedMessage());
+		}
+		item.setDisabled(b);
 	}
 
 	protected void refreshIndex() {

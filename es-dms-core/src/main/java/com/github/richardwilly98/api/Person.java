@@ -11,8 +11,8 @@ public class Person extends ItemBase {
 	}
 	
 	public Person(String id, String name, String city, String email) {
-		this.id = id;
-		this.name = name;
+		setId(id);
+		setName(name);
 		this.city = city;
 		this.email = email;
 	}

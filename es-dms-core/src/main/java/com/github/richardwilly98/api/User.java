@@ -16,7 +16,7 @@ public class User extends Person implements Principal {
 	Set<Role> roles;
 	String hash;
 
-	@JsonIgnore
+//	@JsonIgnore
 	String password;
 
 	@JsonIgnore
@@ -81,8 +81,8 @@ public class User extends Person implements Principal {
 
 	@Override
 	public String toString() {
-		return Objects.toStringHelper(this.getClass()).add("id", id)
-				.add("name", name).add("login", login).add("email", email)
+		return Objects.toStringHelper(this.getClass()).add("id", getId())
+				.add("name", getName()).add("login", login).add("email", email)
 				.toString();
 	}
 }

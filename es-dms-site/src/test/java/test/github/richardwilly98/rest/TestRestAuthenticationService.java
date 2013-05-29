@@ -19,7 +19,6 @@ public class TestRestAuthenticationService extends TestRestUserService {
 		try {
 			String password = "secret1";
 			String login = "user-" + System.currentTimeMillis();
-			log.debug("Resource: " + resource());
 			createUser(login, password);
 			boolean rememberMe = true;
 			Credential credential = new Credential(login, password, rememberMe);
