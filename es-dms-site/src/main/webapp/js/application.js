@@ -224,6 +224,9 @@ simpleApp.factory('authenticationService', function ($http) {
 					headers: {'Content-Type':'application/json; charset=UTF-8'}
 			};
 			$http.post('api/auth/login', payload, config).success(callback);
+		},
+		logout: function() {
+			$http.post('api/auth/logout');
 		}
 	};
 });

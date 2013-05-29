@@ -302,7 +302,7 @@ simpleApp.controller('modalCtrl', function ($scope) {
 	
 });
 
-simpleApp.controller('navbarController', function ($scope, sharedService) {
+simpleApp.controller('navbarController', function ($scope, sharedService, authenticationService) {
 	$scope.showLogout = false;
 	$scope.$on('handleBroadcast', function() {
         $scope.showLogout = sharedService.message.logout;
@@ -320,5 +320,9 @@ simpleApp.controller('navbarController', function ($scope, sharedService) {
 		 { "view": "/admin/users", title: "Users" },
 		 { "view": "/admin/roles", title: "Roles" }
 	];
+	
+	$scope.logout = function() {
+		authenticationService.logout();
+	}
 });
 
