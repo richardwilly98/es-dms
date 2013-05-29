@@ -7,6 +7,9 @@ class SimpleDocument extends Document {
 	
 	private static final long serialVersionUID = 1L;
 
+	public SimpleDocument() {
+	}
+	
 	SimpleDocument(final Document document) {
 		super(document);
 	}

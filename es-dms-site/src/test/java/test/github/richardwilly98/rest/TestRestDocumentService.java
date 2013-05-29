@@ -105,7 +105,7 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 					RestDocumentService.DOCUMENTS_PATH);
 			
 			attributes = document2.getAttributes();
-			Assert.assertFalse(attributes.containsKey(Document.STATUS));
+			Assert.assertTrue(document2.getAttributes().get(Document.STATUS).equals(Document.DocumentStatus.AVAILABLE.getStatusCode()));
 			Assert.assertFalse(attributes.containsKey(Document.LOCKED_BY));
 		} catch (Throwable t) {
 			log.error("testCheckoutCheckinDocument fail", t);
