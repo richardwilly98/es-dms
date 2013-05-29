@@ -41,6 +41,17 @@ public class Document extends SecuredItem {
 		setAttributes(attributes);
 	}
 
+	/*
+	 * Method used to deserialize attributes Map
+	 */
+	@JsonProperty("attributes")
+	private void deserialize(Map<String, Object> attributes) {
+		if (! attributes.containsKey(Document.STATUS)) {
+			attributes.put(Document.STATUS, Document.DocumentStatus.AVAILABLE.getStatusCode());
+		}
+		this.attributes = attributes;
+	}
+
 	public Document(Document document) {
 		this(document.getId(), document.getName(), document.getFile(), null);
 		// Override behavior for read-only attribute.
