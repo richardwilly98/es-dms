@@ -8,6 +8,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +25,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
-import org.elasticsearch.common.Base64;
 import org.joda.time.DateTime;
 
 import com.github.richardwilly98.api.Document;
@@ -104,17 +105,22 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		}
 		try {
 			isAuthenticated();
-			String encodedContent;
+//			String encodedContent;
+			byte[] content;
 			if (size > 16 * 1024 * 1024) {
 				path = System.getProperty("java.io.tmpdir")
 						+ System.currentTimeMillis() + filename;
 				writeToFile(uploadedInputStream, path);
-				encodedContent = Base64.encodeFromFile(path);
+//				encodedContent = Base64.encodeFromFile(path);
+//				Path path = Paths.get(path);
+				content = Files.readAllBytes(Paths.get(path));
 			} else {
-				encodedContent = Base64
-						.encodeBytes(toByteArray(uploadedInputStream));
+//				encodedContent = Base64
+//						.encodeBytes(toByteArray(uploadedInputStream));
+				content = toByteArray(uploadedInputStream);
 			}
-			File file = new File(encodedContent, filename, contentType);
+			File file = new File(content, filename, contentType);
+//			File file = new File(encodedContent, filename, contentType);
 			Map<String, Object> attributes = new HashMap<String, Object>();
 			Document document = new Document(null, name, file, attributes);
 			return create(document);
@@ -146,9 +152,11 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			}
 			byte[] content = body.getEntityAs(byte[].class);
 			String contentType = body.getMediaType().toString();
-			String encodedContent = Base64.encodeBytes(content);
-			File file = new File(encodedContent, fileDetail.getFileName(),
-					contentType);
+//			String encodedContent = Base64.encodeBytes(content);
+//			File file = new File(encodedContent, fileDetail.getFileName(),
+//					contentType);
+			File file = new File(content, fileDetail.getFileName(),
+			contentType);
 			Map<String, Object> attributes = new HashMap<String, Object>();
 			DateTime now = new DateTime();
 			attributes.put(Document.CREATION_DATE, now.toString());
@@ -210,7 +218,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			ResponseBuilder rb = new ResponseBuilderImpl();
 			rb.type(document.getFile().getContentType());
 			InputStream stream = new ByteArrayInputStream(
-					Base64.decode(document.getFile().getContent()));
+					document.getFile().getContent());
 			rb.entity(stream);
 			rb.status(Status.OK);
 			rb.header("Content-Disposition", contentDisposition.build());

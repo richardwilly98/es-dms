@@ -35,10 +35,12 @@ public class DocumentProviderTest extends ProviderTestBase {
 		List<Document> documents = documentService.getList(contentSearch);
 		startCount = documents.size();
 		log.info(String.format("startCount: %s", startCount));
-		Document document = new Document();
-		File file = new File(encodedContent, name, contentType);
-		document.setFile(file);
-		document.setId(id);
+//		Document document = new Document();
+//		File file = new File(encodedContent, name, contentType);
+		File file = new File(content, name, contentType);
+		Document document = new Document(id, name, file, null);
+//		document.setFile(file);
+//		document.setId(id);
 		Document newDocument = documentService.create(document);
 		Assert.assertNotNull(newDocument);
 		log.info(String.format("New document created #%s", newDocument.getId()));

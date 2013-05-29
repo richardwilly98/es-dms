@@ -10,23 +10,24 @@ import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.api.Document;
+import com.github.richardwilly98.api.File;
 
-//@Guice(modules = ProviderModule.class)
 public class DocumentSerializationTest {
 
 	private static Logger log = Logger.getLogger(DocumentSerializationTest.class);
 	
 	private static final ObjectMapper mapper = new ObjectMapper();
-//	@Inject
-//	HashService service;
 
 	@Test
-	public void testHashComputing() throws Throwable {
+	public void testSerializeDeserializeDocument() throws Throwable {
+		log.debug("*** testSerializeDeserializeDocument ***");
 		String id = "id-" + System.currentTimeMillis();
 		String name = "name-" + System.currentTimeMillis();
+		String html = "<html><body><h1>Hello World</h1></body></html>";
+		byte[] content = html.getBytes();
 		Map<String, Object> attributes = newHashMap();
 		attributes.put("attribut1", "value1");
-		DocumentTest document = new DocumentTest(new Document(id, name, null, attributes));
+		DocumentTest document = new DocumentTest(new Document(id, name, new File(content, "test.html", "text/html"), attributes));
 		document.setReadOnlyAttribute(Document.AUTHOR, "richard");
 		log.debug(document);
 		String json = mapper.writeValueAsString(document);
@@ -36,12 +37,6 @@ public class DocumentSerializationTest {
 		Assert.assertEquals(document.getId(), document2.getId());
 		Assert.assertEquals(document.getName(), document2.getName());
 		Assert.assertEquals(document.getAttributes(), document2.getAttributes());
-//		String hash1 = service.toBase64("secret".getBytes());
-//		Assert.assertNotNull(hash1);
-//		log.debug("hash1: " + hash1);
-//		String hash2 = service.toBase64("secret1".getBytes());
-//		log.debug("hash2: " + hash2);
-//		Assert.assertNotNull(hash2);
-//		Assert.assertNotSame(hash1, hash2);
+		Assert.assertEquals(html, new String(document2.getFile().getContent()));
 	}
 }
