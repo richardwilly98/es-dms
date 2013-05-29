@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Objects;
 
-@JsonInclude(Include.NON_NULL)
+@JsonInclude(Include.NON_DEFAULT)
 public class ItemBase implements Serializable {
 
 	final protected Logger log = Logger.getLogger(getClass());
@@ -40,7 +40,7 @@ public class ItemBase implements Serializable {
 	}
 
 	ItemBase(String id, Map<String, Object> attributes) {
-		this.disabled = false;
+//		this.disabled = false;
 		this.id = id;
 		this.attributes = attributes;
 	}
