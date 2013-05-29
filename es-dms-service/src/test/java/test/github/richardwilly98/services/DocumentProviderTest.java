@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.authz.UnauthorizedException;
-import org.elasticsearch.common.Base64;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -30,19 +29,15 @@ public class DocumentProviderTest extends ProviderTestBase {
 			String path, String contentSearch) throws Throwable {
 		String id = String.valueOf(System.currentTimeMillis());
 		byte[] content = copyToBytesFromClasspath(path);
-		String encodedContent = Base64.encodeBytes(content);
 		int startCount = 0;
 		List<Document> documents = documentService.getList(contentSearch);
 		startCount = documents.size();
 		log.info(String.format("startCount: %s", startCount));
-//		Document document = new Document();
-//		File file = new File(encodedContent, name, contentType);
 		File file = new File(content, name, contentType);
 		Document document = new Document(id, name, file, null);
-//		document.setFile(file);
-//		document.setId(id);
 		Document newDocument = documentService.create(document);
 		Assert.assertNotNull(newDocument);
+		Assert.assertEquals(id, newDocument.getId());
 		log.info(String.format("New document created #%s", newDocument.getId()));
 	}
 
@@ -202,7 +197,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		documentService.checkin(newDocument);
 		newDocument = documentService.get(newDocument.getId());
 		log.trace(String.format("Document checked-in %s", newDocument));
-		Assert.assertFalse(attributes.containsKey(Document.STATUS));
-		Assert.assertFalse(attributes.containsKey(Document.LOCKED_BY));
+		Assert.assertTrue(newDocument.getAttributes().get(Document.STATUS).equals(Document.DocumentStatus.AVAILABLE.getStatusCode()));
+		Assert.assertFalse(newDocument.getAttributes().containsKey(Document.LOCKED_BY));
 	}
 }

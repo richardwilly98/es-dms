@@ -21,12 +21,14 @@ public class DocumentSerializationTest {
 	@Test
 	public void testSerializeDeserializeDocument() throws Throwable {
 		log.debug("*** testSerializeDeserializeDocument ***");
+		String attributeKey = "attribut1";
+		String attributeValue = "value1";
 		String id = "id-" + System.currentTimeMillis();
 		String name = "name-" + System.currentTimeMillis();
 		String html = "<html><body><h1>Hello World</h1></body></html>";
 		byte[] content = html.getBytes();
 		Map<String, Object> attributes = newHashMap();
-		attributes.put("attribut1", "value1");
+		attributes.put(attributeKey, attributeValue);
 		DocumentTest document = new DocumentTest(new Document(id, name, new File(content, "test.html", "text/html"), attributes));
 		document.setReadOnlyAttribute(Document.AUTHOR, "richard");
 		log.debug(document);
@@ -36,7 +38,7 @@ public class DocumentSerializationTest {
 		DocumentTest document2 = mapper.readValue(json, DocumentTest.class);
 		Assert.assertEquals(document.getId(), document2.getId());
 		Assert.assertEquals(document.getName(), document2.getName());
-		Assert.assertEquals(document.getAttributes(), document2.getAttributes());
+		Assert.assertTrue(document2.getAttributes().get(attributeKey).equals(attributeValue));
 		Assert.assertEquals(html, new String(document2.getFile().getContent()));
 	}
 }
