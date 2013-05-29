@@ -168,7 +168,40 @@ simpleApp.factory('roleService', function ($rootScope, $resource) {
 });
 
 simpleApp.factory('documentService', function ($resource) {
-    return $resource('api/documents/:verb/:name', {}, {});
+	var resource = $resource('api/documents/:verb/:name', {}, {
+	});
+	var documentResource = $resource('api/documents/:id/:action' , {}, {
+		checkout: {method:'POST', params: {action: 'checkout'}},
+		checkin: {method:'POST', params: {action: 'checkin'}},
+	})
+	var documents = {};
+	return {
+		find: function(criteria) {
+			documents = resource.query({ verb: 'find', name: criteria });
+			return documents;
+		},
+		edit: function(id) {
+			console.log('edit document: ' + id);
+		},
+		checkout: function(id) {
+			console.log('checkout document: ' + id);
+			var doc = new documentResource.get({'id': id})
+			doc.$checkout({'id': id});
+		},
+		checkin: function(id) {
+			console.log('checkin document: ' + id);
+			var doc = new documentResource.get({'id': id})
+			doc.$checkin({'id': id});
+		},
+		getDocument: function(id) {
+			for (i in documents) {
+				if (documents[i].id == id) {
+					return documents[i];
+				}
+			}
+		}
+	};
+    
 });
 
 simpleApp.factory('authenticationService', function ($http) {

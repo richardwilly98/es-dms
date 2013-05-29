@@ -19,6 +19,7 @@
 		    			<th>Id</th>
 		    			<th>Name</th>
 		    			<th>Actions</th>
+		    			<th>Status</th>
 		    		</tr>
 		    	</thead>
 		    	<tbody>
@@ -26,10 +27,23 @@
 		    			<td>{{ document.id }}</td>
 		    			<td>{{ document.name }}</td>
 		    			<td>
-		    				<button class="btn btn-primary" data-ng-click="edit(document.id)" data-toggle="modal" href="#editModal">
-		    					<i class="icon-pencil icon-white"></i> Edit
-		    				</button>
+		    				<div data-ng-switch="document.attributes.status">
+		    					<div data-ng-switch-when="A" >
+				    				<button class="btn btn-primary" data-ng-click="edit(document.id)" data-toggle="modal" href="#editModal">
+				    					<i class="icon-pencil icon-white"></i> Edit
+				    				</button>
+				    				<button class="btn btn-primary" data-ng-click="checkout(document.id)" data-toggle="modal" href="#editModal">
+				    					<i class="icon-pencil icon-white"></i> Check-Out
+				    				</button>
+		    					</div>
+		    					<div data-ng-switch-when="L" >
+				    				<button class="btn btn-primary" data-ng-click="checkin(document.id)" data-toggle="modal" href="#editModal">
+				    					<i class="icon-pencil icon-white"></i> Check-In
+				    				</button>
+		    					</div>
+		    				</div>
 		    			</td>
+		    			<td>{{ document.attributes.status }}</td>
 		    		</tr>
 		    	</tbody>
 		    </table>			

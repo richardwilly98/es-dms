@@ -204,12 +204,31 @@ simpleApp.controller('documentController', function ($scope, documentService) {
     init();
 
     function init() {
-        //$scope.documents = documentService.query({ verb: 'find', name: '*' });
     }
     
     $scope.search = function() {
-    	$scope.documents = documentService.query({ verb: 'search', name: $scope.criteria });
+    	$scope.documents = documentService.find($scope.criteria);
     }
+
+    $scope.edit = function(id) {
+    	documentService.edit(id);
+    };
+
+    $scope.checkout = function(id) {
+    	documentService.checkout(id);
+    	var document = documentService.getDocument(id);
+    	if (document) {
+    		document.attributes.status = 'L';
+    	}
+    };
+
+    $scope.checkin = function(id) {
+    	documentService.checkin(id);
+    	var document = documentService.getDocument(id);
+    	if (document) {
+    		document.attributes.status = 'A';
+    	}
+    };
 });
 
 simpleApp.controller('AlertDemoCtrl', function ($scope) {
