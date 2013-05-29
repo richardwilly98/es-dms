@@ -69,5 +69,18 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}
+	
+	@Override
+	public User update(User item) throws ServiceException {
+		if (item.getPassword() != null) {
+			String encodedHash = computeBase64Hash(item.getPassword());
+			if (log.isTraceEnabled()) {
+				log.trace(String.format("From service - hash: %s for login %s", encodedHash, item.getLogin()));
+			}
+			item.setHash(encodedHash);
+			item.setPassword(null);
+		}
+		return super.update(item);
+	}
 
 }

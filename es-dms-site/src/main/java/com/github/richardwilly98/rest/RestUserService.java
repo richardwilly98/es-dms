@@ -38,6 +38,8 @@ public class RestUserService extends RestServiceBase<User> {
 			log.trace("From service - hash: " + encodedHash);
 			item.setHash(encodedHash);
 			item.setPassword(null);
+		} else {
+			log.warn("Missing password");
 		}
 		return super.create(item);
 	}
