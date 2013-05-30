@@ -23,12 +23,12 @@ simpleApp.controller('userController', function ($scope, userService) {
     };
     
     $scope.add = function () {
-//        var user = new userService();
-//        user.name = $scope.name;
-//        user.city = $scope.city;
-//        user.email = $scope.email
-//        user.$save(); 
-//        $scope.user.push(user);
+// var user = new userService();
+// user.name = $scope.name;
+// user.city = $scope.city;
+// user.email = $scope.email
+// user.$save();
+// $scope.user.push(user);
     };
 });
 
@@ -50,12 +50,12 @@ simpleApp.controller('roleController', function ($scope, roleService) {
     };
     
     $scope.add = function () {
-//        var user = new userService();
-//        user.name = $scope.name;
-//        user.city = $scope.city;
-//        user.email = $scope.email
-//        user.$save(); 
-//        $scope.user.push(user);
+// var user = new userService();
+// user.name = $scope.name;
+// user.city = $scope.city;
+// user.email = $scope.email
+// user.$save();
+// $scope.user.push(user);
     };
 });
 
@@ -74,8 +74,9 @@ simpleApp.controller('userEditController', function ($scope, $rootScope, $http, 
 	    if (editUser.id) {
 	    	$scope.user = editUser;
 	    	$scope.newUser = false;
-	    	//$scope.uid = editUser.id;
-//	    	$scope.user.roles = [{id: 'reader', name: 'Reader'}, {id: 'writer', name: 'Writer'}];
+	    	// $scope.uid = editUser.id;
+// $scope.user.roles = [{id: 'reader', name: 'Reader'}, {id: 'writer', name:
+// 'Writer'}];
 	    } else {
 	    	$scope.newUser = true;
 	    	$scope.incomplete = true;
@@ -152,7 +153,7 @@ simpleApp.controller('simpleController', function ($scope, userService) {
     init();
 
     function init() {
-        //$scope.customers = userService.query({ verb: 'find', name: '*' });
+        // $scope.customers = userService.query({ verb: 'find', name: '*' });
     	$scope.customers = userService.find('*');
     }
     $scope.addCustomer = function () {
@@ -167,7 +168,7 @@ simpleApp.controller('simpleController', function ($scope, userService) {
     };
 });
 
-simpleApp.controller('loginController', function ($scope, /*$cookieStore,*/ authenticationService, authService, sharedService) {
+simpleApp.controller('loginController', function ($scope, /* $cookieStore, */ authenticationService, authService, sharedService) {
 
     $scope.shouldBeOpen = true;
 
@@ -175,14 +176,14 @@ simpleApp.controller('loginController', function ($scope, /*$cookieStore,*/ auth
     	console.log('loginController - login');
     	authenticationService.login($scope.username, $scope.password, $scope.rememberMe, function(data) {
     		console.log('data: ' + data);
-//    		var response = JSON.parse(data);
-//    		console.log('response: ' + response);
+// var response = JSON.parse(data);
+// console.log('response: ' + response);
     		if (data.status === 'AUTHENTICATED') {
         		authService.loginConfirmed();
         		var token = data.token;
         		console.log(token);
-//        		$cookieStore.put('_ES_DMS_TICKET', unescape(token))
-//        		console.log('Cookie ES_DMS_TICKET: ' + $cookieStore.get('_ES_DMS_TICKET'));
+// $cookieStore.put('_ES_DMS_TICKET', unescape(token))
+// console.log('Cookie ES_DMS_TICKET: ' + $cookieStore.get('_ES_DMS_TICKET'));
         		$scope.shouldBeOpen = false;
         		sharedService.prepForBroadcast({logout: true});
     		}
@@ -309,10 +310,10 @@ simpleApp.controller('navbarController', function ($scope, sharedService, authen
     }); 
 	
 	$scope.tabs = [
+	    { "view": "/search-view", title: "Search" },
+	    { "view": "/edit-view", title: "Edit" },
         { "view": "/view1", title: "View #1" },
         { "view": "/view2", title: "View #2" },
-        { "view": "/search-view", title: "Search" },
-        { "view": "/edit-view", title: "Edit" },
         { "view": "/view3", title: "Test View" }
     ];
 	

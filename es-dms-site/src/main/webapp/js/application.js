@@ -53,11 +53,11 @@ simpleApp.config(function ($routeProvider) {
 		})
 		.when('/search-view', {
 		    controller: 'documentController',
-		    templateUrl: 'views/search-view.html'
+		    templateUrl: 'views/documents/search-view.html'
 		})
 		.when('/edit-view', {
 		    controller: 'documentController',
-		    templateUrl: 'views/edit-view.html'
+		    templateUrl: 'views/documents/edit-view.html'
 		})
 		.when('/admin/users', {
 		    controller: 'adminController',
@@ -67,7 +67,7 @@ simpleApp.config(function ($routeProvider) {
 		    controller: 'adminController',
 		    templateUrl: 'views/role-list.html'
 		})
-		.otherwise({ redirectTo: '/view1' })
+		.otherwise({ redirectTo: '/search-view' })
 });
 
 simpleApp.factory('sharedService', function($rootScope) {
