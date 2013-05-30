@@ -129,7 +129,11 @@ public abstract class RestServiceBase<T extends ItemBase> {
 		}
 		try {
 			T item = service.get(id);
-			service.delete(item);
+			if (item != null) {
+				service.delete(item);
+			} else {
+				return Response.status(Status.NOT_FOUND).build();
+			}
 			return Response.ok().build();
 		} catch (ServiceException e) {
 			throw new RestServiceException(e.getLocalizedMessage());
