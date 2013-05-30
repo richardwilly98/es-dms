@@ -8,8 +8,6 @@ import javax.ws.rs.core.MediaType;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import test.github.richardwilly98.api.TestUser;
-
 import com.github.richardwilly98.api.User;
 import com.github.richardwilly98.api.services.UserService;
 import com.github.richardwilly98.rest.RestServiceBase;
@@ -71,7 +69,7 @@ public class TestRestUserService extends GuiceAndJettyTestBase<User> {
 
 	protected User createUser(String login, String password) throws Throwable {
 		log.debug(String.format("*** createUser - %s - %s ***", login, password));
-		TestUser user = new TestUser();
+		User user = new User();
 		user.setId(login);
 		user.setName(login);
 		user.setEmail(login);
@@ -80,7 +78,7 @@ public class TestRestUserService extends GuiceAndJettyTestBase<User> {
 		log.trace(json);
 		ClientResponse response = resource().path(RestUserService.USERS_PATH).cookie(adminCookie)
 				.type(MediaType.APPLICATION_JSON)
-				.post(ClientResponse.class, user);
+				.post(ClientResponse.class, user	);
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.CREATED
 				.getStatusCode());
