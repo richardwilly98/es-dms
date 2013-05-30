@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -152,20 +153,17 @@ public class DocumentProvider extends ProviderBase<Document> implements
 
 	@Override
 	public void checkin(Document document) throws ServiceException {
-//		SimpleDocument sd = updateModifiedDate(document);
-		SimpleDocument sd = new SimpleDocument(document);
-//		DateTime now = new DateTime();
-		sd.removeReadOnlyAttribute(Document.STATUS);
-//		sd.setReadOnlyAttribute(Document.MODIFIED_DATE, now.toString());
-		sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
-		sd.removeReadOnlyAttribute(Document.LOCKED_BY);
-		//document.removeAttribute(Document.LOCKED_BY);
-		document = update(sd);
-//		document.removeAttribute(Document.STATUS);
-//		DateTime now = new DateTime();
-//		document.setAttribute(Document.MODIFIED_DATE, now.toString());
-//		document.removeAttribute(Document.LOCKED_BY);
-//		document = update(document);
+		String status = getStatus(document);
+		if (status.equals(Document.DocumentStatus.LOCKED.getStatusCode())) {
+			SimpleDocument sd = new SimpleDocument(document);
+			sd.removeReadOnlyAttribute(Document.STATUS);
+			sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
+			sd.removeReadOnlyAttribute(Document.LOCKED_BY);
+			document = update(sd);
+		} else {
+			throw new ServiceException(String.format(
+					"Document %s is not locked.", document.getId()));
+		}
 	}
 
 	@Override
@@ -222,6 +220,15 @@ public class DocumentProvider extends ProviderBase<Document> implements
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 		document.setDisabled(b);
+	}
+	
+	private String getStatus(Document document) {
+		Map<String, Object> attributes = document.getAttributes();
+		if (attributes == null || !attributes.containsKey(Document.STATUS)) {
+			return null;
+		} else {
+			return attributes.get(Document.STATUS).toString();
+		}
 	}
 
 }

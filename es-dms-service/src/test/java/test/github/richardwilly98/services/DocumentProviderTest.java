@@ -19,6 +19,7 @@ import com.github.richardwilly98.api.File;
 import com.github.richardwilly98.api.Permission;
 import com.github.richardwilly98.api.Role;
 import com.github.richardwilly98.api.User;
+import com.github.richardwilly98.api.exception.ServiceException;
 
 /*
  * https://github.com/shairontoledo/elasticsearch-attachment-tests/blob/master/src/test/java/net/hashcode/esattach/AttachmentTest.java
@@ -185,6 +186,11 @@ public class DocumentProviderTest extends ProviderTestBase {
 		documentService.checkout(newDocument);
 		newDocument = documentService.get(newDocument.getId());
 		log.trace(String.format("Document checked-out %s", newDocument));
+		try {
+			documentService.checkout(newDocument);
+			Assert.fail("Should not be authorized to check-out document twice");
+		} catch (ServiceException sEx) {
+		}
 		
 		attributes = newDocument.getAttributes();
 		Assert.assertNotNull(attributes.get(Document.STATUS));
@@ -199,5 +205,11 @@ public class DocumentProviderTest extends ProviderTestBase {
 		log.trace(String.format("Document checked-in %s", newDocument));
 		Assert.assertTrue(newDocument.getAttributes().get(Document.STATUS).equals(Document.DocumentStatus.AVAILABLE.getStatusCode()));
 		Assert.assertFalse(newDocument.getAttributes().containsKey(Document.LOCKED_BY));
+
+		try {
+			documentService.checkin(newDocument);
+			Assert.fail("Should not be authorized to check-out document twice");
+		} catch (ServiceException sEx) {
+		}
 	}
 }

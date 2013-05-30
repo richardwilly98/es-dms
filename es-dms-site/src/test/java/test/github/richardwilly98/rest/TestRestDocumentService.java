@@ -107,6 +107,16 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			attributes = document2.getAttributes();
 			Assert.assertTrue(document2.getAttributes().get(Document.STATUS).equals(Document.DocumentStatus.AVAILABLE.getStatusCode()));
 			Assert.assertFalse(attributes.containsKey(Document.LOCKED_BY));
+
+			response = resource()
+					.path(RestDocumentService.DOCUMENTS_PATH)
+					.path(document.getId()).path("checkin").cookie(adminCookie)
+					.type(MediaType.APPLICATION_JSON)
+					.post(ClientResponse.class);
+			log.debug(String.format("status: %s", response.getStatus()));
+			Assert.assertTrue(response.getStatus() == Status.CONFLICT
+					.getStatusCode());
+
 		} catch (Throwable t) {
 			log.error("testCheckoutCheckinDocument fail", t);
 			Assert.fail();

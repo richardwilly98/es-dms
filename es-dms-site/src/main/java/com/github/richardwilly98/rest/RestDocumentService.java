@@ -172,7 +172,6 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		} catch (Throwable t) {
 			log.error("checkout failed", t);
 			return Response.status(Status.CONFLICT).build();
-			// throw new RestServiceException(t.getLocalizedMessage());
 		}
 	}
 
@@ -188,7 +187,6 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		} catch (Throwable t) {
 			log.error("checkin failed", t);
 			return Response.status(Status.CONFLICT).build();
-			// throw new RestServiceException(t.getLocalizedMessage());
 		}
 	}
 
