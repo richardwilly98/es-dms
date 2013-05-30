@@ -28,6 +28,7 @@ import com.github.richardwilly98.api.exception.ServiceException;
 import com.github.richardwilly98.api.services.AuthenticationService;
 import com.github.richardwilly98.api.services.BaseService;
 import com.github.richardwilly98.rest.exception.RestServiceException;
+import com.github.richardwilly98.rest.exception.UnauthorizedException;
 import com.google.inject.Inject;
 
 /*

@@ -4,10 +4,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
 import org.apache.log4j.Logger;
-import org.apache.shiro.guice.web.ShiroWebModule;
+import org.apache.shiro.guice.aop.ShiroAopModule;
 
-import com.github.richardwilly98.rest.EsJerseyServletModule;
-import com.github.richardwilly98.shiro.EsConfigModule;
+import com.github.richardwilly98.inject.EsJerseyServletModule;
+import com.github.richardwilly98.shiro.EsShiroWebModule;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.mycila.inject.jsr250.Jsr250;
@@ -21,9 +21,12 @@ public class RestGuiceServletConfig extends GuiceServletContextListener {
 	@Override
 	protected Injector getInjector() {
 		String securityFilterPath = "/api/*";
-		return Jsr250.createInjector(new EsJerseyServletModule(
-				securityFilterPath), new EsConfigModule(servletContext,
-				securityFilterPath), ShiroWebModule.guiceFilterModule());
+		return Jsr250.createInjector(new EsShiroWebModule(servletContext,
+				securityFilterPath), new ShiroAopModule(), new EsJerseyServletModule(
+						securityFilterPath)/*, ShiroWebModule.guiceFilterModule()*/);
+//		return Jsr250.createInjector(new EsConfigModule(servletContext,
+//				securityFilterPath), new EsJerseyServletModule(
+//						securityFilterPath)/*, ShiroWebModule.guiceFilterModule()*/);
 	}
 
 	@Override

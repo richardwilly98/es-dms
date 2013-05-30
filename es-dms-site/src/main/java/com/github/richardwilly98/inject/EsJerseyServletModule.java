@@ -1,4 +1,4 @@
-package com.github.richardwilly98.rest;
+package com.github.richardwilly98.inject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,11 +25,10 @@ public class EsJerseyServletModule extends JerseyServletModule {
 	public EsJerseyServletModule(String securityFilterPath) {
 		this.securityFilterPath = securityFilterPath;
 
-//		params.put(JSONConfiguration.FEATURE_POJO_MAPPING, "true");
 		params.put(JERSEY_SPI_CONTAINER_CONTAINER_REQUEST_FILTERS,
 				JERSEY_API_CONTAINER_FILTER_POST_REPLACE_FILTER);
+
 		/* bind dynamically the REST resources */
-//		params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.github.richardwilly98.rest");
 		params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "com.github.richardwilly98.rest;com.fasterxml.jackson.jaxrs");
 	}
 	
