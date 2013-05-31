@@ -4,7 +4,8 @@
 	'ngCookies', 
 	'$strap.directives', 
 	'ngUpload', 
-	'http-auth-interceptor'
+	'http-auth-interceptor',
+	'blueimp.fileupload'
 ]);
 
 simpleApp.directive('authenticationDirective', function($dialog) {

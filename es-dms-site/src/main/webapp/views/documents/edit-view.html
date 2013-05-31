@@ -1,5 +1,10 @@
-<div class="container" data-ng-controller="modalCtrl">
+<div class="container">
     <br />
-    <a href="#newDocument" role="button" class="btn btn-primary" data-toggle="modal">New Document</a>
-    <div id="newDocument" class="modal hide fade" data-ng-include src="'views/documents/new-document.html'">
+    <div class="btn-group">
+    	<a href="#newDocument" role="button" class="btn btn-primary" data-toggle="modal">New Document</a>
+    	<a href="#newUpload" role="button" class="btn btn-primary" data-toggle="modal">Multi File Upload</a>
+    </div>
+    
+    <div id="newDocument" class="modal hide fade" data-ng-include src="'views/documents/new-document.html'"></div>
+    <div id="newUpload" class="modal hide fade" data-ng-include src="'views/documents/upload-document.html'"></div>
 </div>
