@@ -47,6 +47,9 @@ public class RestDocumentService extends RestServiceBase<Document> {
 
 	public static final String UPLOAD_PATH = "upload";
 	public static final String DOCUMENTS_PATH = "documents";
+	public static final String CHECKOUT_PATH = "checkout";
+	public static final String CHECKIN_PATH = "checkin";
+	public static final String DOWNLOAD_PATH = "download";
 	private final DocumentService documentService;
 
 	@Inject
@@ -161,7 +164,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	}
 
 	@POST
-	@Path("{id}/checkout")
+	@Path("{id}/" + CHECKOUT_PATH)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response checkout(@PathParam("id") String id) {
@@ -176,7 +179,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	}
 
 	@POST
-	@Path("{id}/checkin")
+	@Path("{id}/" + CHECKIN_PATH)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response checkin(@PathParam("id") String id) {
@@ -191,7 +194,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	}
 
 	@GET
-	@Path("{id}/download")
+	@Path("{id}/" + DOWNLOAD_PATH)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response download(@PathParam("id") String id) {
 		try {
