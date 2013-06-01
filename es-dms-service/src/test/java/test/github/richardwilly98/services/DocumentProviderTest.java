@@ -1,17 +1,22 @@
 package test.github.richardwilly98.services;
 
 import static org.elasticsearch.common.io.Streams.copyToBytesFromClasspath;
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.ws.spi.Provider;
+
 import org.apache.shiro.authz.UnauthorizedException;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.testng.internal.thread.ThreadExecutionException;
 
 import com.github.richardwilly98.api.Credential;
 import com.github.richardwilly98.api.Document;
@@ -26,8 +31,8 @@ import com.github.richardwilly98.api.exception.ServiceException;
  */
 public class DocumentProviderTest extends ProviderTestBase {
 
-	private void testCreateDocument(String name, String contentType,
-			String path, String contentSearch) throws Throwable {
+	private String createDocument(String name, String contentType, String path,
+			String contentSearch) throws Throwable {
 		String id = String.valueOf(System.currentTimeMillis());
 		byte[] content = copyToBytesFromClasspath(path);
 		int startCount = 0;
@@ -40,6 +45,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		Assert.assertNotNull(newDocument);
 		Assert.assertEquals(id, newDocument.getId());
 		log.info(String.format("New document created #%s", newDocument.getId()));
+		return id;
 	}
 
 	@Test
@@ -59,11 +65,12 @@ public class DocumentProviderTest extends ProviderTestBase {
 		Assert.assertNotNull(user);
 		authenticationService.login(new Credential(user.getLogin(), user
 				.getPassword()));
-		// TODO: Not sure the reason PDF parsing does not work anymore. To be investigated...
-//		testCreateDocument("lorem.pdf", "application/pdf",
-//				"/test/github/richardwilly98/services/lorem.pdf",
-//				"Lorem ipsum dolor");
-		testCreateDocument("test-attachment.html", "text/html",
+		// TODO: Not sure the reason PDF parsing does not work anymore. To be
+		// investigated...
+		// testCreateDocument("lorem.pdf", "application/pdf",
+		// "/test/github/richardwilly98/services/lorem.pdf",
+		// "Lorem ipsum dolor");
+		createDocument("test-attachment.html", "text/html",
 				"/test/github/richardwilly98/services/test-attachment.html",
 				"Aliquam");
 	}
@@ -90,7 +97,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		authenticationService.login(new Credential(user.getLogin(), user
 				.getPassword()));
 		try {
-			testCreateDocument(
+			createDocument(
 					"test-attachment.html",
 					"text/html",
 					"/test/github/richardwilly98/services/test-attachment.html",
@@ -100,28 +107,20 @@ public class DocumentProviderTest extends ProviderTestBase {
 		}
 	}
 
-	// @Test
-	// public void testHighlightDocument() throws Throwable {
-	// log.info("Start testHighlightDocument");
-	// String id = String.valueOf(System.currentTimeMillis());
-	// String name = "lorem.pdf";
-	// String contentType = "application/pdf";
-	// byte[] content =
-	// copyToBytesFromClasspath("/test/github/richardwilly98/services/lorem.pdf");
-	// String encodedContent = Base64.encodeBytes(content);
-	// DocumentProvider provider = new DocumentProvider();
-	// int startCount = 0;
-	// List<Document> documents = provider.getDocuments("Lorem ipsum dolor");
-	// startCount = documents.size();
-	// Document document = new Document();
-	// File file = new File(encodedContent, name, contentType);
-	// document.setFile(file);
-	// document.setId(id);
-	// String newId = provider.createDocument(document);
-	// log.info(String.format("New document created #%s", newId));
-	// documents = provider.getDocuments("Lorem ipsum dolor");
-	// Assert.assertEquals(documents.size() - startCount, 1);
-	// }
+	@Test
+	public void testHighlightDocument() throws Throwable {
+		log.info("Start testHighlightDocument");
+		loginAdminUser();
+		String id = createDocument("test-attachment.html", "text/html",
+				"/test/github/richardwilly98/services/test-attachment.html",
+				"Aliquam");
+
+		Document document = documentService.get(id);
+		String preview = documentService.preview(document, "Aliquam", 0);
+		Assert.assertNotNull(preview);
+		Assert.assertTrue(preview.contains("Aliquam"));
+		log.info(String.format("document preview: %s", preview));
+	}
 
 	@Test
 	public void testCreateDocumentWithAuthor() throws Throwable {
@@ -141,9 +140,11 @@ public class DocumentProviderTest extends ProviderTestBase {
 		String author = attributes.get(Document.AUTHOR).toString();
 		Assert.assertTrue(!author.isEmpty());
 		// Test ignore set read-only attribute
-		newDocument.setAttribute(Document.AUTHOR, author + "-" + System.currentTimeMillis());
+		newDocument.setAttribute(Document.AUTHOR,
+				author + "-" + System.currentTimeMillis());
 		Document updatedDocument = documentService.update(newDocument);
-		Assert.assertTrue(updatedDocument.getAttributes().get(Document.AUTHOR).toString().equals(author));
+		Assert.assertTrue(updatedDocument.getAttributes().get(Document.AUTHOR)
+				.toString().equals(author));
 	}
 
 	@Test
@@ -167,7 +168,8 @@ public class DocumentProviderTest extends ProviderTestBase {
 				.dateOptionalTimeParser();
 		DateTime newDate = formatter.parseDateTime(attributes.get(
 				Document.CREATION_DATE).toString());
-		log.info(String.format("Attribute %s - %s", Document.CREATION_DATE, newDate));
+		log.info(String.format("Attribute %s - %s", Document.CREATION_DATE,
+				newDate));
 	}
 
 	@Test
@@ -191,25 +193,84 @@ public class DocumentProviderTest extends ProviderTestBase {
 			Assert.fail("Should not be authorized to check-out document twice");
 		} catch (ServiceException sEx) {
 		}
-		
+
 		attributes = newDocument.getAttributes();
 		Assert.assertNotNull(attributes.get(Document.STATUS));
-		Assert.assertTrue(attributes.get(Document.STATUS).equals(Document.DocumentStatus.LOCKED.getStatusCode()));
+		Assert.assertTrue(attributes.get(Document.STATUS).equals(
+				Document.DocumentStatus.LOCKED.getStatusCode()));
 		Assert.assertNotNull(attributes.get(Document.LOCKED_BY));
-		Assert.assertTrue(attributes.get(Document.LOCKED_BY).equals(adminCredential.getUsername()));
+		Assert.assertTrue(attributes.get(Document.LOCKED_BY).equals(
+				adminCredential.getUsername()));
 		Assert.assertNotNull(attributes.get(Document.MODIFIED_DATE));
-		
+
 		log.debug(String.format("Checkin document %s", newDocument.getId()));
 		documentService.checkin(newDocument);
 		newDocument = documentService.get(newDocument.getId());
 		log.trace(String.format("Document checked-in %s", newDocument));
-		Assert.assertTrue(newDocument.getAttributes().get(Document.STATUS).equals(Document.DocumentStatus.AVAILABLE.getStatusCode()));
-		Assert.assertFalse(newDocument.getAttributes().containsKey(Document.LOCKED_BY));
+		Assert.assertTrue(newDocument.getAttributes().get(Document.STATUS)
+				.equals(Document.DocumentStatus.AVAILABLE.getStatusCode()));
+		Assert.assertFalse(newDocument.getAttributes().containsKey(
+				Document.LOCKED_BY));
 
 		try {
 			documentService.checkin(newDocument);
 			Assert.fail("Should not be authorized to check-out document twice");
 		} catch (ServiceException sEx) {
+		}
+	}
+
+	@Test(enabled = false)
+	public void testJson() {
+		try {
+			XContentBuilder mapping = jsonBuilder().startObject()
+					.startObject("XXXXXXX").startObject("properties")
+					.startObject("content").field("type", "attachment")
+					.endObject().startObject("filename")
+					.field("type", "string").endObject()
+					.startObject("contentType").field("type", "string")
+					.endObject().startObject("md5").field("type", "string")
+					.endObject().startObject("length").field("type", "long")
+					.endObject().startObject("chunkSize").field("type", "long")
+					.endObject().endObject().endObject().endObject();
+			log.info("Mapping: " + mapping.string());
+			String query = jsonBuilder().startObject().startObject("query")
+					.startObject("bool").startArray("must")
+					.startObject()
+						.startObject("queryString")
+							.field("query", "XXXX")
+							.array("fields", "_all", "file")
+						.endObject()
+					.endObject()
+					.startObject()
+						.startObject("queryString")
+							.field("query", "id")
+							.field("default_field", "id")
+						.endObject()
+					.endObject()
+					.endArray().endObject()
+					// .startArray("must")
+					// .startObject()
+					// .startObject("queryString")
+					// .field("query", criteria)
+					// .startArray("fields")
+					// .value("_all")
+					// .value("file")
+					// .endArray()
+					// .endObject()
+					// .endObject()
+					// .startObject()
+					// .startObject("queryString")
+					// .field("query", document.getId())
+					// .field("default_field" , "id")
+					// .endObject()
+					// .endObject()
+					// .endArray()
+					.endObject().endObject().string();
+
+			log.debug("query: " + query);
+		} catch (Throwable t) {
+			log.error("testJson failed", t);
+			Assert.fail();
 		}
 	}
 }

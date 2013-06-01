@@ -16,6 +16,7 @@
 		    <table class="table table-condensed">
 		    	<thead>
 		    		<tr>
+		    			<th>Preview</th>
 		    			<th>Id</th>
 		    			<th>Name</th>
 		    			<th>Author</th>
@@ -25,7 +26,8 @@
 		    	</thead>
 		    	<tbody>
 		    		<tr data-ng-repeat="document in documents">
-		    			<td>{{ document.id }}</td>
+		    			<td><a data-toggle="tooltip" title="first tooltip" href="api/documents/{{ document.id }}/preview/{{ criteria }}" target="_blank">Preview</a></td>
+		    			<td><span>{{ document.id }}</span></td>
 		    			<td>{{ document.name }}</td>
 		    			<td>{{ document.attributes.author }}</td>
 		    			<td>{{ document.attributes.status }}</td>

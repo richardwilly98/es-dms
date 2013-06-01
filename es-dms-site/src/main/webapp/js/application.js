@@ -171,7 +171,7 @@ simpleApp.factory('roleService', function ($rootScope, $resource) {
 simpleApp.factory('documentService', function ($resource) {
 	var resource = $resource('api/documents/:verb/:name', {}, {
 	});
-	var documentResource = $resource('api/documents/:id/:action' , {}, {
+	var documentResource = $resource('api/documents/:id/:action/:parameter' , {}, {
 		checkout: {method:'POST', params: {action: 'checkout'}},
 		checkin: {method:'POST', params: {action: 'checkin'}},
 	})
@@ -198,6 +198,11 @@ simpleApp.factory('documentService', function ($resource) {
 			console.log('delete document: ' + id);
 			var doc = new documentResource.get({'id': id})
 			doc.$delete({'id': id});
+		},
+		preview: function(id, criteria) {
+			console.log('preview document: ' + id + ' - criteria: ' + criteria);
+			var text = new documentResource.get({'id': id, 'action': 'preview', 'parameter': criteria})
+			return text;
 		},
 		getDocument: function(id) {
 			for (i in documents) {

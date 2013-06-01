@@ -15,11 +15,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -80,6 +82,25 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			return Response.status(Status.OK).entity(documents).build();
 		} catch (ServiceException e) {
 			log.error("search failed", e);
+			throw new RestServiceException(e.getLocalizedMessage());
+		}
+	}
+
+	@GET
+//	@Produces({ MediaType.APPLICATION_JSON })
+	@Path("{id}/preview/{criteria}")
+	public Response preview(@PathParam("id") String id, @PathParam("criteria") String criteria, @QueryParam("fs") @DefaultValue("1024") int fragmentSize) {
+		try {
+			isAuthenticated();
+			if (log.isTraceEnabled()) {
+				log.trace(String.format("preview - %s - %s", id, criteria));
+			}
+			Document document = service.get(id);
+			checkNotNull(document);
+			String preview = documentService.preview(document, criteria, fragmentSize);
+			return Response.status(Status.OK).entity(preview).build();
+		} catch (ServiceException e) {
+			log.error("preview failed", e);
 			throw new RestServiceException(e.getLocalizedMessage());
 		}
 	}
@@ -185,6 +206,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	public Response checkin(@PathParam("id") String id) {
 		try {
 			Document document = service.get(id);
+			checkNotNull(document);
 			documentService.checkin(document);
 			return Response.noContent().build();
 		} catch (Throwable t) {

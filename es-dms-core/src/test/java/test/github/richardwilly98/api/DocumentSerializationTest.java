@@ -41,4 +41,31 @@ public class DocumentSerializationTest {
 		Assert.assertTrue(document2.getAttributes().get(attributeKey).equals(attributeValue));
 		Assert.assertEquals(html, new String(document2.getFile().getContent()));
 	}
+
+	@Test
+	public void testTagsDocument() throws Throwable {
+		log.debug("*** testTagsDocument ***");
+		String id = "id-" + System.currentTimeMillis();
+		String name = "name-" + System.currentTimeMillis();
+		String html = "<html><body><h1>Hello World</h1></body></html>";
+		byte[] content = html.getBytes();
+		Map<String, Object> attributes = newHashMap();
+		DocumentTest document = new DocumentTest(new Document(id, name, new File(content, "test.html", "text/html"), attributes));
+		document.addTag("java");
+		Assert.assertTrue(document.getTags().contains("java"));
+		document.addTag("c#");
+		Assert.assertTrue(document.getTags().contains("c#"));
+		document.removeTag("c#");
+		Assert.assertTrue(! document.getTags().contains("c#"));
+		log.debug(document);
+		String json = mapper.writeValueAsString(document);
+		log.debug(json);
+		Assert.assertNotNull(json);
+		DocumentTest document2 = mapper.readValue(json, DocumentTest.class);
+		Assert.assertEquals(document.getId(), document2.getId());
+		Assert.assertEquals(document.getName(), document2.getName());
+		Assert.assertTrue(document2.getTags().size() == 1);
+		Assert.assertTrue(document2.getTags().contains("java"));
+		Assert.assertEquals(html, new String(document2.getFile().getContent()));
+	}
 }

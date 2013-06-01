@@ -1,5 +1,8 @@
 package com.github.richardwilly98.api;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Sets.newHashSet;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -19,6 +22,8 @@ public class Document extends SecuredItem {
 	
 	@JsonProperty("file")
 	private File file;
+	
+	private Set<String> tags;
 
 	public Document() {
 		super();
@@ -64,6 +69,30 @@ public class Document extends SecuredItem {
 
 	public void setFile(File file) {
 		this.file = file;
+	}
+
+	public Set<String> getTags() {
+		return tags;
+	}
+
+	void setTags(Set<String> tags) {
+		this.tags = tags;
+	}
+	
+	public void addTag(String tag) {
+		if (tags == null) {
+			tags = newHashSet();
+		}
+		tags.add(tag);
+	}
+	
+	public void removeTag(String tag) {
+		checkNotNull(tag);
+		if (tags != null) {
+			if (tags.contains(tag)) {
+				tags.remove(tag);
+			}
+		}
 	}
 
 	public enum DocumentStatus {

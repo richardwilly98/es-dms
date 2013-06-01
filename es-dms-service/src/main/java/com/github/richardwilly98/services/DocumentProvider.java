@@ -1,6 +1,7 @@
 package com.github.richardwilly98.services;
 
 import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 import static org.elasticsearch.index.query.QueryBuilders.fieldQuery;
 
 import java.io.IOException;
@@ -11,12 +12,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.highlight.HighlightField;
 import org.joda.time.DateTime;
 
 import com.github.richardwilly98.api.Document;
@@ -58,11 +61,11 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		sd.setReadOnlyAttribute(Document.MODIFIED_DATE, now.toString());
 		return sd;
 	}
-	
+
 	@RequiresPermissions(CREATE_PERMISSION)
 	@Override
 	public Document create(Document item) throws ServiceException {
-//		SimpleDocument sd = updateModifiedDate(item);
+		// SimpleDocument sd = updateModifiedDate(item);
 		SimpleDocument sd = new SimpleDocument(item);
 		DateTime now = new DateTime();
 		sd.setReadOnlyAttribute(Document.CREATION_DATE, now.toString());
@@ -171,27 +174,83 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		SimpleDocument document = updateModifiedDate(item);
 		return super.update(document);
 	}
-	
+
 	@Override
 	public void checkout(Document document) throws ServiceException {
 		SimpleDocument sd = new SimpleDocument(document);
-		if (document.getAttributes() != null && document.getAttributes().containsKey(Document.STATUS)) {
+		if (document.getAttributes() != null
+				&& document.getAttributes().containsKey(Document.STATUS)) {
 			if (document.getAttributes().get(Document.STATUS)
 					.equals(Document.DocumentStatus.LOCKED.getStatusCode())) {
 				throw new ServiceException(String.format(
 						"Document %s already locked.", document.getId()));
 			}
 		}
-		sd.setReadOnlyAttribute(Document.STATUS, Document.DocumentStatus.LOCKED.getStatusCode());
-//		document.setAttribute(Document.STATUS,
-//				Document.DocumentStatus.LOCKED.getStatusCode());
-//		DateTime now = new DateTime();
-//		sd.setReadOnlyAttribute(Document.MODIFIED_DATE, now.toString());
-//		document.setAttribute(Document.MODIFIED_DATE, now.toString());
+		sd.setReadOnlyAttribute(Document.STATUS,
+				Document.DocumentStatus.LOCKED.getStatusCode());
+		// document.setAttribute(Document.STATUS,
+		// Document.DocumentStatus.LOCKED.getStatusCode());
+		// DateTime now = new DateTime();
+		// sd.setReadOnlyAttribute(Document.MODIFIED_DATE, now.toString());
+		// document.setAttribute(Document.MODIFIED_DATE, now.toString());
 		sd.setReadOnlyAttribute(Document.LOCKED_BY, getCurrentUser());
-//		document.setAttribute(Document.LOCKED_BY, getCurrentUser());
+		// document.setAttribute(Document.LOCKED_BY, getCurrentUser());
 		update(sd);
-//		update(document);
+		// update(document);
+	}
+
+	@Override
+	public String preview(Document document, String criteria, int size)
+			throws ServiceException {
+		try {
+			log.trace("*** preview ***");
+			String query = jsonBuilder().startObject().startObject("bool")
+					.startArray("must").startObject()
+					.startObject("queryString").field("query", criteria)
+					.array("fields", "_all", "file").endObject().endObject()
+					.startObject().startObject("queryString")
+					.field("query", document.getId())
+					.field("default_field", "id").endObject().endObject()
+					.endArray().endObject().endObject().string();
+
+			log.debug("query: " + query);
+
+			// FieldQueryBuilder x = QueryBuilders.fieldQuery("id",
+			// document.getId());
+			SearchRequestBuilder srb = client.prepareSearch(index)
+					.setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH)
+					.setQuery(query)
+					// .setQuery(fieldQuery("file", criteria))
+					.setHighlighterOrder("score")
+					.addHighlightedField("file", size, 1);
+			log.trace("Search request: " + srb);
+			SearchResponse searchResponse = srb.execute().actionGet();
+			log.debug("totalHits: " + searchResponse.getHits().totalHits());
+			String preview = null;
+			for (SearchHit hit : searchResponse.getHits().hits()) {
+				log.debug(String.format("HighlightFields: %s", hit
+						.getHighlightFields().size()));
+				for (String key : hit.getHighlightFields().keySet()) {
+					HighlightField field = hit.getHighlightFields().get(key);
+					log.debug(String.format("Highlight key: %s", key));
+					log.debug(String.format("Highlight: %s", hit
+							.getHighlightFields().get(key)));
+					for (Text text : field.fragments()) {
+						if (preview == null) {
+							preview = text.string();
+						}
+					}
+				}
+				// String json = hit.getSourceAsString();
+				// Document document = mapper.readValue(json, Document.class);
+				// documents.add(document);
+			}
+			return preview;
+			// return documents;
+		} catch (Throwable t) {
+			log.error("getItems failed", t);
+			throw new ServiceException(t.getLocalizedMessage());
+		}
 	}
 
 	@Override
@@ -221,7 +280,7 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		}
 		document.setDisabled(b);
 	}
-	
+
 	private String getStatus(Document document) {
 		Map<String, Object> attributes = document.getAttributes();
 		if (attributes == null || !attributes.containsKey(Document.STATUS)) {
