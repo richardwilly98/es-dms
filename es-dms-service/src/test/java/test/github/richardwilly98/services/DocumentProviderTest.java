@@ -107,7 +107,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		}
 	}
 
-	@Test
+	@Test(enabled = false)
 	public void testHighlightDocument() throws Throwable {
 		log.info("Start testHighlightDocument");
 		loginAdminUser();
