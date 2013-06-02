@@ -23,6 +23,7 @@ public class Document extends SecuredItem {
 	@JsonProperty("file")
 	private File file;
 	
+	private Set<Version> versions;
 	private Set<String> tags;
 
 	public Document() {
