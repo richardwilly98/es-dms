@@ -47,6 +47,8 @@ import com.sun.jersey.multipart.FormDataParam;
 @Path(RestDocumentService.DOCUMENTS_PATH)
 public class RestDocumentService extends RestServiceBase<Document> {
 
+	public static final String PREVIEW_FRAGMENT_SIZ_PARAMETER = "fs";
+	public static final String PREVIEW_CRITERIA_PARAMETER = "cr";
 	public static final String UPLOAD_PATH = "upload";
 	public static final String DOCUMENTS_PATH = "documents";
 	public static final String CHECKOUT_PATH = "checkout";
@@ -90,7 +92,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("{id}/" + PREVIEW_PATH)
-	public Response preview(@PathParam("id") String id, @QueryParam("cr") String criteria, @QueryParam("fs") @DefaultValue("1024") int fragmentSize) {
+	public Response preview(@PathParam("id") String id, @QueryParam(PREVIEW_CRITERIA_PARAMETER) String criteria, @QueryParam(PREVIEW_FRAGMENT_SIZ_PARAMETER) @DefaultValue("1024") int fragmentSize) {
 		try {
 			isAuthenticated();
 			if (log.isTraceEnabled()) {

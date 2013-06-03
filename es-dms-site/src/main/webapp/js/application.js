@@ -34,28 +34,6 @@ simpleApp.directive('authenticationDirective', function($dialog) {
     }
 });
 
-simpleApp.directive('popoverPreview', function() {
-    return {
-    	link: function(scope, elem, attrs) {
-    		attrs.$observe('docid', function(value) {
-    	        elem.popover(/*{
-    	        	trigger: 'manual',
-    	        	html: true,
-    	        	title: 'preview', 
-    	        	content: '...'
-    	        }*/).click(function (e) {
-    	            e.preventDefault();
-//    	            var data = elem.data('popover')
-//    	            data.options.content = scope.preview(value);
-    	            scope.preview(value);
-    	            elem.popover('toggle');
-    	         });
-    	    });
-    		
-      }
-    }
-});
-
 simpleApp.config(function ($routeProvider) {
     $routeProvider
 		.when('/login', {
