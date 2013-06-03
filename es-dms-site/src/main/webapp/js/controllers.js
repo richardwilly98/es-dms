@@ -200,7 +200,10 @@ simpleApp.controller('loginController', function ($scope, /* $cookieStore, */ au
 });
 
 simpleApp.controller('documentController', function ($scope, documentService) {
+    $scope.alerts = [];
+
     $scope.documents = [];
+    var currentDocument = null;
 
     init();
 
@@ -208,8 +211,17 @@ simpleApp.controller('documentController', function ($scope, documentService) {
     }
     
     $scope.search = function() {
-    	$scope.documents = documentService.find($scope.criteria);
+    	if ($scope.criteria == '' || $scope.criteria == '*') {
+    		$scope.alerts.push({ msg: "Empty or wildcard not allowed" });
+    		$scope.documents = [];
+    	} else {
+        	$scope.documents = documentService.find($scope.criteria);
+    	}
     }
+
+    $scope.closeAlert = function (index) {
+        $scope.alerts.splice(index, 1);
+    };
 
     $scope.edit = function(id) {
     	documentService.edit(id);
@@ -238,6 +250,19 @@ simpleApp.controller('documentController', function ($scope, documentService) {
     		$scope.documents.splice(index, 1);
     	}
     };
+    
+    $scope.preview = function(id) {
+		var document = documentService.getDocument(id);
+		if (currentDocument != document) {
+	    	documentService.preview(id, $scope.criteria, function(response) {
+	        		console.log('Preview document - ' + document.id);
+	        		document.preview = response;
+	    	});
+		} else {
+			console.log('Do not fetch preview again!');
+		}
+		currentDocument = document;
+    }
 });
 
 simpleApp.controller('AlertDemoCtrl', function ($scope) {

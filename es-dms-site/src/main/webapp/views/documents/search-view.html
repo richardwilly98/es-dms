@@ -5,18 +5,10 @@
             	<button type="button" class="btn btn-primary" data-ng-click="search()">Search</button>
             </form>
 			<br/>
-			<ul>
-				<li data-ng-repeat="document in documents">{{ document.id }} - {{ document.file.name }}
-					<br/>
-					<div ng-bind-html-unsafe="document.file.highlight"></div>
-					<br/>
-				</li>
-			</ul>
-			<br/>
+    		<alert data-ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
 		    <table class="table table-condensed">
 		    	<thead>
 		    		<tr>
-		    			<th>Preview</th>
 		    			<th>Id</th>
 		    			<th>Name</th>
 		    			<th>Author</th>
@@ -26,9 +18,10 @@
 		    	</thead>
 		    	<tbody>
 		    		<tr data-ng-repeat="document in documents">
-		    			<td><a data-toggle="tooltip" title="first tooltip" href="api/documents/{{ document.id }}/preview/{{ criteria }}" target="_blank">Preview</a></td>
-		    			<td><span>{{ document.id }}</span></td>
-		    			<td>{{ document.name }}</td>
+		    			<td>{{ document.id }}</td>
+		    			<td>
+		    				<div popover="{{ document.preview}}" popover-placement="bottom" data-content="{{ document.preview }}" popover-title="Preview" popover-trigger="click" data-ng-click="preview(document.id)">{{ document.name }}</div>
+		    			</td>
 		    			<td>{{ document.attributes.author }}</td>
 		    			<td>{{ document.attributes.status }}</td>
 		    			<td>
@@ -53,10 +46,3 @@
 		    </table>			
 		</div>
 		
-		<div class="modal fade hide" id="viewDocument" tabindex="-1" role="dialog" data-remote="api/documents/1bde98d9-752f-4a94-acec-49b1562173b2/download">
-			<div class="modal-body">
-			</div>
-			<div class="modal-footer">
-    			<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-  			</div>
-  		</div>

@@ -52,6 +52,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	public static final String CHECKOUT_PATH = "checkout";
 	public static final String CHECKIN_PATH = "checkin";
 	public static final String DOWNLOAD_PATH = "download";
+	public static final String PREVIEW_PATH = "preview";
 	private final DocumentService documentService;
 
 	@Inject
@@ -87,22 +88,36 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	}
 
 	@GET
-//	@Produces({ MediaType.APPLICATION_JSON })
-	@Path("{id}/preview/{criteria}")
-	public Response preview(@PathParam("id") String id, @PathParam("criteria") String criteria, @QueryParam("fs") @DefaultValue("1024") int fragmentSize) {
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Path("{id}/" + PREVIEW_PATH)
+	public Response preview(@PathParam("id") String id, @QueryParam("cr") String criteria, @QueryParam("fs") @DefaultValue("1024") int fragmentSize) {
 		try {
 			isAuthenticated();
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("preview - %s - %s", id, criteria));
 			}
+			if (criteria == null) {
+				criteria = "*";
+			}
 			Document document = service.get(id);
 			checkNotNull(document);
-			String preview = documentService.preview(document, criteria, fragmentSize);
+			final String content = documentService.preview(document, criteria, fragmentSize);
+			Preview preview = new Preview() {
+				
+				@Override
+				public String getContent() {
+					return content;
+				}
+			};
 			return Response.status(Status.OK).entity(preview).build();
 		} catch (ServiceException e) {
 			log.error("preview failed", e);
 			throw new RestServiceException(e.getLocalizedMessage());
 		}
+	}
+	
+	interface Preview {
+		String getContent();
 	}
 
 	@POST

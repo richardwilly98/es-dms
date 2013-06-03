@@ -32,7 +32,29 @@ simpleApp.directive('authenticationDirective', function($dialog) {
         });
       }
     }
-  });
+});
+
+simpleApp.directive('popoverPreview', function() {
+    return {
+    	link: function(scope, elem, attrs) {
+    		attrs.$observe('docid', function(value) {
+    	        elem.popover(/*{
+    	        	trigger: 'manual',
+    	        	html: true,
+    	        	title: 'preview', 
+    	        	content: '...'
+    	        }*/).click(function (e) {
+    	            e.preventDefault();
+//    	            var data = elem.data('popover')
+//    	            data.options.content = scope.preview(value);
+    	            scope.preview(value);
+    	            elem.popover('toggle');
+    	         });
+    	    });
+    		
+      }
+    }
+});
 
 simpleApp.config(function ($routeProvider) {
     $routeProvider
@@ -174,6 +196,7 @@ simpleApp.factory('documentService', function ($resource) {
 	var documentResource = $resource('api/documents/:id/:action/:parameter' , {}, {
 		checkout: {method:'POST', params: {action: 'checkout'}},
 		checkin: {method:'POST', params: {action: 'checkin'}},
+		preview: {method:'GET', params: {action: 'preview'}}
 	})
 	var documents = {};
 	return {
@@ -199,10 +222,11 @@ simpleApp.factory('documentService', function ($resource) {
 			var doc = new documentResource.get({'id': id})
 			doc.$delete({'id': id});
 		},
-		preview: function(id, criteria) {
+		preview: function(id, criteria, callback) {
 			console.log('preview document: ' + id + ' - criteria: ' + criteria);
-			var text = new documentResource.get({'id': id, 'action': 'preview', 'parameter': criteria})
-			return text;
+			var response = documentResource.preview({'id': id, 'cr': criteria/*, 'fs': 100*/}, function () {
+				callback(response.content);
+			});
 		},
 		getDocument: function(id) {
 			for (i in documents) {
