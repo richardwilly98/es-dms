@@ -4,15 +4,15 @@ import java.util.Date;
 
 import org.apache.shiro.session.mgt.SimpleSession;
 
-import com.github.richardwilly98.esdms.api.ISession;
+import com.github.richardwilly98.esdms.api.Session;
 
-public class EsSession extends SimpleSession implements ISession {
+public class EsSession extends SimpleSession implements Session {
 
 	private static final long serialVersionUID = 1L;
 
-	private final ISession session;
+	private final Session session;
 
-	public EsSession(ISession session) {
+	public EsSession(Session session) {
 		if (session == null) {
 			throw new NullPointerException("session is null");
 		}

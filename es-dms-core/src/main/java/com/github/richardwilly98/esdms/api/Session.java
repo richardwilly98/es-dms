@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.richardwilly98.esdms.SessionImpl;
 
 @JsonDeserialize(as = SessionImpl.class)
-public interface ISession {
+public interface Session {
 
 	public abstract String getId();
 

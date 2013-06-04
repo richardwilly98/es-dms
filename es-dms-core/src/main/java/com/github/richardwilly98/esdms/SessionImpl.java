@@ -2,11 +2,11 @@ package com.github.richardwilly98.esdms;
 
 import java.util.Date;
 
-import com.github.richardwilly98.esdms.api.ISession;
+import com.github.richardwilly98.esdms.api.Session;
 import com.github.richardwilly98.esdms.api.ItemBase;
 import com.google.common.base.Objects;
 
-public class SessionImpl extends ItemBaseImpl implements ItemBase, ISession {
+public class SessionImpl extends ItemBaseImpl implements ItemBase, Session {
 
 	private static final long serialVersionUID = 1L;
 

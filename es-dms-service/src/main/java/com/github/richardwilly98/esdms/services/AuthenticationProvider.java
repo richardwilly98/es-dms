@@ -28,7 +28,7 @@ import org.elasticsearch.search.SearchHit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.esdms.SessionImpl;
 import com.github.richardwilly98.esdms.api.Credential;
-import com.github.richardwilly98.esdms.api.ISession;
+import com.github.richardwilly98.esdms.api.Session;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
@@ -162,7 +162,7 @@ public class AuthenticationProvider implements AuthenticationService {
 	private PrincipalCollection getPrincipals(String token)
 			throws ServiceException {
 		User user = null;
-		ISession session = get(token);
+		Session session = get(token);
 		if (session != null) {
 			String login = session.getUserId();
 			user = userService.get(login);

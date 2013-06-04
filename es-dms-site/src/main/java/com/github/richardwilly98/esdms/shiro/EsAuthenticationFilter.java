@@ -12,7 +12,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.filter.authc.UserFilter;
 
-import com.github.richardwilly98.esdms.api.ISession;
+import com.github.richardwilly98.esdms.api.Session;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.rest.RestAuthencationService;
@@ -75,7 +75,7 @@ public class EsAuthenticationFilter extends UserFilter {
 			log.trace(String.format("Start getPrincipals - %s", token));
 		}
 		User user = null;
-		ISession session = authenticationService.get(token);
+		Session session = authenticationService.get(token);
 		if (session != null) {
 			String login = session.getUserId();
 			user = userService.get(login);

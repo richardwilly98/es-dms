@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.api.Credential;
-import com.github.richardwilly98.esdms.api.ISession;
+import com.github.richardwilly98.esdms.api.Session;
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.User;
@@ -16,13 +16,14 @@ public class AuthenticationProviderTest extends ProviderTestBase {
 	public void testLogin() throws Throwable {
 		log.info("Start testLogin");
 		for (User user : users.values()) {
-			Credential credential = new CredentialImpl(user.getLogin(),
-					user.getPassword());
+			Credential credential = new CredentialImpl.Builder()
+					.username(user.getLogin()).password(user.getPassword())
+					.build();
 			String token = authenticationService.login(credential);
 			Assert.assertNotNull(token);
 			log.trace(String.format("Login %s - token: %s", user.getLogin(),
 					token));
-			ISession session = authenticationService.get(token);
+			Session session = authenticationService.get(token);
 			Assert.assertNotNull(session);
 			Assert.assertEquals(token, session.getId());
 		}
@@ -32,8 +33,9 @@ public class AuthenticationProviderTest extends ProviderTestBase {
 	public void testRolePermission() throws Throwable {
 		log.info("Start testRolePermission");
 		for (User user : users.values()) {
-			Credential credential = new CredentialImpl(user.getLogin(),
-					user.getPassword());
+			Credential credential = new CredentialImpl.Builder()
+					.username(user.getLogin()).password(user.getPassword())
+					.build();
 			String token = authenticationService.login(credential);
 			Assert.assertNotNull(token);
 			for (Role role : roles) {
@@ -72,11 +74,12 @@ public class AuthenticationProviderTest extends ProviderTestBase {
 	public void testGetSession() throws Throwable {
 		log.info("Start testGetSession");
 		for (User user : users.values()) {
-			Credential credential = new CredentialImpl(user.getLogin(),
-					user.getPassword());
+			Credential credential = new CredentialImpl.Builder()
+					.username(user.getLogin()).password(user.getPassword())
+					.build();
 			String token = authenticationService.login(credential);
 			Assert.assertNotNull(token);
-			ISession session = authenticationService.get(token);
+			Session session = authenticationService.get(token);
 			Assert.assertNotNull(session);
 			Assert.assertNotNull(session.getId());
 			Assert.assertNotNull(session.getCreateTime());
@@ -89,14 +92,15 @@ public class AuthenticationProviderTest extends ProviderTestBase {
 	public void testLogout() throws Throwable {
 		log.info("Start testLogout");
 		for (User user : users.values()) {
-			Credential credential = new CredentialImpl(user.getLogin(),
-					user.getPassword());
+			Credential credential = new CredentialImpl.Builder()
+					.username(user.getLogin()).password(user.getPassword())
+					.build();
 			String token = authenticationService.login(credential);
 			Assert.assertNotNull(token);
 			log.trace(String.format("Login %s - token: %s", user.getLogin(),
 					token));
 			authenticationService.logout(token);
-			ISession session = authenticationService.get(token);
+			Session session = authenticationService.get(token);
 			Assert.assertNull(session);
 		}
 	}

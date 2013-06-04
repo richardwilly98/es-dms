@@ -11,7 +11,6 @@ import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.eis.AbstractSessionDAO;
 
 import com.github.richardwilly98.esdms.SessionImpl;
-import com.github.richardwilly98.esdms.api.ISession;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.services.AuthenticationProvider;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
@@ -65,7 +64,7 @@ public class EsSessionDAO extends AbstractSessionDAO {
 			Set<SessionImpl> sessions = service
 					.getItems("active:true");
 			Set<Session> activeSessions = new HashSet<Session>();
-			for (com.github.richardwilly98.esdms.api.ISession session : sessions) {
+			for (com.github.richardwilly98.esdms.api.Session session : sessions) {
 				activeSessions.add(new EsSession(session));
 			}
 			return activeSessions;
@@ -98,7 +97,7 @@ public class EsSessionDAO extends AbstractSessionDAO {
 	@Override
 	protected Session doReadSession(Serializable sessionId) {
 		try {
-			ISession session = service.get(sessionId.toString());
+			com.github.richardwilly98.esdms.api.Session session = service.get(sessionId.toString());
 			if (session == null) {
 				return null;
 			}
