@@ -20,10 +20,10 @@ public interface File {
 
 	public abstract void setContentType(String contentType);
 
-	public abstract String getHighlight();
-
-	public abstract void setHighlight(String highlight);
-
+//	public abstract String getHighlight();
+//
+//	public abstract void setHighlight(String highlight);
+//
 	public abstract DateTime getDate();
 
 	public abstract void setDate(DateTime date);

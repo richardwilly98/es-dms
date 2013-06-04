@@ -83,7 +83,7 @@ public class FileImpl implements Serializable, File {
 		this(null);
 	}
 	
-	public FileImpl(Builder builder) {
+	protected FileImpl(Builder builder) {
 		if (builder != null) {
 			this.author = builder.author;
 				this.content = builder.content;
@@ -95,15 +95,7 @@ public class FileImpl implements Serializable, File {
 		if (this.content == null) {
 			this.content = new byte[0];
 		}
-		// this(new byte[0], "", "");
 	}
-
-//	public FileImpl(byte[] content, String name, String contentType) {
-//		checkNotNull(content);
-//		this.content = content;
-//		this.name = name;
-//		this.contentType = contentType;
-//	}
 
 	/*
 	 * (non-Javadoc)
@@ -165,25 +157,25 @@ public class FileImpl implements Serializable, File {
 		this.contentType = contentType;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.github.richardwilly98.api.File#getHighlight()
-	 */
-	@Override
-	public String getHighlight() {
-		return highlight;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.github.richardwilly98.api.File#setHighlight(java.lang.String)
-	 */
-	@Override
-	public void setHighlight(String highlight) {
-		this.highlight = highlight;
-	}
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see com.github.richardwilly98.api.File#getHighlight()
+//	 */
+//	@Override
+//	public String getHighlight() {
+//		return highlight;
+//	}
+//
+//	/*
+//	 * (non-Javadoc)
+//	 * 
+//	 * @see com.github.richardwilly98.api.File#setHighlight(java.lang.String)
+//	 */
+//	@Override
+//	public void setHighlight(String highlight) {
+//		this.highlight = highlight;
+//	}
 
 	/*
 	 * (non-Javadoc)
