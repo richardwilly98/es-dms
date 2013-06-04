@@ -64,9 +64,13 @@ public class AuthenticationProvider implements AuthenticationService {
 	@Override
 	public SessionImpl get(String id) throws ServiceException {
 		try {
+			if (log.isTraceEnabled()) {
+				log.trace(String.format("get - %s", id));
+			}
 			GetResponse response = client.prepareGet(index, type, id).execute()
 					.actionGet();
 			if (!response.isExists()) {
+				log.info(String.format("Cannot find item %s", id));
 				return null;
 			}
 			String json = response.getSourceAsString();
@@ -84,6 +88,9 @@ public class AuthenticationProvider implements AuthenticationService {
 		char[] password = credential.getPassword().toCharArray();
 		boolean rememberMe = credential.isRememberMe();
 		try {
+			if (log.isTraceEnabled()) {
+				log.trace(String.format("login - %s", credential));
+			}
 			UsernamePasswordToken token = new UsernamePasswordToken(login,
 					password, rememberMe);
 			AuthenticationInfo info = securityManager.authenticate(token);
@@ -124,6 +131,9 @@ public class AuthenticationProvider implements AuthenticationService {
 
 	@Override
 	public void logout(String token) throws ServiceException {
+		if (log.isTraceEnabled()) {
+			log.trace(String.format("logout - %s", token));
+		}
 		Subject subject = getSubjectBySessionId(token);
 		if (subject != null) {
 			subject.logout();

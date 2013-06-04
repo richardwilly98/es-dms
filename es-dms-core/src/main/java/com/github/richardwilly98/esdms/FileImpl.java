@@ -1,7 +1,5 @@
 package com.github.richardwilly98.esdms;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.io.Serializable;
 
 import org.joda.time.DateTime;
@@ -17,38 +15,99 @@ public class FileImpl implements Serializable, File {
 
 	private static final long serialVersionUID = 1L;
 	@JsonProperty("content")
-	byte[] content;
+	private byte[] content;
 
 	@JsonProperty("_name")
-	String name;
+	private String name;
 
 	@JsonProperty("_content_type")
-	String contentType;
+	private String contentType;
 
 	@JsonIgnore
-	String highlight;
+	private String highlight;
 
 	@JsonProperty("date")
-	DateTime date;
+	private DateTime date;
 
 	@JsonProperty("title")
-	String title;
+	private String title;
 
 	@JsonProperty("author")
-	String author;
+	private String author;
 
-	public FileImpl() {
-		this(new byte[0], "", "");
+	public static class Builder {
+
+		private String author;
+		private String contentType;
+		private byte[] content;
+		private DateTime date;
+		private String name;
+		private String title;
+
+		public Builder content(byte[] content) {
+			this.content = content;
+			return this;
+		}
+
+		public Builder name(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public Builder contentType(String contentType) {
+			this.contentType = contentType;
+			return this;
+		}
+
+		public Builder date(DateTime date) {
+			this.date = date;
+			return this;
+		}
+
+		public Builder title(String title) {
+			this.title = title;
+			return this;
+		}
+
+		public Builder author(String author) {
+			this.author = author;
+			return this;
+		}
+
+		public File build() {
+			return new FileImpl(this);
+		}
 	}
 
-	public FileImpl(byte[] content, String name, String contentType) {
-		checkNotNull(content);
-		this.content = content;
-		this.name = name;
-		this.contentType = contentType;
+	FileImpl() {
+		this(null);
+	}
+	
+	public FileImpl(Builder builder) {
+		if (builder != null) {
+			this.author = builder.author;
+				this.content = builder.content;
+			this.contentType = builder.contentType;
+			this.date = builder.date;
+			this.name = builder.name;
+			this.title = builder.title;
+		}
+		if (this.content == null) {
+			this.content = new byte[0];
+		}
+		// this(new byte[0], "", "");
 	}
 
-	/* (non-Javadoc)
+//	public FileImpl(byte[] content, String name, String contentType) {
+//		checkNotNull(content);
+//		this.content = content;
+//		this.name = name;
+//		this.contentType = contentType;
+//	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.File#getContent()
 	 */
 	@Override
@@ -56,7 +115,9 @@ public class FileImpl implements Serializable, File {
 		return content;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.File#setContent(byte[])
 	 */
 	@Override
@@ -64,7 +125,9 @@ public class FileImpl implements Serializable, File {
 		this.content = content;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.File#getName()
 	 */
 	@Override
@@ -72,7 +135,9 @@ public class FileImpl implements Serializable, File {
 		return name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.File#setName(java.lang.String)
 	 */
 	@Override
@@ -80,7 +145,9 @@ public class FileImpl implements Serializable, File {
 		this.name = name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.File#getContentType()
 	 */
 	@Override
@@ -88,7 +155,9 @@ public class FileImpl implements Serializable, File {
 		return contentType;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.File#setContentType(java.lang.String)
 	 */
 	@Override
@@ -96,7 +165,9 @@ public class FileImpl implements Serializable, File {
 		this.contentType = contentType;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.File#getHighlight()
 	 */
 	@Override
@@ -104,7 +175,9 @@ public class FileImpl implements Serializable, File {
 		return highlight;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.File#setHighlight(java.lang.String)
 	 */
 	@Override
@@ -112,7 +185,9 @@ public class FileImpl implements Serializable, File {
 		this.highlight = highlight;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.File#getDate()
 	 */
 	@Override
@@ -120,7 +195,9 @@ public class FileImpl implements Serializable, File {
 		return date;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.File#setDate(org.joda.time.DateTime)
 	 */
 	@Override
@@ -128,7 +205,9 @@ public class FileImpl implements Serializable, File {
 		this.date = date;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.File#getTitle()
 	 */
 	@Override
@@ -136,7 +215,9 @@ public class FileImpl implements Serializable, File {
 		return title;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.File#setTitle(java.lang.String)
 	 */
 	@Override
@@ -144,7 +225,9 @@ public class FileImpl implements Serializable, File {
 		this.title = title;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.File#getAuthor()
 	 */
 	@Override
@@ -152,7 +235,9 @@ public class FileImpl implements Serializable, File {
 		return author;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.File#setAuthor(java.lang.String)
 	 */
 	@Override

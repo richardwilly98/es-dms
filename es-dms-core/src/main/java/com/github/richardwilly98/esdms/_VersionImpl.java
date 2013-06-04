@@ -14,7 +14,7 @@ public class _VersionImpl extends _ContainerImpl{
 	}
 	
 	public _VersionImpl(String versionId, boolean current){
-		super();
+		super(null);
 		this.versionId = versionId;
 		this.current = current;
 	}

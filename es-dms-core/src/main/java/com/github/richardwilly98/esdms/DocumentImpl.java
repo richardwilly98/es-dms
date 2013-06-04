@@ -9,6 +9,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.File;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 
 public class DocumentImpl extends SecuredItemImpl implements Document {
@@ -16,53 +17,99 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 	private static final long serialVersionUID = 1L;
 	private static final Set<String> readOnlyAttributes = ImmutableSet.of(
 			AUTHOR, CREATION_DATE, MODIFIED_DATE, STATUS, LOCKED_BY);
-	
+
 	private String versionId;
-	
 	@JsonProperty("file")
 	private File file;
-	
 	private Set<String> tags;
 
-	public DocumentImpl() {
-		super();
+	public static class Builder extends
+			SecuredItemImpl.Builder<DocumentImpl.Builder> {
+
+		private String versionId;
+		private File file;
+		private Set<String> tags;
+
+		public Builder versionId(String versionId) {
+			this.versionId = versionId;
+			return getThis();
+		}
+
+		public Builder file(File file) {
+			this.file = file;
+			return getThis();
+		}
+
+		public Builder tags(Set<String> tags) {
+			this.tags = tags;
+			return getThis();
+		}
+
+		@Override
+		protected Builder getThis() {
+			return this;
+		}
+
+		public Document build() {
+			return new DocumentImpl(this);
+		}
+	}
+
+	DocumentImpl() {
+		this(null);
+	}
+
+	public DocumentImpl(Builder builder) {
+		super(builder);
+		if (builder != null) {
+			if (Strings.isNullOrEmpty(builder.versionId)) {
+				this.versionId = "1";
+			} else {
+				this.versionId = builder.versionId;
+			}
+			this.file = builder.file;
+			this.tags = builder.tags;
+		}
 		readOnlyAttributeKeys = readOnlyAttributes;
 	}
 
-	public DocumentImpl(String id, File file) {
-		this(id, null, file, null);
-	}
+	// public DocumentImpl(String id, File file) {
+	// this(id, null, file, null);
+	// }
 
-	public DocumentImpl(String id, String name, File file,
-			Map<String, Object> attributes) {
-		this();
-		if (file == null) {
-			file = new FileImpl();
-		}
-		setId(id);
-		setName(name);
-		this.file = file;
-		setAttributes(attributes);
-	}
+	// public DocumentImpl(String id, String name, File file,
+	// Map<String, Object> attributes) {
+	// this();
+	// if (file == null) {
+	// file = new FileImpl();
+	// }
+	// setId(id);
+	// setName(name);
+	// this.file = file;
+	// setAttributes(attributes);
+	// }
+
+	// public DocumentImpl(Document document) {
+	// this(document.getId(), document.getName(), document.getFile(), null);
+	// // Override behavior for read-only attribute.
+	// this.attributes = document.getAttributes();
+	// }
 
 	/*
 	 * Method used to deserialize attributes Map
 	 */
 	@JsonProperty("attributes")
 	private void deserialize(Map<String, Object> attributes) {
-		if (! attributes.containsKey(DocumentImpl.STATUS)) {
-			attributes.put(DocumentImpl.STATUS, DocumentImpl.DocumentStatus.AVAILABLE.getStatusCode());
+		if (!attributes.containsKey(DocumentImpl.STATUS)) {
+			attributes.put(DocumentImpl.STATUS,
+					DocumentImpl.DocumentStatus.AVAILABLE.getStatusCode());
 		}
 		this.attributes = attributes;
 	}
 
-	public DocumentImpl(Document document) {
-		this(document.getId(), document.getName(), document.getFile(), null);
-		// Override behavior for read-only attribute.
-		this.attributes = document.getAttributes();
-	}
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.IDocument#getFile()
 	 */
 	@Override
@@ -74,7 +121,9 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 		this.file = file;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.IDocument#getVersionId()
 	 */
 	@Override
@@ -82,7 +131,9 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 		return versionId;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.IDocument#getTags()
 	 */
 	@Override
@@ -93,7 +144,7 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 	void setTags(Set<String> tags) {
 		this.tags = tags;
 	}
-	
+
 	@Override
 	public void addTag(String tag) {
 		if (tags == null) {
@@ -101,7 +152,7 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 		}
 		tags.add(tag);
 	}
-	
+
 	@Override
 	public void removeTag(String tag) {
 		checkNotNull(tag);

@@ -9,6 +9,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.UserImpl;
+import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.rest.RestServiceBase;
 import com.github.richardwilly98.esdms.rest.RestUserService;
 import com.github.richardwilly98.esdms.services.UserService;
@@ -69,11 +70,12 @@ public class TestRestUserService extends GuiceAndJettyTestBase<UserImpl> {
 
 	protected UserImpl createUser(String login, String password) throws Throwable {
 		log.debug(String.format("*** createUser - %s - %s ***", login, password));
-		UserImpl user = new UserImpl();
-		user.setId(login);
-		user.setName(login);
-		user.setEmail(login);
-		user.setPassword(password);
+		User user = new UserImpl.Builder().id(login).name(login).email(login).password(password).build();
+//		User user = new UserImpl();
+//		user.setId(login);
+//		user.setName(login);
+//		user.setEmail(login);
+//		user.setPassword(password);
 		String json = mapper.writeValueAsString(user);
 		log.trace(json);
 		ClientResponse response = resource().path(RestUserService.USERS_PATH).cookie(adminCookie)

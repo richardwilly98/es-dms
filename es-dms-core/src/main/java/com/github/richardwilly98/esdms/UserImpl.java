@@ -14,14 +14,56 @@ import com.google.common.base.Objects;
 public class UserImpl extends PersonImpl implements User {
 
 	private static final long serialVersionUID = 1L;
-	private Set<Role> roles;
-	private String hash;
-	private String password;
+	Set<Role> roles;
+	String hash;
+	String password;
 
 	@JsonIgnore
 	private String login;
 
-	public UserImpl() {
+	public static class Builder extends PersonImpl.Builder<Builder> {
+		
+		Set<Role> roles;
+		String hash;
+		String password;
+		
+        public Builder password(String password) {
+        	this.password = password;
+        	return getThis();
+        }
+
+        public Builder roles(Set<Role> roles) {
+        	this.roles = roles;
+            return getThis();
+        }
+
+        public Builder hash(String hash) {
+        	this.hash = hash;
+            return getThis();
+        }
+
+        @Override
+		protected Builder getThis() {
+			return this;		
+		}
+        
+		public UserImpl build(){
+            return new UserImpl(this);
+        }
+	}
+	
+	UserImpl() {
+		this(null);
+	}
+	
+	protected UserImpl(Builder builder) {
+		super(builder);
+		if (builder != null) {
+			this.password = builder.password;
+			this.roles = builder.roles;
+			this.hash = builder.hash;
+			this.login = builder.email;
+		}
 	}
 
 	/* (non-Javadoc)

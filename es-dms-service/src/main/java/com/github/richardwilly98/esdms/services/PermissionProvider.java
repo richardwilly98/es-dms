@@ -23,25 +23,35 @@ public class PermissionProvider extends ProviderBase<Permission> implements Perm
 
 	@Override
 	protected void loadInitialData() throws ServiceException {
-		Permission permission = new PermissionImpl(DocumentService.CREATE_PERMISSION);
+		Permission permission = new PermissionImpl.Builder().name(DocumentService.CREATE_PERMISSION).build();
+//		Permission permission = new PermissionImpl(DocumentService.CREATE_PERMISSION);
 		super.create(permission);
-		permission = new PermissionImpl(DocumentService.DELETE_PERMISSION);
+//		permission = new PermissionImpl(DocumentService.DELETE_PERMISSION);
+		permission = new PermissionImpl.Builder().name(DocumentService.DELETE_PERMISSION).build();
 		create(permission);
-		permission = new PermissionImpl(DocumentService.EDIT_PERMISSION);
+//		permission = new PermissionImpl(DocumentService.EDIT_PERMISSION);
+		permission = new PermissionImpl.Builder().name(DocumentService.EDIT_PERMISSION).build();
 		create(permission);
-		permission = new PermissionImpl(DocumentService.READ_PERMISSION);
+//		permission = new PermissionImpl(DocumentService.READ_PERMISSION);
+		permission = new PermissionImpl.Builder().name(DocumentService.READ_PERMISSION).build();
 		create(permission);
-		permission = new PermissionImpl(UserService.CREATE_PERMISSION);
+//		permission = new PermissionImpl(UserService.CREATE_PERMISSION);
+		permission = new PermissionImpl.Builder().name(UserService.CREATE_PERMISSION).build();
 		create(permission);
-		permission = new PermissionImpl(UserService.EDIT_PERMISSION);
+//		permission = new PermissionImpl(UserService.EDIT_PERMISSION);
+		permission = new PermissionImpl.Builder().name(UserService.EDIT_PERMISSION).build();
 		create(permission);
-		permission = new PermissionImpl(UserService.DELETE_PERMISSION);
+//		permission = new PermissionImpl(UserService.DELETE_PERMISSION);
+		permission = new PermissionImpl.Builder().name(UserService.DELETE_PERMISSION).build();
 		create(permission);
-		permission = new PermissionImpl(RoleService.CREATE_PERMISSION);
+//		permission = new PermissionImpl(RoleService.CREATE_PERMISSION);
+		permission = new PermissionImpl.Builder().name(RoleService.CREATE_PERMISSION).build();
 		create(permission);
-		permission = new PermissionImpl(RoleService.EDIT_PERMISSION);
+//		permission = new PermissionImpl(RoleService.EDIT_PERMISSION);
+		permission = new PermissionImpl.Builder().name(RoleService.EDIT_PERMISSION).build();
 		create(permission);
-		permission = new PermissionImpl(RoleService.DELETE_PERMISSION);
+//		permission = new PermissionImpl(RoleService.DELETE_PERMISSION);
+		permission = new PermissionImpl.Builder().name(RoleService.DELETE_PERMISSION).build();
 		create(permission);
 	}
 

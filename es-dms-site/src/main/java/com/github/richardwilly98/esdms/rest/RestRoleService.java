@@ -2,7 +2,6 @@ package com.github.richardwilly98.esdms.rest;
 
 import javax.ws.rs.Path;
 
-import com.github.richardwilly98.esdms.RoleImpl;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.RoleService;

@@ -13,7 +13,6 @@ import javax.ws.rs.core.Response;
 
 import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.SessionImpl;
-import com.github.richardwilly98.esdms.api.ISession;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.google.inject.Inject;

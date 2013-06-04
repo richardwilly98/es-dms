@@ -6,6 +6,11 @@ import com.github.richardwilly98.esdms.api.SecuredItem;
 
 public class _ContainerImpl extends SecuredItemImpl implements Container {
 	
+	protected _ContainerImpl(Builder<?> builder) {
+		super(builder);
+		// TODO Auto-generated constructor stub
+	}
+
 	@JsonIgnore
 	SecuredItem parent;
 

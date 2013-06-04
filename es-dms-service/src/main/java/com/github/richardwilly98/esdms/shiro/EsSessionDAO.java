@@ -80,11 +80,12 @@ public class EsSessionDAO extends AbstractSessionDAO {
 		try {
 			Serializable sessionId = generateSessionId(session);
 			assignSessionId(session, sessionId);
-			SessionImpl s = new SessionImpl();
-			s.setId(sessionId.toString());
-			s.setCreateTime(session.getStartTimestamp());
-			s.setLastAccessTime(session.getLastAccessTime());
-			s.setActive(true);
+//			SessionImpl s = new SessionImpl();
+//			s.setId(sessionId.toString());
+//			s.setCreateTime(session.getStartTimestamp());
+//			s.setLastAccessTime(session.getLastAccessTime());
+//			s.setActive(true);
+			SessionImpl s = new SessionImpl.Builder().id(sessionId.toString()).createTime(session.getStartTimestamp()).lastAccessTime(session.getLastAccessTime()).active(true).build();
 			s = service.create(s);
 			EsSession esSession = new EsSession(s);
 			return esSession.getId();

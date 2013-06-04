@@ -17,15 +17,17 @@ public class UserSerializationTest {
 	@Test
 	public void testSerializeDeserializeUser() throws Throwable {
 		log.debug("*** testSerializeDeserializeUser ***");
-		User user = new UserImpl();
+//				User user = new UserImpl();
 		String id = "user-" + System.currentTimeMillis();
-		user.setId(id);
+//		user.setId(id);
 		String name = id;
-		user.setName(name);
+//		user.setName(name);
 		String email = id + "@gmail.com";
-		user.setEmail(email);
+//		user.setEmail(email);
 		String password = "secret";
-		user.setPassword(password);
+//		user.setPassword(password);
+//		User user = new UserImpl.Builder().password(password).email(email).id(id).name(name).build();
+		User user = new UserImpl.Builder().password(password).id(id).name(name).email(email).build();
 		log.debug(user);
 		String json = mapper.writeValueAsString(user);
 		log.debug(json);

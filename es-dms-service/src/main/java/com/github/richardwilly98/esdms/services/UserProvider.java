@@ -29,11 +29,12 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 
 	@Override
 	protected void loadInitialData() throws ServiceException {
-		User user = new UserImpl();
-		user.setId(DEFAULT_ADMIN_LOGIN);
-		user.setName(DEFAULT_ADMIN_LOGIN);
-		user.setDescription("System administrator");
-		user.setHash(computeBase64Hash(DEFAULT_ADMIN_PASSWORD));
+		User user = new UserImpl.Builder().hash(computeBase64Hash(DEFAULT_ADMIN_PASSWORD)).id(DEFAULT_ADMIN_LOGIN).name(DEFAULT_ADMIN_LOGIN).description("System administrator").email(DEFAULT_ADMIN_LOGIN).build();
+//		User user = new UserImpl();
+//		user.setId(DEFAULT_ADMIN_LOGIN);
+//		user.setName(DEFAULT_ADMIN_LOGIN);
+//		user.setDescription("System administrator");
+//		user.setHash(computeBase64Hash(DEFAULT_ADMIN_PASSWORD));
 		Role role = roleService.get(RoleService.ADMINISTRATOR_ROLE);
 		user.addRole(role);
 		super.create(user);

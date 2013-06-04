@@ -1,6 +1,7 @@
 package com.github.richardwilly98.esdms;
 
-import java.util.HashSet;
+import static com.google.common.collect.Sets.newHashSet;
+
 import java.util.Set;
 
 import com.github.richardwilly98.esdms.api.Permission;
@@ -12,7 +13,41 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 	Set<String> scopes;
 	Set<Permission> permissions;
 
-	public RoleImpl() {
+	public static class Builder extends BuilderBase<Builder> {
+
+		Set<String> scopes;
+		Set<Permission> permissions;
+
+		public Builder scopes(Set<String> scopes) {
+			this.scopes = scopes;
+			return getThis();
+		}
+
+		public Builder permissions(Set<Permission> permissions) {
+			this.permissions = permissions;
+			return getThis();
+		}
+
+		@Override
+		protected Builder getThis() {
+			return this;
+		}
+
+		public RoleImpl build() {
+			return new RoleImpl(this);
+		}
+	}
+
+	RoleImpl() {
+		super(null);
+	}
+
+	protected RoleImpl(Builder builder) {
+		super(builder);
+		if (builder != null) {
+			this.scopes = builder.scopes;
+			this.permissions = builder.permissions;
+		}
 	}
 
 	// methods on scope
@@ -31,7 +66,7 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 	public void setScopes(Set<String> scopes) {
 		if (scopes != null) {
 			if (this.scopes == null) {
-				this.scopes = new HashSet<String>();
+				this.scopes = newHashSet();
 			}
 			this.scopes.addAll(scopes);
 		}
@@ -43,7 +78,7 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 	@Override
 	public void addScope(String scope) {
 		if (scopes == null) {
-			scopes = new HashSet<String>();
+			scopes = newHashSet();
 		}
 		if (!scopes.contains(scope)) {
 			scopes.add(scope);
@@ -78,7 +113,7 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 	public void setPermissions(Set<Permission> permissions) {
 		if (permissions != null) {
 			if (this.permissions == null) {
-				this.permissions = new HashSet<Permission>();
+				this.permissions = newHashSet();
 			}
 			this.permissions.addAll(permissions);
 		}
@@ -93,7 +128,7 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 			return;
 		}
 		if (this.permissions == null) {
-			this.permissions = new HashSet<Permission>();
+			this.permissions = newHashSet();
 		}
 		if (!this.permissions.contains(permission)) {
 			permissions.add(permission);

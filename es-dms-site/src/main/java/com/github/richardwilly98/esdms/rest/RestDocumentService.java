@@ -1,6 +1,7 @@
 package com.github.richardwilly98.esdms.rest;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Maps.newHashMap;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -155,9 +156,11 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			} else {
 				content = toByteArray(uploadedInputStream);
 			}
-			File file = new FileImpl(content, filename, contentType);
-			Map<String, Object> attributes = new HashMap<String, Object>();
-			Document document = new DocumentImpl(null, name, file, attributes);
+//			File file = new FileImpl(content, filename, contentType);
+			File file = new FileImpl.Builder().content(content).name(filename).contentType(contentType).build();
+			Map<String, Object> attributes = newHashMap();
+//			Document document = new DocumentImpl(null, name, file, attributes);
+			Document document = new DocumentImpl.Builder().file(file).name(name).attributes(attributes).roles(null).build();
 			return create(document);
 		} catch (Throwable t) {
 			log.error("upload failed", t);
@@ -190,12 +193,14 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			// String encodedContent = Base64.encodeBytes(content);
 			// File file = new File(encodedContent, fileDetail.getFileName(),
 			// contentType);
-			File file = new FileImpl(content, fileDetail.getFileName(), contentType);
+//			File file = new FileImpl(content, fileDetail.getFileName(), contentType);
+			File file = new FileImpl.Builder().content(content).name(fileDetail.getFileName()).contentType(contentType).build();
 			Map<String, Object> attributes = new HashMap<String, Object>();
 			DateTime now = new DateTime();
 			attributes.put(Document.CREATION_DATE, now.toString());
 			attributes.put(Document.AUTHOR, getCurrentUser());
-			Document document = new DocumentImpl(null, name, file, attributes);
+//			Document document = new DocumentImpl(null, name, file, attributes);
+			Document document = new DocumentImpl.Builder().file(file).name(name).attributes(attributes).roles(null).build();
 			return create(document);
 		} catch (Throwable t) {
 			log.error("upload failed", t);
@@ -242,7 +247,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			Document document = service.get(id);
 			checkNotNull(document);
 			checkNotNull(document.getFile());
-			ContentDispositionBuilder contentDisposition = ContentDisposition
+			ContentDispositionBuilder<?, ?> contentDisposition = ContentDisposition
 					.type("attachment");
 
 			contentDisposition.fileName(document.getFile().getName());

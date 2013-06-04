@@ -17,41 +17,89 @@ import com.github.richardwilly98.esdms.api.ItemBase;
 import com.google.common.base.Objects;
 
 @JsonInclude(Include.NON_DEFAULT)
-public class ItemBaseImpl implements Serializable, ItemBase {
+public abstract class ItemBaseImpl implements Serializable, ItemBase {
 
 	final protected Logger log = Logger.getLogger(getClass());
 	private static final long serialVersionUID = 1L;
 
-	private String id;
-	private String name;
-	private boolean disabled;
-	private String description;
+	String id;
+	String name;
+	boolean disabled;
+	String description;
 
 	Map<String, Object> attributes;
 
 	@JsonIgnore
 	protected Set<String> readOnlyAttributeKeys;
 
-	ItemBaseImpl() {
-		this(null);
+	static abstract class BuilderBase<T extends BuilderBase<T>> {
+
+		String id;
+		String name;
+		boolean disabled;
+		String description;
+		Map<String, Object> attributes;
+
+		public T id(String id) {
+			this.id = id;
+			return getThis();
+		}
+
+		public T name(String name) {
+			this.name = name;
+			return getThis();
+		}
+
+		public T description(String description) {
+			this.description = description;
+			return getThis();
+		}
+
+		public T disabled(boolean disabled) {
+			this.disabled = disabled;
+			return getThis();
+		}
+
+		public T attributes(Map<String, Object> attributes) {
+			this.attributes = attributes;
+			return getThis();
+		}
+
+		protected abstract T getThis();
+
 	}
 
-	ItemBaseImpl(String id) {
-		this(id, null);
+	protected ItemBaseImpl(BuilderBase<?> builder) {
+		if (builder != null) {
+//			checkNotNull(builder.id);
+			checkNotNull(builder.name);
+			this.id = builder.id;
+			this.name = builder.name;
+			this.disabled = builder.disabled;
+			this.description = builder.description;
+			this.attributes = builder.attributes;
+		}
+		// this(null);
 	}
 
-	ItemBaseImpl(String id, Map<String, Object> attributes) {
-//		this.disabled = false;
-		this.id = id;
-		this.attributes = attributes;
-	}
+	// ItemBaseImpl(String id) {
+	// this(id, null);
+	// }
+	//
+	// ItemBaseImpl(String id, Map<String, Object> attributes) {
+	// // this.disabled = false;
+	// this.id = id;
+	// this.attributes = attributes;
+	// }
 
 	@JsonProperty("attributes")
 	private void deserialize(Map<String, Object> attributes) {
 		this.attributes = attributes;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.IItemBase#getId()
 	 */
 	@Override
@@ -59,7 +107,9 @@ public class ItemBaseImpl implements Serializable, ItemBase {
 		return id;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.IItemBase#setId(java.lang.String)
 	 */
 	@Override
@@ -67,7 +117,9 @@ public class ItemBaseImpl implements Serializable, ItemBase {
 		this.id = id;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.IItemBase#isDisabled()
 	 */
 	@Override
@@ -75,7 +127,9 @@ public class ItemBaseImpl implements Serializable, ItemBase {
 		return this.disabled;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.IItemBase#setDisabled(boolean)
 	 */
 	@Override
@@ -83,7 +137,9 @@ public class ItemBaseImpl implements Serializable, ItemBase {
 		this.disabled = value;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.IItemBase#getName()
 	 */
 	@Override
@@ -91,7 +147,9 @@ public class ItemBaseImpl implements Serializable, ItemBase {
 		return this.name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.IItemBase#setName(java.lang.String)
 	 */
 	@Override
@@ -99,7 +157,9 @@ public class ItemBaseImpl implements Serializable, ItemBase {
 		this.name = name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.IItemBase#getDescription()
 	 */
 	@Override
@@ -107,15 +167,20 @@ public class ItemBaseImpl implements Serializable, ItemBase {
 		return this.description;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.github.richardwilly98.api.IItemBase#setDescription(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.github.richardwilly98.api.IItemBase#setDescription(java.lang.String)
 	 */
 	@Override
 	public void setDescription(String description) {
 		this.description = description;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.IItemBase#getAttributes()
 	 */
 	@Override
@@ -123,7 +188,9 @@ public class ItemBaseImpl implements Serializable, ItemBase {
 		return attributes;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.IItemBase#getAttributes(java.util.Set)
 	 */
 	@Override
@@ -139,15 +206,21 @@ public class ItemBaseImpl implements Serializable, ItemBase {
 		return attributes;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.github.richardwilly98.api.IItemBase#setAttribute(java.lang.String, java.lang.Object)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.github.richardwilly98.api.IItemBase#setAttribute(java.lang.String,
+	 * java.lang.Object)
 	 */
 	@Override
 	public void setAttribute(String name, Object value) {
 		updateAttribute(name, value, false);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.IItemBase#setAttributes(java.util.Map)
 	 */
 	@Override
@@ -159,15 +232,20 @@ public class ItemBaseImpl implements Serializable, ItemBase {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.github.richardwilly98.api.IItemBase#removeAttribute(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.github.richardwilly98.api.IItemBase#removeAttribute(java.lang.String)
 	 */
 	@Override
 	public void removeAttribute(String name) {
 		updateAttribute(name, null, false);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.IItemBase#getReadOnlyAttributeKeys()
 	 */
 	@Override

@@ -30,13 +30,17 @@ public class DocumentSerializationTest {
 		byte[] content = html.getBytes();
 		Map<String, Object> attributes = newHashMap();
 		attributes.put(attributeKey, attributeValue);
-		DocumentTest document = new DocumentTest(new DocumentImpl(id, name, new FileImpl(content, "test.html", "text/html"), attributes));
+//		DocumentTest document = new DocumentTest(new DocumentImpl(id, name, new FileImpl(content, "test.html", "text/html"), attributes));
+		DocumentTest document = new DocumentTest(new DocumentImpl.Builder().file(new FileImpl.Builder().content(content).name("test.html").contentType("text/html").build()).id(id).name(name).attributes(attributes).roles(null));
+		Assert.assertTrue(document.getAttributes().get(attributeKey).equals(attributeValue));
+		Assert.assertEquals(document.getVersionId(), "1");
 		document.setReadOnlyAttribute(DocumentImpl.AUTHOR, "richard");
 		log.debug(document);
 		String json = mapper.writeValueAsString(document);
 		log.debug(json);
 		Assert.assertNotNull(json);
 		Document document2 = mapper.readValue(json, Document.class);
+		Assert.assertEquals(document2.getVersionId(), "1");
 		Assert.assertEquals(document.getId(), document2.getId());
 		Assert.assertEquals(document.getName(), document2.getName());
 		Assert.assertTrue(document2.getAttributes().get(attributeKey).equals(attributeValue));
@@ -51,7 +55,8 @@ public class DocumentSerializationTest {
 		String html = "<html><body><h1>Hello World</h1></body></html>";
 		byte[] content = html.getBytes();
 		Map<String, Object> attributes = newHashMap();
-		Document document = new DocumentTest(new DocumentImpl(id, name, new FileImpl(content, "test.html", "text/html"), attributes));
+//		Document document = new DocumentTest(new DocumentImpl(id, name, new FileImpl(content, "test.html", "text/html"), attributes));
+		DocumentTest document = new DocumentTest(new DocumentImpl.Builder().file(new FileImpl.Builder().content(content).name("test.html").contentType("text/html").build()).id(id).name(name).attributes(attributes).roles(null));
 		document.addTag("java");
 		Assert.assertTrue(document.getTags().contains("java"));
 		document.addTag("c#");

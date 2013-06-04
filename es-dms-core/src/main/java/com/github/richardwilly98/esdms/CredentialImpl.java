@@ -1,7 +1,7 @@
 package com.github.richardwilly98.esdms;
 
 import com.github.richardwilly98.esdms.api.Credential;
-
+import com.google.common.base.Objects;
 
 public class CredentialImpl implements Credential {
 
@@ -12,7 +12,7 @@ public class CredentialImpl implements Credential {
 	public CredentialImpl() {
 		this(null, null);
 	}
-	
+
 	public CredentialImpl(String username, String password) {
 		this(username, password, false);
 	}
@@ -22,8 +22,10 @@ public class CredentialImpl implements Credential {
 		this.password = password;
 		this.rememberMe = rememberMe;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.esdms.Credential#getUsername()
 	 */
 	@Override
@@ -31,15 +33,20 @@ public class CredentialImpl implements Credential {
 		return username;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.github.richardwilly98.esdms.Credential#setUsername(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.github.richardwilly98.esdms.Credential#setUsername(java.lang.String)
 	 */
 	@Override
 	public void setUsername(String username) {
 		this.username = username;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.esdms.Credential#getPassword()
 	 */
 	@Override
@@ -47,15 +54,20 @@ public class CredentialImpl implements Credential {
 		return password;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.github.richardwilly98.esdms.Credential#setPassword(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.github.richardwilly98.esdms.Credential#setPassword(java.lang.String)
 	 */
 	@Override
 	public void setPassword(String password) {
 		this.password = password;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.esdms.Credential#isRememberMe()
 	 */
 	@Override
@@ -63,7 +75,9 @@ public class CredentialImpl implements Credential {
 		return rememberMe;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.esdms.Credential#setRememberMe(boolean)
 	 */
 	@Override
@@ -71,4 +85,9 @@ public class CredentialImpl implements Credential {
 		this.rememberMe = rememberMe;
 	}
 
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this).add("username", username)
+				.add("rememberMe", rememberMe).toString();
+	}
 }

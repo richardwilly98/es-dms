@@ -2,15 +2,13 @@ package com.github.richardwilly98.esdms.api;
 
 import java.util.Map;
 
-import com.github.richardwilly98.esdms.RoleImpl;
-
 public interface SecuredItem {
 
-	public abstract Map<String, RoleImpl> getRoles();
+	public abstract Map<String, Role> getRoles();
 
-	public abstract void setPermissions(Map<String, RoleImpl> roles);
+	public abstract void setPermissions(Map<String, Role> roles);
 
-	public abstract void setRole(String name, RoleImpl role);
+	public abstract void setRole(String name, Role role);
 
 	public abstract Map<String, SecuredItem> getAttachments();
 

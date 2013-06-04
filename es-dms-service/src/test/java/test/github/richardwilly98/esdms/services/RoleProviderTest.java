@@ -1,5 +1,7 @@
 package test.github.richardwilly98.esdms.services;
 
+import static com.google.common.collect.Sets.newHashSet;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,7 +37,7 @@ public class RoleProviderTest extends ProviderTestBase {
 		// Make sure to be login with user having sufficient permission
 		loginAdminUser();
 		
-		Set<Permission> permissions = new HashSet<Permission>();
+		Set<Permission> permissions = newHashSet();
 		
 		permissions.add(createPermission("profile:read", "profile:read", true));
 		permissions.add(createPermission("content:read", "content:read", true));
@@ -136,7 +138,7 @@ public class RoleProviderTest extends ProviderTestBase {
 		
 		log.info("Start testDeleteRole");
 		
-		Set<Permission> permissions = new HashSet<Permission>();
+		Set<Permission> permissions = newHashSet();
 		
 		log.info("Creating roles - ");
 		permissions.add(createPermission("profile:read", "profile:read", true));

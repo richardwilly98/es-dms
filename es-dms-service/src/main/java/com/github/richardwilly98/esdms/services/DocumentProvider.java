@@ -56,7 +56,7 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	}
 
 	private SimpleDocument updateModifiedDate(Document document) {
-		SimpleDocument sd = new SimpleDocument(document);
+		SimpleDocument sd = new SimpleDocument.Builder().document(document).build();
 		DateTime now = new DateTime();
 		sd.setReadOnlyAttribute(Document.MODIFIED_DATE, now.toString());
 		return sd;
@@ -66,7 +66,8 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	@Override
 	public Document create(Document item) throws ServiceException {
 		// SimpleDocument sd = updateModifiedDate(item);
-		SimpleDocument sd = new SimpleDocument(item);
+//		SimpleDocument sd = new SimpleDocument(item);
+		SimpleDocument sd = new SimpleDocument.Builder().document(item).build();
 		DateTime now = new DateTime();
 		sd.setReadOnlyAttribute(Document.CREATION_DATE, now.toString());
 		sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
@@ -84,21 +85,30 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		try {
 			Set<Document> documents = new HashSet<Document>();
 
+			// SearchResponse searchResponse = client.prepareSearch(index)
+			// .setTypes(type).setQuery(QueryBuilders.queryString(name))
+			// .addHighlightedField("file").execute().actionGet();
+			// log.debug("totalHits: " + searchResponse.getHits().totalHits());
+			// for (SearchHit hit : searchResponse.getHits().hits()) {
+			// log.debug(String.format("HighlightFields: %s", hit
+			// .getHighlightFields().size()));
+			// for (String key : hit.getHighlightFields().keySet()) {
+			// log.debug(String.format("Highlight key: %s", key));
+			// }
+			// String json = hit.getSourceAsString();
+			// Document document = mapper.readValue(json, Document.class);
+			// documents.add(document);
+			// }
+
 			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type).setQuery(QueryBuilders.queryString(name))
-					.addHighlightedField("file").execute().actionGet();
+					.execute().actionGet();
 			log.debug("totalHits: " + searchResponse.getHits().totalHits());
 			for (SearchHit hit : searchResponse.getHits().hits()) {
-				log.debug(String.format("HighlightFields: %s", hit
-						.getHighlightFields().size()));
-				for (String key : hit.getHighlightFields().keySet()) {
-					log.debug(String.format("Highlight key: %s", key));
-				}
 				String json = hit.getSourceAsString();
 				Document document = mapper.readValue(json, Document.class);
 				documents.add(document);
 			}
-
 			return documents;
 		} catch (Throwable t) {
 			log.error("getItems failed", t);
@@ -117,33 +127,45 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		try {
 			List<Document> documents = new ArrayList<Document>();
 
+//			SearchResponse searchResponse = client.prepareSearch(index)
+//					.setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH)
+//					.setQuery(fieldQuery("file", criteria))
+//					.addHighlightedField("file").execute().actionGet();
+//			log.debug("totalHits: " + searchResponse.getHits().totalHits());
+//			for (SearchHit hit : searchResponse.getHits().hits()) {
+//				String highlight = null;
+//				if (log.isTraceEnabled()) {
+//					log.trace(String.format("HighlightFields: %s", hit
+//							.getHighlightFields().size()));
+//				}
+//				for (String key : hit.getHighlightFields().keySet()) {
+//					if (log.isTraceEnabled()) {
+//						log.trace(String.format("Highlight key: %s", key));
+//					}
+//					for (Text text : hit.getHighlightFields().get(key)
+//							.fragments()) {
+//						log.debug(String.format("Fragment: %s", text));
+//						highlight = text.toString();
+//					}
+//				}
+//				String json = hit.getSourceAsString();
+//				Document document = mapper.readValue(json, Document.class);
+//				document.getFile().setContent(null);
+//				if (highlight != null) {
+//					document.getFile().setHighlight(highlight);
+//				}
+//				documents.add(document);
+//			}
+
 			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH)
 					.setQuery(fieldQuery("file", criteria))
-					.addHighlightedField("file").execute().actionGet();
+					.execute().actionGet();
 			log.debug("totalHits: " + searchResponse.getHits().totalHits());
 			for (SearchHit hit : searchResponse.getHits().hits()) {
-				String highlight = null;
-				if (log.isTraceEnabled()) {
-					log.trace(String.format("HighlightFields: %s", hit
-							.getHighlightFields().size()));
-				}
-				for (String key : hit.getHighlightFields().keySet()) {
-					if (log.isTraceEnabled()) {
-						log.trace(String.format("Highlight key: %s", key));
-					}
-					for (Text text : hit.getHighlightFields().get(key)
-							.fragments()) {
-						log.debug(String.format("Fragment: %s", text));
-						highlight = text.toString();
-					}
-				}
 				String json = hit.getSourceAsString();
 				Document document = mapper.readValue(json, Document.class);
 				document.getFile().setContent(null);
-				if (highlight != null) {
-					document.getFile().setHighlight(highlight);
-				}
 				documents.add(document);
 			}
 
@@ -158,7 +180,8 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	public void checkin(Document document) throws ServiceException {
 		String status = getStatus(document);
 		if (status.equals(Document.DocumentStatus.LOCKED.getStatusCode())) {
-			SimpleDocument sd = new SimpleDocument(document);
+//			SimpleDocument sd = new SimpleDocument(document);
+			SimpleDocument sd = new SimpleDocument.Builder().document(document).build();
 			sd.removeReadOnlyAttribute(Document.STATUS);
 			sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
 			sd.removeReadOnlyAttribute(Document.LOCKED_BY);
@@ -177,7 +200,8 @@ public class DocumentProvider extends ProviderBase<Document> implements
 
 	@Override
 	public void checkout(Document document) throws ServiceException {
-		SimpleDocument sd = new SimpleDocument(document);
+//		SimpleDocument sd = new SimpleDocument(document);
+		SimpleDocument sd = new SimpleDocument.Builder().document(document).build();
 		if (document.getAttributes() != null
 				&& document.getAttributes().containsKey(Document.STATUS)) {
 			if (document.getAttributes().get(Document.STATUS)

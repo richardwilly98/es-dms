@@ -102,6 +102,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			GetResponse response = client.prepareGet(index, type, id).execute()
 					.actionGet();
 			if (!response.isExists()) {
+				log.info(String.format("Cannot find item %s", id));
 				return null;
 			}
 			String json = response.getSourceAsString();
@@ -275,15 +276,10 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			client.admin().indices().prepareCreate(index).execute().actionGet();
 			refreshIndex();
 		}
-		log.info("Exists type "
-				+ type
-				+ " in index "
-				+ index
-				+ ": "
-				+ client.admin().indices().prepareTypesExists(index)
-						.setTypes(type).execute().actionGet().isExists());
-		if (!client.admin().indices().prepareTypesExists(index).setTypes(type)
-				.execute().actionGet().isExists()) {
+		boolean exists = client.admin().indices().prepareTypesExists(index)
+				.setTypes(type).execute().actionGet().isExists();
+		log.info(String.format("Exists type %s in index %s: %s", type, index, exists));
+		if (!exists) {
 			String mapping = getMapping();
 			if (mapping != null) {
 				log.debug(String.format("Create mapping %s", mapping));
@@ -298,10 +294,6 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		}
 	}
 
-//	public abstract boolean disabled(T item) throws ServiceException;
-//
-//	public abstract void disable(T item, boolean b) throws ServiceException;
-	
 	@Override
 	public boolean disabled(T item) throws ServiceException {
 		try {
