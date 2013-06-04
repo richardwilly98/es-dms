@@ -190,9 +190,6 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			}
 			byte[] content = body.getEntityAs(byte[].class);
 			String contentType = body.getMediaType().toString();
-			// String encodedContent = Base64.encodeBytes(content);
-			// File file = new File(encodedContent, fileDetail.getFileName(),
-			// contentType);
 //			File file = new FileImpl(content, fileDetail.getFileName(), contentType);
 			File file = new FileImpl.Builder().content(content).name(fileDetail.getFileName()).contentType(contentType).build();
 			Map<String, Object> attributes = new HashMap<String, Object>();
@@ -281,8 +278,6 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			int read = 0;
 			byte[] bytes = new byte[1024];
 
-			// out = new FileOutputStream(new
-			// java.io.File(uploadedFileLocation));
 			while ((read = uploadedInputStream.read(bytes)) != -1) {
 				out.write(bytes, 0, read);
 			}

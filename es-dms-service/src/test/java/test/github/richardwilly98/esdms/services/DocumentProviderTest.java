@@ -38,10 +38,12 @@ public class DocumentProviderTest extends ProviderTestBase {
 		List<Document> documents = documentService.getList(contentSearch);
 		startCount = documents.size();
 		log.info(String.format("startCount: %s", startCount));
-//		FileImpl file = new FileImpl(content, name, contentType);
-		File file = new FileImpl.Builder().content(content).name(name).contentType(contentType).build();
-//		Document document = new DocumentImpl(id, name, file, null);
-		Document document = new DocumentImpl.Builder().file(file).id(id).name(name).roles(null).build();
+		// FileImpl file = new FileImpl(content, name, contentType);
+		File file = new FileImpl.Builder().content(content).name(name)
+				.contentType(contentType).build();
+		// Document document = new DocumentImpl(id, name, file, null);
+		Document document = new DocumentImpl.Builder().file(file).id(id)
+				.name(name).roles(null).build();
 		Document newDocument = documentService.create(document);
 		Assert.assertNotNull(newDocument);
 		Assert.assertEquals(id, newDocument.getId());
@@ -64,8 +66,9 @@ public class DocumentProviderTest extends ProviderTestBase {
 			}
 		}
 		Assert.assertNotNull(user);
-		authenticationService.login(new CredentialImpl(user.getLogin(), user
-				.getPassword()));
+		authenticationService
+				.login(new CredentialImpl.Builder().username(user.getLogin())
+						.password(user.getPassword()).build());
 		// TODO: Not sure the reason PDF parsing does not work anymore. To be
 		// investigated...
 		// testCreateDocument("lorem.pdf", "application/pdf",
@@ -95,8 +98,9 @@ public class DocumentProviderTest extends ProviderTestBase {
 			}
 		}
 		Assert.assertNotNull(user);
-		authenticationService.login(new CredentialImpl(user.getLogin(), user
-				.getPassword()));
+		authenticationService
+				.login(new CredentialImpl.Builder().username(user.getLogin())
+						.password(user.getPassword()).build());
 		try {
 			createDocument(
 					"test-attachment.html",
@@ -130,8 +134,9 @@ public class DocumentProviderTest extends ProviderTestBase {
 		String id = String.valueOf(System.currentTimeMillis());
 		String name = "document-" + id;
 		Map<String, Object> attributes = new HashMap<String, Object>();
-//		Document document = new DocumentImpl(id, name, null, attributes);
-		Document document = new DocumentImpl.Builder().attributes(attributes).id(id).name(name).roles(null).build();
+		// Document document = new DocumentImpl(id, name, null, attributes);
+		Document document = new DocumentImpl.Builder().attributes(attributes)
+				.id(id).name(name).roles(null).build();
 		document.setId(id);
 		Document newDocument = documentService.create(document);
 		Assert.assertNotNull(newDocument);
@@ -145,8 +150,8 @@ public class DocumentProviderTest extends ProviderTestBase {
 		newDocument.setAttribute(DocumentImpl.AUTHOR,
 				author + "-" + System.currentTimeMillis());
 		Document updatedDocument = documentService.update(newDocument);
-		Assert.assertTrue(updatedDocument.getAttributes().get(DocumentImpl.AUTHOR)
-				.toString().equals(author));
+		Assert.assertTrue(updatedDocument.getAttributes()
+				.get(DocumentImpl.AUTHOR).toString().equals(author));
 	}
 
 	@Test
@@ -156,8 +161,9 @@ public class DocumentProviderTest extends ProviderTestBase {
 		String id = String.valueOf(System.currentTimeMillis());
 		String name = "document-" + id;
 		Map<String, Object> attributes = new HashMap<String, Object>();
-//		Document document = new DocumentImpl(id, name, null, attributes);
-		Document document = new DocumentImpl.Builder().attributes(attributes).id(id).name(name).roles(null).build();
+		// Document document = new DocumentImpl(id, name, null, attributes);
+		Document document = new DocumentImpl.Builder().attributes(attributes)
+				.id(id).name(name).roles(null).build();
 		document.setId(id);
 		Document newDocument = documentService.create(document);
 		Assert.assertNotNull(newDocument);
@@ -182,8 +188,9 @@ public class DocumentProviderTest extends ProviderTestBase {
 		String id = String.valueOf(System.currentTimeMillis());
 		String name = "document-" + id;
 		Map<String, Object> attributes = new HashMap<String, Object>();
-//		Document document = new DocumentImpl(id, name, null, attributes);
-		Document document = new DocumentImpl.Builder().attributes(attributes).id(id).name(name).roles(null).build();
+		// Document document = new DocumentImpl(id, name, null, attributes);
+		Document document = new DocumentImpl.Builder().attributes(attributes)
+				.id(id).name(name).roles(null).build();
 		document.setId(id);
 		Document newDocument = documentService.create(document);
 		Assert.assertNotNull(newDocument);
@@ -238,39 +245,13 @@ public class DocumentProviderTest extends ProviderTestBase {
 					.endObject().endObject().endObject().endObject();
 			log.info("Mapping: " + mapping.string());
 			String query = jsonBuilder().startObject().startObject("query")
-					.startObject("bool").startArray("must")
-					.startObject()
-						.startObject("queryString")
-							.field("query", "XXXX")
-							.array("fields", "_all", "file")
-						.endObject()
-					.endObject()
-					.startObject()
-						.startObject("queryString")
-							.field("query", "id")
-							.field("default_field", "id")
-						.endObject()
-					.endObject()
-					.endArray().endObject()
-					// .startArray("must")
-					// .startObject()
-					// .startObject("queryString")
-					// .field("query", criteria)
-					// .startArray("fields")
-					// .value("_all")
-					// .value("file")
-					// .endArray()
-					// .endObject()
-					// .endObject()
-					// .startObject()
-					// .startObject("queryString")
-					// .field("query", document.getId())
-					// .field("default_field" , "id")
-					// .endObject()
-					// .endObject()
-					// .endArray()
-					.endObject().endObject().string();
-
+					.startObject("bool").startArray("must").startObject()
+					.startObject("queryString").field("query", "XXXX")
+					.array("fields", "_all", "file").endObject().endObject()
+					.startObject().startObject("queryString")
+					.field("query", "id").field("default_field", "id")
+					.endObject().endObject().endArray().endObject().endObject()
+					.endObject().string();
 			log.debug("query: " + query);
 		} catch (Throwable t) {
 			log.error("testJson failed", t);

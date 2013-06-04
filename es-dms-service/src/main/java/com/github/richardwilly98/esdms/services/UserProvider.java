@@ -21,7 +21,9 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 	private final RoleService roleService;
 
 	@Inject
-	UserProvider(Client client, BootstrapService bootstrapService, HashService hashService, RoleService roleService) throws ServiceException {
+	UserProvider(Client client, BootstrapService bootstrapService,
+			HashService hashService, RoleService roleService)
+			throws ServiceException {
 		super(client, bootstrapService, null, UserProvider.type, User.class);
 		this.hashService = hashService;
 		this.roleService = roleService;
@@ -29,24 +31,24 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 
 	@Override
 	protected void loadInitialData() throws ServiceException {
-		User user = new UserImpl.Builder().hash(computeBase64Hash(DEFAULT_ADMIN_PASSWORD)).id(DEFAULT_ADMIN_LOGIN).name(DEFAULT_ADMIN_LOGIN).description("System administrator").email(DEFAULT_ADMIN_LOGIN).build();
-//		User user = new UserImpl();
-//		user.setId(DEFAULT_ADMIN_LOGIN);
-//		user.setName(DEFAULT_ADMIN_LOGIN);
-//		user.setDescription("System administrator");
-//		user.setHash(computeBase64Hash(DEFAULT_ADMIN_PASSWORD));
+		User user = new UserImpl.Builder()
+				.hash(computeBase64Hash(DEFAULT_ADMIN_PASSWORD))
+				.id(DEFAULT_ADMIN_LOGIN).name(DEFAULT_ADMIN_LOGIN)
+				.description(DEFAULT_ADMIN_DESCRIPTION)
+				.email(DEFAULT_ADMIN_LOGIN).build();
 		Role role = roleService.get(RoleService.ADMINISTRATOR_ROLE);
 		user.addRole(role);
 		super.create(user);
 	}
-	
+
 	@Override
 	protected String getMapping() {
 		return null;
 	}
 
 	private String computeBase64Hash(String password) {
-		return hashService.toBase64(ByteSource.Util.bytes(password.toCharArray()).getBytes());
+		return hashService.toBase64(ByteSource.Util.bytes(
+				password.toCharArray()).getBytes());
 	}
 
 	@RequiresPermissions(CREATE_PERMISSION)
@@ -59,7 +61,9 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 			if (user.getPassword() != null) {
 				String encodedHash = computeBase64Hash(user.getPassword());
 				if (log.isTraceEnabled()) {
-					log.trace(String.format("From service - hash: %s for login %s", encodedHash, user.getLogin()));
+					log.trace(String.format(
+							"From service - hash: %s for login %s",
+							encodedHash, user.getLogin()));
 				}
 				user.setHash(encodedHash);
 				user.setPassword(null);
@@ -71,13 +75,14 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}
-	
+
 	@Override
 	public User update(User item) throws ServiceException {
 		if (item.getPassword() != null) {
 			String encodedHash = computeBase64Hash(item.getPassword());
 			if (log.isTraceEnabled()) {
-				log.trace(String.format("From service - hash: %s for login %s", encodedHash, item.getLogin()));
+				log.trace(String.format("From service - hash: %s for login %s",
+						encodedHash, item.getLogin()));
 			}
 			item.setHash(encodedHash);
 			item.setPassword(null);

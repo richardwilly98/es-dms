@@ -1,12 +1,12 @@
 package com.github.richardwilly98.esdms.services;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 import static org.elasticsearch.index.query.QueryBuilders.fieldQuery;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,14 +24,12 @@ import org.joda.time.DateTime;
 
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.exception.ServiceException;
-import com.github.richardwilly98.esdms.services.BootstrapService;
-import com.github.richardwilly98.esdms.services.DocumentService;
 import com.google.inject.Inject;
 
 public class DocumentProvider extends ProviderBase<Document> implements
 		DocumentService {
 
-	private static final String DOCUMENT_MAPPING_JSON = "/com/github/richardwilly98/services/document-mapping.json";
+	private static final String DOCUMENT_MAPPING_JSON = "/com/github/richardwilly98/esdms/services/document-mapping.json";
 	private final static String type = "document";
 
 	@Inject
@@ -65,8 +63,6 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	@RequiresPermissions(CREATE_PERMISSION)
 	@Override
 	public Document create(Document item) throws ServiceException {
-		// SimpleDocument sd = updateModifiedDate(item);
-//		SimpleDocument sd = new SimpleDocument(item);
 		SimpleDocument sd = new SimpleDocument.Builder().document(item).build();
 		DateTime now = new DateTime();
 		sd.setReadOnlyAttribute(Document.CREATION_DATE, now.toString());
@@ -83,25 +79,11 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	@Override
 	public Set<Document> getItems(String name) throws ServiceException {
 		try {
-			Set<Document> documents = new HashSet<Document>();
-
-			// SearchResponse searchResponse = client.prepareSearch(index)
-			// .setTypes(type).setQuery(QueryBuilders.queryString(name))
-			// .addHighlightedField("file").execute().actionGet();
-			// log.debug("totalHits: " + searchResponse.getHits().totalHits());
-			// for (SearchHit hit : searchResponse.getHits().hits()) {
-			// log.debug(String.format("HighlightFields: %s", hit
-			// .getHighlightFields().size()));
-			// for (String key : hit.getHighlightFields().keySet()) {
-			// log.debug(String.format("Highlight key: %s", key));
-			// }
-			// String json = hit.getSourceAsString();
-			// Document document = mapper.readValue(json, Document.class);
-			// documents.add(document);
-			// }
+			Set<Document> documents = newHashSet();
 
 			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type).setQuery(QueryBuilders.queryString(name))
+					.setFrom(0).setSize(100)
 					.execute().actionGet();
 			log.debug("totalHits: " + searchResponse.getHits().totalHits());
 			for (SearchHit hit : searchResponse.getHits().hits()) {
@@ -125,37 +107,7 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	@Override
 	public List<Document> search(String criteria) throws ServiceException {
 		try {
-			List<Document> documents = new ArrayList<Document>();
-
-//			SearchResponse searchResponse = client.prepareSearch(index)
-//					.setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH)
-//					.setQuery(fieldQuery("file", criteria))
-//					.addHighlightedField("file").execute().actionGet();
-//			log.debug("totalHits: " + searchResponse.getHits().totalHits());
-//			for (SearchHit hit : searchResponse.getHits().hits()) {
-//				String highlight = null;
-//				if (log.isTraceEnabled()) {
-//					log.trace(String.format("HighlightFields: %s", hit
-//							.getHighlightFields().size()));
-//				}
-//				for (String key : hit.getHighlightFields().keySet()) {
-//					if (log.isTraceEnabled()) {
-//						log.trace(String.format("Highlight key: %s", key));
-//					}
-//					for (Text text : hit.getHighlightFields().get(key)
-//							.fragments()) {
-//						log.debug(String.format("Fragment: %s", text));
-//						highlight = text.toString();
-//					}
-//				}
-//				String json = hit.getSourceAsString();
-//				Document document = mapper.readValue(json, Document.class);
-//				document.getFile().setContent(null);
-//				if (highlight != null) {
-//					document.getFile().setHighlight(highlight);
-//				}
-//				documents.add(document);
-//			}
+			List<Document> documents = newArrayList();
 
 			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH)
@@ -180,7 +132,6 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	public void checkin(Document document) throws ServiceException {
 		String status = getStatus(document);
 		if (status.equals(Document.DocumentStatus.LOCKED.getStatusCode())) {
-//			SimpleDocument sd = new SimpleDocument(document);
 			SimpleDocument sd = new SimpleDocument.Builder().document(document).build();
 			sd.removeReadOnlyAttribute(Document.STATUS);
 			sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
@@ -200,7 +151,6 @@ public class DocumentProvider extends ProviderBase<Document> implements
 
 	@Override
 	public void checkout(Document document) throws ServiceException {
-//		SimpleDocument sd = new SimpleDocument(document);
 		SimpleDocument sd = new SimpleDocument.Builder().document(document).build();
 		if (document.getAttributes() != null
 				&& document.getAttributes().containsKey(Document.STATUS)) {
@@ -212,15 +162,8 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		}
 		sd.setReadOnlyAttribute(Document.STATUS,
 				Document.DocumentStatus.LOCKED.getStatusCode());
-		// document.setAttribute(Document.STATUS,
-		// Document.DocumentStatus.LOCKED.getStatusCode());
-		// DateTime now = new DateTime();
-		// sd.setReadOnlyAttribute(Document.MODIFIED_DATE, now.toString());
-		// document.setAttribute(Document.MODIFIED_DATE, now.toString());
 		sd.setReadOnlyAttribute(Document.LOCKED_BY, getCurrentUser());
-		// document.setAttribute(Document.LOCKED_BY, getCurrentUser());
 		update(sd);
-		// update(document);
 	}
 
 	@Override
@@ -265,44 +208,12 @@ public class DocumentProvider extends ProviderBase<Document> implements
 						}
 					}
 				}
-				// String json = hit.getSourceAsString();
-				// Document document = mapper.readValue(json, Document.class);
-				// documents.add(document);
 			}
 			return preview;
-			// return documents;
 		} catch (Throwable t) {
 			log.error("getItems failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
 		}
-	}
-
-	@Override
-	public boolean disabled(Document document) throws ServiceException {
-		try {
-			if (document == null) {
-				throw new IllegalArgumentException("document is null");
-			}
-			//
-		} catch (Throwable t) {
-			log.error("getDocuments failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
-		return document.isDisabled();
-	}
-
-	@Override
-	public void disable(Document document, boolean b) throws ServiceException {
-		try {
-			if (document == null) {
-				throw new IllegalArgumentException("document is null");
-			}
-			//
-		} catch (Throwable t) {
-			log.error("getDocuments failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
-		document.setDisabled(b);
 	}
 
 	private String getStatus(Document document) {

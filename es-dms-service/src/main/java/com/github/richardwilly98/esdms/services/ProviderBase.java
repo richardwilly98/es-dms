@@ -1,9 +1,9 @@
 package com.github.richardwilly98.esdms.services;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -31,8 +31,6 @@ import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.ItemBase;
 import com.github.richardwilly98.esdms.api.Settings;
 import com.github.richardwilly98.esdms.exception.ServiceException;
-import com.github.richardwilly98.esdms.services.BaseService;
-import com.github.richardwilly98.esdms.services.BootstrapService;
 
 abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 
@@ -116,7 +114,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 
 	@Override
 	public List<T> getList(String name) throws ServiceException {
-		return new ArrayList<T>(getItems(name));
+		return newArrayList(getItems(name));
 	}
 
 	@Override
@@ -125,7 +123,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("getItems - %s", name));
 			}
-			Set<T> items = new HashSet<T>();
+			Set<T> items = newHashSet();
 			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type).setQuery(QueryBuilders.queryString(name))
 					.execute().actionGet();
@@ -153,7 +151,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("get all items in List"));
 			}
-			Set<T> items = new HashSet<T>();
+			Set<T> items = newHashSet();
 
 			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type).setQuery(QueryBuilders.queryString("*"))
@@ -179,7 +177,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	@Override
 	public List<T> search(String criteria) throws ServiceException {
 		try {
-			List<T> items = new ArrayList<T>();
+			List<T> items = newArrayList();
 
 			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH)
@@ -298,24 +296,22 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	public boolean disabled(T item) throws ServiceException {
 		try {
 			checkNotNull(item);
-			//
+			return item.isDisabled();
 		} catch (Throwable t) {
 			log.error("disabled failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
 		}
-		return item.isDisabled();
 	}
 
 	@Override
 	public void disable(T item, boolean b) throws ServiceException {
 		try {
 			checkNotNull(item);
-			//
+			item.setDisabled(b);
 		} catch (Throwable t) {
 			log.error("disable failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
 		}
-		item.setDisabled(b);
 	}
 
 	protected void refreshIndex() {
