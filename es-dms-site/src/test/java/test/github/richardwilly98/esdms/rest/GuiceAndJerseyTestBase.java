@@ -10,13 +10,8 @@ import javax.ws.rs.core.NewCookie;
 
 import org.apache.log4j.Logger;
 import org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider;
-import org.junit.Before;
 import org.testng.Assert;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Guice;
 
-import test.github.richardwilly98.esdms.inject.TestEsClientModule;
 import test.github.richardwilly98.esdms.web.TestRestGuiceServletConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +20,6 @@ import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.api.ItemBase;
 import com.github.richardwilly98.esdms.rest.RestAuthencationService;
 import com.github.richardwilly98.esdms.services.UserService;
-import com.google.inject.Inject;
 import com.google.inject.servlet.GuiceFilter;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
@@ -40,8 +34,7 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 public class GuiceAndJerseyTestBase<T extends ItemBase> extends JerseyTest {
 
 	final protected Logger log = Logger.getLogger(this.getClass());
-	protected final static Credential adminCredential = new CredentialImpl(
-			UserService.DEFAULT_ADMIN_LOGIN, UserService.DEFAULT_ADMIN_PASSWORD);
+	protected final static Credential adminCredential = new CredentialImpl.Builder().username(UserService.DEFAULT_ADMIN_LOGIN).password(UserService.DEFAULT_ADMIN_PASSWORD).build();
 	final static ObjectMapper mapper = new ObjectMapper();
 	protected String adminToken;
 	protected Cookie adminCookie;

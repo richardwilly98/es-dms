@@ -5,22 +5,45 @@ import com.google.common.base.Objects;
 
 public class CredentialImpl implements Credential {
 
-	String username;
-	String password;
-	boolean rememberMe;
+	private String username;
+	private String password;
+	private boolean rememberMe;
 
-	public CredentialImpl() {
-		this(null, null);
+	public static class Builder {
+
+		private String username;
+		private String password;
+		private boolean rememberMe;
+
+		public Builder username(String username) {
+			this.username = username;
+			return this;
+		}
+
+		public Builder password(String password) {
+			this.password = password;
+			return this;
+		}
+
+		public Builder rememberMe(boolean rememberMe) {
+			this.rememberMe = rememberMe;
+			return this;
+		}
+
+		public Credential build() {
+			return new CredentialImpl(this);
+		}
 	}
 
-	public CredentialImpl(String username, String password) {
-		this(username, password, false);
+	CredentialImpl() {
+		this(null);
 	}
-
-	public CredentialImpl(String username, String password, boolean rememberMe) {
-		this.username = username;
-		this.password = password;
-		this.rememberMe = rememberMe;
+	private CredentialImpl(Builder builder) {
+		if (builder != null) {
+			this.username = builder.username;
+			this.password = builder.password;
+			this.rememberMe = builder.rememberMe;
+		}
 	}
 
 	/*

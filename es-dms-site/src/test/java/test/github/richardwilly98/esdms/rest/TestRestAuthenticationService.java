@@ -22,7 +22,7 @@ public class TestRestAuthenticationService extends TestRestUserService {
 			String login = "user-" + System.currentTimeMillis();
 			createUser(login, password);
 			boolean rememberMe = true;
-			Credential credential = new CredentialImpl(login, password, rememberMe);
+			Credential credential = new CredentialImpl.Builder().username(login).password(password).rememberMe(rememberMe).build();
 			Cookie cookie = login(credential);
 			Assert.assertNotNull(cookie);
 			logout(cookie);

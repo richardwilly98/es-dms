@@ -20,11 +20,9 @@ import org.testng.annotations.Guice;
 import test.github.richardwilly98.esdms.inject.TestEsClientModule;
 import test.github.richardwilly98.esdms.web.TestRestGuiceServletConfig;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.cfg.Annotations;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import com.fasterxml.jackson.jaxrs.json.JsonMapperConfigurator;
 import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.api.ItemBase;
@@ -46,8 +44,9 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 public class GuiceAndJettyTestBase<T extends ItemBase> {
 
 	protected final Logger log = Logger.getLogger(getClass());
-	protected final static Credential adminCredential = new CredentialImpl(
-			UserService.DEFAULT_ADMIN_LOGIN, UserService.DEFAULT_ADMIN_PASSWORD);
+	protected final static Credential adminCredential = new CredentialImpl.Builder()
+			.username(UserService.DEFAULT_ADMIN_LOGIN)
+			.password(UserService.DEFAULT_ADMIN_PASSWORD).build();
 	private final Server server;
 	final static ObjectMapper mapper = new ObjectMapper();
 	protected static String adminToken;
@@ -61,34 +60,35 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
 	org.elasticsearch.client.Client client;
 
 	GuiceAndJettyTestBase() throws Exception {
-//		mapper.configure(
-//                DeserializationConfig.Feature.USE_ANNOTATIONS, false)
-//                .configure(SerializationConfig.Feature.USE_ANNOTATIONS, false);
+		// mapper.configure(
+		// DeserializationConfig.Feature.USE_ANNOTATIONS, false)
+		// .configure(SerializationConfig.Feature.USE_ANNOTATIONS, false);
 		server = new Server(HTTP_PORT);
 		// Connector secureConnector = createSecureConnector();
 		// server.setConnectors(new Connector[] {secureConnector});
 		ClientConfig config = new DefaultClientConfig();
-//		config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+		// config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING,
+		// Boolean.TRUE);
 		config.getClasses().add(JacksonJaxbJsonProvider.class);
-//		config.getFeatures().add(JacksonJsonProvider.class);
+		// config.getFeatures().add(JacksonJsonProvider.class);
 		restClient = Client.create(config);
-//		restClient = Client.create(new DefaultClientConfig(
-//				JacksonJaxbJsonProvider.class));
+		// restClient = Client.create(new DefaultClientConfig(
+		// JacksonJaxbJsonProvider.class));
 		// securedClient = createSecuredClient();
 	}
-	
-	final static Annotations[] BASIC_ANNOTATIONS = {
-        Annotations.JACKSON
-    };
-//	private void dump() {
-//		JsonMapperConfigurator configurator = new JsonMapperConfigurator(mapper, BASIC_ANNOTATIONS);
-//		configurator.configure(f, state)
-//	}
 
-    protected T get(String id, Class<T> type, String path) throws Throwable {
+	final static Annotations[] BASIC_ANNOTATIONS = { Annotations.JACKSON };
+
+	// private void dump() {
+	// JsonMapperConfigurator configurator = new JsonMapperConfigurator(mapper,
+	// BASIC_ANNOTATIONS);
+	// configurator.configure(f, state)
+	// }
+
+	protected T get(String id, Class<T> type, String path) throws Throwable {
 		ClientResponse response = resource().path(path).path(id)
-				.cookie(adminCookie).type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-				.get(ClientResponse.class);
+				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		log.debug(String.format("status: %s", response.getStatus()));
 		if (response.getStatus() == Status.OK.getStatusCode()) {
 			return response.getEntity(type);
@@ -101,17 +101,19 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
 		ClientResponse response = client().resource(uri).cookie(adminCookie)
 				.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 		log.debug(String.format("status: %s", response.getStatus()));
-//		log.debug(String.format("get - body: %s", response.getEntity(String.class)));
+		// log.debug(String.format("get - body: %s",
+		// response.getEntity(String.class)));
 		if (response.getStatus() == Status.OK.getStatusCode()) {
-//			return deserialize(response.getEntity(String.class), type);
+			// return deserialize(response.getEntity(String.class), type);
 			return response.getEntity(type);
 		}
 		return null;
 	}
-	
+
 	private T deserialize(String json, Class<T> type) {
 		try {
-			log.debug(String.format("deserialize in %s -> %s", type.getName(), json));
+			log.debug(String.format("deserialize in %s -> %s", type.getName(),
+					json));
 			return mapper.readValue(json, type);
 		} catch (Throwable t) {
 			log.error("deserialize failed", t);
@@ -181,11 +183,12 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
 		server.setHandler(webAppContext);
 		server.start();
 
-//		ClientConfig config = new DefaultClientConfig();
-//		config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-//		config.getClasses().add(JacksonJaxbJsonProvider.class);
-////		config.getFeatures().add(JacksonJsonProvider.class);
-//		restClient = Client.create(config);
+		// ClientConfig config = new DefaultClientConfig();
+		// config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING,
+		// Boolean.TRUE);
+		// config.getClasses().add(JacksonJaxbJsonProvider.class);
+		// // config.getFeatures().add(JacksonJsonProvider.class);
+		// restClient = Client.create(config);
 
 		loginAdminUser();
 	}

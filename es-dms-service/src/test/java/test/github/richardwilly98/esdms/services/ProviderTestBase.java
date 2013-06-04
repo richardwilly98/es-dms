@@ -3,7 +3,6 @@ package test.github.richardwilly98.esdms.services;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,78 +40,41 @@ import com.google.inject.Inject;
 public class ProviderTestBase {
 
 	final protected Logger log = Logger.getLogger(this.getClass());
-	final static Credential adminCredential = new CredentialImpl(
-			UserService.DEFAULT_ADMIN_LOGIN, UserService.DEFAULT_ADMIN_PASSWORD);
+	final static Credential adminCredential = new CredentialImpl.Builder().username(UserService.DEFAULT_ADMIN_LOGIN).password(UserService.DEFAULT_ADMIN_PASSWORD).build();
 	final static Map<String, User> users = newHashMap();
 	final static Set<Permission> permissions = newHashSet();
 	final static Set<Role> roles = newHashSet();
 	static String adminToken;
 
 	static {
-		// Permission permissionCreateDocument = new
-		// PermissionImpl("document:create");
 		Permission permissionCreateDocument = new PermissionImpl.Builder()
-				.name("document:create").build();
-		permissionCreateDocument.setDescription("Create document");
+				.name("document:create").description("Create document").build();
 		permissions.add(permissionCreateDocument);
 
-		// Permission permissionDeleteDocument = new
-		// PermissionImpl("document:delete");
 		Permission permissionDeleteDocument = new PermissionImpl.Builder()
-				.name("document:delete").build();
-		permissionDeleteDocument.setDescription("Delete document");
+				.name("document:delete").description("Delete document").build();
 		permissions.add(permissionDeleteDocument);
 
-		// Permission permissionReadDocument = new
-		// PermissionImpl("document:read");
 		Permission permissionReadDocument = new PermissionImpl.Builder().name(
-				"document:read").build();
-		permissionReadDocument.setDescription("Read document");
+				"document:read").description("Read document").build();
 		permissions.add(permissionReadDocument);
 
-		// Role collaboratorRole = new RoleImpl();
-		// collaboratorRole.setId("collaborator");
-		// collaboratorRole.setName(collaboratorRole.getId());
-		// collaboratorRole.setDescription("Collaborator");
-		// collaboratorRole.setDisabled(false);
-		// collaboratorRole.setPermissions(permissions);
 		Role collaboratorRole = new RoleImpl.Builder().permissions(permissions)
 				.id("collaborator").name("Collaborator")
 				.description("Collaborator").disabled(false).build();
 		roles.add(collaboratorRole);
 
-		// Role readerRole = new RoleImpl();
-		// readerRole.setId("reader");
-		// readerRole.setName(readerRole.getId());
-		// readerRole.setDescription("Reader");
-		// readerRole.setDisabled(false);
-		Set<Permission> ps = new HashSet<Permission>();
-		ps.add(permissionReadDocument);
+		Set<Permission> ps = newHashSet(permissionReadDocument);
 		Role readerRole = new RoleImpl.Builder().permissions(ps).id("reader")
 				.name("Reader").description("Reader").disabled(false).build();
-		// readerRole.setPermissions(ps);
 		roles.add(readerRole);
 
-		// User user = new UserImpl();
-		// user.setId("richard.louapre@gmail.com");
-		// user.setEmail(user.getId());
-		// user.setName("Richard");
-		// user.setDisabled(false);
-		// user.setCity("Jersey City");
-		// user.setPassword("secret");
 		User user = new UserImpl.Builder().id("richard.louapre@gmail.com")
 				.name("Richard").disabled(false).city("Jersey City")
 				.password("secret").email("richard.louapre@gmail.com").build();
 		user.addRole(readerRole);
 		users.put(user.getLogin(), user);
 
-		// user = new UserImpl();
-		// user.setId("danilo.sandron@gmail.com");
-		// user.setEmail(user.getId());
-		// user.setName("Danilo");
-		// user.setDisabled(false);
-		// user.setCity("Bankok");
-		// user.setPassword("segreto");
 		user = new UserImpl.Builder().id("danilo.sandron@gmail.com")
 				.name("Danilo").disabled(false).city("Bankok")
 				.password("segreto").email("danilo.sandron@gmail.com").build();
@@ -230,12 +192,6 @@ public class ProviderTestBase {
 			boolean disabled) throws ServiceException {
 		Assert.assertTrue(!(name == null || name.isEmpty()));
 
-		// PermissionImpl permission = new PermissionImpl();
-		// String id = String.valueOf(name);
-		// permission.setId(id);
-		// permission.setName(name);
-		// permission.setDescription(description);
-		// permission.setDisabled(disabled);
 		Permission permission = new PermissionImpl.Builder().id(name)
 				.name(name).description(description).disabled(disabled).build();
 		return createPermission(permission);
@@ -256,14 +212,6 @@ public class ProviderTestBase {
 	protected User createUser(String name, String description,
 			boolean disabled, String email, String password, Set<Role> roles)
 			throws ServiceException {
-		// User user = new UserImpl();
-		// String id = String.valueOf(email);
-		// user.setId(id);
-		// user.setName(name);
-		// user.setDescription(description);
-		// user.setDisabled(disabled);
-		// user.setEmail(email);
-		// user.setPassword(password);
 		User user = new UserImpl.Builder().id(email).name(name)
 				.description(description).disabled(disabled).email(email)
 				.password(password).roles(roles).build();
@@ -287,13 +235,6 @@ public class ProviderTestBase {
 			throws ServiceException {
 		log.trace("Preparing to create permission: " + name);
 		Assert.assertTrue(!(name == null || name.isEmpty()));
-		// Role role = new RoleImpl();
-		// String id = String.valueOf(name);
-		// role.setId(id);
-		// role.setName(name);
-		// role.setDescription(description);
-		// role.setDisabled(disabled);
-		// role.setPermissions(permissions);
 		Role role = new RoleImpl.Builder().id(name).name(name)
 				.description(description).disabled(disabled)
 				.permissions(permissions).build();
