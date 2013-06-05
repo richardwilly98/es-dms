@@ -79,18 +79,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
 			this.description = builder.description;
 			this.attributes = builder.attributes;
 		}
-		// this(null);
 	}
-
-	// ItemBaseImpl(String id) {
-	// this(id, null);
-	// }
-	//
-	// ItemBaseImpl(String id, Map<String, Object> attributes) {
-	// // this.disabled = false;
-	// this.id = id;
-	// this.attributes = attributes;
-	// }
 
 	@JsonProperty("attributes")
 	private void deserialize(Map<String, Object> attributes) {

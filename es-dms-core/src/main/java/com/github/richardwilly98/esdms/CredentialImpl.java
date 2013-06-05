@@ -38,7 +38,8 @@ public class CredentialImpl implements Credential {
 	CredentialImpl() {
 		this(null);
 	}
-	private CredentialImpl(Builder builder) {
+
+	protected CredentialImpl(Builder builder) {
 		if (builder != null) {
 			this.username = builder.username;
 			this.password = builder.password;

@@ -14,10 +14,6 @@ public class DocumentTest extends DocumentImpl {
 		super(builder);
 	}
 	
-//	public DocumentTest(Document document) {
-//		super(document);
-//	}
-	
 	@Override
 	protected void setReadOnlyAttribute(String name, Object value) {
 		super.setReadOnlyAttribute(name, value);

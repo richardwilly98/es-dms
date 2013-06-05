@@ -14,19 +14,18 @@ public class SessionImpl extends ItemBaseImpl implements ItemBase, Session {
 	private String userId; // user
 	private boolean active; // session active?
 	private boolean secure; // session secure?
-
 	private Date createTime; // session create time
 	private Date lastAccessTime; // session last use time
 	private long timeout; // session create time
 
 	public static class Builder extends BuilderBase<Builder> {
 
-		String userId;
-		boolean active;
-		boolean secure;
-		Date createTime;
-		Date lastAccessTime;
-		long timeout;
+		private String userId;
+		private boolean active;
+		private boolean secure;
+		private Date createTime;
+		private Date lastAccessTime;
+		private long timeout;
 
 		public Builder userId(String userId) {
 			this.userId = userId;

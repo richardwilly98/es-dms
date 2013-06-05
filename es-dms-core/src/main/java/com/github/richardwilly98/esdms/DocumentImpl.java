@@ -50,7 +50,7 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 			return this;
 		}
 
-		public Document build() {
+		public DocumentImpl build() {
 			return new DocumentImpl(this);
 		}
 	}
@@ -59,7 +59,7 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 		this(null);
 	}
 
-	public DocumentImpl(Builder builder) {
+	protected DocumentImpl(Builder builder) {
 		super(builder);
 		if (builder != null) {
 			if (Strings.isNullOrEmpty(builder.versionId)) {
@@ -72,28 +72,6 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 		}
 		readOnlyAttributeKeys = readOnlyAttributes;
 	}
-
-	// public DocumentImpl(String id, File file) {
-	// this(id, null, file, null);
-	// }
-
-	// public DocumentImpl(String id, String name, File file,
-	// Map<String, Object> attributes) {
-	// this();
-	// if (file == null) {
-	// file = new FileImpl();
-	// }
-	// setId(id);
-	// setName(name);
-	// this.file = file;
-	// setAttributes(attributes);
-	// }
-
-	// public DocumentImpl(Document document) {
-	// this(document.getId(), document.getName(), document.getFile(), null);
-	// // Override behavior for read-only attribute.
-	// this.attributes = document.getAttributes();
-	// }
 
 	/*
 	 * Method used to deserialize attributes Map

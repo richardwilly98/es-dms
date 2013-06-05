@@ -40,13 +40,6 @@ public class PersonImpl extends ItemBaseImpl implements Person {
 		}
 	}
 
-	// public PersonImpl(String id, String name, String city, String email) {
-	// setId(id);
-	// setName(name);
-	// this.city = city;
-	// this.email = email;
-	// }
-
 	/*
 	 * (non-Javadoc)
 	 * 

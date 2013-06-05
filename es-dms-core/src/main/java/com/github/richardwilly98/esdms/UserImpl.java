@@ -14,18 +14,18 @@ import com.google.common.base.Objects;
 public class UserImpl extends PersonImpl implements User {
 
 	private static final long serialVersionUID = 1L;
-	Set<Role> roles;
-	String hash;
-	String password;
 
+	private Set<Role> roles;
+	private String hash;
+	private String password;
 	@JsonIgnore
 	private String login;
 
 	public static class Builder extends PersonImpl.Builder<Builder> {
 		
-		Set<Role> roles;
-		String hash;
-		String password;
+		private Set<Role> roles;
+		private String hash;
+		private String password;
 		
         public Builder password(String password) {
         	this.password = password;
