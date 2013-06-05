@@ -39,10 +39,8 @@ import com.google.inject.Inject;
 public abstract class RestServiceBase<T extends ItemBase> {
 
 	public static final String FIND_PATH = "find";
-
-	private static final String FIND_FIRST_PARAMETER = "fi";
-
-	private static final String FIND_PAGE_SIZE_PARAMETER = "ps";
+	public static final String FIND_FIRST_PARAMETER = "fi";
+	public static final String FIND_PAGE_SIZE_PARAMETER = "ps";
 	
 	protected final Logger log = Logger.getLogger(getClass());
 	protected final AuthenticationService authenticationService;

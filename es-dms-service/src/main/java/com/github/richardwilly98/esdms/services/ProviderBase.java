@@ -109,68 +109,6 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		}
 	}
 
-//	@Override
-//	public List<T> getList(String name) throws ServiceException {
-//		return newArrayList(getItems(name));
-//	}
-
-//	@Override
-//	public Set<T> getItems(String name) throws ServiceException {
-//		try {
-//			if (log.isTraceEnabled()) {
-//				log.trace(String.format("getItems - %s", name));
-//			}
-//			Set<T> items = newHashSet();
-//			SearchResponse searchResponse = client.prepareSearch(index)
-//					.setTypes(type).setQuery(QueryBuilders.queryString(name))
-//					.execute().actionGet();
-//			log.debug("totalHits: " + searchResponse.getHits().totalHits());
-//			for (SearchHit hit : searchResponse.getHits().hits()) {
-//				String json = hit.getSourceAsString();
-//				try {
-//					T item = mapper.readValue(json, clazz);
-//					items.add(item);
-//				} catch (Throwable t) {
-//					log.error("Json processing exception.", t);
-//				}
-//			}
-//
-//			return items;
-//		} catch (Throwable t) {
-//			log.error("getItems failed", t);
-//			throw new ServiceException(t.getLocalizedMessage());
-//		}
-//	}
-
-//	@Override
-//	public Set<T> getItems() throws ServiceException {
-//		try {
-//			if (log.isTraceEnabled()) {
-//				log.trace(String.format("get all items in List"));
-//			}
-//			Set<T> items = newHashSet();
-//
-//			SearchResponse searchResponse = client.prepareSearch(index)
-//					.setTypes(type).setQuery(QueryBuilders.queryString("*"))
-//					.execute().actionGet();
-//			log.debug("totalHits: " + searchResponse.getHits().totalHits());
-//			for (SearchHit hit : searchResponse.getHits().hits()) {
-//				String json = hit.getSourceAsString();
-//				try {
-//					T item = mapper.readValue(json, clazz);
-//					items.add(item);
-//				} catch (Throwable t) {
-//					log.error("Json processing exception.", t);
-//				}
-//			}
-//
-//			return items;
-//		} catch (Throwable t) {
-//			log.error("getItems failed", t);
-//			throw new ServiceException(t.getLocalizedMessage());
-//		}
-//	}
-
 	@Override
 	public Set<T> search(String criteria, int first, int pageSize) throws ServiceException {
 		try {

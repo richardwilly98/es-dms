@@ -2,7 +2,6 @@ package com.github.richardwilly98.esdms.services;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -31,8 +30,6 @@ import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.api.Session;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
-import com.github.richardwilly98.esdms.services.AuthenticationService;
-import com.github.richardwilly98.esdms.services.UserService;
 import com.google.inject.Inject;
 
 public class AuthenticationProvider implements AuthenticationService {
@@ -311,18 +308,6 @@ public class AuthenticationProvider implements AuthenticationService {
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}
-
-//	@Override
-//	public List<SessionImpl> getList(String name) throws ServiceException {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//	@Override
-//	public Set<SessionImpl> getItems() throws ServiceException {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
 
 	@Override
 	public Set<SessionImpl> search(String criteria, int first, int pageSize) throws ServiceException {

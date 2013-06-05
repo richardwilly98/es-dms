@@ -75,32 +75,6 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		super.delete(item);
 	}
 
-//	@Override
-//	public Set<Document> getItems(String name) throws ServiceException {
-//		try {
-//			Set<Document> documents = newHashSet();
-//
-//			SearchResponse searchResponse = client.prepareSearch(index)
-//					.setTypes(type).setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setQuery(QueryBuilders.queryString(name))
-//					.setFrom(0).setSize(100)
-//					.execute().actionGet();
-//			log.debug(String.format("TotalHits: %s - TookInMillis: %s", searchResponse.getHits().totalHits(), searchResponse.getTookInMillis()));
-//			Stopwatch watch = new Stopwatch();
-//			watch.start();
-//			for (SearchHit hit : searchResponse.getHits().hits()) {
-//				String json = hit.getSourceAsString();
-//				Document document = mapper.readValue(json, Document.class);
-//				documents.add(document);
-//			}
-//			watch.stop();
-//			log.debug("Elapsed time to build document list " + watch.elapsed(TimeUnit.MILLISECONDS));
-//			return documents;
-//		} catch (Throwable t) {
-//			log.error("getItems failed", t);
-//			throw new ServiceException(t.getLocalizedMessage());
-//		}
-//	}
-
 	/*
 	 * (non-Javadoc)
 	 * 

@@ -11,9 +11,6 @@ public class PermissionProviderTest extends ProviderTestBase {
 	private Permission testCreatePermission(String name, String description,
 			boolean disabled) throws Throwable {
 		Permission permission = new PermissionImpl.Builder().id(name).description(description).disabled(disabled).build();
-//		PermissionImpl permission = new PermissionImpl(name);
-//		permission.setDescription(description);
-//		permission.setDisabled(disabled);
 		
 		Permission aPermission = permissionService.create(permission);
 		Assert.assertEquals(permission.getId(), aPermission.getId());

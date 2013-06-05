@@ -12,7 +12,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
@@ -67,30 +66,6 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		super(authenticationService, documentService);
 		this.documentService = documentService;
 	}
-
-//	@GET
-//	@Produces({ MediaType.APPLICATION_JSON })
-//	@Path("/search/{criteria}")
-//	public Response search(@PathParam("criteria") String criteria) {
-//		// public List<Document> search(@PathParam("criteria") String criteria)
-//		// {
-//		try {
-//			isAuthenticated();
-//			// log.debug("Principal: " +
-//			// SecurityUtils.getSubject().getPrincipal());
-//			// if (! SecurityUtils.getSubject().hasRole("writer")) {
-//			// return Response.status(Status.UNAUTHORIZED).build();
-//			// }
-//			if (log.isTraceEnabled()) {
-//				log.trace(String.format("search - %s", criteria));
-//			}
-//			List<Document> documents = documentService.search(criteria);
-//			return Response.status(Status.OK).entity(documents).build();
-//		} catch (ServiceException e) {
-//			log.error("search failed", e);
-//			throw new RestServiceException(e.getLocalizedMessage());
-//		}
-//	}
 
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -156,10 +131,8 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			} else {
 				content = toByteArray(uploadedInputStream);
 			}
-//			File file = new FileImpl(content, filename, contentType);
 			File file = new FileImpl.Builder().content(content).name(filename).contentType(contentType).build();
 			Map<String, Object> attributes = newHashMap();
-//			Document document = new DocumentImpl(null, name, file, attributes);
 			Document document = new DocumentImpl.Builder().file(file).name(name).attributes(attributes).roles(null).build();
 			return create(document);
 		} catch (Throwable t) {
