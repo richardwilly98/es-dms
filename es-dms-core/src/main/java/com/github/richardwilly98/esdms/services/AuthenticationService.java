@@ -25,14 +25,8 @@ public interface AuthenticationService extends BaseService<SessionImpl> {
 
 	public abstract SessionImpl get(String id) throws ServiceException;
 
-//	public abstract List<ISession> getList(String name) throws ServiceException;
-//
 	public abstract Set<SessionImpl> getItems(String name) throws ServiceException;
 	
-//	public abstract Set<ISession> getItems() throws ServiceException;
-//
-//	public abstract List<ISession> search(String criteria) throws ServiceException;
-
 	public abstract SessionImpl create(SessionImpl item) throws ServiceException;
 
 	public abstract void delete(SessionImpl item) throws ServiceException;

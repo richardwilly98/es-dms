@@ -1,23 +1,22 @@
 package com.github.richardwilly98.esdms.services;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 import static org.elasticsearch.index.query.QueryBuilders.fieldQuery;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.base.Stopwatch;
 import org.elasticsearch.common.text.Text;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.joda.time.DateTime;
@@ -76,27 +75,31 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		super.delete(item);
 	}
 
-	@Override
-	public Set<Document> getItems(String name) throws ServiceException {
-		try {
-			Set<Document> documents = newHashSet();
-
-			SearchResponse searchResponse = client.prepareSearch(index)
-					.setTypes(type).setQuery(QueryBuilders.queryString(name))
-					.setFrom(0).setSize(100)
-					.execute().actionGet();
-			log.debug("totalHits: " + searchResponse.getHits().totalHits());
-			for (SearchHit hit : searchResponse.getHits().hits()) {
-				String json = hit.getSourceAsString();
-				Document document = mapper.readValue(json, Document.class);
-				documents.add(document);
-			}
-			return documents;
-		} catch (Throwable t) {
-			log.error("getItems failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
-	}
+//	@Override
+//	public Set<Document> getItems(String name) throws ServiceException {
+//		try {
+//			Set<Document> documents = newHashSet();
+//
+//			SearchResponse searchResponse = client.prepareSearch(index)
+//					.setTypes(type).setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setQuery(QueryBuilders.queryString(name))
+//					.setFrom(0).setSize(100)
+//					.execute().actionGet();
+//			log.debug(String.format("TotalHits: %s - TookInMillis: %s", searchResponse.getHits().totalHits(), searchResponse.getTookInMillis()));
+//			Stopwatch watch = new Stopwatch();
+//			watch.start();
+//			for (SearchHit hit : searchResponse.getHits().hits()) {
+//				String json = hit.getSourceAsString();
+//				Document document = mapper.readValue(json, Document.class);
+//				documents.add(document);
+//			}
+//			watch.stop();
+//			log.debug("Elapsed time to build document list " + watch.elapsed(TimeUnit.MILLISECONDS));
+//			return documents;
+//		} catch (Throwable t) {
+//			log.error("getItems failed", t);
+//			throw new ServiceException(t.getLocalizedMessage());
+//		}
+//	}
 
 	/*
 	 * (non-Javadoc)
@@ -105,21 +108,27 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	 * com.github.richardwilly98.services.BaseService#search(java.lang.String)
 	 */
 	@Override
-	public List<Document> search(String criteria) throws ServiceException {
+	public Set<Document> search(String criteria, int first, int pageSize) throws ServiceException {
 		try {
-			List<Document> documents = newArrayList();
+			Set<Document> documents = newHashSet();
 
 			SearchResponse searchResponse = client.prepareSearch(index)
-					.setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH)
+					.setTypes(type).setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+					.setFrom(first).setSize(pageSize)
 					.setQuery(fieldQuery("file", criteria))
 					.execute().actionGet();
 			log.debug("totalHits: " + searchResponse.getHits().totalHits());
+			log.debug(String.format("TotalHits: %s - TookInMillis: %s", searchResponse.getHits().totalHits(), searchResponse.getTookInMillis()));
+			Stopwatch watch = new Stopwatch();
+			watch.start();
 			for (SearchHit hit : searchResponse.getHits().hits()) {
 				String json = hit.getSourceAsString();
 				Document document = mapper.readValue(json, Document.class);
 				document.getFile().setContent(null);
 				documents.add(document);
 			}
+			watch.stop();
+			log.debug("Elapsed time to build document list " + watch.elapsed(TimeUnit.MILLISECONDS));
 
 			return documents;
 		} catch (Throwable t) {

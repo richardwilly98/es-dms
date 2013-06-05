@@ -176,7 +176,7 @@ public class RoleProviderTest extends ProviderTestBase {
 		if (role == null) log.error("Failed to retrieve role collaborator!!");
 		Assert.assertNotNull(role);
 		
-		Set<Role>  roles = roleService.getItems();
+		Set<Role>  roles = roleService.search("*", 0, -1);
 		log.info("List of available roles: ");
 		for (Role r :roles) log.info(r.getId());
 		

@@ -312,20 +312,20 @@ public class AuthenticationProvider implements AuthenticationService {
 		}
 	}
 
-	@Override
-	public List<SessionImpl> getList(String name) throws ServiceException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public List<SessionImpl> getList(String name) throws ServiceException {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public Set<SessionImpl> getItems() throws ServiceException {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
-	public Set<SessionImpl> getItems() throws ServiceException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<SessionImpl> search(String criteria) throws ServiceException {
+	public Set<SessionImpl> search(String criteria, int first, int pageSize) throws ServiceException {
 		// TODO Auto-generated method stub
 		return null;
 	}

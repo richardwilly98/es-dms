@@ -3,16 +3,18 @@ package com.github.richardwilly98.esdms.rest;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.net.URI;
-import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -37,6 +39,10 @@ import com.google.inject.Inject;
 public abstract class RestServiceBase<T extends ItemBase> {
 
 	public static final String FIND_PATH = "find";
+
+	private static final String FIND_FIRST_PARAMETER = "fi";
+
+	private static final String FIND_PAGE_SIZE_PARAMETER = "ps";
 	
 	protected final Logger log = Logger.getLogger(getClass());
 	protected final AuthenticationService authenticationService;
@@ -159,13 +165,13 @@ public abstract class RestServiceBase<T extends ItemBase> {
 
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
-	@Path(FIND_PATH + "/{name}")
-	public Response find(@PathParam("name") String name) {
+	@Path(FIND_PATH + "/{criteria}")
+	public Response find(@PathParam("criteria") String criteria, @QueryParam(FIND_FIRST_PARAMETER) @DefaultValue("0") int first, @QueryParam(FIND_PAGE_SIZE_PARAMETER) @DefaultValue("20") int pageSize) {
 		if (log.isTraceEnabled()) {
-			log.trace(String.format("find - %s", name));
+			log.trace(String.format("find - %s", criteria));
 		}
 		try {
-			List<T> items = service.getList(name);
+			Set<T> items = service.search(criteria, first, pageSize);
 			return Response.ok(items).build();
 		} catch (ServiceException e) {
 			throw new RestServiceException(e.getLocalizedMessage());

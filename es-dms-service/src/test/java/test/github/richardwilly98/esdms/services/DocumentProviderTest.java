@@ -4,8 +4,8 @@ import static org.elasticsearch.common.io.Streams.copyToBytesFromClasspath;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.shiro.authz.UnauthorizedException;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -35,7 +35,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		String id = String.valueOf(System.currentTimeMillis());
 		byte[] content = copyToBytesFromClasspath(path);
 		int startCount = 0;
-		List<Document> documents = documentService.getList(contentSearch);
+		Set<Document> documents = documentService.search(contentSearch, 0, 10);
 		startCount = documents.size();
 		log.info(String.format("startCount: %s", startCount));
 		// FileImpl file = new FileImpl(content, name, contentType);

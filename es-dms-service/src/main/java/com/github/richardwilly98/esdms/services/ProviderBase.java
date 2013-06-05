@@ -1,10 +1,8 @@
 package com.github.richardwilly98.esdms.services;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,7 +20,6 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 
@@ -112,75 +109,76 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		}
 	}
 
-	@Override
-	public List<T> getList(String name) throws ServiceException {
-		return newArrayList(getItems(name));
-	}
+//	@Override
+//	public List<T> getList(String name) throws ServiceException {
+//		return newArrayList(getItems(name));
+//	}
+
+//	@Override
+//	public Set<T> getItems(String name) throws ServiceException {
+//		try {
+//			if (log.isTraceEnabled()) {
+//				log.trace(String.format("getItems - %s", name));
+//			}
+//			Set<T> items = newHashSet();
+//			SearchResponse searchResponse = client.prepareSearch(index)
+//					.setTypes(type).setQuery(QueryBuilders.queryString(name))
+//					.execute().actionGet();
+//			log.debug("totalHits: " + searchResponse.getHits().totalHits());
+//			for (SearchHit hit : searchResponse.getHits().hits()) {
+//				String json = hit.getSourceAsString();
+//				try {
+//					T item = mapper.readValue(json, clazz);
+//					items.add(item);
+//				} catch (Throwable t) {
+//					log.error("Json processing exception.", t);
+//				}
+//			}
+//
+//			return items;
+//		} catch (Throwable t) {
+//			log.error("getItems failed", t);
+//			throw new ServiceException(t.getLocalizedMessage());
+//		}
+//	}
+
+//	@Override
+//	public Set<T> getItems() throws ServiceException {
+//		try {
+//			if (log.isTraceEnabled()) {
+//				log.trace(String.format("get all items in List"));
+//			}
+//			Set<T> items = newHashSet();
+//
+//			SearchResponse searchResponse = client.prepareSearch(index)
+//					.setTypes(type).setQuery(QueryBuilders.queryString("*"))
+//					.execute().actionGet();
+//			log.debug("totalHits: " + searchResponse.getHits().totalHits());
+//			for (SearchHit hit : searchResponse.getHits().hits()) {
+//				String json = hit.getSourceAsString();
+//				try {
+//					T item = mapper.readValue(json, clazz);
+//					items.add(item);
+//				} catch (Throwable t) {
+//					log.error("Json processing exception.", t);
+//				}
+//			}
+//
+//			return items;
+//		} catch (Throwable t) {
+//			log.error("getItems failed", t);
+//			throw new ServiceException(t.getLocalizedMessage());
+//		}
+//	}
 
 	@Override
-	public Set<T> getItems(String name) throws ServiceException {
+	public Set<T> search(String criteria, int first, int pageSize) throws ServiceException {
 		try {
-			if (log.isTraceEnabled()) {
-				log.trace(String.format("getItems - %s", name));
-			}
 			Set<T> items = newHashSet();
-			SearchResponse searchResponse = client.prepareSearch(index)
-					.setTypes(type).setQuery(QueryBuilders.queryString(name))
-					.execute().actionGet();
-			log.debug("totalHits: " + searchResponse.getHits().totalHits());
-			for (SearchHit hit : searchResponse.getHits().hits()) {
-				String json = hit.getSourceAsString();
-				try {
-					T item = mapper.readValue(json, clazz);
-					items.add(item);
-				} catch (Throwable t) {
-					log.error("Json processing exception.", t);
-				}
-			}
-
-			return items;
-		} catch (Throwable t) {
-			log.error("getItems failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
-	}
-
-	@Override
-	public Set<T> getItems() throws ServiceException {
-		try {
-			if (log.isTraceEnabled()) {
-				log.trace(String.format("get all items in List"));
-			}
-			Set<T> items = newHashSet();
 
 			SearchResponse searchResponse = client.prepareSearch(index)
-					.setTypes(type).setQuery(QueryBuilders.queryString("*"))
-					.execute().actionGet();
-			log.debug("totalHits: " + searchResponse.getHits().totalHits());
-			for (SearchHit hit : searchResponse.getHits().hits()) {
-				String json = hit.getSourceAsString();
-				try {
-					T item = mapper.readValue(json, clazz);
-					items.add(item);
-				} catch (Throwable t) {
-					log.error("Json processing exception.", t);
-				}
-			}
-
-			return items;
-		} catch (Throwable t) {
-			log.error("getItems failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
-	}
-
-	@Override
-	public List<T> search(String criteria) throws ServiceException {
-		try {
-			List<T> items = newArrayList();
-
-			SearchResponse searchResponse = client.prepareSearch(index)
-					.setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH)
+					.setTypes(type).setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+					.setFrom(first).setSize(pageSize)
 					.setQuery(new QueryStringQueryBuilder(criteria)).execute()
 					.actionGet();
 			log.debug("totalHits: " + searchResponse.getHits().totalHits());

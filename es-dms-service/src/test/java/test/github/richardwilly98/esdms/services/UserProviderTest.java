@@ -44,12 +44,12 @@ public class UserProviderTest extends ProviderTestBase {
 		String username = "richard" + System.currentTimeMillis();
 		String id = testCreateUser(username, "", false, "", username, null);
 		Assert.assertNotNull(id);
-		List<User> users = userService.getList(username);
+		Set<User> users = userService.search(username, 0 , -1);
 		// List should not be null
 		Assert.assertNotNull(users);
 		// List should have one item
 		Assert.assertEquals(users.size(), 1);
-		log.info("User found: " + users.get(0).getName());
+		log.info("User found: " + users.iterator().next().getName());
 
 		// user = service.get("Danilo");
 		//
@@ -74,7 +74,7 @@ public class UserProviderTest extends ProviderTestBase {
 				"richard@pippo.pippo", "123456", null);
 		String id2 = testCreateUser("Danilo2", "Mezza calzetta", true,
 				"danilo@pippo.pippo", "123456", null);
-		List<User> users = userService.getList("*");
+		Set<User> users = userService.search("*", 0, -1);
 		Assert.assertNotNull(users);
 		int found = 0;
 		log.debug(String.format("id1 %s", id1));
