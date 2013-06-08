@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.google.common.base.Objects;
@@ -16,7 +18,97 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 
 	
 	private long milliseconds;	
-	private Set<T> resultItems;	
+	private Set<T> resultItems;
+	private int index;
+	private int pageSize;
+	private String statement;
+	Set<String> view;
+	
+	public SearchResultImpl(){
+		this(0,25,null,null);
+	}
+	
+	public SearchResultImpl(int index, int pageSize, String statement, Set<String> view){
+		this.index = index;
+		this.pageSize = pageSize;
+		this.statement = statement;
+		this.view = view;
+		resultItems = new LinkedHashSet<T>();
+	}
+	
+	public void setPageIndex(int page){
+		this.index = page;
+	}
+	
+	public int	getPageIndex(){
+		return this.index;
+	}
+	
+	public int	getPageSize(){
+		return this.pageSize;
+	}
+	
+	public void setPageSize(int size){
+		this.pageSize = size;
+	}
+	public String getStatement(){
+		return this.statement;
+	}
+	public void setStatement(String statement){
+		
+	}
+	
+	public Set<String> getColumns(){
+		Set<String> columns = new HashSet<String>();
+		//extract columns from query statement;
+		return columns;
+	}
+	
+	public void setView(Set<String> view){
+		this.view = view;
+	}
+	public Set<String> getView(){
+		return this.view;
+	}
+	
+	public int getTotalHits(){
+		return this.resultItems.size();
+	}
+	public boolean	hasData(){
+		return this.resultItems.size() < this.index;
+	}
+	public Set<T> getItems(){
+		return this.resultItems;
+	}
+
+	public Set<T>	getNextPage(){
+		Set<T> page = new LinkedHashSet<T>();
+		Iterator<T> iterat = this.resultItems.iterator();
+		
+		for(int pos = 0; pos < index; pos++) iterat.next();
+		
+		for (int i=0; i<pageSize; i++){
+			if(!iterat.hasNext()) break;
+			index++;
+			page.add(iterat.next());
+		}
+		return page;
+	}
+	
+	public Set<T>	getPage(int page){
+		int index = page * this.pageSize;
+		Set<T> data = new LinkedHashSet<T>();
+		Iterator<T> iterat = this.resultItems.iterator();
+		
+		for(int pos = 0; pos < index; pos++) iterat.next();
+		
+		for (int i=0; i<pageSize; i++){
+			if(!iterat.hasNext()) break;
+			index++;
+			data.add(iterat.next());
+		}
+		return data;
+	}
 	
 	public void sort(Comparator<T> c){
 		List<T> list = new ArrayList<T>(this.resultItems);
@@ -32,6 +124,10 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 	
 	public long getElapsedTime(){
 		return this.milliseconds;
+	}
+	
+	public void first(){
+		index = 0;
 	}
 	
 	public int size(){
