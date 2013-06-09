@@ -1,21 +1,22 @@
 package com.github.richardwilly98.esdms;
 
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.google.common.base.Objects;
 
 public class SearchResultImpl<T> implements SearchResult<T> {
 
+	private static Logger log = Logger.getLogger(SearchResultImpl.class);
 	
 	private long milliseconds;	
 	private Set<T> resultItems;
@@ -37,11 +38,11 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 	}
 	
 	public void setPageIndex(int page){
-		this.index = page;
+		this.index = page * pageSize;
 	}
 	
 	public int	getPageIndex(){
-		return this.index;
+		return this.index / pageSize;
 	}
 	
 	public int	getPageSize(){
@@ -55,48 +56,61 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 		return this.statement;
 	}
 	public void setStatement(String statement){
-		
+		this.statement = statement;
 	}
 	
 	public Set<String> getColumns(){
-		Set<String> columns = new HashSet<String>();
-		//extract columns from query statement;
-		return columns;
+		throw new UnsupportedOperationException();
+//		Set<String> columns = new HashSet<String>();
+//		//extract columns from query statement;
+//		return columns;
 	}
 	
 	public void setView(Set<String> view){
-		this.view = view;
+		throw new UnsupportedOperationException();
+		//this.view = view;
 	}
 	public Set<String> getView(){
-		return this.view;
+		throw new UnsupportedOperationException();
+		//return this.view;
 	}
 	
 	public int getTotalHits(){
 		return this.resultItems.size();
 	}
 	public boolean	hasData(){
-		return this.resultItems.size() < this.index;
+		log.debug("entering hasData(): resultItems.size: " + resultItems.size() + " index position: " + this.index);
+		return this.resultItems.size() > this.index;
 	}
 	public Set<T> getItems(){
 		return this.resultItems;
 	}
 
 	public Set<T>	getNextPage(){
+		log.debug("entering getNextPage()");
+		if(index > this.resultItems.size()) return null;
+		
 		Set<T> page = new LinkedHashSet<T>();
 		Iterator<T> iterat = this.resultItems.iterator();
 		
 		for(int pos = 0; pos < index; pos++) iterat.next();
 		
-		for (int i=0; i<pageSize; i++){
+		for (int i=0; i< pageSize; i++){
 			if(!iterat.hasNext()) break;
 			index++;
 			page.add(iterat.next());
 		}
+		
+		log.debug("returning page with: " + page.size() + " result items");
+		log.debug("exiting getNextPage()");
 		return page;
 	}
 	
 	public Set<T>	getPage(int page){
+		log.debug("entering getPage()");
 		int index = page * this.pageSize;
+		if(index > this.resultItems.size()) return null;
+		
 		Set<T> data = new LinkedHashSet<T>();
 		Iterator<T> iterat = this.resultItems.iterator();
 		
@@ -107,6 +121,9 @@ public class SearchResultImpl<T> implements SearchResult<T> {
 			index++;
 			data.add(iterat.next());
 		}
+		
+		log.debug("returning page with: " + data.size() + " result items");
+		log.debug("exiting getPage()");
 		return data;
 	}
 	
