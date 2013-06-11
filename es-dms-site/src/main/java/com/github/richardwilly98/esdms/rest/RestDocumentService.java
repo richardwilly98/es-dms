@@ -56,6 +56,8 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	public static final String CHECKOUT_PATH = "checkout";
 	public static final String CHECKIN_PATH = "checkin";
 	public static final String DOWNLOAD_PATH = "download";
+	public static final String VIEW_PATH = "view";
+	public static final String EDIT_PATH = "edit";
 	public static final String PREVIEW_PATH = "preview";
 	private final DocumentService documentService;
 
@@ -93,6 +95,36 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		} catch (ServiceException e) {
 			log.error("preview failed", e);
 			throw new RestServiceException(e.getLocalizedMessage());
+		}
+	}
+	
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Path("{id}/" + VIEW_PATH)
+	public Response view(@PathParam("id") String id) {
+		try {
+			Document document = service.get(id);
+			checkNotNull(document);
+			checkNotNull(document.getFile());
+			ContentDispositionBuilder<?, ?> contentDisposition = ContentDisposition
+					.type("inline");
+
+			contentDisposition.fileName(document.getFile().getName());
+			if (document.getFile().getDate() != null) {
+				contentDisposition.creationDate(document.getFile().getDate()
+						.toDate());
+			}
+			ResponseBuilder rb = new ResponseBuilderImpl();
+			rb.type(document.getFile().getContentType());
+			InputStream stream = new ByteArrayInputStream(document.getFile()
+					.getContent());
+			rb.entity(stream);
+			rb.status(Status.OK);
+			rb.header("Content-Disposition", contentDisposition.build());
+			return rb.build();
+		} catch (Throwable t) {
+			log.error("download failed", t);
+			return Response.status(Status.NOT_FOUND).build();
 		}
 	}
 	

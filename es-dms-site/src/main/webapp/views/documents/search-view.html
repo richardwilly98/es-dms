@@ -20,7 +20,7 @@
 		    		<tr data-ng-repeat="document in documents">
 		    			<td>{{ document.id }}</td>
 		    			<td>
-		    				<div popover="{{ document.preview}}" popover-placement="bottom" data-content="{{ document.preview }}" popover-title="Preview" popover-trigger="click" data-ng-click="preview(document.id)">{{ document.name }}</div>
+		    				<div class="ihighlight" popover="{{ document.preview}}" popover-placement="bottom" data-content="{{ document.preview }}" popover-title="Preview" popover-trigger="click" data-ng-click="preview(document.id)">{{ document.name }}</div>
 		    			</td>
 		    			<td>{{ document.attributes.author }}</td>
 		    			<td>{{ document.attributes.status }}</td>
@@ -31,12 +31,14 @@
 	    							<span class="caret"></span>
 	  							</a>
 	  							<ul data-ng-switch-when="A" class="dropdown-menu">
-	  								<li><a href="api/documents/{{ document.id }}/download" target="_blank">View</a></li>
+	  								<li><a href="api/documents/{{ document.id }}/view" target="_blank">View</a></li>
+	  								<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
 	  								<li><a data-ng-click="checkout(document.id)">Check-Out</a></li>
 	  								<li><a data-ng-click="delete(document.id)">Delete</a></li>
 	  							</ul>
 	  							<ul data-ng-switch-when="L" class="dropdown-menu">
-	  								<li><a href="api/documents/{{ document.id }}/download" target="_blank">View</a></li>
+	  								<li><a href="api/documents/{{ document.id }}/view" target="_blank">View</a></li>
+	  								<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
 	  								<li><a data-ng-click="checkin(document.id)">Check-In</a></li>
 	  							</ul>
 			    			</div>
