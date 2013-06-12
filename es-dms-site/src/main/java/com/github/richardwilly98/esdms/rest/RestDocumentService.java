@@ -116,6 +116,14 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			}
 			ResponseBuilder rb = new ResponseBuilderImpl();
 			rb.type(document.getFile().getContentType());
+			log.debug("Document: " + id + " Content type: " + document.getFile().getContentType());
+			/********************************
+			 **** ERROR
+			 **** D. Sandron
+			 **** changed contentype to text/plain
+			 **** needs fixing
+			 ********************************/
+			rb.type("text/plain");
 			InputStream stream = new ByteArrayInputStream(document.getFile()
 					.getContent());
 			rb.entity(stream);

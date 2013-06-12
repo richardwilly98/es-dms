@@ -12,6 +12,10 @@
         Add Alert</button>
 </div>
 <h2>Example of creating Modal with Twitter Bootstrap</h2>
+<div ng-controller='HelloController'>
+    <p>{{greeting.text}}, World</p>
+ </div>
+
 <div class="well">
 	<a href="#" id="example" class="btn btn-success" rel="popover" data-content="It's so simple to create a tooltop for my website!" data-original-title="Twitter Bootstrap Popover">hover for popover</a>
 </div>
@@ -19,4 +23,8 @@
 $(function ()
 { $("#example").popover();
 });
+
+function HelloController($scope) {
+	  $scope.greeting = { text: 'Hello' };
+	}
 </script>
