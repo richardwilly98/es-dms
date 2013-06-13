@@ -339,7 +339,8 @@ simpleApp.controller('navbarController', function ($scope, sharedService, authen
 	    { "view": "/edit-view", title: "Edit" },
         { "view": "/view1", title: "View #1" },
         { "view": "/view2", title: "View #2" },
-        { "view": "/view3", title: "Test View" }
+        { "view": "/view3", title: "Test View"},
+        { "view": "/view4", title: "View #4" }
     ];
 	
 	$scope.adminTabs = [
