@@ -99,7 +99,7 @@ simpleApp.factory('userService', function ($rootScope, $resource) {
 	
 	return {
 		find: function(criteria) {
-			users = resource.query({ verb: 'find', name: criteria });
+			users = resource.query({ verb: 'search', name: criteria });
 			return users;
 		},
 		edit: function(id) {
@@ -139,7 +139,7 @@ simpleApp.factory('roleService', function ($rootScope, $resource) {
 	
 	return {
 		find: function(criteria) {
-			roles = resource.query({ verb: 'find', name: criteria });
+			roles = resource.query({ verb: 'search', name: criteria });
 			return roles;
 		},
 		edit: function(id) {
