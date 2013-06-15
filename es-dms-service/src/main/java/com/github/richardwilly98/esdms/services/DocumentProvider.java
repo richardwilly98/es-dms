@@ -5,7 +5,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
-import static org.elasticsearch.index.query.QueryBuilders.fieldQuery;
 
 import java.io.IOException;
 import java.util.Map;
@@ -19,6 +18,7 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.base.Stopwatch;
 import org.elasticsearch.common.text.Text;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightField;
@@ -98,9 +98,9 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		try {
 			Set<Document> documents = newHashSet();
 
-			// QueryBuilder query = new MultiMatchQueryBuilder(criteria, "file",
-			// "name");
-			QueryBuilder query = fieldQuery("file", criteria);
+			 QueryBuilder query = new MultiMatchQueryBuilder(criteria, "file",
+			 "name");
+//			QueryBuilder query = fieldQuery("file", criteria);
 			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type)
 					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
