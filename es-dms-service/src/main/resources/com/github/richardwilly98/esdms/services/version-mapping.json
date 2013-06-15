@@ -1,0 +1,28 @@
+{
+	"version": {
+		"properties": {
+				"id" : {
+					"type": "string"
+				},
+				"version_id" : {
+					"type": "integer"
+				},
+				"parent_id" : {
+					"type": "integer"
+				},
+				"document_id" : {
+					"type": "string"
+				},
+				"file": {
+					"type": "attachment",
+					"fields": {
+						"file": {
+							"store": "yes",
+							"term_vector": "with_positions_offsets"
+						}
+					}
+				}
+			}
+		}
+	}
+}

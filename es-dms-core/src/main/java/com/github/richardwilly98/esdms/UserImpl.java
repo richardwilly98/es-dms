@@ -158,7 +158,7 @@ public class UserImpl extends PersonImpl implements User {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this.getClass()).add("id", getId())
-				.add("name", getName()).add("login", login).add("email", email)
+				.add("name", getName()).add("login", login).add("email", getEmail())
 				.toString();
 	}
 }

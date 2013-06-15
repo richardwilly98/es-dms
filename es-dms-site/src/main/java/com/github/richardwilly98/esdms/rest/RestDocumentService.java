@@ -2,6 +2,7 @@ package com.github.richardwilly98.esdms.rest;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Sets.newHashSet;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -12,7 +13,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -31,8 +34,10 @@ import org.joda.time.DateTime;
 
 import com.github.richardwilly98.esdms.DocumentImpl;
 import com.github.richardwilly98.esdms.FileImpl;
+import com.github.richardwilly98.esdms.VersionImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.File;
+import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
@@ -59,6 +64,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	public static final String VIEW_PATH = "view";
 	public static final String EDIT_PATH = "edit";
 	public static final String PREVIEW_PATH = "preview";
+	public static final String VERSIONS_PATH = "versions";
 	private final DocumentService documentService;
 
 	@Inject
@@ -105,18 +111,20 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		try {
 			Document document = service.get(id);
 			checkNotNull(document);
-			checkNotNull(document.getFile());
+			Version version = document.getCurrentVersion();
+			checkNotNull(version);
+			checkNotNull(version.getFile());
 			ContentDispositionBuilder<?, ?> contentDisposition = ContentDisposition
 					.type("inline");
 
-			contentDisposition.fileName(document.getFile().getName());
-			if (document.getFile().getDate() != null) {
-				contentDisposition.creationDate(document.getFile().getDate()
+			contentDisposition.fileName(version.getFile().getName());
+			if (version.getFile().getDate() != null) {
+				contentDisposition.creationDate(version.getFile().getDate()
 						.toDate());
 			}
 			ResponseBuilder rb = new ResponseBuilderImpl();
-			rb.type(document.getFile().getContentType());
-			log.debug("Document: " + id + " Content type: " + document.getFile().getContentType());
+			rb.type(version.getFile().getContentType());
+			log.debug("Document: " + id + " Content type: " + version.getFile().getContentType());
 			/********************************
 			 **** ERROR
 			 **** D. Sandron
@@ -124,7 +132,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			 **** needs fixing
 			 ********************************/
 			rb.type("text/plain");
-			InputStream stream = new ByteArrayInputStream(document.getFile()
+			InputStream stream = new ByteArrayInputStream(version.getFile()
 					.getContent());
 			rb.entity(stream);
 			rb.status(Status.OK);
@@ -173,8 +181,23 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			}
 			File file = new FileImpl.Builder().content(content).name(filename).contentType(contentType).build();
 			Map<String, Object> attributes = newHashMap();
-			Document document = new DocumentImpl.Builder().file(file).name(name).attributes(attributes).roles(null).build();
-			return create(document);
+//			Set<Version> versions = newHashSet();
+//			versions.add(new VersionImpl.Builder()
+//				.documentId(null)
+//				.file(file)
+//				.versionId(1).build());
+			Document document = new DocumentImpl.Builder().versions(new HashSet<Version>()).name(name).attributes(attributes).roles(null).build();
+			document = service.create(document);
+			Response response = Response
+					.created(
+							getItemUri(document)).build();
+			Version version = new VersionImpl.Builder()
+			.documentId(document.getId()).current(true)
+			.file(file)
+			.versionId(1).build();
+			documentService.addVersion(document, version);
+//			return create(document);
+			return response;
 		} catch (Throwable t) {
 			log.error("upload failed", t);
 			throw new RestServiceException(t.getLocalizedMessage());
@@ -210,7 +233,12 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			attributes.put(Document.CREATION_DATE, now.toString());
 			attributes.put(Document.AUTHOR, getCurrentUser());
 //			Document document = new DocumentImpl(null, name, file, attributes);
-			Document document = new DocumentImpl.Builder().file(file).name(name).attributes(attributes).roles(null).build();
+			Set<Version> versions = newHashSet();
+			versions.add(new VersionImpl.Builder()
+				.documentId(null)
+				.file(file)
+				.versionId(1).build());
+			Document document = new DocumentImpl.Builder().versions(versions).name(name).attributes(attributes).roles(null).build();
 			return create(document);
 		} catch (Throwable t) {
 			log.error("upload failed", t);
@@ -256,18 +284,20 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		try {
 			Document document = service.get(id);
 			checkNotNull(document);
-			checkNotNull(document.getFile());
+			Version version = document.getCurrentVersion();
+			checkNotNull(version);
+			checkNotNull(version.getFile());
 			ContentDispositionBuilder<?, ?> contentDisposition = ContentDisposition
 					.type("attachment");
 
-			contentDisposition.fileName(document.getFile().getName());
-			if (document.getFile().getDate() != null) {
-				contentDisposition.creationDate(document.getFile().getDate()
+			contentDisposition.fileName(version.getFile().getName());
+			if (version.getFile().getDate() != null) {
+				contentDisposition.creationDate(version.getFile().getDate()
 						.toDate());
 			}
 			ResponseBuilder rb = new ResponseBuilderImpl();
-			rb.type(document.getFile().getContentType());
-			InputStream stream = new ByteArrayInputStream(document.getFile()
+			rb.type(version.getFile().getContentType());
+			InputStream stream = new ByteArrayInputStream(version.getFile()
 					.getContent());
 			rb.entity(stream);
 			rb.status(Status.OK);
@@ -276,6 +306,24 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		} catch (Throwable t) {
 			log.error("download failed", t);
 			return Response.status(Status.NOT_FOUND).build();
+		}
+	}
+
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Path("{id}/" + VERSIONS_PATH)
+	public Response versions(@PathParam("id") String id) {
+		if (log.isTraceEnabled()) {
+			log.trace(String.format("versions - %s", id));
+		}
+		try {
+			Document document = service.get(id);
+			if (document == null) {
+				return Response.status(Status.NOT_FOUND).build();
+			}
+			return Response.ok(document.getVersions()).build();
+		} catch (ServiceException e) {
+			throw new RestServiceException(e.getLocalizedMessage());
 		}
 	}
 

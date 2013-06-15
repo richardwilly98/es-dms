@@ -12,6 +12,8 @@ import com.github.richardwilly98.esdms.services.RoleService;
 import com.github.richardwilly98.esdms.services.SHA512HashProvider;
 import com.github.richardwilly98.esdms.services.UserProvider;
 import com.github.richardwilly98.esdms.services.UserService;
+import com.github.richardwilly98.esdms.services.VersionProvider;
+import com.github.richardwilly98.esdms.services.VersionService;
 import com.google.inject.AbstractModule;
 
 public class ServicesModule extends AbstractModule {
@@ -26,6 +28,7 @@ public class ServicesModule extends AbstractModule {
 		bind(RoleService.class).to(RoleProvider.class).asEagerSingleton();
 		bind(UserService.class).to(UserProvider.class).asEagerSingleton();
 		bind(DocumentService.class).to(DocumentProvider.class).asEagerSingleton();
+		bind(VersionService.class).to(VersionProvider.class).asEagerSingleton();
 	}
 
 }

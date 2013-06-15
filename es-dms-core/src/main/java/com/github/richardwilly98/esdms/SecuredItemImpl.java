@@ -1,6 +1,7 @@
 package com.github.richardwilly98.esdms;
 
-import java.util.HashMap;
+import static com.google.common.collect.Maps.newHashMap;
+
 import java.util.Map;
 
 import com.github.richardwilly98.esdms.api.Annotation;
@@ -11,10 +12,10 @@ public class SecuredItemImpl extends ItemBaseImpl implements SecuredItem {
 
 	private static final long serialVersionUID = 1L;
 
-	Map<String, Role> roles;
-	Map<String, SecuredItem> attachments;
-	Map<String, Annotation> annotations;
-	Map<String, _CommentImpl> comments;
+	private final Map<String, Role> roles = newHashMap();
+	private final Map<String, SecuredItem> attachments = newHashMap();
+	private final Map<String, Annotation> annotations = newHashMap();
+	private final Map<String, _CommentImpl> comments = newHashMap();
 
 	public static abstract class Builder<T extends Builder<T>> extends
 			ItemBaseImpl.BuilderBase<Builder<T>> {
@@ -55,10 +56,18 @@ public class SecuredItemImpl extends ItemBaseImpl implements SecuredItem {
 	protected SecuredItemImpl(Builder<?> builder) {
 		super(builder);
 		if (builder != null) {
-			this.roles = builder.roles;
-			this.annotations = builder.annotations;
-			this.attachments = builder.attachments;
-			this.comments = builder.comments;
+			if (builder.roles != null) {
+				this.roles.putAll(builder.roles);
+			}
+			if (builder.annotations != null) {
+				this.annotations.putAll(builder.annotations);
+			}
+			if (builder.attachments != null) {
+				this.attachments.putAll(builder.attachments);
+			}
+			if (builder.comments != null) {
+				this.comments.putAll(builder.comments);
+			}
 		}
 	}
 
@@ -80,7 +89,9 @@ public class SecuredItemImpl extends ItemBaseImpl implements SecuredItem {
 	 */
 	@Override
 	public void setPermissions(Map<String, Role> roles) {
-		this.roles = roles;
+		if (roles != null) {
+			this.roles.putAll(roles);
+		}
 	}
 
 	/*
@@ -92,8 +103,8 @@ public class SecuredItemImpl extends ItemBaseImpl implements SecuredItem {
 	 */
 	@Override
 	public void setRole(String name, Role role) {
-		if (roles == null)
-			roles = new HashMap<String, Role>();
+		// if (roles == null)
+		// roles = new HashMap<String, Role>();
 		this.roles.put(name, role);
 	}
 
@@ -115,7 +126,9 @@ public class SecuredItemImpl extends ItemBaseImpl implements SecuredItem {
 	 */
 	@Override
 	public void setAttachments(Map<String, SecuredItem> attachments) {
-		this.attachments = attachments;
+		if (attachments != null) {
+			this.attachments.putAll(attachments);
+		}
 	}
 
 	/*
@@ -127,8 +140,8 @@ public class SecuredItemImpl extends ItemBaseImpl implements SecuredItem {
 	 */
 	@Override
 	public void setAttachment(String name, SecuredItem attachment) {
-		if (attachments == null)
-			attachments = new HashMap<String, SecuredItem>();
+//		if (attachments == null)
+//			attachments = new HashMap<String, SecuredItem>();
 		this.attachments.put(name, attachment);
 	}
 }

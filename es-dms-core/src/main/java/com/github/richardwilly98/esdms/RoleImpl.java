@@ -10,8 +10,8 @@ import com.github.richardwilly98.esdms.api.Role;
 public class RoleImpl extends ItemBaseImpl implements Role {
 
 	private static final long serialVersionUID = 1L;
-	Set<String> scopes;
-	Set<Permission> permissions;
+	private final Set<String> scopes = newHashSet();
+	private final Set<Permission> permissions = newHashSet();
 
 	public static class Builder extends BuilderBase<Builder> {
 
@@ -45,8 +45,18 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 	protected RoleImpl(Builder builder) {
 		super(builder);
 		if (builder != null) {
-			this.scopes = builder.scopes;
-			this.permissions = builder.permissions;
+//			this.scopes = builder.scopes;
+//			this.permissions = builder.permissions;
+			if (builder.scopes != null) {
+				for (String scope : builder.scopes) {
+					this.scopes.add(scope);
+				}
+			}
+			if (builder.permissions != null) {
+				for (Permission permission : builder.permissions) {
+					this.permissions.add(permission);
+				}
+			}
 		}
 	}
 
@@ -65,9 +75,9 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 	@Override
 	public void setScopes(Set<String> scopes) {
 		if (scopes != null) {
-			if (this.scopes == null) {
-				this.scopes = newHashSet();
-			}
+//			if (this.scopes == null) {
+//				this.scopes = newHashSet();
+//			}
 			this.scopes.addAll(scopes);
 		}
 	}
@@ -77,9 +87,9 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 	 */
 	@Override
 	public void addScope(String scope) {
-		if (scopes == null) {
-			scopes = newHashSet();
-		}
+//		if (scopes == null) {
+//			scopes = newHashSet();
+//		}
 		if (!scopes.contains(scope)) {
 			scopes.add(scope);
 		}
@@ -112,9 +122,9 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 	@Override
 	public void setPermissions(Set<Permission> permissions) {
 		if (permissions != null) {
-			if (this.permissions == null) {
-				this.permissions = newHashSet();
-			}
+//			if (this.permissions == null) {
+//				this.permissions = newHashSet();
+//			}
 			this.permissions.addAll(permissions);
 		}
 	}
@@ -127,9 +137,9 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 		if (permission == null) {
 			return;
 		}
-		if (this.permissions == null) {
-			this.permissions = newHashSet();
-		}
+//		if (this.permissions == null) {
+//			this.permissions = newHashSet();
+//		}
 		if (!this.permissions.contains(permission)) {
 			permissions.add(permission);
 		}

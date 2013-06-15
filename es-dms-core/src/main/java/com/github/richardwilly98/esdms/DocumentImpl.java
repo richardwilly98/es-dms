@@ -1,16 +1,21 @@
 package com.github.richardwilly98.esdms;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.richardwilly98.esdms.api.Document;
-import com.github.richardwilly98.esdms.api.File;
-import com.google.common.base.Strings;
+import com.github.richardwilly98.esdms.api.Version;
+import com.google.common.base.Objects;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 public class DocumentImpl extends SecuredItemImpl implements Document {
 
@@ -18,30 +23,22 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 	private static final Set<String> readOnlyAttributes = ImmutableSet.of(
 			AUTHOR, CREATION_DATE, MODIFIED_DATE, STATUS, LOCKED_BY);
 
-	private String versionId;
-	@JsonProperty("file")
-	private File file;
-	private Set<String> tags;
+	private final Set<String> tags = newHashSet();
+	private final Set<Version> versions = newHashSet();
 
 	public static class Builder extends
 			SecuredItemImpl.Builder<DocumentImpl.Builder> {
 
-		private String versionId;
-		private File file;
 		private Set<String> tags;
-
-		public Builder versionId(String versionId) {
-			this.versionId = versionId;
-			return getThis();
-		}
-
-		public Builder file(File file) {
-			this.file = file;
-			return getThis();
-		}
+		private Set<Version> versions;
 
 		public Builder tags(Set<String> tags) {
 			this.tags = tags;
+			return getThis();
+		}
+
+		public Builder versions(Set<Version> versions) {
+			this.versions = versions;
 			return getThis();
 		}
 
@@ -62,13 +59,18 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 	protected DocumentImpl(Builder builder) {
 		super(builder);
 		if (builder != null) {
-			if (Strings.isNullOrEmpty(builder.versionId)) {
-				this.versionId = "1";
-			} else {
-				this.versionId = builder.versionId;
+			if (builder.tags != null) {
+				for (String tag : builder.tags) {
+					this.tags.add(tag);
+				}
 			}
-			this.file = builder.file;
-			this.tags = builder.tags;
+			if (builder.versions != null) {
+				for (Version version : builder.versions) {
+					this.versions.add(version);
+				}
+			}
+			// this.tags = builder.tags;
+			// this.versions = builder.versions;
 		}
 		readOnlyAttributeKeys = readOnlyAttributes;
 	}
@@ -82,32 +84,94 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 			attributes.put(DocumentImpl.STATUS,
 					DocumentImpl.DocumentStatus.AVAILABLE.getStatusCode());
 		}
-		this.attributes = attributes;
+		// this.attributes = attributes;
+		for (String key : attributes.keySet()) {
+			getAttributes().put(key, attributes.get(key));
+		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.richardwilly98.api.IDocument#getFile()
+	 * @see com.github.richardwilly98.api.IDocument#getCurrentVersion()
 	 */
 	@Override
-	public File getFile() {
-		return file;
+	@JsonIgnore
+	public Version getCurrentVersion() {
+		if (versions == null || versions.size() == 0) {
+			return null;
+		} else {
+			try {
+				return Iterables.find(versions, new Predicate<Version>() {
+					@Override
+					public boolean apply(Version version) {
+						return version.isCurrent();
+					}
+				});
+			} catch (NoSuchElementException ex) {
+				return null;
+			}
+		}
 	}
 
-	public void setFile(File file) {
-		this.file = file;
+	@Override
+	@JsonIgnore
+	public Version getVersion(final int versionId) {
+		checkArgument(versionId > 0);
+		return Iterables.find(versions, new Predicate<Version>() {
+			@Override
+			public boolean apply(Version version) {
+				return (version.getVersionId() == versionId);
+			}
+		});
 	}
 
+	// @JsonProperty("current_version")
+	// private Version serializeCurrentVersion() {
+	// Version version = getCurrentVersion();
+	// return version;
+	// }
+	//
+	// @JsonProperty("current_version")
+	// private void deserializeCurrentVersions(Version version) {
+	// if (versions != null) {
+	//
+	// }
+	// }
+
+	// @JsonProperty("versions")
+	// private Set<Version> serializeVersions() throws JsonProcessingException {
+	// if (versions == null) {
+	// return null;
+	// } else {
+	// Set<Version> _versions = newHashSet();
+	// for (Version version : versions) {
+	// _versions.add(new
+	// VersionImpl.Builder().versionId(version.getVersionId()).current(version.isCurrent()).id(version.getId()).roles(null).build());
+	// }
+	// return _versions;
+	// }
+	// }
+
+	// @JsonProperty("versions")
+	// private void deserializeVersions(Set<Version> versions) {
+	// if (versions != null) {
+	//
+	// }
+	// }
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.richardwilly98.api.IDocument#getVersionId()
+	 * @see com.github.richardwilly98.api.IDocument#getVersions()
 	 */
 	@Override
-	public String getVersionId() {
-		return versionId;
+	public Set<Version> getVersions() {
+		return versions;
 	}
+
+	// protected void setVersion(Set<Version> versions) {
+	// this.versions = versions;
+	// }
 
 	/*
 	 * (non-Javadoc)
@@ -119,15 +183,15 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 		return tags;
 	}
 
-	void setTags(Set<String> tags) {
-		this.tags = tags;
-	}
+	// void setTags(Set<String> tags) {
+	// this.tags = tags;
+	// }
 
 	@Override
 	public void addTag(String tag) {
-		if (tags == null) {
-			tags = newHashSet();
-		}
+		// if (tags == null) {
+		// tags = newHashSet();
+		// }
 		tags.add(tag);
 	}
 
@@ -141,4 +205,11 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return Objects.toStringHelper(this).add("id", id).add("name", name)
+				.add("versions", versions).add("tags", tags)
+				.add("description", description)
+				.add("attributes", getAttributes()).toString();
+	}
 }

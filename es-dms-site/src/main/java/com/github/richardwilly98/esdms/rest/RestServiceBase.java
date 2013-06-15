@@ -38,9 +38,9 @@ import com.google.inject.Inject;
  */
 public abstract class RestServiceBase<T extends ItemBase> {
 
-	public static final String FIND_PATH = "find";
-	public static final String FIND_FIRST_PARAMETER = "fi";
-	public static final String FIND_PAGE_SIZE_PARAMETER = "ps";
+	public static final String SEARCH_PATH = "search";
+	public static final String SEARCH_FIRST_PARAMETER = "fi";
+	public static final String SEARCH_PAGE_SIZE_PARAMETER = "ps";
 	
 	protected final Logger log = Logger.getLogger(getClass());
 	protected final AuthenticationService authenticationService;
@@ -163,10 +163,10 @@ public abstract class RestServiceBase<T extends ItemBase> {
 
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
-	@Path(FIND_PATH + "/{criteria}")
-	public Response find(@PathParam("criteria") String criteria, @QueryParam(FIND_FIRST_PARAMETER) @DefaultValue("0") int first, @QueryParam(FIND_PAGE_SIZE_PARAMETER) @DefaultValue("20") int pageSize) {
+	@Path(SEARCH_PATH + "/{criteria}")
+	public Response search(@PathParam("criteria") String criteria, @QueryParam(SEARCH_FIRST_PARAMETER) @DefaultValue("0") int first, @QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("20") int pageSize) {
 		if (log.isTraceEnabled()) {
-			log.trace(String.format("find - %s", criteria));
+			log.trace(String.format("search - %s", criteria));
 		}
 		try {
 			Set<T> items = service.search(criteria, first, pageSize);

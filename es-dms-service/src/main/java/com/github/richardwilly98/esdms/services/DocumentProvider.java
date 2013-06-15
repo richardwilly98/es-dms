@@ -1,5 +1,7 @@
 package com.github.richardwilly98.esdms.services;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
@@ -17,12 +19,18 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.base.Stopwatch;
 import org.elasticsearch.common.text.Text;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.joda.time.DateTime;
 
 import com.github.richardwilly98.esdms.api.Document;
+import com.github.richardwilly98.esdms.api.File;
+import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
 public class DocumentProvider extends ProviderBase<Document> implements
@@ -30,12 +38,14 @@ public class DocumentProvider extends ProviderBase<Document> implements
 
 	private static final String DOCUMENT_MAPPING_JSON = "/com/github/richardwilly98/esdms/services/document-mapping.json";
 	private final static String type = "document";
+	private final VersionService versionService;
 
 	@Inject
-	DocumentProvider(Client client, BootstrapService bootstrapService)
-			throws ServiceException {
+	DocumentProvider(Client client, BootstrapService bootstrapService,
+			VersionService versionService) throws ServiceException {
 		super(client, bootstrapService, null, DocumentProvider.type,
 				Document.class);
+		this.versionService = versionService;
 	}
 
 	@Override
@@ -53,7 +63,8 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	}
 
 	private SimpleDocument updateModifiedDate(Document document) {
-		SimpleDocument sd = new SimpleDocument.Builder().document(document).build();
+		SimpleDocument sd = new SimpleDocument.Builder().document(document)
+				.build();
 		DateTime now = new DateTime();
 		sd.setReadOnlyAttribute(Document.MODIFIED_DATE, now.toString());
 		return sd;
@@ -82,27 +93,38 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	 * com.github.richardwilly98.services.BaseService#search(java.lang.String)
 	 */
 	@Override
-	public Set<Document> search(String criteria, int first, int pageSize) throws ServiceException {
+	public Set<Document> search(String criteria, int first, int pageSize)
+			throws ServiceException {
 		try {
 			Set<Document> documents = newHashSet();
 
+			// QueryBuilder query = new MultiMatchQueryBuilder(criteria, "file",
+			// "name");
+			QueryBuilder query = fieldQuery("file", criteria);
 			SearchResponse searchResponse = client.prepareSearch(index)
-					.setTypes(type).setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-					.setFrom(first).setSize(pageSize)
-					.setQuery(fieldQuery("file", criteria))
-					.execute().actionGet();
+					.setTypes(type)
+					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+					.setFrom(first).setSize(pageSize).setQuery(query).execute()
+					.actionGet();
 			log.debug("totalHits: " + searchResponse.getHits().totalHits());
-			log.debug(String.format("TotalHits: %s - TookInMillis: %s", searchResponse.getHits().totalHits(), searchResponse.getTookInMillis()));
+			log.debug(String.format("TotalHits: %s - TookInMillis: %s",
+					searchResponse.getHits().totalHits(),
+					searchResponse.getTookInMillis()));
 			Stopwatch watch = new Stopwatch();
 			watch.start();
 			for (SearchHit hit : searchResponse.getHits().hits()) {
 				String json = hit.getSourceAsString();
 				Document document = mapper.readValue(json, Document.class);
-				document.getFile().setContent(null);
+				Version currentVersion = document.getCurrentVersion();
+				if (currentVersion != null) {
+					currentVersion.getFile().setContent(null);
+				}
+				// document.getFile().setContent(null);
 				documents.add(document);
 			}
 			watch.stop();
-			log.debug("Elapsed time to build document list " + watch.elapsed(TimeUnit.MILLISECONDS));
+			log.debug("Elapsed time to build document list "
+					+ watch.elapsed(TimeUnit.MILLISECONDS));
 
 			return documents;
 		} catch (Throwable t) {
@@ -115,7 +137,8 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	public void checkin(Document document) throws ServiceException {
 		String status = getStatus(document);
 		if (status.equals(Document.DocumentStatus.LOCKED.getStatusCode())) {
-			SimpleDocument sd = new SimpleDocument.Builder().document(document).build();
+			SimpleDocument sd = new SimpleDocument.Builder().document(document)
+					.build();
 			sd.removeReadOnlyAttribute(Document.STATUS);
 			sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
 			sd.removeReadOnlyAttribute(Document.LOCKED_BY);
@@ -129,12 +152,26 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	@Override
 	public Document update(Document item) throws ServiceException {
 		SimpleDocument document = updateModifiedDate(item);
+		for (Version version : document.getVersions().toArray(new Version[0])) {
+			SimpleVersion sv = new SimpleVersion.Builder().version(version).build();
+			if (! sv.isCurrent()) {
+				if (Strings.isNullOrEmpty(sv.getId())) {
+					Version newVersion = versionService.create(sv);
+					sv.setId(newVersion.getId());
+				} else {
+					versionService.update(sv);
+				}
+				sv.setFile(null);
+				document.updateVersion(sv);
+			}
+		}
 		return super.update(document);
 	}
 
 	@Override
 	public void checkout(Document document) throws ServiceException {
-		SimpleDocument sd = new SimpleDocument.Builder().document(document).build();
+		SimpleDocument sd = new SimpleDocument.Builder().document(document)
+				.build();
 		if (document.getAttributes() != null
 				&& document.getAttributes().containsKey(Document.STATUS)) {
 			if (document.getAttributes().get(Document.STATUS)
@@ -208,4 +245,168 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		}
 	}
 
+	@Override
+	public void addVersion(Document document, Version version)
+			throws ServiceException {
+		if (log.isTraceEnabled()) {
+			log.trace(String.format(
+					"*** addVersion document: %s - version: %s ***", document,
+					version));
+		}
+		checkNotNull(document);
+		checkNotNull(version);
+		SimpleDocument sd = new SimpleDocument.Builder().document(document)
+				.build();
+		if (document.getCurrentVersion() != null) {
+			// Move current version to archived index
+			SimpleVersion sv = new SimpleVersion.Builder().version(
+					document.getCurrentVersion()).build();
+			sv.setCurrent(false);
+//			Version currentVersion = versionService.create(sv);
+//			sv.setId(currentVersion.getId());
+//			sv.setFile(null);
+			sv.setParentId(document.getCurrentVersion().getParentId());
+			sd.updateVersion(sv);
+		}
+		sd.addVersion(version);
+		update(sd);
+	}
+
+	public void deleteVersion(Document document, Version version)
+			throws ServiceException {
+		if (log.isTraceEnabled()) {
+			log.trace(String.format(
+					"*** deleteVersion document: %s - version: %s ***",
+					document, version));
+		}
+		checkNotNull(document);
+		checkNotNull(version);
+		if (document.getVersions().size() == 1) {
+			throw new ServiceException(
+					"Cannot delete the last version of a document. Use DocumentService.delete");
+		}
+		SimpleDocument sd = new SimpleDocument.Builder().document(document)
+				.build();
+		SimpleVersion sv;
+		if (!version.isCurrent()) {
+			versionService.delete(version);
+		} else {
+			if (version.getParentId() > 0) {
+				String id = document.getVersion(version.getParentId()).getId();
+				if (id != null) {
+					Version lastVersion = versionService.get(id);
+					sv = new SimpleVersion.Builder().version(lastVersion)
+							.build();
+					sv.setCurrent(true);
+					sv.setId(null);
+					sd.updateVersion(sv);
+					versionService.delete(lastVersion);
+				}
+			} else {
+				throw new ServiceException(String.format(
+						"Version %s is current but does not have parent!",
+						version));
+			}
+		}
+
+		// Change parent of version where parent is the deleted version
+		int parentId = version.getParentId();
+		final int versionId = version.getVersionId();
+		Set<Version> _versions = Sets.filter(document.getVersions(),
+				new Predicate<Version>() {
+					@Override
+					public boolean apply(Version version) {
+						return (version.getParentId() == versionId);
+					}
+				});
+
+		for (Version v : _versions.toArray(new Version[0])) {
+			sv = new SimpleVersion.Builder().version(v).build();
+			sv.setParentId(parentId);
+			sd.updateVersion(sv);
+		}
+
+		sd.deleteVersion(version);
+		update(sd);
+	}
+
+	public Version getVersion(Document document, int versionId)
+			throws ServiceException {
+		if (log.isTraceEnabled()) {
+			log.trace(String.format(
+					"*** getVersion document: %s - versionId: %s ***",
+					document, versionId));
+		}
+		checkNotNull(document);
+		checkNotNull(versionId);
+		Version version = document.getVersion(versionId);
+		checkNotNull(version);
+		if (!version.isCurrent()) {
+			return versionService.get(version.getId());
+		} else {
+			return version;
+		}
+	}
+
+	@Override
+	public Set<Version> getVersions(Document document) throws ServiceException {
+		if (log.isTraceEnabled()) {
+			log.trace(String.format("*** getVersions document: %s ***",
+					document));
+		}
+		Set<Version> versions = newHashSet();
+		for (Version version : document.getVersions()) {
+			if (version.isCurrent()) {
+				versions.add(version);
+			} else {
+				versions.add(versionService.get(version.getId()));
+			}
+		}
+		return versions;
+	}
+
+	@Override
+	public File getVersionContent(Document document, int versionId)
+			throws ServiceException {
+		checkNotNull(document);
+		checkArgument(versionId > 0);
+		Version version = document.getVersion(versionId);
+		if (version == null) {
+			throw new ServiceException(String.format("Version %s not found.",
+					versionId));
+		}
+		if (version.isCurrent()) {
+			return version.getFile();
+		} else {
+			version = versionService.get(version.getId());
+			if (version == null || version.getFile() == null) {
+				throw new ServiceException(String.format(
+						"Version %s or its contents not found.", versionId));
+			}
+			return version.getFile();
+		}
+	}
+
+	@Override
+	public void setCurrentVersion(Document document, int versionId)
+			throws ServiceException {
+		checkNotNull(document);
+		checkArgument(versionId > 0);
+		Version version = document.getVersion(versionId);
+		if (version == null) {
+			throw new ServiceException(String.format("Version %s not found.",
+					versionId));
+		}
+		SimpleDocument sd = new SimpleDocument.Builder().document(document)
+				.build();
+		SimpleVersion sv = new SimpleVersion.Builder().version(document.getCurrentVersion()).build();
+		sv.setCurrent(false);
+		sd.updateVersion(sv);
+
+		sv = new SimpleVersion.Builder().version(version).build();
+		sv.setCurrent(true);
+		sd.updateVersion(sv);
+
+		update(sd);
+	}
 }

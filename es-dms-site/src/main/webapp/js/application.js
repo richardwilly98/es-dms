@@ -183,7 +183,7 @@ simpleApp.factory('documentService', function ($resource) {
 	var documents = {};
 	return {
 		find: function(criteria) {
-			documents = resource.query({ verb: 'find', name: criteria });
+			documents = resource.query({ verb: 'search', name: criteria });
 			return documents;
 		},
 		edit: function(id) {

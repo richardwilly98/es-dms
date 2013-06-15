@@ -29,14 +29,14 @@ public interface Document extends ItemBase {
 
 	}
 
-	public abstract File getFile();
-
-	public abstract String getVersionId();
+	public abstract Version getCurrentVersion();
+	
+	public abstract Version getVersion(final int versionId);
+	
+	public abstract Set<Version> getVersions();
 
 	public abstract Set<String> getTags();
 
-//	public abstract void setTags(Set<String> tags);
-	
 	public abstract void addTag(String tag);
 	
 	public abstract void removeTag(String tag);

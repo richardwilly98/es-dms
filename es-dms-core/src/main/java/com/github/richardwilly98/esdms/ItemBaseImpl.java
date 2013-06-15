@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.esdms.api.ItemBase;
 import com.google.common.base.Objects;
 
@@ -20,14 +21,15 @@ import com.google.common.base.Objects;
 public abstract class ItemBaseImpl implements Serializable, ItemBase {
 
 	final protected Logger log = Logger.getLogger(getClass());
-	private static final long serialVersionUID = 1L;
+	final static private long serialVersionUID = 1L;
+	final static protected ObjectMapper mapper = new ObjectMapper();
 
 	String id;
 	String name;
 	boolean disabled;
 	String description;
 
-	Map<String, Object> attributes;
+	private final Map<String, Object> attributes = newHashMap();
 
 	@JsonIgnore
 	protected Set<String> readOnlyAttributeKeys;
@@ -71,19 +73,26 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
 
 	protected ItemBaseImpl(BuilderBase<?> builder) {
 		if (builder != null) {
-//			checkNotNull(builder.id);
+			// checkNotNull(builder.id);
 			checkNotNull(builder.name);
 			this.id = builder.id;
 			this.name = builder.name;
 			this.disabled = builder.disabled;
 			this.description = builder.description;
-			this.attributes = builder.attributes;
+			if (builder.attributes != null) {
+				for (String key : builder.attributes.keySet()) {
+					this.attributes.put(key, builder.attributes.get(key));
+				}
+			}
 		}
 	}
 
 	@JsonProperty("attributes")
 	private void deserialize(Map<String, Object> attributes) {
-		this.attributes = attributes;
+		// this.attributes = attributes;
+		for (String key : attributes.keySet()) {
+			this.attributes.put(key, attributes.get(key));
+		}
 	}
 
 	/*
@@ -259,9 +268,9 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
 				&& (readOnlyAttributeKeys != null && readOnlyAttributeKeys
 						.contains(name)) || !readOnly) {
 			if (name != null && !name.isEmpty()) {
-				if (this.attributes == null) {
-					this.attributes = newHashMap();
-				}
+				// if (this.attributes == null) {
+				// this.attributes = newHashMap();
+				// }
 				if (value != null) {
 					this.attributes.put(name, value);
 				} else {

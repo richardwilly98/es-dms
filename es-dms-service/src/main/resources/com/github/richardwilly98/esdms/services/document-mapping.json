@@ -1,12 +1,32 @@
 {
 	"document": {
 		"properties": {
-			"file": {
-				"type": "attachment",
-				"fields": {
+			"versions" : {
+				"type": "object",
+				"properties": {
+					"id" : {
+						"type": "string"
+					},
+					"version_id" : {
+						"type": "integer"
+					},
+					"parent_id" : {
+						"type": "integer"
+					},
+					"document_id" : {
+						"type": "string"
+					},
+					"current" : {
+						"type": "boolean"
+					},
 					"file": {
-						"store": "yes",
-						"term_vector": "with_positions_offsets"
+						"type": "attachment",
+						"fields": {
+							"file": {
+								"store": "yes",
+								"term_vector": "with_positions_offsets"
+							}
+						}
 					}
 				}
 			},

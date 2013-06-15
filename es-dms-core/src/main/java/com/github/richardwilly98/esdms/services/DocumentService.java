@@ -1,6 +1,10 @@
 package com.github.richardwilly98.esdms.services;
 
+import java.util.Set;
+
 import com.github.richardwilly98.esdms.api.Document;
+import com.github.richardwilly98.esdms.api.File;
+import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
 public interface DocumentService extends BaseService <Document> {
@@ -35,5 +39,23 @@ public interface DocumentService extends BaseService <Document> {
 			throws ServiceException;
 	
 	public abstract String preview(Document document, String criteria, int size)
+			throws ServiceException;
+
+	public abstract void addVersion(Document document, Version version)
+			throws ServiceException;
+
+	public abstract void deleteVersion(Document document, Version version)
+			throws ServiceException;
+
+	public abstract Set<Version> getVersions(Document document)
+			throws ServiceException;
+
+	public abstract Version getVersion(Document document, int versionId)
+			throws ServiceException;
+
+	public abstract File getVersionContent(Document document, int versionId)
+			throws ServiceException;
+
+	public abstract void setCurrentVersion(Document document, int versionId)
 			throws ServiceException;
 }

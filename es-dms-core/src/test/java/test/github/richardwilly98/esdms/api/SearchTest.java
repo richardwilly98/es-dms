@@ -1,6 +1,7 @@
 package test.github.richardwilly98.esdms.api;
 
 import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -11,8 +12,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.esdms.DocumentImpl;
 import com.github.richardwilly98.esdms.FileImpl;
 import com.github.richardwilly98.esdms.SearchResultImpl;
+import com.github.richardwilly98.esdms.VersionImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.api.Version;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -37,7 +40,10 @@ public class SearchTest {
 			Map<String, Object> attributes = newHashMap();
 			attributes.put(attributeKey, attributeValue);
 //			DocumentTest document = new DocumentTest(new DocumentImpl(id, name, new FileImpl(content, "test.html", "text/html"), attributes));
-			DocumentTest document = new DocumentTest(new DocumentImpl.Builder().file(new FileImpl.Builder().content(content).name("test" + i + ".html").contentType("text/html").build()).id(id).name(name).attributes(attributes).roles(null));
+			Set<Version> versions = newHashSet();
+			versions.add(new VersionImpl.Builder().documentId(id).file(new FileImpl.Builder().content(content).name("test" + i + ".html").contentType("text/html").build()).current(true).versionId(1).build());
+			DocumentTest document = new DocumentTest(new DocumentImpl.Builder().versions(versions).id(id).name(name).attributes(attributes).roles(null));
+//			DocumentTest document = new DocumentTest(new DocumentImpl.Builder().file(new FileImpl.Builder().content(content).name("test" + i + ".html").contentType("text/html").build()).id(id).name(name).attributes(attributes).roles(null));
 			docs.add(document);
 		}
 		return docs;

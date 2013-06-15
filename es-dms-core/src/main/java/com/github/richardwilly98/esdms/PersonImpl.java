@@ -5,8 +5,8 @@ import com.github.richardwilly98.esdms.api.Person;
 public class PersonImpl extends ItemBaseImpl implements Person {
 
 	private static final long serialVersionUID = 1L;
-	String city;
-	String email;
+	private String city;
+	private String email;
 
 	public static abstract class Builder<T extends Builder<T>>
 			extends ItemBaseImpl.BuilderBase<Builder<T>> {

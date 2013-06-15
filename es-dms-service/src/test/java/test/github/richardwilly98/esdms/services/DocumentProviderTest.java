@@ -1,9 +1,10 @@
 package test.github.richardwilly98.esdms.services;
 
+import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Sets.newHashSet;
 import static org.elasticsearch.common.io.Streams.copyToBytesFromClasspath;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,11 +19,13 @@ import org.testng.annotations.Test;
 import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.DocumentImpl;
 import com.github.richardwilly98.esdms.FileImpl;
+import com.github.richardwilly98.esdms.VersionImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.User;
+import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
 /*
@@ -38,17 +41,38 @@ public class DocumentProviderTest extends ProviderTestBase {
 		Set<Document> documents = documentService.search(contentSearch, 0, 10);
 		startCount = documents.size();
 		log.info(String.format("startCount: %s", startCount));
-		// FileImpl file = new FileImpl(content, name, contentType);
 		File file = new FileImpl.Builder().content(content).name(name)
 				.contentType(contentType).build();
-		// Document document = new DocumentImpl(id, name, file, null);
-		Document document = new DocumentImpl.Builder().file(file).id(id)
-				.name(name).roles(null).build();
+		Set<Version> versions = newHashSet();
+		versions.add(new VersionImpl.Builder().documentId(id).file(file)
+				.current(true).versionId(1).build());
+
+		Document document = new DocumentImpl.Builder().versions(versions)
+				.id(id).name(name).roles(null).build();
 		Document newDocument = documentService.create(document);
 		Assert.assertNotNull(newDocument);
 		Assert.assertEquals(id, newDocument.getId());
 		log.info(String.format("New document created #%s", newDocument.getId()));
 		return id;
+	}
+
+	private Document addVersion(Document document, int versionId, File file,
+			int parentId) throws ServiceException {
+		try {
+			if (parentId == 0) {
+				parentId = document.getCurrentVersion().getVersionId();
+			}
+			Version version = new VersionImpl.Builder()
+					.documentId(document.getId()).file(file)
+					.versionId(versionId).parentId(parentId).build();
+			documentService.addVersion(document, version);
+			Document updatedDocument = documentService.get(document.getId());
+			Assert.assertNotNull(updatedDocument);
+			return updatedDocument;
+		} catch (ServiceException sEx) {
+			Assert.fail("addVersion failed", sEx);
+			throw sEx;
+		}
 	}
 
 	@Test
@@ -133,7 +157,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		loginAdminUser();
 		String id = String.valueOf(System.currentTimeMillis());
 		String name = "document-" + id;
-		Map<String, Object> attributes = new HashMap<String, Object>();
+		Map<String, Object> attributes = newHashMap();
 		// Document document = new DocumentImpl(id, name, null, attributes);
 		Document document = new DocumentImpl.Builder().attributes(attributes)
 				.id(id).name(name).roles(null).build();
@@ -160,7 +184,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		loginAdminUser();
 		String id = String.valueOf(System.currentTimeMillis());
 		String name = "document-" + id;
-		Map<String, Object> attributes = new HashMap<String, Object>();
+		Map<String, Object> attributes = newHashMap();
 		// Document document = new DocumentImpl(id, name, null, attributes);
 		Document document = new DocumentImpl.Builder().attributes(attributes)
 				.id(id).name(name).roles(null).build();
@@ -187,7 +211,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		loginAdminUser();
 		String id = String.valueOf(System.currentTimeMillis());
 		String name = "document-" + id;
-		Map<String, Object> attributes = new HashMap<String, Object>();
+		Map<String, Object> attributes = newHashMap();
 		// Document document = new DocumentImpl(id, name, null, attributes);
 		Document document = new DocumentImpl.Builder().attributes(attributes)
 				.id(id).name(name).roles(null).build();
@@ -228,6 +252,272 @@ public class DocumentProviderTest extends ProviderTestBase {
 			Assert.fail("Should not be authorized to check-out document twice");
 		} catch (ServiceException sEx) {
 		}
+	}
+
+	@Test
+	public void testCreateDocumentWithVersions() throws Throwable {
+		log.info("*** testCreateDocumentWithVersions ***");
+		loginAdminUser();
+		String id = String.valueOf(System.currentTimeMillis());
+		String name = "document-" + id;
+		Map<String, Object> attributes = newHashMap();
+		String html = "<html><body><h1>Hello World</h1></body></html>";
+		String html2 = "<html><body><h1>Version 2</h1></body></html>";
+		byte[] content = html.getBytes();
+		byte[] content2 = html2.getBytes();
+		Set<Version> versions = newHashSet();
+		versions.add(new VersionImpl.Builder()
+				.documentId(id)
+				.file(new FileImpl.Builder().content(content).name("test.html")
+						.contentType("text/html").build()).current(true)
+				.versionId(1).build());
+		Document document = new DocumentImpl.Builder().versions(versions)
+				.attributes(attributes).id(id).name(name).roles(null).build();
+		document.setId(id);
+		Document newDocument = documentService.create(document);
+		Assert.assertNotNull(newDocument);
+		log.info(String.format("New document created %s", newDocument));
+		Assert.assertNotNull(newDocument.getCurrentVersion());
+		Assert.assertNotNull(newDocument.getVersions());
+		Assert.assertTrue(newDocument.getVersions().size() == 1);
+		Assert.assertTrue(newDocument.getCurrentVersion().getVersionId() == 1);
+
+		newDocument = addVersion(newDocument, 2, new FileImpl.Builder().content(content2)
+						.name("test.html").contentType("text/html").build(), 0);
+//		Version version2 = new VersionImpl.Builder()
+//				.documentId(id)
+//				.file(new FileImpl.Builder().content(content2)
+//						.name("test.html").contentType("text/html").build())
+//				.current(false).versionId(2).parentId(1).build();
+//		documentService.addVersion(newDocument, version2);
+//
+//		newDocument = documentService.get(id);
+		log.info(String.format("Version #2 added to document %s", newDocument));
+		Assert.assertTrue(newDocument.getVersions().size() == 2);
+		Assert.assertTrue(newDocument.getCurrentVersion().getVersionId() == 2);
+
+		// Version #1 is not current anymore
+		Version v = newDocument.getVersion(1);
+		Assert.assertNotNull(v);
+		Assert.assertFalse(v.isCurrent());
+		Assert.assertNull(v.getFile());
+
+		// Version #2 is current and has content
+		v = newDocument.getVersion(2);
+		Assert.assertNotNull(v);
+		Assert.assertTrue(v.isCurrent());
+		Assert.assertNotNull(v.getFile());
+		Assert.assertEquals(v.getFile().getContent(), content2);
+
+		// Test retrieve archived version (not current)
+		v = documentService.getVersion(newDocument, newDocument.getVersion(1)
+				.getVersionId());
+		Assert.assertNotNull(v);
+		Assert.assertNotNull(v.getFile());
+		Assert.assertEquals(v.getFile().getContent(), content);
+
+		// Test delete version
+		documentService.deleteVersion(newDocument, v);
+		newDocument = documentService.get(id);
+		Assert.assertTrue(newDocument.getVersions().size() == 1);
+		Assert.assertTrue(newDocument.getCurrentVersion().getVersionId() == 2);
+	}
+
+	@Test
+	public void testSerializeDeserializeVersions() throws Throwable {
+		log.info("*** testSerializeDeserializeVersions ***");
+		loginAdminUser();
+		String id = String.valueOf(System.currentTimeMillis());
+		String name = "document-" + id;
+		Map<String, Object> attributes = newHashMap();
+		String html = "<html><body><h1>Hello World</h1></body></html>";
+		byte[] content = html.getBytes();
+		Set<Version> versions = newHashSet();
+
+		Version version1 = new VersionImpl.Builder()
+				.documentId(id)
+				.file(new FileImpl.Builder().content(content).name("test.html")
+						.contentType("text/html").build()).current(true)
+				.versionId(1).build();
+
+		Version version2 = new VersionImpl.Builder()
+				.documentId(id)
+				.file(new FileImpl.Builder().content(content).name("test.html")
+						.contentType("text/html").build()).versionId(2)
+				.parentId(1).build();
+
+		Version version3 = new VersionImpl.Builder()
+				.documentId(id)
+				.file(new FileImpl.Builder().content(content).name("test.html")
+						.contentType("text/html").build()).versionId(3)
+				.parentId(2).build();
+
+		versions.add(version1);
+		Document document = new DocumentImpl.Builder().versions(versions)
+				.attributes(attributes).id(id).name(name).roles(null).build();
+		document.setId(id);
+
+		Document newDocument = documentService.create(document);
+		Assert.assertNotNull(newDocument);
+
+		newDocument = addVersion(newDocument, 2, version2.getFile(), 0);
+
+//		documentService.addVersion(newDocument, version2);
+//		newDocument = documentService.get(id);
+		log.info(String.format("Document updated - %s", newDocument));
+
+		Version v2 = newDocument.getVersion(2);
+		Assert.assertNotNull(v2);
+		Assert.assertTrue(v2.isCurrent());
+		Assert.assertEquals(v2.getFile().getContentType(), version2.getFile()
+				.getContentType());
+		Assert.assertEquals(v2.getFile().getContent(), version2.getFile()
+				.getContent());
+		Assert.assertEquals(v2.getParentId(), version2.getParentId());
+		Assert.assertEquals(v2.getDocumentId(), newDocument.getId());
+
+		newDocument = addVersion(newDocument, 3, version3.getFile(), 0);
+
+//		documentService.addVersion(newDocument, version3);
+//		newDocument = documentService.get(id);
+		log.info(String.format("Document updated - %s", newDocument));
+
+		newDocument = documentService.get(id);
+		log.info(String.format("Document updated - %s", newDocument));
+
+		Version v3 = newDocument.getVersion(3);
+		Assert.assertNotNull(v3);
+		Assert.assertTrue(v3.isCurrent());
+		Assert.assertEquals(v3.getFile().getContentType(), version3.getFile()
+				.getContentType());
+		Assert.assertEquals(v3.getFile().getContent(), version3.getFile()
+				.getContent());
+		Assert.assertEquals(v3.getParentId(), version3.getParentId());
+		Assert.assertEquals(v3.getDocumentId(), newDocument.getId());
+
+		v2 = newDocument.getVersion(2);
+		Assert.assertNotNull(v2);
+		Assert.assertFalse(v2.isCurrent());
+		Assert.assertNull(v2.getFile());
+		Assert.assertEquals(v2.getParentId(), version2.getParentId());
+		Assert.assertEquals(v2.getDocumentId(), newDocument.getId());
+	}
+
+	@Test
+	public void testDeleteVersion() throws Throwable {
+		log.info("*** testDeleteVersion ***");
+		loginAdminUser();
+		String id = String.valueOf(System.currentTimeMillis());
+		String name = "document-" + id;
+		Map<String, Object> attributes = newHashMap();
+		String html = "<html><body><h1>Hello World</h1></body></html>";
+		byte[] content = html.getBytes();
+		Set<Version> versions = newHashSet();
+		versions.add(new VersionImpl.Builder()
+				.documentId(id)
+				.file(new FileImpl.Builder().content(content).name("test.html")
+						.contentType("text/html").build()).current(true)
+				.versionId(1).build());
+		Document document = new DocumentImpl.Builder().versions(versions)
+				.attributes(attributes).id(id).name(name).roles(null).build();
+		document.setId(id);
+
+		Document newDocument = documentService.create(document);
+		Assert.assertNotNull(newDocument);
+
+		Version version2 = new VersionImpl.Builder()
+				.documentId(id)
+				.file(new FileImpl.Builder().content(content).name("test.html")
+						.contentType("text/html").build()).versionId(2)
+				.parentId(1).build();
+		documentService.addVersion(newDocument, version2);
+		newDocument = documentService.get(id);
+		log.info(String.format("Document updated - %s", newDocument));
+
+		Version v2 = newDocument.getVersion(2);
+		Assert.assertNotNull(v2);
+		Assert.assertTrue(v2.isCurrent());
+		Assert.assertEquals(v2.getParentId(), 1);
+
+		Version version3 = new VersionImpl.Builder()
+				.documentId(id)
+				.file(new FileImpl.Builder().content(content).name("test.html")
+						.contentType("text/html").build()).versionId(3)
+				.parentId(2).build();
+		documentService.addVersion(newDocument, version3);
+		newDocument = documentService.get(id);
+		log.info(String.format("Document updated - %s", newDocument));
+
+		// Version #3 is current and has content
+		Version v3 = newDocument.getCurrentVersion();
+		log.info(String.format("Version #3 - %s", v3));
+		Assert.assertNotNull(v3);
+		Assert.assertTrue(v3.isCurrent());
+		Assert.assertEquals(v3.getParentId(), 2);
+
+		v2 = newDocument.getVersion(2);
+		log.info(String.format("Version #2 - %s", v2));
+		Assert.assertNotNull(v2);
+		Assert.assertFalse(v2.isCurrent());
+
+		Assert.assertTrue(newDocument.getVersions().size() == 3);
+
+		// Test delete version #2
+		documentService.deleteVersion(newDocument, v2);
+		newDocument = documentService.get(id);
+		Assert.assertTrue(newDocument.getVersions().size() == 2);
+		log.info(String.format(
+				"Document after version #2 has been deleted - %s", newDocument));
+
+		// Test delete current version #2
+		v3 = newDocument.getVersion(3);
+		documentService.deleteVersion(newDocument, v3);
+		newDocument = documentService.get(id);
+		log.info(String.format(
+				"Document after version #3 has been deleted - %s", newDocument));
+		Assert.assertTrue(newDocument.getVersions().size() == 1);
+		Assert.assertTrue(newDocument.getCurrentVersion().getVersionId() == 1);
+	}
+
+	@Test
+	public void testChangeCurrentVersion() throws Throwable {
+		log.info("*** testChangeCurrentVersion ***");
+		loginAdminUser();
+		String id = String.valueOf(System.currentTimeMillis());
+		String name = "document-" + id;
+		Map<String, Object> attributes = newHashMap();
+		String html = "<html><body><h1>Hello World</h1></body></html>";
+		byte[] content = html.getBytes();
+		Set<Version> versions = newHashSet();
+		versions.add(new VersionImpl.Builder()
+				.documentId(id)
+				.file(new FileImpl.Builder().content(content).name("test.html")
+						.contentType("text/html").build()).current(true)
+				.versionId(1).build());
+		Document document = new DocumentImpl.Builder().versions(versions)
+				.attributes(attributes).id(id).name(name).roles(null).build();
+		document.setId(id);
+
+		Document newDocument = documentService.create(document);
+		Assert.assertNotNull(newDocument);
+
+		Version version2 = new VersionImpl.Builder()
+				.documentId(id)
+				.file(new FileImpl.Builder().content(content).name("test.html")
+						.contentType("text/html").build()).versionId(2)
+				.parentId(1).build();
+		documentService.addVersion(newDocument, version2);
+		newDocument = documentService.get(id);
+		log.info(String.format("Document updated - %s", newDocument));
+		Version v2 = newDocument.getVersion(2);
+		Assert.assertTrue(v2.isCurrent());
+
+		documentService.setCurrentVersion(newDocument, 1);
+		newDocument = documentService.get(id);
+		log.info(String.format(
+				"Document updated (set current version #1) - %s", newDocument));
+		Version v1 = newDocument.getVersion(1);
+		Assert.assertTrue(v1.isCurrent());
 	}
 
 	@Test(enabled = false)

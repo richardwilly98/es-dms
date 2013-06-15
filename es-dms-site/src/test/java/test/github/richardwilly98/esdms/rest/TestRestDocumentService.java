@@ -166,7 +166,7 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			Assert.assertNotNull(document);
 			ClientResponse response = resource()
 					.path(RestDocumentService.DOCUMENTS_PATH)
-					.path(RestServiceBase.FIND_PATH).path(criteria)
+					.path(RestServiceBase.SEARCH_PATH).path(criteria)
 					.cookie(adminCookie).accept(MediaType.APPLICATION_JSON)
 					.get(ClientResponse.class);
 			log.debug(String.format("status: %s", response.getStatus()));

@@ -6,7 +6,7 @@ import com.google.common.base.Strings;
 public class PermissionImpl extends ItemBaseImpl implements Permission {
 
 	private static final long serialVersionUID = 1L;
-	String access;
+	private String access;
 
 	public static class Builder extends BuilderBase<Builder> {
 

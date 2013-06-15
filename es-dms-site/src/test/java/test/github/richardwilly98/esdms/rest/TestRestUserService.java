@@ -30,7 +30,7 @@ public class TestRestUserService extends GuiceAndJettyTestBase<UserImpl> {
 		try {
 			ClientResponse response;
 			log.debug("Resource: " + resource());
-			response = resource().path(RestUserService.USERS_PATH).path(RestServiceBase.FIND_PATH)
+			response = resource().path(RestUserService.USERS_PATH).path(RestServiceBase.SEARCH_PATH)
 					.path(UserService.DEFAULT_ADMIN_LOGIN).cookie(adminCookie)
 					.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 			log.debug("status: " + response.getStatus());
