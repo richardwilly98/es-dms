@@ -40,6 +40,8 @@ public class EsSessionDAO extends AbstractSessionDAO {
 					s.setUserId(session.getAttribute(AuthenticationProvider.ES_DMS_LOGIN_ATTRIBUTE).toString());
 				}
 				service.update(s);
+			} else {
+				throw new UnknownSessionException(String.format("update session failed for %s", session.getId()));
 			}
 		} catch (ServiceException ex) {
 			log.error("update failed", ex);
