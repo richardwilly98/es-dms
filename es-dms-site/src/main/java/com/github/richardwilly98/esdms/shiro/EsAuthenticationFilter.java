@@ -4,6 +4,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
@@ -11,6 +12,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.filter.authc.UserFilter;
+import org.apache.shiro.web.util.WebUtils;
 
 import com.github.richardwilly98.esdms.api.Session;
 import com.github.richardwilly98.esdms.api.User;
@@ -23,17 +25,19 @@ import com.google.inject.Inject;
 public class EsAuthenticationFilter extends UserFilter {
 
 	private static Logger log = Logger.getLogger(EsAuthenticationFilter.class);
-	
+
 	private final AuthenticationService authenticationService;
 	private final UserService userService;
-	
+
 	@Inject
-	public EsAuthenticationFilter(final AuthenticationService authenticationService, final UserService userService) {
+	public EsAuthenticationFilter(
+			final AuthenticationService authenticationService,
+			final UserService userService) {
 		this.authenticationService = authenticationService;
 		this.userService = userService;
-//		setLoginUrl("/#/login");
+		// setLoginUrl("/#/login");
 	}
-	
+
 	@Override
 	protected Subject getSubject(ServletRequest request,
 			ServletResponse response) {
@@ -51,13 +55,17 @@ public class EsAuthenticationFilter extends UserFilter {
 				log.warn("Cookies collection is null");
 				return new Subject.Builder().buildSubject();
 			}
-			for(Cookie cookie : httpRequest.getCookies()) {
-				if (RestAuthencationService.ES_DMS_TICKET.equals(cookie.getName())) {
+			for (Cookie cookie : httpRequest.getCookies()) {
+				if (RestAuthencationService.ES_DMS_TICKET.equals(cookie
+						.getName())) {
 					String token = cookie.getValue();
-					log.debug(String.format("Find cookie %s: [%s]", RestAuthencationService.ES_DMS_TICKET, token));
+					log.debug(String.format("Find cookie %s: [%s]",
+							RestAuthencationService.ES_DMS_TICKET, token));
 					try {
 						Subject subject = getSubjectFromSessionId(token);
-						log.debug("Subject principal: " + subject.getPrincipal() + " - authenticated: " + subject.isAuthenticated());
+						log.debug("Subject principal: "
+								+ subject.getPrincipal() + " - authenticated: "
+								+ subject.isAuthenticated());
 						ThreadContext.bind(subject);
 						return subject;
 					} catch (Throwable t) {
@@ -80,26 +88,44 @@ public class EsAuthenticationFilter extends UserFilter {
 			String login = session.getUserId();
 			user = userService.get(login);
 		}
-		SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user, "", "");
+		SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user, "",
+				"");
 		return info.getPrincipals();
 	}
 
-	private Subject getSubjectByPrincipal(String token, PrincipalCollection principals) {
+	private Subject getSubjectByPrincipal(String token,
+			PrincipalCollection principals) {
 		if (log.isTraceEnabled()) {
-			log.trace(String.format("Start getSubjectByPrincipal - %s - %s", token, principals));
+			log.trace(String.format("Start getSubjectByPrincipal - %s - %s",
+					token, principals));
 		}
-		Subject currentUser = new Subject.Builder().principals(principals).sessionId(token).authenticated(true)
-				.buildSubject();
+		Subject currentUser = new Subject.Builder().principals(principals)
+				.sessionId(token).authenticated(true).buildSubject();
 		return currentUser;
 	}
 
 	private Subject getSubjectFromSessionId(String token)
 			throws ServiceException {
 		if (log.isTraceEnabled()) {
-			log.trace(String.format("Start getSubjectFromSessionId - %s", token));
+			log.trace(String
+					.format("Start getSubjectFromSessionId - %s", token));
 		}
 		Subject subject = getSubjectByPrincipal(token, getPrincipals(token));
 		return subject;
+	}
+
+	@Override
+	protected boolean onAccessDenied(ServletRequest request,
+			ServletResponse response) throws Exception {
+		Subject subject = getSubject(request, response);
+		if (subject.getPrincipal() == null) {
+			WebUtils.toHttp(response).sendError(
+					HttpServletResponse.SC_UNAUTHORIZED);
+		} else {
+			WebUtils.toHttp(response).sendError(
+					HttpServletResponse.SC_UNAUTHORIZED);
+		}
+		return false;
 	}
 
 }
