@@ -404,6 +404,49 @@ public class DocumentProviderTest extends ProviderTestBase {
 	}
 
 	@Test
+	public void testAddVersion() throws Throwable {
+		log.info("*** testAddVersion ***");
+		loginAdminUser();
+		String id = String.valueOf(System.currentTimeMillis());
+		String name = "document-" + id;
+		Map<String, Object> attributes = newHashMap();
+		String html = "<html><body><h1>Hello World</h1></body></html>";
+		byte[] content = html.getBytes();
+		Set<Version> versions = newHashSet();
+		versions.add(new VersionImpl.Builder()
+				.documentId(id)
+				.file(new FileImpl.Builder().content(content).name("test.html")
+						.contentType("text/html").build()).current(true)
+				.versionId(1).build());
+		Document document = new DocumentImpl.Builder().versions(versions)
+				.attributes(attributes).id(id).name(name).roles(null).build();
+		document.setId(id);
+
+		Document newDocument = documentService.create(document);
+		Assert.assertNotNull(newDocument);
+
+		Version version2 = new VersionImpl.Builder()
+				.documentId(id)
+				.file(new FileImpl.Builder().content(content).name("test.html")
+						.contentType("text/html").build()).versionId(2)
+				.build();
+		documentService.addVersion(newDocument, version2);
+		newDocument = documentService.get(id);
+		log.info(String.format("Document updated - %s", newDocument));
+
+		Version v1 = newDocument.getVersion(1);
+		Assert.assertNotNull(v1);
+		Assert.assertNotNull(v1.getId());
+		Assert.assertFalse(v1.isCurrent());
+
+		Version v2 = newDocument.getVersion(2);
+		Assert.assertNotNull(v2);
+		Assert.assertNull(v2.getId());
+		Assert.assertTrue(v2.isCurrent());
+		Assert.assertEquals(v2.getParentId(), v1.getVersionId());
+	}
+	
+	@Test
 	public void testDeleteVersion() throws Throwable {
 		log.info("*** testDeleteVersion ***");
 		loginAdminUser();
