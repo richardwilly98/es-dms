@@ -9,7 +9,6 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import org.apache.shiro.guice.web.GuiceShiroFilter;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import com.github.richardwilly98.esdms.inject.ProviderModule;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.guice.JerseyServletModule;
 import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
@@ -48,6 +47,7 @@ public class EsJerseyServletModule extends JerseyServletModule {
 	}
 
 	private void filters() {
+		filter("/api/*").through(GuiceShiroFilter.class);
 //		 filter("/*").through(GuiceShiroFilter.class);
 //		 filter("/api/*").through(GuiceContainer.class);
 	}
