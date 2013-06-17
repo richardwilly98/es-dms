@@ -20,6 +20,7 @@ import org.elasticsearch.common.base.Stopwatch;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.joda.time.DateTime;
@@ -109,9 +110,10 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		try {
 			Set<Document> documents = newHashSet();
 
-			QueryBuilder query = new MultiMatchQueryBuilder(criteria, "file",
-					"name");
+//			QueryBuilder query = new MultiMatchQueryBuilder(criteria, "file",
+//					"name");
 			// QueryBuilder query = fieldQuery("file", criteria);
+			QueryBuilder query = new QueryStringQueryBuilder(criteria);
 			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type)
 					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
