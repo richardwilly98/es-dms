@@ -20,12 +20,14 @@ simpleApp.directive('authenticationDirective', function($dialog) {
         login.hide();
         
         scope.$on('event:auth-loginRequired', function() {
+        	console.log('event:auth-loginRequired - Show login');
         	login.show()
         	login.slideDown('slow', function() {
         		main.hide();
         	});
         });
         scope.$on('event:auth-loginConfirmed', function() {
+        	console.log('event:auth-loginConfirmed - Hide login');
         	main.show();
         	login.slideUp();
         	login.hide();
@@ -38,7 +40,7 @@ simpleApp.config(function ($routeProvider) {
     $routeProvider
 		.when('/login', {
 		    controller: 'loginController',
-		    templateUrl: 'views/login.html'
+		    templateUrl: 'views/authentication/login.html'
 		})
 		.when('/view1', {
 		    controller: 'simpleController',
