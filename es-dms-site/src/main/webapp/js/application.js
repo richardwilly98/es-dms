@@ -21,7 +21,7 @@ simpleApp.directive('authenticationDirective', function($dialog) {
         
         scope.$on('event:auth-loginRequired', function() {
         	console.log('event:auth-loginRequired - Show login');
-        	login.show()
+//        	login.show();
         	login.slideDown('slow', function() {
         		main.hide();
         	});
@@ -30,7 +30,7 @@ simpleApp.directive('authenticationDirective', function($dialog) {
         	console.log('event:auth-loginConfirmed - Hide login');
         	main.show();
         	login.slideUp();
-        	login.hide();
+//        	login.hide();
         });
       }
     }
