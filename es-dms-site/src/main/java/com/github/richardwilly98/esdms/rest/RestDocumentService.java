@@ -18,9 +18,11 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -39,6 +41,7 @@ import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.rest.exception.PreconditionException;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.DocumentService;
@@ -65,6 +68,9 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	public static final String EDIT_PATH = "edit";
 	public static final String PREVIEW_PATH = "preview";
 	public static final String VERSIONS_PATH = "versions";
+	public static final String MARKDELETED_PATH = "deleted";
+	public static final String DELETE_PATH = "delete";
+	public static final String UNDELETE_PATH = "undelete";
 	private final DocumentService documentService;
 
 	@Inject
@@ -89,7 +95,50 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			}
 			Document document = service.get(id);
 			checkNotNull(document);
-			final String content = documentService.preview(document, criteria, fragmentSize);
+			
+			/*
+			 * Danilo
+			 * preview requires a version id parameter
+			 * 
+			 * */
+			
+			final String content = documentService.preview(document, /* document.getCurrentVersion().getId(),*/ criteria, fragmentSize);
+			Preview preview = new Preview() {
+				
+				@Override
+				public String getContent() {
+					return content;
+				}
+			};
+			return Response.status(Status.OK).entity(preview).build();
+		} catch (ServiceException e) {
+			log.error("preview failed", e);
+			throw new RestServiceException(e.getLocalizedMessage());
+		}
+	}
+	
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Path("{id}/{vid}/" + PREVIEW_PATH)
+	public Response preview(@PathParam("id") String id, @PathParam("vid") String vid, @QueryParam(PREVIEW_CRITERIA_PARAMETER) String criteria, @QueryParam(PREVIEW_FRAGMENT_SIZE_PARAMETER) @DefaultValue("1024") int fragmentSize) {
+		try {
+			isAuthenticated();
+			if (log.isTraceEnabled()) {
+				log.trace(String.format("preview - %s - %s", id, criteria));
+			}
+			if (criteria == null) {
+				criteria = "*";
+			}
+			Document document = service.get(id);
+			checkNotNull(document);
+			
+			/*
+			 * Danilo
+			 * preview requires a version id parameter
+			 * 
+			 * */
+			
+			final String content = documentService.preview(document, /* Integer.parseInt(vid),*/ criteria, fragmentSize);
 			Preview preview = new Preview() {
 				
 				@Override
@@ -127,7 +176,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			log.debug("Document: " + id + " Content type: " + version.getFile().getContentType());
 			/********************************
 			 **** ERROR
-			 **** D. Sandron
+			 **** Danilo
 			 **** changed contentype to text/plain
 			 **** needs fixing
 			 ********************************/
@@ -197,6 +246,133 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			.versionId(1).build();
 			documentService.addVersion(document, version);
 //			return create(document);
+			return response;
+		} catch (Throwable t) {
+			log.error("upload failed", t);
+			throw new RestServiceException(t.getLocalizedMessage());
+		} finally {
+			if (path != null) {
+				deleteFile(path);
+			}
+		}
+	}
+	
+	@POST
+	@Path("{id}/" + UPLOAD_PATH)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response uploadVersion(@PathParam("id") String id,
+			@FormDataParam("file") InputStream uploadedInputStream,
+			@FormDataParam("file") FormDataBodyPart body) {
+		checkNotNull(body);
+		checkNotNull(body.getContentDisposition());
+		String filename = body.getContentDisposition().getFileName();
+
+		String path = null;
+		long size = body.getContentDisposition().getSize();
+		String contentType = body.getMediaType().toString();
+		if (log.isTraceEnabled()) {
+			log.trace(String.format("upload - %s - %s - %s - %s - %s", id,
+					filename, size, contentType));
+		}
+		try {
+			isAuthenticated();
+			byte[] content;
+			if (size > 16 * 1024 * 1024) {
+				path = System.getProperty("java.io.tmpdir")
+						+ System.currentTimeMillis() + filename;
+				writeToFile(uploadedInputStream, path);
+				content = Files.readAllBytes(Paths.get(path));
+			} else {
+				content = toByteArray(uploadedInputStream);
+			}
+			File file = new FileImpl.Builder().content(content).name(filename).contentType(contentType).build();
+
+			Document document = service.get(id);
+			checkNotNull(document);
+			
+			if (!isAvailable(document)) throw new PreconditionException(String.format("Document %s is not available for uploading a version", id));
+			
+			Version currentVersion = document.getCurrentVersion();
+			checkNotNull(currentVersion);
+			currentVersion.setCurrent(false);			
+			
+			Response response = Response
+					.created(
+							getItemUri(document)).build();
+			Version version = new VersionImpl.Builder()
+			.documentId(document.getId()).current(true)
+			.file(file)
+			.parentId(currentVersion.getVersionId())
+			.current(true)
+			.versionId(document.getVersions().size() + 1 ).build();
+			documentService.addVersion(document, version);
+
+			return response;
+		} catch (Throwable t) {
+			log.error("upload failed", t);
+			throw new RestServiceException(t.getLocalizedMessage());
+		} finally {
+			if (path != null) {
+				deleteFile(path);
+			}
+		}
+	}
+	
+	@POST
+	@Path("{id}/{vid}/" + UPLOAD_PATH)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response uploadVersion(@PathParam("id") String id, @PathParam("vid") String vid,
+			@FormDataParam("file") InputStream uploadedInputStream,
+			@FormDataParam("file") FormDataBodyPart body) {
+		checkNotNull(body);
+		checkNotNull(body.getContentDisposition());
+		String filename = body.getContentDisposition().getFileName();
+
+		String path = null;
+		long size = body.getContentDisposition().getSize();
+		String contentType = body.getMediaType().toString();
+		if (log.isTraceEnabled()) {
+			log.trace(String.format("upload - %s - %s - %s - %s - %s", id,
+					filename, size, contentType));
+		}
+		try {
+			isAuthenticated();
+			byte[] content;
+			if (size > 16 * 1024 * 1024) {
+				path = System.getProperty("java.io.tmpdir")
+						+ System.currentTimeMillis() + filename;
+				writeToFile(uploadedInputStream, path);
+				content = Files.readAllBytes(Paths.get(path));
+			} else {
+				content = toByteArray(uploadedInputStream);
+			}
+			File file = new FileImpl.Builder().content(content).name(filename).contentType(contentType).build();
+
+			Document document = service.get(id);
+			checkNotNull(document);
+			
+			if (!isAvailable(document)) throw new PreconditionException(String.format("Document %s is not available for uploading a version", id));
+			
+			Version currentVersion = document.getCurrentVersion();
+			checkNotNull(currentVersion);
+			currentVersion.setCurrent(false);
+			
+			Version parentVersion = document.getVersion(Integer.parseInt(vid));
+			checkNotNull(parentVersion);
+						
+			Response response = Response
+					.created(
+							getItemUri(document)).build();
+			Version version = new VersionImpl.Builder()
+			.documentId(document.getId()).current(true)
+			.file(file)
+			.parentId(Integer.parseInt(vid))
+			.current(true)
+			.versionId(document.getVersions().size() + 1 ).build();
+			documentService.addVersion(document, version);
+
 			return response;
 		} catch (Throwable t) {
 			log.error("upload failed", t);
@@ -308,6 +484,46 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 	}
+	
+	@GET
+	@Path("{id}/{vid}/" + DOWNLOAD_PATH)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response download(@PathParam("id") String id, @PathParam("vid") String vid) {
+		try {
+			Document document = service.get(id);
+			checkNotNull(document);
+			
+			/*
+			 * Danilo
+			 * forse si puo usare un default per il vid per poi usare il getCurrentVersion
+			 * e usare una sola version del metodo.
+			 * 
+			 * */		
+			
+			Version version = document.getVersion(Integer.parseInt(vid));
+			checkNotNull(version);
+			checkNotNull(version.getFile());
+			ContentDispositionBuilder<?, ?> contentDisposition = ContentDisposition
+					.type("attachment");
+
+			contentDisposition.fileName(version.getFile().getName());
+			if (version.getFile().getDate() != null) {
+				contentDisposition.creationDate(version.getFile().getDate()
+						.toDate());
+			}
+			ResponseBuilder rb = new ResponseBuilderImpl();
+			rb.type(version.getFile().getContentType());
+			InputStream stream = new ByteArrayInputStream(version.getFile()
+					.getContent());
+			rb.entity(stream);
+			rb.status(Status.OK);
+			rb.header("Content-Disposition", contentDisposition.build());
+			return rb.build();
+		} catch (Throwable t) {
+			log.error("download failed", t);
+			return Response.status(Status.NOT_FOUND).build();
+		}
+	}
 
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -327,6 +543,121 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		}
 	}
 
+	@POST
+	@Path("{id}/" + MARKDELETED_PATH)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response queueDelete(@PathParam("id") String id) {
+		try {
+			Document document = service.get(id);
+			checkNotNull(document);
+			
+			documentService.markDeleted(document);
+			
+			return Response.noContent().build();
+		} 
+		catch (ServiceException t) {
+			log.error(String.format("Document %s is not marked as available", id), t);
+			return Response.status(Status.PRECONDITION_FAILED).build();
+		}
+		catch (Throwable t) {
+			log.error(String.format("Check if document %s exists", id), t);
+			return Response.status(Status.NOT_FOUND).build();
+		}
+	}
+	
+	@POST
+	@Path("{id}/" + UNDELETE_PATH)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response undelete(@PathParam("id") String id) {
+		try {
+			Document document = service.get(id);
+			checkNotNull(document);
+			
+			documentService.undelete(document);
+			
+			return Response.noContent().build();
+		} 
+		catch (ServiceException t) {
+			log.error(String.format("Document %s is not marked as deleted", id), t);
+			return Response.status(Status.PRECONDITION_FAILED).build();
+		}
+		catch (Throwable t) {
+			log.error(String.format("Check if document %s exists", id), t);
+			return Response.status(Status.NOT_FOUND).build();
+		}
+	}
+	
+	@DELETE
+	@Path("{id}/" + DELETE_PATH)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response delete(@PathParam("id") String id) {
+		try {
+			Document document = service.get(id);
+			checkNotNull(document);
+			
+			if (!isDeleted(document)) throw new ServiceException(String.format("Document %s is not marked as deleted", id));
+			
+			return Response.noContent().build();
+		} 
+		catch (ServiceException t) {
+			log.error(String.format("Document %s is not marked as deleted", id), t);
+			return Response.status(Status.PRECONDITION_FAILED).build();
+		}
+		catch (Throwable t) {
+			log.error(String.format("Check if document %s exists", id), t);
+			return Response.status(Status.NOT_FOUND).build();
+		}
+	}
+	
+	@POST
+	@Path("{id}/{vid}/" + MARKDELETED_PATH)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response queueDelete(@PathParam("id") String id, @PathParam("vid") String vid) {
+		try {
+			Document document = service.get(id);
+			checkNotNull(document);
+			
+			documentService.markDeleted(document);
+			
+			return Response.noContent().build();
+		} 
+		catch (ServiceException t) {
+			log.error(String.format("Document %s is not marked as available", id), t);
+			return Response.status(Status.PRECONDITION_FAILED).build();
+		}
+		catch (Throwable t) {
+			log.error(String.format("Check if document %s exists", id), t);
+			return Response.status(Status.NOT_FOUND).build();
+		}
+	}
+	
+//	@DELETE ***************************
+//	@Path("{id}/{vid}/" + DELETE_PATH)
+//	@Consumes(MediaType.APPLICATION_JSON)
+//	@Produces({ MediaType.APPLICATION_JSON })
+//	public Response delete(@PathParam("id") String id, @PathParam("vid") String vid) {
+//		try {
+//			Document document = service.get(id);
+//			checkNotNull(document);
+//			
+//			if (!isDeleted(document)) throw new ServiceException(String.format("Document %s is not marked as deleted", id));
+//			
+//			return Response.noContent().build();
+//		} 
+//		catch (ServiceException t) {
+//			log.error(String.format("Document %s is not marked as deleted", id), t);
+//			return Response.status(Status.PRECONDITION_FAILED).build();
+//		}
+//		catch (Throwable t) {
+//			log.error(String.format("Check if document %s exists", id), t);
+//			return Response.status(Status.NOT_FOUND).build();
+//		}
+//	}
+	
 	/*
 	 * Save uploaded file to temp location
 	 */
@@ -378,5 +709,23 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		} catch (Throwable t) {
 			log.error("deleteFile failed", t);
 		}
+	}
+	
+	private boolean isAvailable(Document document){
+		String status = document.getAttributes().get(Document.STATUS).toString();
+		
+		return status == null || status.equals("") || status.equals(Document.DocumentStatus.AVAILABLE.getStatusCode());
+	}
+	
+	private boolean isLocked(Document document){
+		String status = document.getAttributes().get(Document.STATUS).toString();
+		
+		return status != null && !status.equals("") && status.equals(Document.DocumentStatus.LOCKED.getStatusCode());
+	}
+	
+	private boolean isDeleted(Document document){
+		String status = document.getAttributes().get(Document.STATUS).toString();
+		
+		return status != null && !status.equals("") && status.equals(Document.DocumentStatus.DELETED.getStatusCode());
 	}
 }

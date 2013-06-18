@@ -30,6 +30,8 @@ public interface Version extends ItemBase {
 	
 	public abstract boolean isCurrent();
 	
+	public abstract void setCurrent(boolean current);
+	
 	public abstract int getParentId();
 	
 	public abstract String getDocumentId();

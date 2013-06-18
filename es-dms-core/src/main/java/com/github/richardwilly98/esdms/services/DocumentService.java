@@ -38,6 +38,12 @@ public interface DocumentService extends BaseService <Document> {
 	public abstract void checkout(Document document)
 			throws ServiceException;
 	
+	public abstract void markDeleted(Document document)
+			throws ServiceException;
+	
+	public abstract void undelete(Document document)
+			throws ServiceException;
+	
 	public abstract String preview(Document document, String criteria, int size)
 			throws ServiceException;
 

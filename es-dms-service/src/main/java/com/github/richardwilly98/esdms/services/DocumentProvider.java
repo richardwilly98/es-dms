@@ -159,6 +159,34 @@ public class DocumentProvider extends ProviderBase<Document> implements
 					"Document %s is not locked.", document.getId()));
 		}
 	}
+	
+	public void markDeleted(Document document) throws ServiceException{
+		String status = getStatus(document);
+		if (status.equals("") || status.equals(Document.DocumentStatus.AVAILABLE.getStatusCode())) {
+			SimpleDocument sd = getSimpleDocument(document);
+			sd.removeReadOnlyAttribute(Document.STATUS);
+			///sd.setReadOnlyAttribute(Document.STATUS, Document.DocumentStatus.AVAILABLE);
+
+			document = update(sd);
+		} else {
+			throw new ServiceException(String.format(
+					"Document %s is not marked as available.", document.getId()));
+		}
+	}
+	
+	public void undelete(Document document) throws ServiceException{
+		String status = getStatus(document);
+		if (!status.equals("") && status.equals(Document.DocumentStatus.DELETED.getStatusCode())) {
+			SimpleDocument sd = getSimpleDocument(document);
+			sd.removeReadOnlyAttribute(Document.STATUS);
+			///sd.setReadOnlyAttribute(Document.STATUS, Document.DocumentStatus.AVAILABLE);
+
+			document = update(sd);
+		} else {
+			throw new ServiceException(String.format(
+					"Document %s is not marked for deletion.", document.getId()));
+		}
+	}
 
 	@Override
 	public Document update(Document item) throws ServiceException {
@@ -184,7 +212,7 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	}
 
 	@Override
-	public String preview(Document document, String criteria, int size)
+	public String preview(Document document, /*int versionId,*/ String criteria, int size)
 			throws ServiceException {
 		try {
 			log.trace("*** preview ***");

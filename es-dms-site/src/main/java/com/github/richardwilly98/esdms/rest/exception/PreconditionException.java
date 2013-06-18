@@ -5,9 +5,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @SuppressWarnings("serial")
-public class RestServiceException extends WebApplicationException {
+public class PreconditionException extends WebApplicationException {
 
-	public RestServiceException(String message) {
+	public PreconditionException(String message) {
 		super(Response.status(Response.Status.BAD_REQUEST)
 	             .entity(message).type(MediaType.TEXT_PLAIN).build());
 	}

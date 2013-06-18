@@ -45,7 +45,7 @@ public class SimpleVersion extends VersionImpl {
 		super.setParentId(parentId);
 	}
 
-	protected void setCurrent(boolean current) {
+	public void setCurrent(boolean current) {
 		super.setCurrent(current);
 	}
 
