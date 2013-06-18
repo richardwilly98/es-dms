@@ -48,6 +48,7 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			Document document3 = update(document2, Document.class,
 					RestDocumentService.DOCUMENTS_PATH);
 			Assert.assertEquals(newName, document3.getName());
+			markDeletedDocument(document.getId());
 			delete(document.getId(), RestDocumentService.DOCUMENTS_PATH);
 			document2 = get(document.getId(), Document.class,
 					RestDocumentService.DOCUMENTS_PATH);
@@ -216,4 +217,12 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 		return get(uri, Document.class);
 	}
 
+	private void markDeletedDocument(String id)
+			throws Throwable {
+		ClientResponse response = resource().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.MARKDELETED_PATH)
+				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
+				.post(ClientResponse.class);
+		log.debug(String.format("status: %s", response.getStatus()));
+		Assert.assertTrue(response.getStatus() == Status.NO_CONTENT.getStatusCode());
+	}
 }

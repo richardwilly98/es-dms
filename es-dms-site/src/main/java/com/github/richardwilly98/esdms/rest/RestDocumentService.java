@@ -589,28 +589,29 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		}
 	}
 	
-	@DELETE
-	@Path("{id}/" + DELETE_PATH)
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces({ MediaType.APPLICATION_JSON })
-	public Response delete(@PathParam("id") String id) {
-		try {
-			Document document = service.get(id);
-			checkNotNull(document);
-			
-			if (!isDeleted(document)) throw new ServiceException(String.format("Document %s is not marked as deleted", id));
-			
-			return Response.noContent().build();
-		} 
-		catch (ServiceException t) {
-			log.error(String.format("Document %s is not marked as deleted", id), t);
-			return Response.status(Status.PRECONDITION_FAILED).build();
-		}
-		catch (Throwable t) {
-			log.error(String.format("Check if document %s exists", id), t);
-			return Response.status(Status.NOT_FOUND).build();
-		}
-	}
+//	@DELETE
+////	@Path("{id}/" + DELETE_PATH)
+//	@Path("{id}")
+//	@Consumes(MediaType.APPLICATION_JSON)
+//	@Produces({ MediaType.APPLICATION_JSON })
+//	public Response delete(@PathParam("id") String id) {
+//		try {
+//			Document document = service.get(id);
+//			checkNotNull(document);
+//			
+//			if (!isDeleted(document)) throw new ServiceException(String.format("Document %s is not marked as deleted", id));
+//			
+//			return Response.noContent().build();
+//		} 
+//		catch (ServiceException t) {
+//			log.error(String.format("Document %s is not marked as deleted", id), t);
+//			return Response.status(Status.PRECONDITION_FAILED).build();
+//		}
+//		catch (Throwable t) {
+//			log.error(String.format("Check if document %s exists", id), t);
+//			return Response.status(Status.NOT_FOUND).build();
+//		}
+//	}
 	
 	@POST
 	@Path("{id}/{vid}/" + MARKDELETED_PATH)
