@@ -84,10 +84,7 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 			attributes.put(DocumentImpl.STATUS,
 					DocumentImpl.DocumentStatus.AVAILABLE.getStatusCode());
 		}
-		// this.attributes = attributes;
-		for (String key : attributes.keySet()) {
-			getAttributes().put(key, attributes.get(key));
-		}
+		getAttributes().putAll(attributes);
 	}
 
 	/*
@@ -181,10 +178,6 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 		return versions;
 	}
 
-	// protected void setVersion(Set<Version> versions) {
-	// this.versions = versions;
-	// }
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -195,15 +188,8 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 		return tags;
 	}
 
-	// void setTags(Set<String> tags) {
-	// this.tags = tags;
-	// }
-
 	@Override
 	public void addTag(String tag) {
-		// if (tags == null) {
-		// tags = newHashSet();
-		// }
 		tags.add(tag);
 	}
 

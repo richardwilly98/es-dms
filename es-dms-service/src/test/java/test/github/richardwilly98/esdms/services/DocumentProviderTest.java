@@ -53,6 +53,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		Document newDocument = documentService.create(document);
 		Assert.assertNotNull(newDocument);
 		Assert.assertEquals(id, newDocument.getId());
+		Assert.assertTrue(newDocument.hasStatus(DocumentStatus.AVAILABLE));
 		log.info(String.format("New document created #%s", newDocument.getId()));
 		return id;
 	}

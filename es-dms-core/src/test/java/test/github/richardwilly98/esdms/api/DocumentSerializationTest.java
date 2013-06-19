@@ -15,6 +15,7 @@ import com.github.richardwilly98.esdms.DocumentImpl;
 import com.github.richardwilly98.esdms.FileImpl;
 import com.github.richardwilly98.esdms.VersionImpl;
 import com.github.richardwilly98.esdms.api.Document;
+import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.Version;
 
 public class DocumentSerializationTest {
@@ -41,6 +42,7 @@ public class DocumentSerializationTest {
 		log.debug(json);
 		Assert.assertNotNull(json);
 		Document document2 = mapper.readValue(json, Document.class);
+		Assert.assertTrue(document2.hasStatus(DocumentStatus.AVAILABLE));
 		Assert.assertEquals(document.getId(), document2.getId());
 		Assert.assertEquals(document.getName(), document2.getName());
 		Assert.assertTrue(document2.getAttributes().get(attributeKey).equals(attributeValue));
