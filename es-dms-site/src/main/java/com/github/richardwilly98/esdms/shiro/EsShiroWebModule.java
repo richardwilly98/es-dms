@@ -25,15 +25,12 @@ public class EsShiroWebModule extends ShiroWebModule {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void configureShiroWeb() {
-		bindConstant().annotatedWith(Names.named("shiro.loginUrl")).to("/#/login");
 		
 		bindRealm().to(EsRealm.class).asEagerSingleton();
 		bind(SessionDAO.class).to(EsSessionDAO.class);
 		bind(EsSessionDAO.class);
 		
-//		addFilterChain("/index.html", ANON);
 		addFilterChain("/api/auth/**", config(SSL, "8443"));
-//		addFilterChain("/api/auth/**", SSL);
 		addFilterChain("/api/**", Key.get(EsAuthenticationFilter.class));
 	}
 	

@@ -19,8 +19,8 @@ public class EsWebSessionManager extends DefaultWebSessionManager {
 		Cookie cookie = new SimpleCookie(RestAuthencationService.ES_DMS_TICKET);
 		cookie.setHttpOnly(true);
 		setSessionIdCookie(cookie);
-		// Cookie session is disabled. Cookie is managed in AuthenticationService login / logout
-		setSessionIdCookieEnabled(false);
+		// Cookie session is enabled. Cookie is managed in AuthenticationService login / logout
+		setSessionIdCookieEnabled(true);
 	}
 
 }

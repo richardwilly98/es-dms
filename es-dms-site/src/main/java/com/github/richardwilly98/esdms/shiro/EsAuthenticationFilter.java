@@ -63,11 +63,15 @@ public class EsAuthenticationFilter extends UserFilter {
 							RestAuthencationService.ES_DMS_TICKET, token));
 					try {
 						Subject subject = getSubjectFromSessionId(token);
+						if (subject != null) {
 						log.debug("Subject principal: "
 								+ subject.getPrincipal() + " - authenticated: "
 								+ subject.isAuthenticated());
 						ThreadContext.bind(subject);
 						return subject;
+						} else {
+							break;
+						}
 					} catch (Throwable t) {
 						log.error("getSubject failed", t);
 					}
@@ -87,6 +91,10 @@ public class EsAuthenticationFilter extends UserFilter {
 		if (session != null) {
 			String login = session.getUserId();
 			user = userService.get(login);
+			log.trace(String.format("getPrincipals - Found user %s from token %s", login, token));
+		} else {
+			log.info(String.format("getPrincipals - Cannot find user with token %s", token));
+			return null;
 		}
 		SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(user, "",
 				"");
@@ -99,7 +107,7 @@ public class EsAuthenticationFilter extends UserFilter {
 			log.trace(String.format("Start getSubjectByPrincipal - %s - %s",
 					token, principals));
 		}
-		Subject currentUser = new Subject.Builder().principals(principals)
+		Subject currentUser = new Subject.Builder().principals(principals)/*.sessionCreationEnabled(false)*/
 				.sessionId(token).authenticated(true).buildSubject();
 		return currentUser;
 	}
@@ -110,7 +118,11 @@ public class EsAuthenticationFilter extends UserFilter {
 			log.trace(String
 					.format("Start getSubjectFromSessionId - %s", token));
 		}
-		Subject subject = getSubjectByPrincipal(token, getPrincipals(token));
+		PrincipalCollection principals = getPrincipals(token);
+		if (principals == null) {
+			return null;
+		}
+		Subject subject = getSubjectByPrincipal(token, principals);
 		return subject;
 	}
 

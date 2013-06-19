@@ -23,7 +23,7 @@ public class EsConfigModule extends AbstractModule {
 	protected void configure() {
 		log.debug("*** configure ***");
 		install(new EsShiroWebModule(servletContext, securityFilterPath));
-		install(new ShiroAopModule());
+//		install(new ShiroAopModule());
 	}
 
 }

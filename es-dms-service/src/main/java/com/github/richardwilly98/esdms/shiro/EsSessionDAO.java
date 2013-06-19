@@ -36,12 +36,16 @@ public class EsSessionDAO extends AbstractSessionDAO {
 			}
 			SessionImpl s = service.get(session.getId().toString());
 			if (s != null) {
-				if (session.getAttribute(AuthenticationProvider.ES_DMS_LOGIN_ATTRIBUTE) != null) {
-					s.setUserId(session.getAttribute(AuthenticationProvider.ES_DMS_LOGIN_ATTRIBUTE).toString());
+				if (session
+						.getAttribute(AuthenticationProvider.ES_DMS_LOGIN_ATTRIBUTE) != null) {
+					s.setUserId(session.getAttribute(
+							AuthenticationProvider.ES_DMS_LOGIN_ATTRIBUTE)
+							.toString());
 				}
 				service.update(s);
 			} else {
-				throw new UnknownSessionException(String.format("update session failed for %s", session.getId()));
+				throw new UnknownSessionException(String.format(
+						"update session failed for %s", session.getId()));
 			}
 		} catch (ServiceException ex) {
 			log.error("update failed", ex);
@@ -63,8 +67,8 @@ public class EsSessionDAO extends AbstractSessionDAO {
 	@Override
 	public Collection<Session> getActiveSessions() {
 		try {
-			Set<SessionImpl> sessions = service
-					.getItems("active:true");
+			log.trace("*** getActiveSessions");
+			Set<SessionImpl> sessions = service.getItems("active:true");
 			Set<Session> activeSessions = new HashSet<Session>();
 			for (com.github.richardwilly98.esdms.api.Session session : sessions) {
 				activeSessions.add(new EsSession(session));
@@ -79,14 +83,16 @@ public class EsSessionDAO extends AbstractSessionDAO {
 	@Override
 	protected Serializable doCreate(Session session) {
 		try {
+			if (log.isTraceEnabled()) {
+				log.trace(String.format("*** doCreate - %s", session));
+			}
 			Serializable sessionId = generateSessionId(session);
 			assignSessionId(session, sessionId);
-//			SessionImpl s = new SessionImpl();
-//			s.setId(sessionId.toString());
-//			s.setCreateTime(session.getStartTimestamp());
-//			s.setLastAccessTime(session.getLastAccessTime());
-//			s.setActive(true);
-			SessionImpl s = new SessionImpl.Builder().id(sessionId.toString()).createTime(session.getStartTimestamp()).lastAccessTime(session.getLastAccessTime()).active(true).build();
+
+			SessionImpl s = new SessionImpl.Builder().id(sessionId.toString())
+					.createTime(session.getStartTimestamp())
+					.lastAccessTime(session.getLastAccessTime()).active(true)
+					.build();
 			s = service.create(s);
 			EsSession esSession = new EsSession(s);
 			return esSession.getId();
@@ -99,7 +105,11 @@ public class EsSessionDAO extends AbstractSessionDAO {
 	@Override
 	protected Session doReadSession(Serializable sessionId) {
 		try {
-			com.github.richardwilly98.esdms.api.Session session = service.get(sessionId.toString());
+			if (log.isTraceEnabled()) {
+				log.trace(String.format("*** doReadSession - %s", sessionId));
+			}
+			com.github.richardwilly98.esdms.api.Session session = service
+					.get(sessionId.toString());
 			if (session == null) {
 				return null;
 			}
