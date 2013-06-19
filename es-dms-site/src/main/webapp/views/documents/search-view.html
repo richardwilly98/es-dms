@@ -20,7 +20,7 @@
 		    		<tr data-ng-repeat="document in documents">
 		    			<td>{{ document.id }}</td>
 		    			<td>
-		    				<div class="ihighlight" popover="{{ document.preview}}" popover-placement="bottom" data-content="{{ document.preview }}" popover-title="Preview" popover-trigger="click" data-ng-click="preview(document.id)">{{ document.name }}</div>
+		    				<div class="highlight" popover="{{ document.preview}}" popover-placement="bottom" data-content="{{ document.preview }}" popover-title="Preview" popover-trigger="click" data-ng-click="preview(document.id)">{{ document.name }}</div>
 		    			</td>
 		    			<td>{{ document.attributes.author }}</td>
 		    			<td>{{ document.attributes.status }}</td>
