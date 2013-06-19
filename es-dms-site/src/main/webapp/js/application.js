@@ -23,7 +23,6 @@ simpleApp.directive('authenticationDirective', function($dialog) {
         });
         scope.$on('event:auth-loginConfirmed', function() {
         	console.log('event:auth-loginConfirmed - Hide login');
-//        	main.show();
         });
       }
     }
