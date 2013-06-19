@@ -1,50 +1,63 @@
-		<div class="container">
-			<h2>Documents Search</h2>
-			<form class="form-search">
-            	<input type="text" data-ng-model="criteria" />
-            	<button type="button" class="btn btn-primary" data-ng-click="search()">Search</button>
-            </form>
-			<br/>
-    		<alert data-ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
-		    <table class="table table-condensed">
-		    	<thead>
-		    		<tr>
-		    			<th>Id</th>
-		    			<th>Name</th>
-		    			<th>Author</th>
-		    			<th>Status</th>
-		    			<th></th>
-		    		</tr>
-		    	</thead>
-		    	<tbody>
-		    		<tr data-ng-repeat="document in documents">
-		    			<td>{{ document.id }}</td>
-		    			<td>
-		    				<div class="highlight" popover="{{ document.preview}}" popover-placement="bottom" data-content="{{ document.preview }}" popover-title="Preview" popover-trigger="click" data-ng-click="preview(document.id)">{{ document.name }}</div>
-		    			</td>
-		    			<td>{{ document.attributes.author }}</td>
-		    			<td>{{ document.attributes.status }}</td>
-		    			<td>
-		    				<div data-ng-switch="document.attributes.status" class="btn-group">
-			    				<a class="btn btn-success dropdown-toggle" data-toggle="dropdown" href="#">
-	    							Action
-	    							<span class="caret"></span>
-	  							</a>
-	  							<ul data-ng-switch-when="A" class="dropdown-menu">
-	  								<li><a href="api/documents/{{ document.id }}/view" target="_blank">View</a></li>
-	  								<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
-	  								<li><a data-ng-click="checkout(document.id)">Check-Out</a></li>
-	  								<li><a data-ng-click="delete(document.id)">Delete</a></li>
-	  							</ul>
-	  							<ul data-ng-switch-when="L" class="dropdown-menu">
-	  								<li><a href="api/documents/{{ document.id }}/view" target="_blank">View</a></li>
-	  								<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
-	  								<li><a data-ng-click="checkin(document.id)">Check-In</a></li>
-	  							</ul>
-			    			</div>
-		    			</td>
-		    		</tr>
-		    	</tbody>
-		    </table>			
-		</div>
-		
+
+<div class="container">
+	<h2>Documents Search</h2>
+	<form class="form-search">
+		<input type="text" data-ng-model="criteria" />
+		<button type="button" class="btn btn-primary" data-ng-click="search()">Search</button>
+	</form>
+	<br />
+	<alert data-ng-repeat="alert in alerts" type="alert.type"
+		close="closeAlert($index)">{{alert.msg}}</alert>
+	<table class="table table-condensed">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Name</th>
+				<th>Author</th>
+				<th>Status</th>
+				<th>Creation</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr data-ng-repeat="document in documents">
+				<td>{{ document.id }}</td>
+				<td>
+				<input type="text" value="Click me!" 
+        popover="I appeared on focus! Click away and I'll vanish..." 
+        popover-trigger="focus" />
+				<div  
+        popover="I appeared on focus! Click away and I'll vanish..." 
+        popover-trigger="focus">Click me!</div>
+					<div class="highlight" popover="{{ document.preview}}"
+						popover-placement="bottom" data-content="{{ document.preview }}"
+						popover-title="Preview" popover-trigger="click"
+						data-ng-click="preview(document.id)">{{ document.name }}</div>
+				</td>
+				<td>{{ document.attributes.author }}</td>
+				<td>{{ document.attributes.status }}</td>
+				<td>{{ document.attributes.creation }}</td>
+				<td>
+					<div data-ng-switch="document.attributes.status" class="btn-group">
+						<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
+							href="#"> Action <span class="caret"></span>
+						</a>
+						<ul data-ng-switch-when="A" class="dropdown-menu">
+							<li><a href="api/documents/{{ document.id }}/view"
+								target="_blank">View</a></li>
+							<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
+							<li><a data-ng-click="checkout(document.id)">Check-Out</a></li>
+							<li><a data-ng-click="delete(document.id)">Delete</a></li>
+						</ul>
+						<ul data-ng-switch-when="L" class="dropdown-menu">
+							<li><a href="api/documents/{{ document.id }}/view"
+								target="_blank">View</a></li>
+							<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
+							<li><a data-ng-click="checkin(document.id)">Check-In</a></li>
+						</ul>
+					</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
