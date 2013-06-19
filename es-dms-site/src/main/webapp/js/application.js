@@ -14,23 +14,16 @@ simpleApp.directive('authenticationDirective', function($dialog) {
       restrict: 'A',
       link: function(scope, elem, attrs) {
         
-        var login = elem.find('#login-holder');
+        var loginButton = elem.find('#loginButton');
         var main = elem.find('#content');
-        
-        login.hide();
         
         scope.$on('event:auth-loginRequired', function() {
         	console.log('event:auth-loginRequired - Show login');
-//        	login.show();
-        	login.slideDown('slow', function() {
-        		main.hide();
-        	});
+        	loginButton.click();
         });
         scope.$on('event:auth-loginConfirmed', function() {
         	console.log('event:auth-loginConfirmed - Hide login');
-        	main.show();
-        	login.slideUp();
-//        	login.hide();
+//        	main.show();
         });
       }
     }
