@@ -25,6 +25,7 @@ import org.elasticsearch.search.highlight.HighlightField;
 import org.joda.time.DateTime;
 
 import com.github.richardwilly98.esdms.api.Document;
+import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
@@ -48,19 +49,16 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		this.versionService = versionService;
 	}
 
-	
 	private SimpleDocument getSimpleDocument(Document document) {
 		checkNotNull(document);
-		return new SimpleDocument.Builder().document(document)
-				.build();
+		return new SimpleDocument.Builder().document(document).build();
 	}
 
 	private SimpleVersion getSimpleVersion(Version version) {
 		checkNotNull(version);
-		return new SimpleVersion.Builder().version(
-				version).build();
+		return new SimpleVersion.Builder().version(version).build();
 	}
-	
+
 	@Override
 	protected void loadInitialData() throws ServiceException {
 	}
@@ -94,10 +92,14 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	@RequiresPermissions(DELETE_PERMISSION)
 	@Override
 	public void delete(Document item) throws ServiceException {
-		
-		if (!item.hasStatus(Document.DocumentStatus.DELETED))
-				throw new ServiceException(String.format("Precondition failure: document %s not marked for deletion!", item.getId()));
-		
+
+		if (!item.hasStatus(DocumentStatus.DELETED)) {
+			throw new ServiceException(
+					String.format(
+							"Precondition failure: document %s not marked for deletion!",
+							item.getId()));
+		}
+
 		super.delete(item);
 	}
 
@@ -113,8 +115,8 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		try {
 			Set<Document> documents = newHashSet();
 
-//			QueryBuilder query = new MultiMatchQueryBuilder(criteria, "file",
-//					"name");
+			// QueryBuilder query = new MultiMatchQueryBuilder(criteria, "file",
+			// "name");
 			// QueryBuilder query = fieldQuery("file", criteria);
 			QueryBuilder query = new QueryStringQueryBuilder(criteria);
 			SearchResponse searchResponse = client.prepareSearch(index)
@@ -151,8 +153,9 @@ public class DocumentProvider extends ProviderBase<Document> implements
 
 	@Override
 	public void checkin(Document document) throws ServiceException {
-		String status = getStatus(document);
-		if (status.equals(Document.DocumentStatus.LOCKED.getStatusCode())) {
+//		String status = getStatus(document);
+		if (document.hasStatus(DocumentStatus.LOCKED)) {
+//		if (status.equals(DocumentStatus.LOCKED.getStatusCode())) {
 			SimpleDocument sd = getSimpleDocument(document);
 			sd.removeReadOnlyAttribute(Document.STATUS);
 			sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
@@ -163,30 +166,29 @@ public class DocumentProvider extends ProviderBase<Document> implements
 					"Document %s is not locked.", document.getId()));
 		}
 	}
-	
-	public void markDeleted(Document document) throws ServiceException{
-		String status = getStatus(document);
-		if (status.equals("") || status.equals(Document.DocumentStatus.AVAILABLE.getStatusCode())) {
-			SimpleDocument sd = getSimpleDocument(document);
-			sd.setReadOnlyAttribute(Document.STATUS, Document.DocumentStatus.DELETED);
 
+	public void markDeleted(Document document) throws ServiceException {
+		if (document.hasStatus(DocumentStatus.AVAILABLE)) {
+			SimpleDocument sd = getSimpleDocument(document);
+			sd.setStatus(DocumentStatus.DELETED);
 			document = update(sd);
 		} else {
-			throw new ServiceException(String.format(
-					"Document %s is not marked as available.", document.getId()));
+			throw new ServiceException(
+					String.format("Document %s is not marked as available.",
+							document.getId()));
 		}
 	}
-	
-	public void undelete(Document document) throws ServiceException{
-		String status = getStatus(document);
-		if (!status.equals("") && status.equals(Document.DocumentStatus.DELETED.getStatusCode())) {
+
+	public void undelete(Document document) throws ServiceException {
+		if (document.hasStatus(DocumentStatus.DELETED)) {
 			SimpleDocument sd = getSimpleDocument(document);
-			sd.setReadOnlyAttribute(Document.STATUS, Document.DocumentStatus.AVAILABLE);
+			sd.setStatus(DocumentStatus.AVAILABLE);
 
 			document = update(sd);
 		} else {
-			throw new ServiceException(String.format(
-					"Document %s is not marked for deletion.", document.getId()));
+			throw new ServiceException(
+					String.format("Document %s is not marked for deletion.",
+							document.getId()));
 		}
 	}
 
@@ -199,23 +201,23 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	@Override
 	public void checkout(Document document) throws ServiceException {
 		SimpleDocument sd = getSimpleDocument(document);
-		if (document.getAttributes() != null
-				&& document.getAttributes().containsKey(Document.STATUS)) {
-			if (document.getAttributes().get(Document.STATUS)
-					.equals(Document.DocumentStatus.LOCKED.getStatusCode())) {
+		if (document.hasStatus(DocumentStatus.LOCKED)) {
+//		if (document.getAttributes() != null
+//				&& document.getAttributes().containsKey(Document.STATUS)) {
+//			if (document.getAttributes().get(Document.STATUS)
+//					.equals(DocumentStatus.LOCKED.getStatusCode())) {
 				throw new ServiceException(String.format(
 						"Document %s already locked.", document.getId()));
 			}
-		}
-		sd.setReadOnlyAttribute(Document.STATUS,
-				Document.DocumentStatus.LOCKED.getStatusCode());
+//		}
+		sd.setStatus(DocumentStatus.LOCKED);
 		sd.setReadOnlyAttribute(Document.LOCKED_BY, getCurrentUser());
 		update(sd);
 	}
 
 	@Override
-	public String preview(Document document, /*int versionId,*/ String criteria, int size)
-			throws ServiceException {
+	public String preview(Document document, /* int versionId, */
+			String criteria, int size) throws ServiceException {
 		try {
 			log.trace("*** preview ***");
 			String query = jsonBuilder().startObject().startObject("bool")
@@ -263,22 +265,14 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		}
 	}
 
-	private String getStatus(Document document) {
-		Map<String, Object> attributes = document.getAttributes();
-		if (attributes == null || !attributes.containsKey(Document.STATUS)) {
-			return null;
-		} else {
-			return attributes.get(Document.STATUS).toString();
-		}
-	}
-
-	private void updateVersions(SimpleDocument document) throws ServiceException {
+	private void updateVersions(SimpleDocument document)
+			throws ServiceException {
 		for (Version version : document.getVersions().toArray(new Version[0])) {
 			SimpleVersion sv = getSimpleVersion(version);
 			if (!sv.isCurrent()) {
 				if (Strings.isNullOrEmpty(sv.getId())) {
-					/*Version newVersion =*/ versionService.create(sv);
-//					sv.setId(newVersion.getId());
+					/* Version newVersion = */versionService.create(sv);
+					// sv.setId(newVersion.getId());
 				} else {
 					versionService.update(sv);
 				}
@@ -287,7 +281,8 @@ public class DocumentProvider extends ProviderBase<Document> implements
 			}
 			log.debug(String.format("updateVersions - Version updated: %s", sv));
 		}
-		log.debug(String.format("updateVersions - 2. Document updated: %s", document));
+		log.debug(String.format("updateVersions - 2. Document updated: %s",
+				document));
 	}
 
 	@Override
@@ -304,8 +299,8 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		SimpleVersion sv = getSimpleVersion(version);
 		if (document.getCurrentVersion() != null) {
 			// Move current version to archived index
-			SimpleVersion currentVersion = getSimpleVersion(
-					document.getCurrentVersion());
+			SimpleVersion currentVersion = getSimpleVersion(document
+					.getCurrentVersion());
 			currentVersion.setCurrent(false);
 			if (sv.getParentId() == 0) {
 				sv.setParentId(currentVersion.getVersionId());
@@ -442,8 +437,7 @@ public class DocumentProvider extends ProviderBase<Document> implements
 					versionId));
 		}
 		SimpleDocument sd = getSimpleDocument(document);
-		SimpleVersion sv = getSimpleVersion(
-				document.getCurrentVersion());
+		SimpleVersion sv = getSimpleVersion(document.getCurrentVersion());
 		sv.setCurrent(false);
 		sd.updateVersion(sv);
 

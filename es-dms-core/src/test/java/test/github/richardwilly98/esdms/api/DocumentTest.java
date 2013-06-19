@@ -53,6 +53,8 @@ public class DocumentTest extends DocumentImpl {
 			Set<Version> versions = newHashSet();
 			versions.add(new VersionImpl.Builder().documentId(id).file(new FileImpl.Builder().content(content).name("test" + i + ".html").contentType("text/html").build()).current(true).versionId(1).build());
 			DocumentTest document = new DocumentTest(new DocumentImpl.Builder().versions(versions).id(id).name(name).attributes(attributes).roles(null));
+			// RLO - document status is not set at this point because it has not been serialized. Work-around force status = AVAILABLE.
+			document.setStatus(DocumentStatus.AVAILABLE);
 //			DocumentTest document = new DocumentTest(new DocumentImpl.Builder().file(new FileImpl.Builder().content(content).name("test" + i + ".html").contentType("text/html").build()).id(id).name(name).attributes(attributes).roles(null));
 			docs.put("" + i, document);
 		}
@@ -60,7 +62,8 @@ public class DocumentTest extends DocumentImpl {
 	}
 	
 	private void setStatus( DocumentStatus status){
-		super.setReadOnlyAttribute(STATUS, status);
+		// RLO - Must be .getStatusCode()
+		super.setReadOnlyAttribute(STATUS, status.getStatusCode());
 	}
 	
 	@Test

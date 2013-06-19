@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.richardwilly98.esdms.DocumentImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Version;
+import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 
 class SimpleDocument extends DocumentImpl {
 
@@ -51,6 +52,12 @@ class SimpleDocument extends DocumentImpl {
 		setReadOnlyAttribute(name, null);
 	}
 
+	protected void setStatus(DocumentStatus status) {
+		checkNotNull(status);
+		setReadOnlyAttribute(Document.STATUS,
+				status.getStatusCode());	
+	}
+	
 	/*
 	 * addVersion set the version added to current
 	 */

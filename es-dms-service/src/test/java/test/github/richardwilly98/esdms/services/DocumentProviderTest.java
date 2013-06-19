@@ -21,6 +21,7 @@ import com.github.richardwilly98.esdms.DocumentImpl;
 import com.github.richardwilly98.esdms.FileImpl;
 import com.github.richardwilly98.esdms.VersionImpl;
 import com.github.richardwilly98.esdms.api.Document;
+import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
@@ -102,7 +103,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 				"/test/github/richardwilly98/services/test-attachment.html",
 				"Aliquam");
 	}
-	
+
 	@Test
 	public void testCreateDeleteDocument() throws Throwable {
 		log.info("Start testCreateDeleteDocument ************************************");
@@ -130,15 +131,21 @@ public class DocumentProviderTest extends ProviderTestBase {
 		Document document = documentService.get(id);
 		log.info("testCreateDeleteDocument: step 3");
 		Assert.assertNotNull(document);
-		try{
+		try {
 			documentService.delete(document);
-		} catch(Exception e){
-			log.info(String.format("Document %s not deleted without having been marked for deletion. Exception raised!", id));
+			Assert.fail("Canot delete document if it has not been marked for deletion.");
+		} catch (Exception e) {
+			log.info(String
+					.format("Document %s not deleted without having been marked for deletion. Exception raised!",
+							id));
 			log.info(e.getLocalizedMessage());
 		}
 		log.info("testCreateDeleteDocument: step 4");
 		documentService.markDeleted(document);
 		
+		document = documentService.get(id);
+		Assert.assertTrue(document.hasStatus(DocumentStatus.DELETED));
+
 		log.info("testCreateDeleteDocument: step 5");
 		documentService.delete(document);
 		log.info("End testCreateDeleteDocument successfully*****************************");
@@ -323,16 +330,17 @@ public class DocumentProviderTest extends ProviderTestBase {
 		Assert.assertTrue(newDocument.getVersions().size() == 1);
 		Assert.assertTrue(newDocument.getCurrentVersion().getVersionId() == 1);
 
-		newDocument = addVersion(newDocument, 2, new FileImpl.Builder().content(content2)
-						.name("test.html").contentType("text/html").build(), 0);
-//		Version version2 = new VersionImpl.Builder()
-//				.documentId(id)
-//				.file(new FileImpl.Builder().content(content2)
-//						.name("test.html").contentType("text/html").build())
-//				.current(false).versionId(2).parentId(1).build();
-//		documentService.addVersion(newDocument, version2);
-//
-//		newDocument = documentService.get(id);
+		newDocument = addVersion(newDocument, 2, new FileImpl.Builder()
+				.content(content2).name("test.html").contentType("text/html")
+				.build(), 0);
+		// Version version2 = new VersionImpl.Builder()
+		// .documentId(id)
+		// .file(new FileImpl.Builder().content(content2)
+		// .name("test.html").contentType("text/html").build())
+		// .current(false).versionId(2).parentId(1).build();
+		// documentService.addVersion(newDocument, version2);
+		//
+		// newDocument = documentService.get(id);
 		log.info(String.format("Version #2 added to document %s", newDocument));
 		Assert.assertTrue(newDocument.getVersions().size() == 2);
 		Assert.assertTrue(newDocument.getCurrentVersion().getVersionId() == 2);
@@ -403,8 +411,8 @@ public class DocumentProviderTest extends ProviderTestBase {
 
 		newDocument = addVersion(newDocument, 2, version2.getFile(), 0);
 
-//		documentService.addVersion(newDocument, version2);
-//		newDocument = documentService.get(id);
+		// documentService.addVersion(newDocument, version2);
+		// newDocument = documentService.get(id);
 		log.info(String.format("Document updated - %s", newDocument));
 
 		Version v2 = newDocument.getVersion(2);
@@ -419,8 +427,8 @@ public class DocumentProviderTest extends ProviderTestBase {
 
 		newDocument = addVersion(newDocument, 3, version3.getFile(), 0);
 
-//		documentService.addVersion(newDocument, version3);
-//		newDocument = documentService.get(id);
+		// documentService.addVersion(newDocument, version3);
+		// newDocument = documentService.get(id);
 		log.info(String.format("Document updated - %s", newDocument));
 
 		newDocument = documentService.get(id);
@@ -469,8 +477,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		Version version2 = new VersionImpl.Builder()
 				.documentId(id)
 				.file(new FileImpl.Builder().content(content).name("test.html")
-						.contentType("text/html").build()).versionId(2)
-				.build();
+						.contentType("text/html").build()).versionId(2).build();
 		documentService.addVersion(newDocument, version2);
 		newDocument = documentService.get(id);
 		log.info(String.format("Document updated - %s", newDocument));
@@ -486,7 +493,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		Assert.assertTrue(v2.isCurrent());
 		Assert.assertEquals(v2.getParentId(), v1.getVersionId());
 	}
-	
+
 	@Test
 	public void testDeleteVersion() throws Throwable {
 		log.info("*** testDeleteVersion ***");
