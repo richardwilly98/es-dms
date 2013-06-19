@@ -102,6 +102,47 @@ public class DocumentProviderTest extends ProviderTestBase {
 				"/test/github/richardwilly98/services/test-attachment.html",
 				"Aliquam");
 	}
+	
+	@Test
+	public void testCreateDeleteDocument() throws Throwable {
+		log.info("Start testCreateDeleteDocument ************************************");
+		User user = null;
+		for (User u : users.values()) {
+			for (Role role : u.getRoles()) {
+				for (Permission permission : role.getPermissions()) {
+					if ("document:create".equals(permission.getId())) {
+						user = u;
+						break;
+					}
+				}
+			}
+		}
+		log.info("testCreateDeleteDocument: step 1");
+		Assert.assertNotNull(user);
+		authenticationService
+				.login(new CredentialImpl.Builder().username(user.getLogin())
+						.password(user.getPassword()).build());
+
+		log.info("testCreateDeleteDocument: step 2");
+		String id = createDocument("test-attachment.html", "text/html",
+				"/test/github/richardwilly98/services/test-attachment.html",
+				"Aliquam");
+		Document document = documentService.get(id);
+		log.info("testCreateDeleteDocument: step 3");
+		Assert.assertNotNull(document);
+		try{
+			documentService.delete(document);
+		} catch(Exception e){
+			log.info(String.format("Document %s not deleted without having been marked for deletion. Exception raised!", id));
+			log.info(e.getLocalizedMessage());
+		}
+		log.info("testCreateDeleteDocument: step 4");
+		documentService.markDeleted(document);
+		
+		log.info("testCreateDeleteDocument: step 5");
+		documentService.delete(document);
+		log.info("End testCreateDeleteDocument successfully*****************************");
+	}
 
 	@Test
 	public void testCannotCreateDocument() throws Throwable {

@@ -69,7 +69,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	public static final String PREVIEW_PATH = "preview";
 	public static final String VERSIONS_PATH = "versions";
 	public static final String MARKDELETED_PATH = "deleted";
-	public static final String DELETE_PATH = "delete";
+//	public static final String DELETE_PATH = "delete";
 	public static final String UNDELETE_PATH = "undelete";
 	private final DocumentService documentService;
 
@@ -291,11 +291,11 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			Document document = service.get(id);
 			checkNotNull(document);
 			
-			if (!isAvailable(document)) throw new PreconditionException(String.format("Document %s is not available for uploading a version", id));
+			if (!document.hasStatus(Document.DocumentStatus.AVAILABLE))
+				throw new PreconditionException(String.format("Document %s is not available for uploading a version", id));
 			
 			Version currentVersion = document.getCurrentVersion();
-			checkNotNull(currentVersion);
-			currentVersion.setCurrent(false);			
+			checkNotNull(currentVersion);		
 			
 			Response response = Response
 					.created(
@@ -304,9 +304,9 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			.documentId(document.getId()).current(true)
 			.file(file)
 			.parentId(currentVersion.getVersionId())
-			.current(true)
 			.versionId(document.getVersions().size() + 1 ).build();
 			documentService.addVersion(document, version);
+			documentService.setCurrentVersion(document, version.getVersionId());
 
 			return response;
 		} catch (Throwable t) {
@@ -353,11 +353,11 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			Document document = service.get(id);
 			checkNotNull(document);
 			
-			if (!isAvailable(document)) throw new PreconditionException(String.format("Document %s is not available for uploading a version", id));
+			if (!document.hasStatus(Document.DocumentStatus.AVAILABLE))
+				throw new PreconditionException(String.format("Document %s is not available for uploading a version", id));
 			
 			Version currentVersion = document.getCurrentVersion();
 			checkNotNull(currentVersion);
-			currentVersion.setCurrent(false);
 			
 			Version parentVersion = document.getVersion(Integer.parseInt(vid));
 			checkNotNull(parentVersion);
@@ -369,9 +369,9 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			.documentId(document.getId()).current(true)
 			.file(file)
 			.parentId(Integer.parseInt(vid))
-			.current(true)
 			.versionId(document.getVersions().size() + 1 ).build();
 			documentService.addVersion(document, version);
+			documentService.setCurrentVersion(document, version.getVersionId());
 
 			return response;
 		} catch (Throwable t) {
@@ -589,29 +589,30 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		}
 	}
 	
-//	@DELETE
-////	@Path("{id}/" + DELETE_PATH)
-//	@Path("{id}")
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces({ MediaType.APPLICATION_JSON })
-//	public Response delete(@PathParam("id") String id) {
-//		try {
-//			Document document = service.get(id);
-//			checkNotNull(document);
-//			
-//			if (!isDeleted(document)) throw new ServiceException(String.format("Document %s is not marked as deleted", id));
-//			
-//			return Response.noContent().build();
-//		} 
-//		catch (ServiceException t) {
-//			log.error(String.format("Document %s is not marked as deleted", id), t);
-//			return Response.status(Status.PRECONDITION_FAILED).build();
-//		}
-//		catch (Throwable t) {
-//			log.error(String.format("Check if document %s exists", id), t);
-//			return Response.status(Status.NOT_FOUND).build();
-//		}
-//	}
+	@DELETE
+//	@Path("{id}/" + DELETE_PATH)
+	@Path("{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response delete(@PathParam("id") String id) {
+		try {
+			Document document = service.get(id);
+			checkNotNull(document);
+			
+			if (!document.hasStatus(Document.DocumentStatus.DELETED))
+				throw new ServiceException(String.format("Document %s is not marked as deleted", id));
+			
+			return super.delete(id);
+		} 
+		catch (ServiceException t) {
+			log.error(String.format("Document %s is not marked as deleted", id), t);
+			return Response.status(Status.PRECONDITION_FAILED).build();
+		}
+		catch (Throwable t) {
+			log.error(String.format("Check if document %s exists", id), t);
+			return Response.status(Status.NOT_FOUND).build();
+		}
+	}
 	
 	@POST
 	@Path("{id}/{vid}/" + MARKDELETED_PATH)
@@ -636,28 +637,34 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		}
 	}
 	
-//	@DELETE ***************************
-//	@Path("{id}/{vid}/" + DELETE_PATH)
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces({ MediaType.APPLICATION_JSON })
-//	public Response delete(@PathParam("id") String id, @PathParam("vid") String vid) {
-//		try {
-//			Document document = service.get(id);
-//			checkNotNull(document);
-//			
-//			if (!isDeleted(document)) throw new ServiceException(String.format("Document %s is not marked as deleted", id));
-//			
-//			return Response.noContent().build();
-//		} 
-//		catch (ServiceException t) {
-//			log.error(String.format("Document %s is not marked as deleted", id), t);
-//			return Response.status(Status.PRECONDITION_FAILED).build();
-//		}
-//		catch (Throwable t) {
-//			log.error(String.format("Check if document %s exists", id), t);
-//			return Response.status(Status.NOT_FOUND).build();
-//		}
-//	}
+	@DELETE
+	@Path("{id}/{vid}/")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response delete(@PathParam("id") String id, @PathParam("vid") String vid) {
+		try {
+			Document document = service.get(id);
+			checkNotNull(document);
+			
+			if (!document.hasStatus(Document.DocumentStatus.DELETED))
+				throw new ServiceException(String.format("Document %s is not marked as deleted", id));
+			
+			Version version = document.getVersion(Integer.parseInt(vid));
+			checkNotNull(version);
+			
+			documentService.deleteVersion(document, version);
+			
+			return Response.noContent().build();
+		} 
+		catch (ServiceException t) {
+			log.error(String.format("Error processing deletion of version %s for document %s", vid, id), t);
+			return Response.status(Status.PRECONDITION_FAILED).build();
+		}
+		catch (Throwable t) {
+			log.error(String.format("Check if document %s exists", id), t);
+			return Response.status(Status.NOT_FOUND).build();
+		}
+	}
 	
 	/*
 	 * Save uploaded file to temp location
@@ -710,23 +717,5 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		} catch (Throwable t) {
 			log.error("deleteFile failed", t);
 		}
-	}
-	
-	private boolean isAvailable(Document document){
-		String status = document.getAttributes().get(Document.STATUS).toString();
-		
-		return status == null || status.equals("") || status.equals(Document.DocumentStatus.AVAILABLE.getStatusCode());
-	}
-	
-	private boolean isLocked(Document document){
-		String status = document.getAttributes().get(Document.STATUS).toString();
-		
-		return status != null && !status.equals("") && status.equals(Document.DocumentStatus.LOCKED.getStatusCode());
-	}
-	
-	private boolean isDeleted(Document document){
-		String status = document.getAttributes().get(Document.STATUS).toString();
-		
-		return status != null && !status.equals("") && status.equals(Document.DocumentStatus.DELETED.getStatusCode());
 	}
 }

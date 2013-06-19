@@ -40,4 +40,6 @@ public interface Document extends ItemBase {
 	public abstract void addTag(String tag);
 	
 	public abstract void removeTag(String tag);
+	
+	public abstract boolean hasStatus(Document.DocumentStatus status);
 }

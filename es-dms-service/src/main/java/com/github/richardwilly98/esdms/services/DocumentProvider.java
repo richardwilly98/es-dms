@@ -94,6 +94,10 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	@RequiresPermissions(DELETE_PERMISSION)
 	@Override
 	public void delete(Document item) throws ServiceException {
+		
+		if (!item.hasStatus(Document.DocumentStatus.DELETED))
+				throw new ServiceException(String.format("Precondition failure: document %s not marked for deletion!", item.getId()));
+		
 		super.delete(item);
 	}
 
@@ -164,8 +168,7 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		String status = getStatus(document);
 		if (status.equals("") || status.equals(Document.DocumentStatus.AVAILABLE.getStatusCode())) {
 			SimpleDocument sd = getSimpleDocument(document);
-			sd.removeReadOnlyAttribute(Document.STATUS);
-			///sd.setReadOnlyAttribute(Document.STATUS, Document.DocumentStatus.AVAILABLE);
+			sd.setReadOnlyAttribute(Document.STATUS, Document.DocumentStatus.DELETED);
 
 			document = update(sd);
 		} else {
@@ -178,8 +181,7 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		String status = getStatus(document);
 		if (!status.equals("") && status.equals(Document.DocumentStatus.DELETED.getStatusCode())) {
 			SimpleDocument sd = getSimpleDocument(document);
-			sd.removeReadOnlyAttribute(Document.STATUS);
-			///sd.setReadOnlyAttribute(Document.STATUS, Document.DocumentStatus.AVAILABLE);
+			sd.setReadOnlyAttribute(Document.STATUS, Document.DocumentStatus.AVAILABLE);
 
 			document = update(sd);
 		} else {

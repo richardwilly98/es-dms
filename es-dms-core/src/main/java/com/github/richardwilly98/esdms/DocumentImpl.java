@@ -125,6 +125,38 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 			}
 		});
 	}
+	
+	@Override
+	@JsonIgnore
+	public boolean hasStatus(Document.DocumentStatus status){
+		 log.debug("*** hasStatus start ***");
+		  
+		 if (!this.getAttributes().containsKey(Document.STATUS)) {
+		  return false;
+		 }
+		   Object dstatus = this.getAttributes().get(Document.STATUS);
+		   
+		   return dstatus.equals(status.getStatusCode());
+		
+//		log.debug("*** hasStatus start ***");
+//			
+//		DocumentStatus docStatus = (DocumentStatus) this.getAttributes().get(Document.STATUS); 
+//
+//		if(docStatus == null){
+//			docStatus = DocumentStatus.AVAILABLE; 
+//		}
+//		
+//		log.debug(String.format("hasStatus looking for status %s, found %s", status.getStatusCode(), docStatus));
+//
+//		return docStatus.getStatusCode().equals(status.getStatusCode());
+		
+//		 log.debug("*** hasStatus start ***");
+//		  
+//		  Object dstatus = this.getAttributes().get(Document.STATUS);
+//		  
+//		  return dstatus.equals(status.getStatusCode());
+
+	}
 
 	// @JsonProperty("current_version")
 	// private Version serializeCurrentVersion() {
