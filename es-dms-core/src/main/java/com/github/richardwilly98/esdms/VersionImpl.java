@@ -147,7 +147,7 @@ public class VersionImpl extends SecuredItemImpl implements Version {
 		return current;
 	}
 
-	public void setCurrent(boolean current) {
+	protected void setCurrent(boolean current) {
 		this.current = current;
 	}
 
