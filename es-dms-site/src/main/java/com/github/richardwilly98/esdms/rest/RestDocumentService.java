@@ -238,7 +238,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			Document document = new DocumentImpl.Builder().versions(new HashSet<Version>()).name(name).attributes(attributes).roles(null).build();
 			document = service.create(document);
 			Response response = Response
-					.created(
+					.ok(
 							getItemUri(document)).build();
 			Version version = new VersionImpl.Builder()
 			.documentId(document.getId()).current(true)

@@ -7,7 +7,6 @@ import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -153,9 +152,7 @@ public class DocumentProvider extends ProviderBase<Document> implements
 
 	@Override
 	public void checkin(Document document) throws ServiceException {
-//		String status = getStatus(document);
 		if (document.hasStatus(DocumentStatus.LOCKED)) {
-//		if (status.equals(DocumentStatus.LOCKED.getStatusCode())) {
 			SimpleDocument sd = getSimpleDocument(document);
 			sd.removeReadOnlyAttribute(Document.STATUS);
 			sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
@@ -202,14 +199,9 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	public void checkout(Document document) throws ServiceException {
 		SimpleDocument sd = getSimpleDocument(document);
 		if (document.hasStatus(DocumentStatus.LOCKED)) {
-//		if (document.getAttributes() != null
-//				&& document.getAttributes().containsKey(Document.STATUS)) {
-//			if (document.getAttributes().get(Document.STATUS)
-//					.equals(DocumentStatus.LOCKED.getStatusCode())) {
-				throw new ServiceException(String.format(
-						"Document %s already locked.", document.getId()));
-			}
-//		}
+			throw new ServiceException(String.format(
+					"Document %s already locked.", document.getId()));
+		}
 		sd.setStatus(DocumentStatus.LOCKED);
 		sd.setReadOnlyAttribute(Document.LOCKED_BY, getCurrentUser());
 		update(sd);
@@ -279,10 +271,7 @@ public class DocumentProvider extends ProviderBase<Document> implements
 				sv.setFile(null);
 				document.updateVersion(sv);
 			}
-			log.debug(String.format("updateVersions - Version updated: %s", sv));
 		}
-		log.debug(String.format("updateVersions - 2. Document updated: %s",
-				document));
 	}
 
 	@Override
