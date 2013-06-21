@@ -40,12 +40,14 @@ public class RestAuthencationService extends RestServiceBase<SessionImpl> {
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("login - %s", credential.getUsername()));
 			}
+			log.trace("getHost: " + url.getBaseUri().getHost());
+			log.trace("getPath: " + url.getPath());
 			String token = authenticationService.login(credential);
 			if (log.isTraceEnabled()) {
 				log.trace(String.format("Create cookie %s: [%s]", ES_DMS_TICKET, token));
 			}
 			return Response.ok().entity(new AuthenticationResponse("AUTHENTICATED", token))
-					.cookie(new NewCookie(ES_DMS_TICKET, token, "/", null, 1, "", 30000, false)).build();
+					.cookie(new NewCookie(ES_DMS_TICKET, token, "/", null, 1, url.getBaseUri().getHost(), 30000, false)).build();
 		} catch (Throwable t) {
 			log.error("login failed", t);
 			throw new RestServiceException(t.getLocalizedMessage());
