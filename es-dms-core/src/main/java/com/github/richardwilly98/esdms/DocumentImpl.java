@@ -115,12 +115,16 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 	@JsonIgnore
 	public Version getVersion(final int versionId) {
 		checkArgument(versionId > 0);
-		return Iterables.find(versions, new Predicate<Version>() {
-			@Override
-			public boolean apply(Version version) {
-				return (version.getVersionId() == versionId);
-			}
-		});
+		try {
+			return Iterables.find(versions, new Predicate<Version>() {
+				@Override
+				public boolean apply(Version version) {
+					return (version.getVersionId() == versionId);
+				}
+			});
+		} catch (NoSuchElementException ex) {
+			return null;
+		}
 	}
 
 	@Override
