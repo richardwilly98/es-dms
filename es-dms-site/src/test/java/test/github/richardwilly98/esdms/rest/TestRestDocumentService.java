@@ -38,6 +38,7 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			Document document = createDocument(name, "text/html",
 					"/test/github/richardwilly98/services/test-attachment.html");
 			Assert.assertNotNull(document);
+			Assert.assertNotNull(document.getCurrentVersion());
 			log.debug("New document: " + document);
 			Assert.assertEquals(document.getName(), name);
 			Document document2 = get(document.getId(), Document.class,
