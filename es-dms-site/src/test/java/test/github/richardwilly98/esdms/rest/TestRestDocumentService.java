@@ -234,6 +234,76 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 		log.debug("*** testCreateDocumentVersions end ***");
 	}
 	
+	@Test
+	public void testCreateUpdateDocumentVersions() throws Throwable {
+		log.debug("*** testCreateUpdateDocumentVersions ***");
+		try {
+			String name = "Aliquam";
+			String criteria  = "Aliquam";
+			
+			Document document = createDocument("test-attachment.html",
+					"text/html",
+					"/test/github/richardwilly98/services/test-attachment.html");
+			Assert.assertNotNull(document);
+			String contentType = "text/plain";
+			Version version = document.getCurrentVersion();
+			log.debug(String.format("step 1 obtained document %s having %s versions. Current version %s", 
+									document.getId(), document.getVersions().size(), version.getVersionId()));
+			Assert.assertEquals(version.getVersionId(), 1);
+			
+			version = updateVersion(document.getId(), "" + version.getVersionId(), name, contentType, "/test/github/richardwilly98/services/test-attachment2.html");
+			log.debug("testCreateUpdateDocumentVersions new content: >>>>>" + new String(version.getFile().getContent(), "UTF-8") + "<<<<<<");
+			
+			ClientResponse response = resource()
+					.path(RestDocumentService.DOCUMENTS_PATH)
+					.path(RestServiceBase.SEARCH_PATH).path(criteria)
+					.cookie(adminCookie).accept(MediaType.APPLICATION_JSON)
+					.get(ClientResponse.class);
+			log.debug(String.format("status: %s", response.getStatus()));
+			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+			List<Document> documents = response
+					.getEntity(new GenericType<List<Document>>() {
+					});
+			Assert.assertNotNull(documents);
+			Assert.assertTrue(documents.size() >= 1);
+		} catch (Throwable t) {
+			log.error("testCreateUpdateDocumentVersions fail", t);
+			Assert.fail();
+		}
+		log.debug("*** testCreateUpdateDocumentVersions end ***");
+	}
+	
+	private Version updateVersion(String documentId, String versionId, String name, String contentType, String path)
+			throws Throwable {
+		log.debug("******* updateVersion  *********");
+		byte[] content = copyToBytesFromClasspath(path);
+		InputStream is = new ByteArrayInputStream(content);
+		
+		FormDataMultiPart form = new FormDataMultiPart();
+		form.field("name", name);
+		
+		FormDataBodyPart p = new FormDataBodyPart("file", is,
+				MediaType.valueOf(contentType));
+		form.bodyPart(p);
+
+		ClientResponse response = resource()
+				.path(RestDocumentService.DOCUMENTS_PATH).path(documentId)
+				.path(RestDocumentService.VERSIONS_PATH).path(versionId)
+				.path(RestDocumentService.UPDATE_PATH).cookie(adminCookie)
+				.type(MediaType.MULTIPART_FORM_DATA)
+				.post(ClientResponse.class, form);
+		log.debug(String.format("updateVersion clientResponse location: %s", response.getLocation()));
+		log.debug(String.format("updateVersion clientResponse cookie: %s", response.getCookies()));
+		log.debug(String.format("updateVersion clientResponse toString: %s", response.toString()));
+		log.debug(String.format("updateVersion clientResponse status: %s", response.getStatus()));
+		Assert.assertTrue(response.getStatus() == Status.CREATED
+				.getStatusCode());
+		URI uri = response.getLocation();
+		Assert.assertNotNull(uri);
+		log.debug("******* updateVersion end *********");
+		return get(uri, Document.class).getCurrentVersion();
+	}
+	
 	private Version createVersion(String documentId, String name, String contentType, String path)
 			throws Throwable {
 		log.debug("******* createVersion  *********");
@@ -279,7 +349,7 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 
 		ClientResponse response = resource()
 				.path(RestDocumentService.DOCUMENTS_PATH).path(documentId)
-				.path(versionId)
+				.path(RestDocumentService.VERSIONS_PATH).path(versionId)
 				.path(RestDocumentService.UPLOAD_PATH).cookie(adminCookie)
 				.type(MediaType.MULTIPART_FORM_DATA)
 				.post(ClientResponse.class, form);

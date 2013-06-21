@@ -436,4 +436,23 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		updateVersions(sd);
 		update(sd);
 	}
+	
+	@Override
+	public void setVersionContent(Document document, int versionId, File file)
+			throws ServiceException {
+		checkNotNull(document);
+		checkArgument(versionId > 0);
+		Version version = document.getVersion(versionId);
+		if (version == null) {
+			throw new ServiceException(String.format("Version %s not found.",
+					versionId));
+		}
+		SimpleDocument sd = getSimpleDocument(document);
+		SimpleVersion sv = getSimpleVersion(version);
+		sv.setFile(file);
+		sd.updateVersion(sv);
+
+		updateVersions(sd);
+		update(sd);
+	}
 }
