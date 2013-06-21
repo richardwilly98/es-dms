@@ -320,66 +320,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	}
 	
 	@POST
-	@Path("{id}/{vid}" + UPDATE_PATH)
-	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	@Produces({ MediaType.APPLICATION_JSON })
-	public Response updateVersion(@PathParam("id") String id,
-			@PathParam("vid") String vid,
-			@FormDataParam("file") InputStream uploadedInputStream,
-			@FormDataParam("file") FormDataBodyPart body) {
-		log.info(String.format("uploadVersion %s for document id %s ", vid, id));
-		checkNotNull(body);
-		checkNotNull(body.getContentDisposition());
-		String filename = body.getContentDisposition().getFileName();
-
-		String path = null;
-		long size = body.getContentDisposition().getSize();
-		String contentType = body.getMediaType().toString();
-		if (log.isTraceEnabled()) {
-			log.trace(String.format("uploadVersion %s for document %s - %s - %s - %s - %s", vid, id,
-					filename, size, contentType));
-		}
-		try {
-			isAuthenticated();
-			byte[] content;
-			if (size > 16 * 1024 * 1024) {
-				path = System.getProperty("java.io.tmpdir")
-						+ System.currentTimeMillis() + filename;
-				writeToFile(uploadedInputStream, path);
-				content = Files.readAllBytes(Paths.get(path));
-			} else {
-				content = toByteArray(uploadedInputStream);
-			}
-			File file = new FileImpl.Builder().content(content).name(filename).contentType(contentType).build();
-
-			Document document = service.get(id);
-			checkNotNull(document);
-			
-			if (!document.hasStatus(Document.DocumentStatus.AVAILABLE))
-				throw new PreconditionException(String.format("uploadVersion: Document %s is not available for uploading a version", id));
-			
-			Version version = document.getVersion(Integer.parseInt(vid));
-			checkNotNull(version);		
-			
-			/*Response response = Response
-					.created(
-							getItemUri(document)).build();
-			version.*/
-			documentService.setCurrentVersion(document, version.getVersionId());
-
-			return null; //response;
-		} catch (Throwable t) {
-			log.error("uploadVersion: upload failed", t);
-			throw new RestServiceException(t.getLocalizedMessage());
-		} finally {
-			if (path != null) {
-				deleteFile(path);
-			}
-		}
-	}
-	
-	@POST
-	@Path("{id}/{vid}/" + UPLOAD_PATH)
+	@Path("{id}/" + VERSIONS_PATH + "/{vid}/" + UPLOAD_PATH)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response uploadVersion(@PathParam("id") String id, @PathParam("vid") String vid,
@@ -435,6 +376,65 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			return response;
 		} catch (Throwable t) {
 			log.error("upload failed", t);
+			throw new RestServiceException(t.getLocalizedMessage());
+		} finally {
+			if (path != null) {
+				deleteFile(path);
+			}
+		}
+	}
+	
+	@POST
+	@Path("{id}/" + VERSIONS_PATH + "/{vid}/"  + UPDATE_PATH)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response updateVersion(@PathParam("id") String id,
+			@PathParam("vid") String vid,
+			@FormDataParam("file") InputStream uploadedInputStream,
+			@FormDataParam("file") FormDataBodyPart body) {
+		log.info(String.format("uploadVersion %s for document id %s ", vid, id));
+		checkNotNull(body);
+		checkNotNull(body.getContentDisposition());
+		String filename = body.getContentDisposition().getFileName();
+
+		String path = null;
+		long size = body.getContentDisposition().getSize();
+		String contentType = body.getMediaType().toString();
+		if (log.isTraceEnabled()) {
+			log.trace(String.format("uploadVersion %s for document %s - %s - %s - %s", vid, id,
+					filename, size, contentType));
+		}
+		try {
+			isAuthenticated();
+			byte[] content;
+			if (size > 16 * 1024 * 1024) {
+				path = System.getProperty("java.io.tmpdir")
+						+ System.currentTimeMillis() + filename;
+				writeToFile(uploadedInputStream, path);
+				content = Files.readAllBytes(Paths.get(path));
+			} else {
+				content = toByteArray(uploadedInputStream);
+			}
+			File file = new FileImpl.Builder().content(content).name(filename).contentType(contentType).build();
+
+			Document document = service.get(id);
+			checkNotNull(document);
+			
+			if (!document.hasStatus(Document.DocumentStatus.AVAILABLE))
+				throw new PreconditionException(String.format("uploadVersion: Document %s is not available for uploading a version", id));
+			
+			Version version = document.getVersion(Integer.parseInt(vid));
+			checkNotNull(version);		
+			
+			log.info(String.format("uploadVersion updating content to: [[[[" +  new String(content, "UTF-8") + "]]]]"));
+			documentService.setVersionContent(document, version.getVersionId(), file);
+			Response response = Response
+					.created(
+							getItemUri(document)).build();
+
+			return response;
+		} catch (Throwable t) {
+			log.error("uploadVersion: upload failed", t);
 			throw new RestServiceException(t.getLocalizedMessage());
 		} finally {
 			if (path != null) {

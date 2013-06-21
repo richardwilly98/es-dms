@@ -64,4 +64,7 @@ public interface DocumentService extends BaseService <Document> {
 
 	public abstract void setCurrentVersion(Document document, int versionId)
 			throws ServiceException;
+	
+	public abstract void setVersionContent(Document document, int versionId, File file)
+			throws ServiceException;
 }
