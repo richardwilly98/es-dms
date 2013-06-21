@@ -17,13 +17,15 @@ $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
 $cookieContainer = New-Object System.Net.CookieContainer
 $session.Cookies = $cookieContainer
 $headers = @{}
+[string] $token = $null
 
 function setToken() {
-    Write-Host "Cookie header: " $session.Cookies.GetCookieHeader($uri)
+    Write-Debug "Cookie header: ($session.Cookies.GetCookieHeader($uri))"
     foreach ($cookie in $session.Cookies.GetCookies($uri)) {
-        Write-Host "Cookie: " $cookie -ForegroundColor Red
         if ($cookie.Name -eq "ES_DMS_TICKET") {
             Write-Host "Cookie: " $cookie.Name " - value: " $cookie.Value -ForegroundColor Cyan
+            $script:token = $cookie.Value
+            Write-Host "Token: $token" -ForegroundColor Red
             $headers.Add("ES_DMS_TICKET", $cookie.Value)
             break
         }
@@ -31,16 +33,14 @@ function setToken() {
 }
 
 function getUri([string] $path) {
-    [System.Uri]$myuri = New-Object System.Uri ($uri.AbsoluteUri + $path)
-    return $myuri
+    [System.Uri]$localuri = New-Object System.Uri ($uri.AbsoluteUri + $path)
+    return $localuri
 }
-function login($user, $password) {
+
+function login([string] $user = "admin", [string] $password = "secret") {
     Write-Host "*** login ***" -ForegroundColor Yellow
     $jsonCredential = @{username=$user;password=$password} | ConvertTo-Json
-    #$jsonCredential
     $response = Invoke-RestMethod -Uri (getUri "/api/auth/login") -Method Post -Body $jsonCredential -ContentType "application/json" -Verbose -SessionVariable session
-    #$response | get-member
-    #$session
     setToken
 }
 
@@ -63,14 +63,10 @@ function parseSearchResult($response) {
     }
 }
 
-function upload([string] $filename, [string] $contentType = "text/plain") {
-    #$body = @{}
-    #$body.Add("name", $filename)
-    #$body.Add("file", $(get-content $filename -raw))
-    #$contents = $(Get-Content $filename -Encoding Unicode) #gc "my file path"
-    #$contents = $(Get-Content $filename -Encoding utf8) #gc "my file path"
-    $contents = $(Get-Content $filename -Encoding UTF8)
-$body = @"
+function uploadOld([string] $filename, [string] $contentType = "text/plain") {
+    Write-Host "*** upload ***" -ForegroundColor Yellow
+    $contents = $(Get-Content $filename -encoding byte)
+    $body = @"
 --boundary
 Content-Disposition: form-data; name="name"
 
@@ -83,7 +79,7 @@ $contents
 --boundary--
 "@
     $body
-    $body | Out-File request.txt -Encoding utf8
+    $body | Out-File request.txt -Encoding Default
 
     $h = $headers
     #$h.Add("Content-Length", $body.Length.ToString())
@@ -94,11 +90,57 @@ $contents
     $response
 }
 
+function upload([string] $filename, [string] $contentType = "text/plain") {
+    Write-Host "*** upload ***" -ForegroundColor Yellow
+    Write-Host "Token: $token" -ForegroundColor Red
+#curl --request POST --header "ES_DMS_TICKET: d732c84f-cfa6-42a0-97af-eb4bfb25a187" --form "name=pippo" --form "file=@sample.pdf;type=application/pdf" --insecure https://localhost:8443/es-dms-site/api/documents/upload --include
+    $command = "curl --request POST --header 'ES_DMS_TICKET: {0}' --form 'name={1}' --form 'file=@{1};type={2}' --insecure https://localhost:8443/es-dms-site/api/documents/upload --include" -f $token, $filename, $contentType
+    Write-Host "Execute command: $command" -ForegroundColor Yellow
+    $response = Invoke-Expression $command
+    Write-Host "Found response: $response" -ForegroundColor Cyan
+}
+
+function import([string] $path) {
+    #Get-ChildItem -Path V:\Myfolder -Filter CopyForbuild.bat -Recurse
+    $files = Get-ChildItem -Path $path -Recurse | Where {!$_.PSIsContainer}# | Select-Object FullName
+    foreach($file in $files) {
+        importFile $file
+    }
+}
+
+function importFile($file) {
+#$file | Get-Member
+    if (Test-Path $file.FullName) {
+        $mimeType = Get-MimeType -extension $file.Extension 
+        Write-Host "Import file extension " $file.Extension " - " $mimeType
+        if ($mimeType -ne $null) {
+            upload $file.FullName $mimeType
+        }
+    }
+}
+
+function Get-MimeType()
+{
+  param($extension = $null);
+  $mimeType = $null;
+  if ( $null -ne $extension )
+  {
+    $drive = Get-PSDrive HKCR -ErrorAction SilentlyContinue;
+    if ( $null -eq $drive )
+    {
+      $drive = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
+    }
+    $mimeType = (Get-ItemProperty HKCR:$extension)."Content Type";
+  }
+  $mimeType;
+}
+
 cls
 login "admin" "secret"
 #search "vaadin"
-#upload "sample.pdf" "application/pdf"
-upload "test.txt"
-search "FilterTcpDropDown"
-#search "sample"
+#upload "test.pdf" "application/pdf"
+#upload "test.txt"
+#search "FilterTcpDropDown"
+#search "Escalation"
+import "D:\Users\Richard\Documents\OpenText"
 #logout
