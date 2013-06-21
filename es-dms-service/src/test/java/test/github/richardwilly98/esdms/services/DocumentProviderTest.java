@@ -134,7 +134,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		Assert.assertNotNull(document);
 		try {
 			documentService.delete(document);
-			Assert.fail("Canot delete document if it has not been marked for deletion.");
+			Assert.fail("Cannot delete document if it has not been marked for deletion.");
 		} catch (Exception e) {
 			log.info(String
 					.format("Document %s not deleted without having been marked for deletion. Exception raised!",
