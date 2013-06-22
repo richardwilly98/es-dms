@@ -63,6 +63,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	public static final String DOCUMENTS_PATH = "documents";
 	public static final String CHECKOUT_PATH = "checkout";
 	public static final String CHECKIN_PATH = "checkin";
+	public static final String CURRENT_PATH = "current";
 	public static final String DOWNLOAD_PATH = "download";
 	public static final String VIEW_PATH = "view";
 	public static final String EDIT_PATH = "edit";
@@ -356,9 +357,6 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			if (!document.hasStatus(Document.DocumentStatus.AVAILABLE))
 				throw new PreconditionException(String.format("Document %s is not available for uploading a version", id));
 			
-			Version currentVersion = document.getCurrentVersion();
-			checkNotNull(currentVersion);
-			
 			Version parentVersion = document.getVersion(Integer.parseInt(vid));
 			checkNotNull(parentVersion);
 						
@@ -477,6 +475,41 @@ public class RestDocumentService extends RestServiceBase<Document> {
 			return create(document);
 		} catch (Throwable t) {
 			log.error("upload failed", t);
+			throw new RestServiceException(t.getLocalizedMessage());
+		}
+	}
+	
+	@POST
+	@Path("{id}/" + VERSIONS_PATH + "/{vid}/" + CURRENT_PATH)
+	//@Consumes(MediaType.APPLICATION_JSON)
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response setCurrentVersion(@PathParam("id") String id, @PathParam("vid") String vid){
+		
+		log.debug(String.format("RestDocumentService: setCurrentVersion for document %s to version %s", id, vid));
+		try {
+			isAuthenticated();
+
+			Document document = service.get(id);
+			checkNotNull(document);
+			
+			if (!document.hasStatus(Document.DocumentStatus.AVAILABLE))
+				throw new PreconditionException(String.format("RestDocumentService: Document %s is not available for uploading a version", id));
+			
+			Version version = document.getVersion(Integer.parseInt(vid));
+			checkNotNull(version);
+			
+			documentService.setCurrentVersion(document, version.getVersionId());
+						
+			Response response = Response
+					.ok(
+							//getItemUri(document)
+							).build();
+
+			log.debug(String.format("RestDocumentService: document - %s, current version - %s, ", document.getId(), version.getVersionId()));
+			log.debug("RestDocumentService: setCurrentVersion end ok");
+			return response;
+		} catch (Throwable t) {
+			log.error("RestDocumentService: setCurrentVersion failed", t);
 			throw new RestServiceException(t.getLocalizedMessage());
 		}
 	}

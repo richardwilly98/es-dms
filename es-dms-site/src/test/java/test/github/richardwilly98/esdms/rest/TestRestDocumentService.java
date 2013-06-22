@@ -186,7 +186,6 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			log.error("testFindDocuments fail", t);
 			Assert.fail();
 		}
-
 	}
 	
 	@Test
@@ -202,18 +201,44 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			Assert.assertNotNull(document);
 			String contentType = "text/plain";
 			Version oldV = document.getCurrentVersion();
-			log.debug(String.format("step 1 obtained document %s having %s versions. Current version %s", 
+			log.debug(String.format("testCreateDocumentVersions step 1 obtained document %s having %s versions. Current version %s", 
 									document.getId(), document.getVersions().size(), oldV.getVersionId()));
 			Assert.assertEquals(oldV.getVersionId(), 1);
 			Version newV = createVersion(document.getId(), name, contentType, "/test/github/richardwilly98/services/test-attachment.html");			
-			log.debug(String.format("step 2 obtained document %s having %s versions. Current version %s, New version %s", 
+			log.debug(String.format("testCreateDocumentVersions step 2 obtained document %s having %s versions. Current version %s, New version %s", 
 					document.getId(), document.getVersions().size(), document.getCurrentVersion().getVersionId(), newV.getVersionId()));
-			Assert.assertEquals(newV.getVersionId(), 2);
+			//Assert.assertEquals(newV.getVersionId(), 2);
+			Assert.assertEquals(document.getCurrentVersion().getVersionId(), 2);
 			
 			newV = createFromVersion(document.getId(), "" + oldV.getVersionId(), name, contentType, "/test/github/richardwilly98/services/test-attachment.html");			
-			log.debug(String.format("step 3 obtained document %s having %s versions. Current version %s, New version %s", 
+			log.debug(String.format("testCreateDocumentVersions step 3 obtained document %s having %s versions. Current version %s, New version %s", 
 					document.getId(), document.getVersions().size(), document.getCurrentVersion().getVersionId(), newV.getVersionId()));
-			Assert.assertEquals(newV.getVersionId(), 3);
+			//Assert.assertEquals(newV.getVersionId(), 3);
+			Assert.assertEquals(document.getCurrentVersion().getVersionId(), 3);
+			
+			log.debug(String.format("testCreateDocumentVersions step 4 obtained document %s having %s versions. Current version %s, New version %s",
+					document.getId(), document.getVersions().size(), document.getCurrentVersion().getVersionId(), 2));
+			
+			if (setCurrentVersion(document.getId(), "" + 2)) log.debug(String.format("testCreateDocumentVersions step 4: Moved current version from 3 to: ", document.getCurrentVersion().getVersionId()));
+			else log.debug(String.format("testCreateDocumentVersions step 4: Failed to move current version from 3 to 2. current version: ", document.getCurrentVersion().getVersionId()));
+				Assert.assertEquals(document.getCurrentVersion().getVersionId(), 2);
+			
+			log.debug(String.format("testCreateDocumentVersions step 5 obtained document %s having %s versions. Current version %s, New version %s",
+					document.getId(), document.getVersions().size(), document.getCurrentVersion().getVersionId(), 1));
+			
+			if (setCurrentVersion(document.getId(), "" + 1)) log.debug(String.format("testCreateDocumentVersions step 5: Moved current version from 2 to: ", document.getCurrentVersion().getVersionId()));
+			else log.debug(String.format("testCreateDocumentVersions step 5: Failed to move current version from 2 to 1. current version: ", document.getCurrentVersion().getVersionId()));
+			Assert.assertEquals(document.getCurrentVersion().getVersionId(), 1);
+			
+			log.debug(String.format("testCreateDocumentVersions step 6 obtained document %s having %s versions. Current version %s, New version %s",
+					document.getId(), document.getVersions().size(), document.getCurrentVersion().getVersionId(), 3));
+			
+			if (setCurrentVersion(document.getId(), "" + 3)) log.debug(String.format("testCreateDocumentVersions step 6: Moved current version from 1 to: ", document.getCurrentVersion().getVersionId()));
+			else log.debug(String.format("testCreateDocumentVersions step 6: Failed to move current version from 1 to 3. current version: ", document.getCurrentVersion().getVersionId()));
+			Assert.assertEquals(document.getCurrentVersion().getVersionId(), 3);
+			
+			log.debug(String.format("testCreateDocumentVersions step 7 obtained document %s having %s versions. Current version %s",
+					document.getId(), document.getVersions().size(), document.getCurrentVersion().getVersionId()));
 			
 			ClientResponse response = resource()
 					.path(RestDocumentService.DOCUMENTS_PATH)
@@ -271,6 +296,26 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			Assert.fail();
 		}
 		log.debug("*** testCreateUpdateDocumentVersions end ***");
+	}
+	
+	private boolean setCurrentVersion(String documentId, String versionId)
+			throws Throwable {
+		log.debug("******* setCurrentVersion  *********");
+
+		ClientResponse response = resource()
+				.path(RestDocumentService.DOCUMENTS_PATH).path(documentId)
+				.path(RestDocumentService.VERSIONS_PATH).path(versionId)
+				.path(RestDocumentService.CURRENT_PATH).cookie(adminCookie)
+				.post(ClientResponse.class);
+		log.debug(String.format("setCurrentVersion clientResponse location: %s", response.getLocation()));
+		log.debug(String.format("setCurrentVersion clientResponse cookie: %s", response.getCookies()));
+		log.debug(String.format("setCurrentVersion clientResponse toString: %s", response.toString()));
+		log.debug(String.format("setCurrentVersion clientResponse status: %s", response.getStatus()));
+		Assert.assertTrue(response.getStatus() == Status.OK
+				.getStatusCode());
+		
+		log.debug("******* setCurrentVersion end *********");
+		return response.getStatus() == Status.OK.getStatusCode();
 	}
 	
 	private Version updateVersion(String documentId, String versionId, String name, String contentType, String path)
