@@ -8,6 +8,7 @@ public class SettingsImpl implements Settings {
 	private String library;
 	private String esHost;
 	private int esPort;
+	private boolean indexRefresh;
 
 	/* (non-Javadoc)
 	 * @see com.github.richardwilly98.esdms.Settings#getLibrary()
@@ -61,5 +62,16 @@ public class SettingsImpl implements Settings {
 	public String toString() {
 		return Objects.toStringHelper(this).add("library", library).add("esPort", esPort)
 				.add("esHost", esHost).toString();
+	}
+
+	@Override
+	public boolean isIndexRefresh() {
+		return indexRefresh;
+	}
+
+	@Override
+	public void setIndexRefresh(boolean indexRefresh) {
+		this.indexRefresh = indexRefresh;
+		
 	}
 }

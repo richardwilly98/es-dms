@@ -4,11 +4,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.common.settings.ImmutableSettings.Builder;
 
 import com.github.richardwilly98.esdms.SettingsImpl;
 import com.github.richardwilly98.esdms.api.Settings;
-import com.github.richardwilly98.esdms.services.BootstrapService;
 
 public class BootstrapProvider implements BootstrapService {
 
@@ -17,17 +15,18 @@ public class BootstrapProvider implements BootstrapService {
 
 	@Override
 	public Settings loadSettings() {
-		if (settings == null) {
-			Builder builder = ImmutableSettings.settingsBuilder()
-					.loadFromClasspath("es-dms-settings.yml");
-			checkNotNull(builder);
-			checkNotNull(builder.get("library"));
-			checkNotNull(builder.get("es.host"));
-			checkNotNull(builder.get("es.port"));
-			settings = new SettingsImpl();
-			settings.setLibrary(builder.get("library"));
-			settings.setEsHost(builder.get("es.host"));
-			settings.setEsPort(Integer.parseInt(builder.get("es.port")));
+		if (this.settings == null) {
+			org.elasticsearch.common.settings.Settings settings = ImmutableSettings.settingsBuilder()
+					.loadFromClasspath("es-dms-settings.yml").build();
+			checkNotNull(settings);
+			checkNotNull(settings.get("library"));
+			checkNotNull(settings.get("es.host"));
+			checkNotNull(settings.get("es.port"));
+			this.settings = new SettingsImpl();
+			this.settings.setLibrary(settings.get("library"));
+			this.settings.setEsHost(settings.get("es.host"));
+			this.settings.setEsPort(settings.getAsInt("es.port", 9300));
+			this.settings.setIndexRefresh(settings.getAsBoolean("es.index.refresh", false));
 			log.debug("settings: " + settings);
 		}
 		return settings;

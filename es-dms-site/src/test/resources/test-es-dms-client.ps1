@@ -1,4 +1,13 @@
-﻿Add-Type @"
+﻿[CmdletBinding(SupportsShouldProcess=$true)]
+
+Param(
+    [Parameter(Mandatory=$true)][string] $path,
+    [Parameter(Mandatory=$false)][Alias("u")][string] $username = "admin",
+    [Parameter(Mandatory=$false)][Alias("p")][string] $password = "secret",
+    [Parameter(Mandatory=$false)][string] $baseuri = "https://localhost:8443"
+)
+
+Add-Type @"
     using System.Net;
     using System.Security.Cryptography.X509Certificates;
     public class TrustAllCertsPolicy : ICertificatePolicy {
@@ -11,7 +20,7 @@
 "@
 [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 
-$baseuri = "https://localhost:8443"
+#$baseuri = "https://localhost:8443"
 $uri = New-Object System.Uri ($baseuri + "/es-dms-site")
 $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
 $cookieContainer = New-Object System.Net.CookieContainer
@@ -25,7 +34,6 @@ function setToken() {
         if ($cookie.Name -eq "ES_DMS_TICKET") {
             Write-Host "Cookie: " $cookie.Name " - value: " $cookie.Value -ForegroundColor Cyan
             $script:token = $cookie.Value
-            Write-Host "Token: $token" -ForegroundColor Red
             $headers.Add("ES_DMS_TICKET", $cookie.Value)
             break
         }
@@ -37,7 +45,7 @@ function getUri([string] $path) {
     return $localuri
 }
 
-function login([string] $user = "admin", [string] $password = "secret") {
+function login([string] $user, [string] $password) {
     Write-Host "*** login ***" -ForegroundColor Yellow
     $jsonCredential = @{username=$user;password=$password} | ConvertTo-Json
     $response = Invoke-RestMethod -Uri (getUri "/api/auth/login") -Method Post -Body $jsonCredential -ContentType "application/json" -Verbose -SessionVariable session
@@ -92,17 +100,17 @@ $contents
 
 function upload([string] $filename, [string] $contentType = "text/plain") {
     Write-Host "*** upload ***" -ForegroundColor Yellow
-    Write-Host "Token: $token" -ForegroundColor Red
-#curl --request POST --header "ES_DMS_TICKET: d732c84f-cfa6-42a0-97af-eb4bfb25a187" --form "name=pippo" --form "file=@sample.pdf;type=application/pdf" --insecure https://localhost:8443/es-dms-site/api/documents/upload --include
-    $command = "curl --request POST --header 'ES_DMS_TICKET: {0}' --form 'name={1}' --form 'file=@{1};type={2}' --insecure https://localhost:8443/es-dms-site/api/documents/upload --include" -f $token, $filename, $contentType
+    #curl --request POST --header "ES_DMS_TICKET: d732c84f-cfa6-42a0-97af-eb4bfb25a187" --form "name=pippo" --form "file=@sample.pdf;type=application/pdf" --insecure https://localhost:8443/es-dms-site/api/documents/upload --include
+    $uri = (getUri("/api/documents/upload")).AbsoluteUri
+    #$command = "curl --request POST --header 'ES_DMS_TICKET: {0}' --form 'name={1}' --form 'file=@{1};type={2}' --insecure https://localhost:8443/es-dms-site/api/documents/upload --include" -f $token, $filename, $contentType
+    $command = "curl --request POST --header 'ES_DMS_TICKET: {0}' --form 'name={1}' --form 'file=@{1};type={2}' --insecure {3} --include" -f $token, $filename, $contentType, $uri
     Write-Host "Execute command: $command" -ForegroundColor Yellow
     $response = Invoke-Expression $command
-    Write-Host "Found response: $response" -ForegroundColor Cyan
+    Write-Host "curl response: $response" -ForegroundColor Cyan
 }
 
 function import([string] $path) {
-    #Get-ChildItem -Path V:\Myfolder -Filter CopyForbuild.bat -Recurse
-    $files = Get-ChildItem -Path $path -Recurse | Where {!$_.PSIsContainer}# | Select-Object FullName
+    $files = Get-ChildItem -Path $path -Recurse | Where {!$_.PSIsContainer}
     foreach($file in $files) {
         importFile $file
     }
@@ -136,11 +144,11 @@ function Get-MimeType()
 }
 
 cls
-login "admin" "secret"
+login $username $password
 #search "vaadin"
 #upload "test.pdf" "application/pdf"
 #upload "test.txt"
 #search "FilterTcpDropDown"
 #search "Escalation"
-import "D:\Users\Richard\Documents\OpenText"
+import $path #"D:\Users\Richard\Documents\OpenText"
 #logout

@@ -17,5 +17,9 @@ public interface Settings {
 	public abstract int getEsPort();
 
 	public abstract void setEsPort(int esPort);
+	
+	public abstract boolean isIndexRefresh();
+	
+	abstract void setIndexRefresh(boolean indexRefresh);
 
 }
