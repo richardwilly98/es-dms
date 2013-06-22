@@ -251,7 +251,9 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	}
 
 	protected void refreshIndex() {
-		client.admin().indices().refresh(new RefreshRequest(index)).actionGet();
+		if (settings.isIndexRefresh()) {
+			client.admin().indices().refresh(new RefreshRequest(index)).actionGet();
+		}
 	}
 
 	protected abstract void loadInitialData() throws ServiceException;
