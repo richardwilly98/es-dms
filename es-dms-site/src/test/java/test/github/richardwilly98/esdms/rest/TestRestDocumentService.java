@@ -24,6 +24,7 @@ import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
+
 //import com.sun.jersey.multipart.FormDataParam;
 
 public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
@@ -187,98 +188,160 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			Assert.fail();
 		}
 	}
-	
+
 	@Test
 	public void testCreateDocumentVersions() throws Throwable {
 		log.debug("*** testCreateDocumentVersions ***");
 		try {
 			String name = "Aliquam";
-			String criteria  = "Aliquam";
-			
+			String criteria = "Aliquam";
+
 			Document document = createDocument("test-attachment.html",
 					"text/html",
 					"/test/github/richardwilly98/services/test-attachment.html");
 			Assert.assertNotNull(document);
 			String contentType = "text/plain";
 			Version oldV = document.getCurrentVersion();
-			log.debug(String.format("testCreateDocumentVersions step 1 obtained document %s having %s versions. Current version %s", 
-									document.getId(), document.getVersions().size(), oldV.getVersionId()));
+			log.debug(String
+					.format("testCreateDocumentVersions step 1 obtained document %s having %s versions. Current version %s",
+							document.getId(), document.getVersions().size(),
+							oldV.getVersionId()));
 			Assert.assertEquals(oldV.getVersionId(), 1);
-			Version newV = createVersion(document.getId(), name, contentType, "/test/github/richardwilly98/services/test-attachment.html");			
-			log.debug(String.format("testCreateDocumentVersions step 2 obtained document %s having %s versions. Current version %s, New version %s", 
-					document.getId(), document.getVersions().size(), document.getCurrentVersion().getVersionId(), newV.getVersionId()));
-			//Assert.assertEquals(newV.getVersionId(), 2);
+			Version newV = createVersion(document.getId(), name, contentType,
+					"/test/github/richardwilly98/services/test-attachment.html");
+			log.debug(String
+					.format("testCreateDocumentVersions step 2 obtained document %s having %s versions. Current version %s, New version %s",
+							document.getId(), document.getVersions().size(),
+							document.getCurrentVersion().getVersionId(),
+							newV.getVersionId()));
+
+			document = get(document.getId(), Document.class,
+					RestDocumentService.DOCUMENTS_PATH);
+			// Assert.assertEquals(newV.getVersionId(), 2);
 			Assert.assertEquals(document.getCurrentVersion().getVersionId(), 2);
-			
-			newV = createFromVersion(document.getId(), "" + oldV.getVersionId(), name, contentType, "/test/github/richardwilly98/services/test-attachment.html");			
-			log.debug(String.format("testCreateDocumentVersions step 3 obtained document %s having %s versions. Current version %s, New version %s", 
-					document.getId(), document.getVersions().size(), document.getCurrentVersion().getVersionId(), newV.getVersionId()));
-			//Assert.assertEquals(newV.getVersionId(), 3);
+
+			newV = createFromVersion(document.getId(),
+					"" + oldV.getVersionId(), name, contentType,
+					"/test/github/richardwilly98/services/test-attachment.html");
+			log.debug(String
+					.format("testCreateDocumentVersions step 3 obtained document %s having %s versions. Current version %s, New version %s",
+							document.getId(), document.getVersions().size(),
+							document.getCurrentVersion().getVersionId(),
+							newV.getVersionId()));
+
+			document = get(document.getId(), Document.class,
+					RestDocumentService.DOCUMENTS_PATH);
+
+			// Assert.assertEquals(newV.getVersionId(), 3);
 			Assert.assertEquals(document.getCurrentVersion().getVersionId(), 3);
-			
-			log.debug(String.format("testCreateDocumentVersions step 4 obtained document %s having %s versions. Current version %s, New version %s",
-					document.getId(), document.getVersions().size(), document.getCurrentVersion().getVersionId(), 2));
-			
-			if (setCurrentVersion(document.getId(), "" + 2)) log.debug(String.format("testCreateDocumentVersions step 4: Moved current version from 3 to: ", document.getCurrentVersion().getVersionId()));
-			else log.debug(String.format("testCreateDocumentVersions step 4: Failed to move current version from 3 to 2. current version: ", document.getCurrentVersion().getVersionId()));
-				Assert.assertEquals(document.getCurrentVersion().getVersionId(), 2);
-			
-			log.debug(String.format("testCreateDocumentVersions step 5 obtained document %s having %s versions. Current version %s, New version %s",
-					document.getId(), document.getVersions().size(), document.getCurrentVersion().getVersionId(), 1));
-			
-			if (setCurrentVersion(document.getId(), "" + 1)) log.debug(String.format("testCreateDocumentVersions step 5: Moved current version from 2 to: ", document.getCurrentVersion().getVersionId()));
-			else log.debug(String.format("testCreateDocumentVersions step 5: Failed to move current version from 2 to 1. current version: ", document.getCurrentVersion().getVersionId()));
+
+			log.debug(String
+					.format("testCreateDocumentVersions step 4 obtained document %s having %s versions. Current version %s, New version %s",
+							document.getId(), document.getVersions().size(),
+							document.getCurrentVersion().getVersionId(), 2));
+
+			if (setCurrentVersion(document.getId(), "" + 2)) {
+				log.debug(String
+						.format("testCreateDocumentVersions step 4: Moved current version from 3 to: ",
+								document.getCurrentVersion().getVersionId()));
+			} else {
+				log.debug(String
+						.format("testCreateDocumentVersions step 4: Failed to move current version from 3 to 2. current version: ",
+								document.getCurrentVersion().getVersionId()));
+			}
+			document = get(document.getId(), Document.class,
+					RestDocumentService.DOCUMENTS_PATH);
+
+			Assert.assertEquals(document.getCurrentVersion().getVersionId(), 2);
+
+			log.debug(String
+					.format("testCreateDocumentVersions step 5 obtained document %s having %s versions. Current version %s, New version %s",
+							document.getId(), document.getVersions().size(),
+							document.getCurrentVersion().getVersionId(), 1));
+
+			if (setCurrentVersion(document.getId(), "" + 1))
+				log.debug(String
+						.format("testCreateDocumentVersions step 5: Moved current version from 2 to: ",
+								document.getCurrentVersion().getVersionId()));
+			else
+				log.debug(String
+						.format("testCreateDocumentVersions step 5: Failed to move current version from 2 to 1. current version: ",
+								document.getCurrentVersion().getVersionId()));
+
+			document = get(document.getId(), Document.class,
+					RestDocumentService.DOCUMENTS_PATH);
+
 			Assert.assertEquals(document.getCurrentVersion().getVersionId(), 1);
+
+			log.debug(String
+					.format("testCreateDocumentVersions step 6 obtained document %s having %s versions. Current version %s, New version %s",
+							document.getId(), document.getVersions().size(),
+							document.getCurrentVersion().getVersionId(), 3));
+
+			if (setCurrentVersion(document.getId(), "" + 3))
+				log.debug(String
+						.format("testCreateDocumentVersions step 6: Moved current version from 1 to: ",
+								document.getCurrentVersion().getVersionId()));
+			else
+				log.debug(String
+						.format("testCreateDocumentVersions step 6: Failed to move current version from 1 to 3. current version: ",
+								document.getCurrentVersion().getVersionId()));
+			document = get(document.getId(), Document.class,
+					RestDocumentService.DOCUMENTS_PATH);
+
 			
-			log.debug(String.format("testCreateDocumentVersions step 6 obtained document %s having %s versions. Current version %s, New version %s",
-					document.getId(), document.getVersions().size(), document.getCurrentVersion().getVersionId(), 3));
-			
-			if (setCurrentVersion(document.getId(), "" + 3)) log.debug(String.format("testCreateDocumentVersions step 6: Moved current version from 1 to: ", document.getCurrentVersion().getVersionId()));
-			else log.debug(String.format("testCreateDocumentVersions step 6: Failed to move current version from 1 to 3. current version: ", document.getCurrentVersion().getVersionId()));
 			Assert.assertEquals(document.getCurrentVersion().getVersionId(), 3);
-			
-			log.debug(String.format("testCreateDocumentVersions step 7 obtained document %s having %s versions. Current version %s",
-					document.getId(), document.getVersions().size(), document.getCurrentVersion().getVersionId()));
-			
-			ClientResponse response = resource()
-					.path(RestDocumentService.DOCUMENTS_PATH)
-					.path(RestServiceBase.SEARCH_PATH).path(criteria)
-					.cookie(adminCookie).accept(MediaType.APPLICATION_JSON)
-					.get(ClientResponse.class);
-			log.debug(String.format("status: %s", response.getStatus()));
-			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-			List<Document> documents = response
-					.getEntity(new GenericType<List<Document>>() {
-					});
-			Assert.assertNotNull(documents);
-			Assert.assertTrue(documents.size() >= 1);
+
+			log.debug(String
+					.format("testCreateDocumentVersions step 7 obtained document %s having %s versions. Current version %s",
+							document.getId(), document.getVersions().size(),
+							document.getCurrentVersion().getVersionId()));
+
+//			ClientResponse response = resource()
+//					.path(RestDocumentService.DOCUMENTS_PATH)
+//					.path(RestServiceBase.SEARCH_PATH).path(criteria)
+//					.cookie(adminCookie).accept(MediaType.APPLICATION_JSON)
+//					.get(ClientResponse.class);
+//			log.debug(String.format("status: %s", response.getStatus()));
+//			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+//			List<Document> documents = response
+//					.getEntity(new GenericType<List<Document>>() {
+//					});
+//			Assert.assertNotNull(documents);
+//			Assert.assertTrue(documents.size() >= 1);
 		} catch (Throwable t) {
 			log.error("testCreateDocumentVersions fail", t);
 			Assert.fail();
 		}
 		log.debug("*** testCreateDocumentVersions end ***");
 	}
-	
+
 	@Test
 	public void testCreateUpdateDocumentVersions() throws Throwable {
 		log.debug("*** testCreateUpdateDocumentVersions ***");
 		try {
 			String name = "Aliquam";
-			String criteria  = "Aliquam";
-			
+			String criteria = "Aliquam";
+
 			Document document = createDocument("test-attachment.html",
 					"text/html",
 					"/test/github/richardwilly98/services/test-attachment.html");
 			Assert.assertNotNull(document);
 			String contentType = "text/plain";
 			Version version = document.getCurrentVersion();
-			log.debug(String.format("step 1 obtained document %s having %s versions. Current version %s", 
-									document.getId(), document.getVersions().size(), version.getVersionId()));
+			log.debug(String
+					.format("step 1 obtained document %s having %s versions. Current version %s",
+							document.getId(), document.getVersions().size(),
+							version.getVersionId()));
 			Assert.assertEquals(version.getVersionId(), 1);
-			
-			version = updateVersion(document.getId(), "" + version.getVersionId(), name, contentType, "/test/github/richardwilly98/services/test-attachment2.html");
-			log.debug("testCreateUpdateDocumentVersions new content: >>>>>" + new String(version.getFile().getContent(), "UTF-8") + "<<<<<<");
-			
+
+			version = updateVersion(document.getId(),
+					"" + version.getVersionId(), name, contentType,
+					"/test/github/richardwilly98/services/test-attachment2.html");
+			log.debug("testCreateUpdateDocumentVersions new content: >>>>>"
+					+ new String(version.getFile().getContent(), "UTF-8")
+					+ "<<<<<<");
+
 			ClientResponse response = resource()
 					.path(RestDocumentService.DOCUMENTS_PATH)
 					.path(RestServiceBase.SEARCH_PATH).path(criteria)
@@ -297,7 +360,7 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 		}
 		log.debug("*** testCreateUpdateDocumentVersions end ***");
 	}
-	
+
 	private boolean setCurrentVersion(String documentId, String versionId)
 			throws Throwable {
 		log.debug("******* setCurrentVersion  *********");
@@ -307,26 +370,31 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 				.path(RestDocumentService.VERSIONS_PATH).path(versionId)
 				.path(RestDocumentService.CURRENT_PATH).cookie(adminCookie)
 				.post(ClientResponse.class);
-		log.debug(String.format("setCurrentVersion clientResponse location: %s", response.getLocation()));
-		log.debug(String.format("setCurrentVersion clientResponse cookie: %s", response.getCookies()));
-		log.debug(String.format("setCurrentVersion clientResponse toString: %s", response.toString()));
-		log.debug(String.format("setCurrentVersion clientResponse status: %s", response.getStatus()));
-		Assert.assertTrue(response.getStatus() == Status.OK
-				.getStatusCode());
-		
+		log.debug(String.format(
+				"setCurrentVersion clientResponse location: %s",
+				response.getLocation()));
+		log.debug(String.format("setCurrentVersion clientResponse cookie: %s",
+				response.getCookies()));
+		log.debug(String.format(
+				"setCurrentVersion clientResponse toString: %s",
+				response.toString()));
+		log.debug(String.format("setCurrentVersion clientResponse status: %s",
+				response.getStatus()));
+		Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+
 		log.debug("******* setCurrentVersion end *********");
 		return response.getStatus() == Status.OK.getStatusCode();
 	}
-	
-	private Version updateVersion(String documentId, String versionId, String name, String contentType, String path)
-			throws Throwable {
+
+	private Version updateVersion(String documentId, String versionId,
+			String name, String contentType, String path) throws Throwable {
 		log.debug("******* updateVersion  *********");
 		byte[] content = copyToBytesFromClasspath(path);
 		InputStream is = new ByteArrayInputStream(content);
-		
+
 		FormDataMultiPart form = new FormDataMultiPart();
 		form.field("name", name);
-		
+
 		FormDataBodyPart p = new FormDataBodyPart("file", is,
 				MediaType.valueOf(contentType));
 		form.bodyPart(p);
@@ -337,10 +405,14 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 				.path(RestDocumentService.UPDATE_PATH).cookie(adminCookie)
 				.type(MediaType.MULTIPART_FORM_DATA)
 				.post(ClientResponse.class, form);
-		log.debug(String.format("updateVersion clientResponse location: %s", response.getLocation()));
-		log.debug(String.format("updateVersion clientResponse cookie: %s", response.getCookies()));
-		log.debug(String.format("updateVersion clientResponse toString: %s", response.toString()));
-		log.debug(String.format("updateVersion clientResponse status: %s", response.getStatus()));
+		log.debug(String.format("updateVersion clientResponse location: %s",
+				response.getLocation()));
+		log.debug(String.format("updateVersion clientResponse cookie: %s",
+				response.getCookies()));
+		log.debug(String.format("updateVersion clientResponse toString: %s",
+				response.toString()));
+		log.debug(String.format("updateVersion clientResponse status: %s",
+				response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.CREATED
 				.getStatusCode());
 		URI uri = response.getLocation();
@@ -348,16 +420,16 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 		log.debug("******* updateVersion end *********");
 		return get(uri, Document.class).getCurrentVersion();
 	}
-	
-	private Version createVersion(String documentId, String name, String contentType, String path)
-			throws Throwable {
+
+	private Version createVersion(String documentId, String name,
+			String contentType, String path) throws Throwable {
 		log.debug("******* createVersion  *********");
 		byte[] content = copyToBytesFromClasspath(path);
 		InputStream is = new ByteArrayInputStream(content);
-		
+
 		FormDataMultiPart form = new FormDataMultiPart();
 		form.field("name", name);
-		
+
 		FormDataBodyPart p = new FormDataBodyPart("file", is,
 				MediaType.valueOf(contentType));
 		form.bodyPart(p);
@@ -367,10 +439,14 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 				.path(RestDocumentService.UPLOAD_PATH).cookie(adminCookie)
 				.type(MediaType.MULTIPART_FORM_DATA)
 				.post(ClientResponse.class, form);
-		log.debug(String.format("createVersion clientResponse location: %s", response.getLocation()));
-		log.debug(String.format("createVersion clientResponse cookie: %s", response.getCookies()));
-		log.debug(String.format("createVersion clientResponse toString: %s", response.toString()));
-		log.debug(String.format("createVersion clientResponse status: %s", response.getStatus()));
+		log.debug(String.format("createVersion clientResponse location: %s",
+				response.getLocation()));
+		log.debug(String.format("createVersion clientResponse cookie: %s",
+				response.getCookies()));
+		log.debug(String.format("createVersion clientResponse toString: %s",
+				response.toString()));
+		log.debug(String.format("createVersion clientResponse status: %s",
+				response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.CREATED
 				.getStatusCode());
 		URI uri = response.getLocation();
@@ -378,16 +454,16 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 		log.debug("******* createVersion end *********");
 		return get(uri, Document.class).getCurrentVersion();
 	}
-	
-	private Version createFromVersion(String documentId, String versionId, String name, String contentType, String path)
-			throws Throwable {
+
+	private Version createFromVersion(String documentId, String versionId,
+			String name, String contentType, String path) throws Throwable {
 		log.debug("******* createFromVersion  *********");
 		byte[] content = copyToBytesFromClasspath(path);
 		InputStream is = new ByteArrayInputStream(content);
-		
+
 		FormDataMultiPart form = new FormDataMultiPart();
 		form.field("name", name);
-		
+
 		FormDataBodyPart p = new FormDataBodyPart("file", is,
 				MediaType.valueOf(contentType));
 		form.bodyPart(p);
@@ -398,10 +474,16 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 				.path(RestDocumentService.UPLOAD_PATH).cookie(adminCookie)
 				.type(MediaType.MULTIPART_FORM_DATA)
 				.post(ClientResponse.class, form);
-		log.debug(String.format("createFromVersion clientResponse location: %s", response.getLocation()));
-		log.debug(String.format("createFromVersion clientResponse cookie: %s", response.getCookies()));
-		log.debug(String.format("createFromVersion clientResponse toString: %s", response.toString()));
-		log.debug(String.format("createFromVersion clientResponse status: %s", response.getStatus()));
+		log.debug(String.format(
+				"createFromVersion clientResponse location: %s",
+				response.getLocation()));
+		log.debug(String.format("createFromVersion clientResponse cookie: %s",
+				response.getCookies()));
+		log.debug(String.format(
+				"createFromVersion clientResponse toString: %s",
+				response.toString()));
+		log.debug(String.format("createFromVersion clientResponse status: %s",
+				response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.CREATED
 				.getStatusCode());
 		URI uri = response.getLocation();
@@ -443,12 +525,13 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 		return get(uri, Document.class);
 	}
 
-	private void markDeletedDocument(String id)
-			throws Throwable {
-		ClientResponse response = resource().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.MARKDELETED_PATH)
-				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
-				.post(ClientResponse.class);
+	private void markDeletedDocument(String id) throws Throwable {
+		ClientResponse response = resource()
+				.path(RestDocumentService.DOCUMENTS_PATH).path(id)
+				.path(RestDocumentService.MARKDELETED_PATH).cookie(adminCookie)
+				.type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
 		log.debug(String.format("status: %s", response.getStatus()));
-		Assert.assertTrue(response.getStatus() == Status.NO_CONTENT.getStatusCode());
+		Assert.assertTrue(response.getStatus() == Status.NO_CONTENT
+				.getStatusCode());
 	}
 }
