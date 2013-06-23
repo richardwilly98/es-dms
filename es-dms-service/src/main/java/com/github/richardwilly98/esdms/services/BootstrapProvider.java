@@ -27,7 +27,7 @@ public class BootstrapProvider implements BootstrapService {
 			this.settings.setEsHost(settings.get("es.host"));
 			this.settings.setEsPort(settings.getAsInt("es.port", 9300));
 			this.settings.setIndexRefresh(settings.getAsBoolean("es.index.refresh", false));
-			log.debug("settings: " + settings);
+			log.debug("settings: " + this.settings);
 		}
 		return settings;
 	}

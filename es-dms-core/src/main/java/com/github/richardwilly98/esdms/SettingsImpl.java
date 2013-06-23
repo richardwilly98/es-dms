@@ -61,7 +61,7 @@ public class SettingsImpl implements Settings {
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this).add("library", library).add("esPort", esPort)
-				.add("esHost", esHost).toString();
+				.add("esHost", esHost).add("indexRefresh", indexRefresh).toString();
 	}
 
 	@Override
