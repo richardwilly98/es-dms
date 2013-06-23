@@ -35,14 +35,9 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
  */
 public class DocumentProviderTest extends ProviderTestBase {
 
-	private String createDocument(String name, String contentType, String path,
-			String contentSearch) throws Throwable {
+	private String createDocument(String name, String contentType, String path) throws Throwable {
 		String id = String.valueOf(System.currentTimeMillis());
 		byte[] content = copyToBytesFromClasspath(path);
-		long totalHits = 0;
-		SearchResult<Document> searchResult = documentService.search(contentSearch, 0, 10);
-		totalHits = searchResult.getTotalHits();
-		log.info(String.format("startCount: %s", totalHits));
 		File file = new FileImpl.Builder().content(content).name(name)
 				.contentType(contentType).build();
 		Set<Version> versions = newHashSet();
@@ -57,6 +52,12 @@ public class DocumentProviderTest extends ProviderTestBase {
 		Assert.assertTrue(newDocument.hasStatus(DocumentStatus.AVAILABLE));
 		log.info(String.format("New document created #%s", newDocument.getId()));
 		return id;
+	}
+	
+	private SearchResult<Document> searchDocument(String criteria, int first, int pageSize) throws Throwable {
+		SearchResult<Document> searchResult = documentService.search(criteria, first, pageSize);
+		Assert.assertNotNull(searchResult);
+		return searchResult;
 	}
 
 	private Document addVersion(Document document, int versionId, File file,
@@ -102,8 +103,8 @@ public class DocumentProviderTest extends ProviderTestBase {
 		// "/test/github/richardwilly98/services/lorem.pdf",
 		// "Lorem ipsum dolor");
 		createDocument("test-attachment.html", "text/html",
-				"/test/github/richardwilly98/services/test-attachment.html",
-				"Aliquam");
+				"/test/github/richardwilly98/services/test-attachment.html"/*,
+				"Aliquam"*/);
 	}
 
 	@Test
@@ -128,8 +129,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 
 		log.info("testCreateDeleteDocument: step 2");
 		String id = createDocument("test-attachment.html", "text/html",
-				"/test/github/richardwilly98/services/test-attachment.html",
-				"Aliquam");
+				"/test/github/richardwilly98/services/test-attachment.html");
 		Document document = documentService.get(id);
 		log.info("testCreateDeleteDocument: step 3");
 		Assert.assertNotNull(document);
@@ -179,8 +179,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 			createDocument(
 					"test-attachment.html",
 					"text/html",
-					"/test/github/richardwilly98/services/test-attachment.html",
-					"Aliquam");
+					"/test/github/richardwilly98/services/test-attachment.html");
 			Assert.fail("Should not be authorized to create document");
 		} catch (UnauthorizedException uEx) {
 		}
@@ -191,8 +190,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		log.info("Start testHighlightDocument");
 		loginAdminUser();
 		String id = createDocument("test-attachment.html", "text/html",
-				"/test/github/richardwilly98/services/test-attachment.html",
-				"Aliquam");
+				"/test/github/richardwilly98/services/test-attachment.html");
 
 		Document document = documentService.get(id);
 		String preview = documentService.preview(document, "Aliquam", 0);
@@ -201,6 +199,30 @@ public class DocumentProviderTest extends ProviderTestBase {
 		log.info(String.format("document preview: %s", preview));
 	}
 
+	//Gingerbread
+	@Test(enabled = false)
+	public void testSearchDocument() throws Throwable {
+		
+		log.info("Start testSearchDocument");
+		loginAdminUser();
+		int max = 15;
+		int i = 0;
+		while (i++ < max) {
+		createDocument("test-attachment.html", "text/html",
+				"/test/github/richardwilly98/services/test-attachment.html");
+		}
+		while (i++ < max) {
+		createDocument("Gingerbread", "text/plain",
+				"/test/github/richardwilly98/services/test-attachment.txt");
+		}
+		SearchResult<Document> result = searchDocument("Gingerbread", 0, max);
+		log.debug(String.format("Total hits: %s", result.getTotalHits()));
+		Assert.assertTrue(result.getTotalHits() >= max);
+		for ( Document document : result.getItems()) {
+			Assert.assertNotNull(document);
+			Assert.assertNull(document.getCurrentVersion());
+		}
+	}
 	@Test
 	public void testCreateDocumentWithAuthor() throws Throwable {
 		log.info("*** testCreateDocumentWithAuthor ***");

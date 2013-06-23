@@ -7,6 +7,7 @@ import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -16,10 +17,14 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.base.Stopwatch;
+import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.text.Text;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHitField;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.joda.time.DateTime;
 
@@ -111,10 +116,10 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	 * com.github.richardwilly98.services.BaseService#search(java.lang.String)
 	 */
 	@Override
-	public SearchResult<Document> search(String criteria, int first, int pageSize)
-			throws ServiceException {
+	public SearchResult<Document> search(String criteria, int first,
+			int pageSize) throws ServiceException {
 		try {
-//			Set<Document> documents = newHashSet();
+			// Set<Document> documents = newHashSet();
 
 			// QueryBuilder query = new MultiMatchQueryBuilder(criteria, "file",
 			// "name");
@@ -122,36 +127,38 @@ public class DocumentProvider extends ProviderBase<Document> implements
 			QueryBuilder query = new QueryStringQueryBuilder(criteria);
 			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type)
+					.addPartialField("document", null, "versions")
 					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
 					.setFrom(first).setSize(pageSize).setQuery(query).execute()
 					.actionGet();
-//			long totalHits = searchResponse.getHits().totalHits();
-//			long elapsedTime = searchResponse.getTookInMillis();
-//			log.debug("totalHits: " + totalHits);
-//			log.debug("totalHits: " + searchResponse.getHits().totalHits());
-//			log.debug(String.format("TotalHits: %s - TookInMillis: %s",
-//					totalHits,
-//					elapsedTime));
-//			Stopwatch watch = new Stopwatch();
-//			watch.start();
-//			for (SearchHit hit : searchResponse.getHits().hits()) {
-//				String json = hit.getSourceAsString();
-//				Document document = mapper.readValue(json, Document.class);
-//				Version currentVersion = document.getCurrentVersion();
-//				if (currentVersion != null) {
-//					currentVersion.getFile().setContent(null);
-//				}
-//				// document.getFile().setContent(null);
-//				documents.add(document);
-//			}
-//			watch.stop();
-//			log.debug("Elapsed time to build document list "
-//					+ watch.elapsed(TimeUnit.MILLISECONDS));
-//
-//			SearchResult<Document> searchResult = new SearchResultImpl.Builder<Document>()
-//					.totalHits(totalHits).elapsedTime(elapsedTime).items(documents)
-//					.firstIndex(first).pageSize(pageSize).build();
-//			return searchResult;
+			// long totalHits = searchResponse.getHits().totalHits();
+			// long elapsedTime = searchResponse.getTookInMillis();
+			// log.debug("totalHits: " + totalHits);
+			// log.debug("totalHits: " + searchResponse.getHits().totalHits());
+			// log.debug(String.format("TotalHits: %s - TookInMillis: %s",
+			// totalHits,
+			// elapsedTime));
+			// Stopwatch watch = new Stopwatch();
+			// watch.start();
+			// for (SearchHit hit : searchResponse.getHits().hits()) {
+			// String json = hit.getSourceAsString();
+			// Document document = mapper.readValue(json, Document.class);
+			// Version currentVersion = document.getCurrentVersion();
+			// if (currentVersion != null) {
+			// currentVersion.getFile().setContent(null);
+			// }
+			// // document.getFile().setContent(null);
+			// documents.add(document);
+			// }
+			// watch.stop();
+			// log.debug("Elapsed time to build document list "
+			// + watch.elapsed(TimeUnit.MILLISECONDS));
+			//
+			// SearchResult<Document> searchResult = new
+			// SearchResultImpl.Builder<Document>()
+			// .totalHits(totalHits).elapsedTime(elapsedTime).items(documents)
+			// .firstIndex(first).pageSize(pageSize).build();
+			// return searchResult;
 			return getSearchResult(searchResponse, first, pageSize);
 		} catch (Throwable t) {
 			log.error("search failed", t);
@@ -160,22 +167,24 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	}
 
 	@Override
-	protected SearchResult<Document> getSearchResult(SearchResponse searchResponse,
-			int first, int pageSize) throws ServiceException {
+	protected SearchResult<Document> getSearchResult(
+			SearchResponse searchResponse, int first, int pageSize)
+			throws ServiceException {
 		log.trace("*** getSearchResult ***");
 		try {
+			// log.debug("searchResponse: " + searchResponse.toString());
 			Stopwatch watch = new Stopwatch();
 			watch.start();
 			Set<Document> items = newHashSet();
 			long totalHits = searchResponse.getHits().totalHits();
 			long elapsedTime = searchResponse.getTookInMillis();
 			for (SearchHit hit : searchResponse.getHits().hits()) {
-				String json = hit.getSourceAsString();
+				String json = convertFieldAsString(hit, "document");
 				Document item = mapper.readValue(json, Document.class);
-				Version currentVersion = item.getCurrentVersion();
-				if (currentVersion != null) {
-					currentVersion.getFile().setContent(null);
-				}
+//				Version currentVersion = item.getCurrentVersion();
+//				if (currentVersion != null) {
+//					currentVersion.getFile().setContent(null);
+//				}
 				items.add(item);
 			}
 			SearchResult<Document> searchResult = new SearchResultImpl.Builder<Document>()
@@ -189,6 +198,14 @@ public class DocumentProvider extends ProviderBase<Document> implements
 			log.error("getSearchResult failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
 		}
+	}
+
+	private String convertFieldAsString(SearchHit hit, String name) throws IOException {
+		XContentBuilder builder = jsonBuilder();
+		if (hit.getFields().containsKey(name)) {
+			builder.value(hit.getFields().get(name).getValue());
+		}
+		return builder.string();
 	}
 
 	@Override
@@ -477,7 +494,7 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		updateVersions(sd);
 		update(sd);
 	}
-	
+
 	@Override
 	public void setVersionContent(Document document, int versionId, File file)
 			throws ServiceException {
