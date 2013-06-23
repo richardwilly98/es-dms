@@ -3,7 +3,6 @@ package com.github.richardwilly98.esdms.rest;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.net.URI;
-import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -26,6 +25,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 
 import com.github.richardwilly98.esdms.api.ItemBase;
+import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
 import com.github.richardwilly98.esdms.rest.exception.UnauthorizedException;
@@ -41,7 +41,7 @@ public abstract class RestServiceBase<T extends ItemBase> {
 	public static final String SEARCH_PATH = "search";
 	public static final String SEARCH_FIRST_PARAMETER = "fi";
 	public static final String SEARCH_PAGE_SIZE_PARAMETER = "ps";
-	
+
 	protected final Logger log = Logger.getLogger(getClass());
 	protected final AuthenticationService authenticationService;
 	protected final BaseService<T> service;
@@ -50,7 +50,8 @@ public abstract class RestServiceBase<T extends ItemBase> {
 	UriInfo url;
 
 	@Inject
-	public RestServiceBase(final AuthenticationService authenticationService, final BaseService<T> service) {
+	public RestServiceBase(final AuthenticationService authenticationService,
+			final BaseService<T> service) {
 		this.authenticationService = authenticationService;
 		this.service = service;
 	}
@@ -83,10 +84,11 @@ public abstract class RestServiceBase<T extends ItemBase> {
 		}
 		return currentUser;
 	}
-	
+
 	protected URI getItemUri(T item) {
 		checkNotNull(item);
-		return url.getBaseUriBuilder().path(getClass()).path(item.getId()).build();
+		return url.getBaseUriBuilder().path(getClass()).path(item.getId())
+				.build();
 	}
 
 	@GET
@@ -116,9 +118,7 @@ public abstract class RestServiceBase<T extends ItemBase> {
 		}
 		try {
 			item = service.create(item);
-			return Response
-					.created(
-							getItemUri(item)).build();
+			return Response.created(getItemUri(item)).build();
 		} catch (ServiceException e) {
 			throw new RestServiceException(e.getLocalizedMessage());
 		}
@@ -164,12 +164,15 @@ public abstract class RestServiceBase<T extends ItemBase> {
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path(SEARCH_PATH + "/{criteria}")
-	public Response search(@PathParam("criteria") String criteria, @QueryParam(SEARCH_FIRST_PARAMETER) @DefaultValue("0") int first, @QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("20") int pageSize) {
+	public Response search(
+			@PathParam("criteria") String criteria,
+			@QueryParam(SEARCH_FIRST_PARAMETER) @DefaultValue("0") int first,
+			@QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("20") int pageSize) {
 		if (log.isTraceEnabled()) {
 			log.trace(String.format("search - %s", criteria));
 		}
 		try {
-			Set<T> items = service.search(criteria, first, pageSize);
+			SearchResult<T> items = service.search(criteria, first, pageSize);
 			return Response.ok(items).build();
 		} catch (ServiceException e) {
 			throw new RestServiceException(e.getLocalizedMessage());

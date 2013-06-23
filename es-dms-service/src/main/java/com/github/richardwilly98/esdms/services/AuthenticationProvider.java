@@ -27,6 +27,7 @@ import org.elasticsearch.search.SearchHit;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.esdms.SessionImpl;
 import com.github.richardwilly98.esdms.api.Credential;
+import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Session;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
@@ -310,7 +311,7 @@ public class AuthenticationProvider implements AuthenticationService {
 	}
 
 	@Override
-	public Set<SessionImpl> search(String criteria, int first, int pageSize) throws ServiceException {
+	public SearchResult<SessionImpl> search(String criteria, int first, int pageSize) throws ServiceException {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -7,6 +7,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.api.Role;
+import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
 
 public class UserProviderTest extends ProviderTestBase {
@@ -44,11 +45,13 @@ public class UserProviderTest extends ProviderTestBase {
 		String username = "richard" + System.currentTimeMillis();
 		String id = testCreateUser(username, "", false, "", username, null);
 		Assert.assertNotNull(id);
-		Set<User> users = userService.search(username, 0 , -1);
+		SearchResult<User> searchResult = userService.search(username, 0 , -1);
 		// List should not be null
-		Assert.assertNotNull(users);
+		Assert.assertNotNull(searchResult);
 		// List should have one item
-		Assert.assertEquals(users.size(), 1);
+		Assert.assertEquals(searchResult.getTotalHits(), 1);
+		Set<User> users = searchResult.getItems();
+		
 		log.info("User found: " + users.iterator().next().getName());
 
 		// user = service.get("Danilo");
@@ -74,8 +77,10 @@ public class UserProviderTest extends ProviderTestBase {
 				"richard@pippo.pippo", "123456", null);
 		String id2 = testCreateUser("Danilo2", "Mezza calzetta", true,
 				"danilo@pippo.pippo", "123456", null);
-		Set<User> users = userService.search("*", 0, -1);
-		Assert.assertNotNull(users);
+		SearchResult<User> searchResult = userService.search("*", 0, -1);
+		Assert.assertNotNull(searchResult);
+		Set<User> users = searchResult.getItems();
+		
 		int found = 0;
 		log.debug(String.format("id1 %s", id1));
 		log.debug(String.format("id2 %s", id2));

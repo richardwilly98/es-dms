@@ -7,6 +7,8 @@ simpleApp.controller('adminController', function ($scope) {
 
 simpleApp.controller('userController', function ($scope, userService) {
     $scope.users = [];
+    $scope.totalHits = 0;
+    $scope.elapsedTime = 0;
     var currentUser = null;
     
     init();
@@ -15,7 +17,11 @@ simpleApp.controller('userController', function ($scope, userService) {
     }
 
     $scope.find = function() {
-    	$scope.users = userService.find($scope.criteria);
+    	var result = userService.find($scope.criteria, function(result) {
+        	$scope.users = result.items;
+        	$scope.totalHits = result.totalHits;
+        	$scope.elapsedTime = result.elapsedTime;
+    	});
     };
     
     $scope.edit = function(id) {
@@ -34,6 +40,8 @@ simpleApp.controller('userController', function ($scope, userService) {
 
 simpleApp.controller('roleController', function ($scope, roleService) {
     $scope.roles = [];
+    $scope.totalHits = 0;
+    $scope.elapsedTime = 0;
     var currentRole = null;
     
     init();
@@ -42,7 +50,11 @@ simpleApp.controller('roleController', function ($scope, roleService) {
     }
 
     $scope.find = function() {
-    	$scope.roles = roleService.find($scope.criteria);
+    	var result = roleService.find($scope.criteria, function(result) {
+        	$scope.roles = result.items;
+        	$scope.totalHits = result.totalHits;
+        	$scope.elapsedTime = result.elapsedTime;
+    	});
     };
     
     $scope.edit = function(id) {
@@ -154,7 +166,9 @@ simpleApp.controller('simpleController', function ($scope, userService) {
 
     function init() {
         // $scope.customers = userService.query({ verb: 'find', name: '*' });
-    	$scope.customers = userService.find('*');
+    	userService.find('*', function(result) {
+    		 $scope.customers = result.items;
+    	});
     }
     $scope.addCustomer = function () {
         var user = new userService();
@@ -203,6 +217,12 @@ simpleApp.controller('documentController', function ($scope, documentService) {
     $scope.alerts = [];
 
     $scope.documents = [];
+    $scope.totalHits = 0;
+    $scope.elapsedTime = 0;
+    $scope.maxPages = 10;
+    $scope.totalPages = 0;
+    $scope.currentPage = 1;
+    $scope.pageSize = 20;
     var currentDocument = null;
 
     init();
@@ -211,14 +231,49 @@ simpleApp.controller('documentController', function ($scope, documentService) {
     }
     
     $scope.search = function() {
+    	console.log('search');
     	if ($scope.criteria == '' || $scope.criteria == '*') {
     		$scope.alerts.push({ msg: "Empty or wildcard not allowed" });
     		$scope.documents = [];
     	} else {
-        	$scope.documents = documentService.find($scope.criteria);
+    		find(0, $scope.criteria, true);
     	}
     }
 
+    function find(first, criteria, updatePagination) {
+		documentService.find(first, $scope.pageSize, criteria, function(result) {
+			if (updatePagination) {
+				setPagination(result);
+			}
+    		console.log(result);
+    		console.log('totalHits: ' + result.totalHits);
+    		console.log('elapsedTime: ' + result.elapsedTime);
+        	$scope.documents = result.items;
+        	$scope.totalHits = result.totalHits;
+        	$scope.elapsedTime = result.elapsedTime;
+		});
+    }
+    
+    function setPagination(result) {
+    	var pageSize = result.pageSize;
+    	var totalHits = result.totalHits;
+    	var firstIndex = result.firstIndex;
+    	$scope.totalPages = Math.ceil(totalHits / pageSize);
+    	$scope.currentPage = 1 + (firstIndex / pageSize);
+    	console.log('totalPages: ' + $scope.totalPages + ' - currentPage: ' + $scope.currentPage);
+    }
+    
+    $scope.setPage = function () {
+    	console.log('setPage');
+    	if ($scope.criteria === undefined ) {
+    		return;
+    	}
+        find( ($scope.currentPage - 1) * $scope.pageSize, $scope.criteria );
+      };
+      
+    $scope.$watch('currentPage', $scope.setPage );
+      
+    
     $scope.closeAlert = function (index) {
         $scope.alerts.splice(index, 1);
     };

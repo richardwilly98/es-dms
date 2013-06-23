@@ -6,6 +6,10 @@
 		<button type="button" class="btn btn-primary" data-ng-click="search()">Search</button>
 	</form>
 	<br />
+	<div data-ng-show="totalHits">
+		About {{ totalHits }} results - search took {{ elapsedTime }} ms
+		<pagination num-pages="totalPages" current-page="currentPage" max-size="maxPages"></pagination>
+	</div>
 	<alert data-ng-repeat="alert in alerts" type="alert.type"
 		close="closeAlert($index)">{{alert.msg}}</alert>
 	<table class="table table-condensed">
@@ -15,7 +19,6 @@
 				<th>Name</th>
 				<th>Author</th>
 				<th>Status</th>
-				<th>Creation</th>
 				<th></th>
 			</tr>
 		</thead>
@@ -30,7 +33,6 @@
 				</td>
 				<td>{{ document.attributes.author }}</td>
 				<td>{{ document.attributes.status }}</td>
-				<td>{{ document.attributes.creation }}</td>
 				<td>
 					<div data-ng-switch="document.attributes.status" class="btn-group">
 						<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"

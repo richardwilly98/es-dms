@@ -1,7 +1,6 @@
 package test.github.richardwilly98.esdms.rest;
 
 import java.net.URI;
-import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
@@ -9,6 +8,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.UserImpl;
+import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.rest.RestServiceBase;
 import com.github.richardwilly98.esdms.rest.RestUserService;
@@ -35,10 +35,10 @@ public class TestRestUserService extends GuiceAndJettyTestBase<UserImpl> {
 					.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 			log.debug("status: " + response.getStatus());
 			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-			List<UserImpl> users = response.getEntity(new GenericType<List<UserImpl>>() {
+			SearchResult<User> users = response.getEntity(new GenericType<SearchResult<User>>() {
 		    });
 			Assert.assertNotNull(users);
-			Assert.assertTrue(users.size() >= 1);
+			Assert.assertTrue(users.getTotalHits() >= 1);
 		} catch (Throwable t) {
 			log.error("testGetUsers fail", t);
 			Assert.fail();

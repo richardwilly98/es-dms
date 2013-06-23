@@ -23,9 +23,11 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.joda.time.DateTime;
 
+import com.github.richardwilly98.esdms.SearchResultImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.File;
+import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.google.common.base.Predicate;
@@ -109,10 +111,10 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	 * com.github.richardwilly98.services.BaseService#search(java.lang.String)
 	 */
 	@Override
-	public Set<Document> search(String criteria, int first, int pageSize)
+	public SearchResult<Document> search(String criteria, int first, int pageSize)
 			throws ServiceException {
 		try {
-			Set<Document> documents = newHashSet();
+//			Set<Document> documents = newHashSet();
 
 			// QueryBuilder query = new MultiMatchQueryBuilder(criteria, "file",
 			// "name");
@@ -123,29 +125,68 @@ public class DocumentProvider extends ProviderBase<Document> implements
 					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
 					.setFrom(first).setSize(pageSize).setQuery(query).execute()
 					.actionGet();
-			log.debug("totalHits: " + searchResponse.getHits().totalHits());
-			log.debug(String.format("TotalHits: %s - TookInMillis: %s",
-					searchResponse.getHits().totalHits(),
-					searchResponse.getTookInMillis()));
+//			long totalHits = searchResponse.getHits().totalHits();
+//			long elapsedTime = searchResponse.getTookInMillis();
+//			log.debug("totalHits: " + totalHits);
+//			log.debug("totalHits: " + searchResponse.getHits().totalHits());
+//			log.debug(String.format("TotalHits: %s - TookInMillis: %s",
+//					totalHits,
+//					elapsedTime));
+//			Stopwatch watch = new Stopwatch();
+//			watch.start();
+//			for (SearchHit hit : searchResponse.getHits().hits()) {
+//				String json = hit.getSourceAsString();
+//				Document document = mapper.readValue(json, Document.class);
+//				Version currentVersion = document.getCurrentVersion();
+//				if (currentVersion != null) {
+//					currentVersion.getFile().setContent(null);
+//				}
+//				// document.getFile().setContent(null);
+//				documents.add(document);
+//			}
+//			watch.stop();
+//			log.debug("Elapsed time to build document list "
+//					+ watch.elapsed(TimeUnit.MILLISECONDS));
+//
+//			SearchResult<Document> searchResult = new SearchResultImpl.Builder<Document>()
+//					.totalHits(totalHits).elapsedTime(elapsedTime).items(documents)
+//					.firstIndex(first).pageSize(pageSize).build();
+//			return searchResult;
+			return getSearchResult(searchResponse, first, pageSize);
+		} catch (Throwable t) {
+			log.error("search failed", t);
+			throw new ServiceException(t.getLocalizedMessage());
+		}
+	}
+
+	@Override
+	protected SearchResult<Document> getSearchResult(SearchResponse searchResponse,
+			int first, int pageSize) throws ServiceException {
+		log.trace("*** getSearchResult ***");
+		try {
 			Stopwatch watch = new Stopwatch();
 			watch.start();
+			Set<Document> items = newHashSet();
+			long totalHits = searchResponse.getHits().totalHits();
+			long elapsedTime = searchResponse.getTookInMillis();
 			for (SearchHit hit : searchResponse.getHits().hits()) {
 				String json = hit.getSourceAsString();
-				Document document = mapper.readValue(json, Document.class);
-				Version currentVersion = document.getCurrentVersion();
+				Document item = mapper.readValue(json, Document.class);
+				Version currentVersion = item.getCurrentVersion();
 				if (currentVersion != null) {
 					currentVersion.getFile().setContent(null);
 				}
-				// document.getFile().setContent(null);
-				documents.add(document);
+				items.add(item);
 			}
+			SearchResult<Document> searchResult = new SearchResultImpl.Builder<Document>()
+					.totalHits(totalHits).elapsedTime(elapsedTime).items(items)
+					.firstIndex(first).pageSize(pageSize).build();
 			watch.stop();
 			log.debug("Elapsed time to build document list "
 					+ watch.elapsed(TimeUnit.MILLISECONDS));
-
-			return documents;
+			return searchResult;
 		} catch (Throwable t) {
-			log.error("search failed", t);
+			log.error("getSearchResult failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}

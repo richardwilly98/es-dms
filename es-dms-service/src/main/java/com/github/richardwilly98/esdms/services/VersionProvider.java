@@ -14,6 +14,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.base.Stopwatch;
 import org.elasticsearch.search.SearchHit;
 
+import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.google.inject.Inject;
@@ -75,28 +76,29 @@ public class VersionProvider extends ProviderBase<Version> implements
 	 * com.github.richardwilly98.services.BaseService#search(java.lang.String)
 	 */
 	@Override
-	public Set<Version> search(String criteria, int first, int pageSize) throws ServiceException {
+	public SearchResult<Version> search(String criteria, int first, int pageSize) throws ServiceException {
 		try {
-			Set<Version> versions = newHashSet();
+//			Set<Version> versions = newHashSet();
 
 			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type).setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
 					.setFrom(first).setSize(pageSize)
 					.setQuery(fieldQuery("file", criteria))
 					.execute().actionGet();
-			log.debug("totalHits: " + searchResponse.getHits().totalHits());
-			log.debug(String.format("TotalHits: %s - TookInMillis: %s", searchResponse.getHits().totalHits(), searchResponse.getTookInMillis()));
-			Stopwatch watch = new Stopwatch();
-			watch.start();
-			for (SearchHit hit : searchResponse.getHits().hits()) {
-				String json = hit.getSourceAsString();
-				Version version = mapper.readValue(json, Version.class);
-				versions.add(version);
-			}
-			watch.stop();
-			log.debug("Elapsed time to build version list " + watch.elapsed(TimeUnit.MILLISECONDS));
+//			log.debug("totalHits: " + searchResponse.getHits().totalHits());
+//			log.debug(String.format("TotalHits: %s - TookInMillis: %s", searchResponse.getHits().totalHits(), searchResponse.getTookInMillis()));
+//			Stopwatch watch = new Stopwatch();
+//			watch.start();
+//			for (SearchHit hit : searchResponse.getHits().hits()) {
+//				String json = hit.getSourceAsString();
+//				Version version = mapper.readValue(json, Version.class);
+//				versions.add(version);
+//			}
+//			watch.stop();
+//			log.debug("Elapsed time to build version list " + watch.elapsed(TimeUnit.MILLISECONDS));
 
-			return versions;
+//			return versions;
+			return getSearchResult(searchResponse, first, pageSize);
 		} catch (Throwable t) {
 			log.error("search failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
