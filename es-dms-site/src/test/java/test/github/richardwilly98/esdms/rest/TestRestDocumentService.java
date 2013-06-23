@@ -8,14 +8,13 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-//import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
-//import javax.ws.rs.core.Response;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.api.Document;
+import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.rest.RestDocumentService;
 import com.github.richardwilly98.esdms.rest.RestServiceBase;
@@ -24,6 +23,8 @@ import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
+//import javax.ws.rs.PathParam;
+//import javax.ws.rs.core.Response;
 
 //import com.sun.jersey.multipart.FormDataParam;
 
@@ -178,11 +179,11 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 					.get(ClientResponse.class);
 			log.debug(String.format("status: %s", response.getStatus()));
 			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-			List<Document> documents = response
-					.getEntity(new GenericType<List<Document>>() {
+			SearchResult<Document> documents = response
+					.getEntity(new GenericType<SearchResult<Document>>() {
 					});
 			Assert.assertNotNull(documents);
-			Assert.assertTrue(documents.size() >= 1);
+			Assert.assertTrue(documents.getTotalHits() >= 1);
 		} catch (Throwable t) {
 			log.error("testFindDocuments fail", t);
 			Assert.fail();
@@ -349,11 +350,11 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 					.get(ClientResponse.class);
 			log.debug(String.format("status: %s", response.getStatus()));
 			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-			List<Document> documents = response
-					.getEntity(new GenericType<List<Document>>() {
+			SearchResult<Document> documents = response
+					.getEntity(new GenericType<SearchResult<Document>>() {
 					});
 			Assert.assertNotNull(documents);
-			Assert.assertTrue(documents.size() >= 1);
+			Assert.assertTrue(documents.getTotalHits() >= 1);
 		} catch (Throwable t) {
 			log.error("testCreateUpdateDocumentVersions fail", t);
 			Assert.fail();
@@ -494,23 +495,14 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 
 	private Document createDocument(String name, String contentType, String path)
 			throws Throwable {
-		String id = String.valueOf(System.currentTimeMillis());
 		byte[] content = copyToBytesFromClasspath(path);
 		InputStream is = new ByteArrayInputStream(content);
 
-		// Filename of the sent stream is not relevant for this test.
-		// StreamDataBodyPart streamData = new StreamDataBodyPart("file", is,
-		// name);
 		FormDataMultiPart form = new FormDataMultiPart();
 		form.field("name", name);
-		// FormDataBodyPart p = new FormDataBodyPart(FormDataContentDisposition
-		// .name("name").build(), name);
-		// p.contentDisposition(ContentDisposition.type(contentType).fileName(name).size(content.length).build());
-		// mp.bodyPart(p);
 		FormDataBodyPart p = new FormDataBodyPart("file", is,
 				MediaType.valueOf(contentType));
 		form.bodyPart(p);
-		// mp.bodyPart(streamData);
 
 		ClientResponse response = resource()
 				.path(RestDocumentService.DOCUMENTS_PATH)

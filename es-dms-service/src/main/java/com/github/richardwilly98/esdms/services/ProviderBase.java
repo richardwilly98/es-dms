@@ -24,8 +24,10 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.richardwilly98.esdms.SearchResultImpl;
 import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.ItemBase;
+import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Settings;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
@@ -44,7 +46,8 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 
 	@Inject
 	ProviderBase(final Client client, final BootstrapService bootstrapService,
-			final String index, final String type, final Class<T> clazz) throws ServiceException {
+			final String index, final String type, final Class<T> clazz)
+			throws ServiceException {
 		checkNotNull(client);
 		checkNotNull(bootstrapService);
 		checkNotNull(type);
@@ -72,7 +75,8 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			} else {
 				if (currentUser == null) {
 					if (currentSubject.getPrincipal() instanceof UserImpl) {
-						currentUser = ((UserImpl)currentSubject.getPrincipal()).getId();
+						currentUser = ((UserImpl) currentSubject.getPrincipal())
+								.getId();
 					}
 				}
 			}
@@ -110,25 +114,55 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	}
 
 	@Override
-	public Set<T> search(String criteria, int first, int pageSize) throws ServiceException {
+	public SearchResult<T> search(String criteria, int first, int pageSize)
+			throws ServiceException {
 		try {
-			Set<T> items = newHashSet();
+//			Set<T> items = newHashSet();
 
 			SearchResponse searchResponse = client.prepareSearch(index)
-					.setTypes(type).setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+					.setTypes(type)
+					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
 					.setFrom(first).setSize(pageSize)
 					.setQuery(new QueryStringQueryBuilder(criteria)).execute()
 					.actionGet();
-			log.debug("totalHits: " + searchResponse.getHits().totalHits());
+//			long totalHits = searchResponse.getHits().totalHits();
+//			long elapsedTime = searchResponse.getTookInMillis();
+//			log.debug("totalHits: " + totalHits);
+//			for (SearchHit hit : searchResponse.getHits().hits()) {
+//				String json = hit.getSourceAsString();
+//				T item = mapper.readValue(json, clazz);
+//				items.add(item);
+//			}
+//
+//			SearchResult<T> searchResult = new SearchResultImpl.Builder<T>()
+//					.totalHits(totalHits).elapsedTime(elapsedTime).items(items)
+//					.firstIndex(first).pageSize(pageSize).build();
+//			return searchResult;
+			return getSearchResult(searchResponse, first, pageSize);
+		} catch (Throwable t) {
+			log.error("search failed", t);
+			throw new ServiceException(t.getLocalizedMessage());
+		}
+	}
+
+	protected SearchResult<T> getSearchResult(SearchResponse searchResponse,
+			int first, int pageSize) throws ServiceException {
+		log.trace("** getSearchResult **");
+		try {
+			Set<T> items = newHashSet();
+			long totalHits = searchResponse.getHits().totalHits();
+			long elapsedTime = searchResponse.getTookInMillis();
 			for (SearchHit hit : searchResponse.getHits().hits()) {
 				String json = hit.getSourceAsString();
 				T item = mapper.readValue(json, clazz);
 				items.add(item);
 			}
-
-			return items;
+			SearchResult<T> searchResult = new SearchResultImpl.Builder<T>()
+					.totalHits(totalHits).elapsedTime(elapsedTime).items(items)
+					.firstIndex(first).pageSize(pageSize).build();
+			return searchResult;
 		} catch (Throwable t) {
-			log.error("search failed", t);
+			log.error("getSearchResult failed", t);
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}
@@ -167,11 +201,11 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			String json;
 			json = mapper.writeValueAsString(item);
 			UpdateResponse response = client
-					.prepareUpdate(index, type, item.getId()).setScript("ctx._source.remove('attributes');")
-					.execute().actionGet();
-			response = client
-					.prepareUpdate(index, type, item.getId()).setDoc(json)
-					.execute().actionGet();
+					.prepareUpdate(index, type, item.getId())
+					.setScript("ctx._source.remove('attributes');").execute()
+					.actionGet();
+			response = client.prepareUpdate(index, type, item.getId())
+					.setDoc(json).execute().actionGet();
 			refreshIndex();
 			T updatedItem = get(response.getId());
 			return updatedItem;
@@ -212,7 +246,8 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		}
 		boolean exists = client.admin().indices().prepareTypesExists(index)
 				.setTypes(type).execute().actionGet().isExists();
-		log.info(String.format("Exists type %s in index %s: %s", type, index, exists));
+		log.info(String.format("Exists type %s in index %s: %s", type, index,
+				exists));
 		if (!exists) {
 			String mapping = getMapping();
 			if (mapping != null) {
@@ -252,7 +287,8 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 
 	protected void refreshIndex() {
 		if (settings.isIndexRefresh()) {
-			client.admin().indices().refresh(new RefreshRequest(index)).actionGet();
+			client.admin().indices().refresh(new RefreshRequest(index))
+					.actionGet();
 		}
 	}
 

@@ -86,15 +86,16 @@ simpleApp.factory('sharedService', function($rootScope) {
     return sharedService;
 });
 
-simpleApp.factory('userService', function ($rootScope, $resource) {
+simpleApp.factory('userService', function ($rootScope, $resource, $http) {
 	var resource = $resource('api/users/:verb/:name', {}, {});
 	var users = [];
 	var editedUser = null;
 	
 	return {
-		find: function(criteria) {
-			users = resource.query({ verb: 'search', name: criteria });
-			return users;
+		find: function(criteria, callback) {
+			$http.get('api/users/search/' + criteria).success(function (data, status) {
+				callback(data);
+			});
 		},
 		edit: function(id) {
 			console.log('edit user: ' + id);
@@ -126,15 +127,16 @@ simpleApp.factory('userService', function ($rootScope, $resource) {
 	};
 });
 
-simpleApp.factory('roleService', function ($rootScope, $resource) {
+simpleApp.factory('roleService', function ($rootScope, $resource, $http) {
 	var resource = $resource('api/roles/:verb/:name', {}, {});
 	var roles = [];
 	var editedRole = null;
 	
 	return {
-		find: function(criteria) {
-			roles = resource.query({ verb: 'search', name: criteria });
-			return roles;
+		find: function(criteria, callback) {
+			$http.get('api/roles/search/' + criteria).success(function (data, status) {
+				callback(data);
+			});
 		},
 		edit: function(id) {
 			console.log('edit role: ' + id);
@@ -166,7 +168,7 @@ simpleApp.factory('roleService', function ($rootScope, $resource) {
 	};
 });
 
-simpleApp.factory('documentService', function ($resource) {
+simpleApp.factory('documentService', function ($resource, $http) {
 	var resource = $resource('api/documents/:verb/:name', {}, {
 	});
 	var documentResource = $resource('api/documents/:id/:action/:parameter' , {}, {
@@ -176,9 +178,18 @@ simpleApp.factory('documentService', function ($resource) {
 	})
 	var documents = {};
 	return {
-		find: function(criteria) {
-			documents = resource.query({ verb: 'search', name: criteria });
-			return documents;
+		find: function(first, pageSize, criteria, callback) {
+			console.log('Document search ' + first + ' - ' + pageSize + ' - ' + criteria)
+//			documents = resource.query({ verb: 'search', name: criteria });
+				$http.get('api/documents/search/' + criteria + '?fi=' + first + '&ps=' + pageSize).success(function (data, status) {
+					callback(data);
+//					console.log('status: ' + status);
+//					console.log('result: ' + data);
+//		           return data;
+		       });
+//			var response = JSON.parse(documents);
+//			console.log('totalHits: ' + documents.totalHits);
+//			return documents;
 		},
 		edit: function(id) {
 			console.log('edit document: ' + id);

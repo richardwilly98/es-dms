@@ -25,6 +25,7 @@ import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
+import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
@@ -38,10 +39,10 @@ public class DocumentProviderTest extends ProviderTestBase {
 			String contentSearch) throws Throwable {
 		String id = String.valueOf(System.currentTimeMillis());
 		byte[] content = copyToBytesFromClasspath(path);
-		int startCount = 0;
-		Set<Document> documents = documentService.search(contentSearch, 0, 10);
-		startCount = documents.size();
-		log.info(String.format("startCount: %s", startCount));
+		long totalHits = 0;
+		SearchResult<Document> searchResult = documentService.search(contentSearch, 0, 10);
+		totalHits = searchResult.getTotalHits();
+		log.info(String.format("startCount: %s", totalHits));
 		File file = new FileImpl.Builder().content(content).name(name)
 				.contentType(contentType).build();
 		Set<Version> versions = newHashSet();
