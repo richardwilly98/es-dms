@@ -62,9 +62,9 @@ public class AuthenticationProvider implements AuthenticationService {
 	@Override
 	public SessionImpl get(String id) throws ServiceException {
 		try {
-			if (log.isTraceEnabled()) {
-				log.trace(String.format("get - %s", id));
-			}
+//			if (log.isTraceEnabled()) {
+//				log.trace(String.format("get - %s", id));
+//			}
 			GetResponse response = client.prepareGet(index, type, id).execute()
 					.actionGet();
 			if (!response.isExists()) {

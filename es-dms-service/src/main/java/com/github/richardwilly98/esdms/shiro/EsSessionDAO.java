@@ -105,9 +105,9 @@ public class EsSessionDAO extends AbstractSessionDAO {
 	@Override
 	protected Session doReadSession(Serializable sessionId) {
 		try {
-			if (log.isTraceEnabled()) {
-				log.trace(String.format("*** doReadSession - %s", sessionId));
-			}
+//			if (log.isTraceEnabled()) {
+//				log.trace(String.format("*** doReadSession - %s", sessionId));
+//			}
 			com.github.richardwilly98.esdms.api.Session session = service
 					.get(sessionId.toString());
 			if (session == null) {
