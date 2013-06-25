@@ -1,5 +1,7 @@
 package com.github.richardwilly98.esdms.rest;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -32,6 +34,9 @@ public class RestUserService extends RestServiceBase<User> {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response create(User item) {
+		checkNotNull(item);
+		checkNotNull(item.getEmail());
+		item.setId(item.getEmail());
 		if (item.getPassword() != null) {
 			String encodedHash = hashService.toBase64(item.getPassword()
 					.getBytes());
