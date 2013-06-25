@@ -32,6 +32,9 @@ public interface DocumentService extends BaseService <Document> {
 	
 	public static final String PROFILE_TODELETE_PERMISSION = "profile:todelete";
 	
+	public abstract Document getMetadata(String id)
+			throws ServiceException;
+
 	public abstract void checkin(Document document)
 			throws ServiceException;
 

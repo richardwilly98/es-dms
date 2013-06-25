@@ -2,15 +2,19 @@ package com.github.richardwilly98.esdms.services;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -24,6 +28,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.joda.time.DateTime;
 
+import com.github.richardwilly98.esdms.DocumentImpl;
 import com.github.richardwilly98.esdms.SearchResultImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
@@ -79,6 +84,45 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		DateTime now = new DateTime();
 		document.setReadOnlyAttribute(Document.MODIFIED_DATE, now.toString());
 		return document;
+	}
+
+	// @RequiresPermissions(PROFILE_READ_PERMISSION)
+	@Override
+	public Document getMetadata(String id) throws ServiceException {
+		try {
+			if (log.isTraceEnabled()) {
+				log.trace(String.format("getMetadata - %s", id));
+			}
+			GetResponse response = client.prepareGet(index, type, id)
+					.setFields("id", "name", "attributes", "tags").execute()
+					.actionGet();
+			if (!response.isExists()) {
+				log.info(String.format("Cannot find item %s", id));
+				return null;
+			}
+
+			checkNotNull(response.getField("name"));
+			String name = response.getField("name").getValue().toString();
+			Map<String, Object> attributes = newHashMap();
+			if (response.getField("attributes") != null
+					&& response.getField("attributes").getValue() instanceof Map<?, ?>) {
+				attributes.putAll((Map<String, Object>) response.getField(
+						"attributes").getValue());
+
+			}
+			Set<String> tags = newHashSet();
+			if (response.getField("tags") != null
+					&& response.getField("tags").getValue() instanceof List<?>) {
+				tags.addAll((List<String>) response.getField("tags").getValue());
+
+			}
+			Document document = new DocumentImpl.Builder().tags(tags).id(id)
+					.name(name).attributes(attributes).roles(null).build();
+			return document;
+		} catch (Throwable t) {
+			log.error("getMetadata failed", t);
+			throw new ServiceException(t.getLocalizedMessage());
+		}
 	}
 
 	@RequiresPermissions(CREATE_PERMISSION)
@@ -177,10 +221,10 @@ public class DocumentProvider extends ProviderBase<Document> implements
 			for (SearchHit hit : searchResponse.getHits().hits()) {
 				String json = convertFieldAsString(hit, "document");
 				Document item = mapper.readValue(json, Document.class);
-//				Version currentVersion = item.getCurrentVersion();
-//				if (currentVersion != null) {
-//					currentVersion.getFile().setContent(null);
-//				}
+				// Version currentVersion = item.getCurrentVersion();
+				// if (currentVersion != null) {
+				// currentVersion.getFile().setContent(null);
+				// }
 				items.add(item);
 			}
 			SearchResult<Document> searchResult = new SearchResultImpl.Builder<Document>()
@@ -196,7 +240,8 @@ public class DocumentProvider extends ProviderBase<Document> implements
 		}
 	}
 
-	private String convertFieldAsString(SearchHit hit, String name) throws IOException {
+	private String convertFieldAsString(SearchHit hit, String name)
+			throws IOException {
 		XContentBuilder builder = jsonBuilder();
 		if (hit.getFields().containsKey(name)) {
 			builder.value(hit.getFields().get(name).getValue());

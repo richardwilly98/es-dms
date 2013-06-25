@@ -1,11 +1,11 @@
 package test.github.richardwilly98.esdms.rest;
 
+import static com.google.common.collect.Sets.newHashSet;
 import static org.elasticsearch.common.io.Streams.copyToBytesFromClasspath;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
@@ -18,6 +18,7 @@ import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.rest.RestDocumentService;
 import com.github.richardwilly98.esdms.rest.RestServiceBase;
+import com.google.common.collect.ImmutableSet;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
 import com.sun.jersey.api.client.GenericType;
@@ -135,6 +136,40 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 		}
 	}
 
+	@Test
+	public void testDocumentMetadata() throws Throwable {
+		log.debug("*** testDocumentMetadata ***");
+		try {
+		String name = "test-document-metadata";
+		Document document = createDocument(name, "text/html",
+				"/test/github/richardwilly98/services/test-attachment.html");
+		Assert.assertNotNull(document);
+		log.info(String.format("New document created %s", document));
+
+		document.addTag("tag1");
+		document.setAttribute("attribut1", "value1");
+		updateDocument(document);
+		
+		document = getDocument(document.getId());
+		log.info(String.format("Updated document %s", document));
+
+		document = getMetadata(document.getId());
+		Assert.assertNotNull(document);
+//		Assert.assertEquals(document.getId(), id);
+		Assert.assertEquals(document.getName(), name);
+		Assert.assertNotNull(document.getVersions());
+		Assert.assertTrue(document.getVersions().size() == 0);
+		Assert.assertNotNull(document.getAttributes());
+		Assert.assertTrue(document.getAttributes().containsKey("attribut1"));
+		Assert.assertTrue(document.getAttributes().get("attribut1").toString().equals("value1"));
+		Assert.assertNotNull(document.getTags());
+		Assert.assertTrue(document.getTags().equals(newHashSet(ImmutableSet.of("tag1"))));
+		} catch (Throwable t) {
+			log.error("testDocumentMetadata fail", t);
+			Assert.fail();
+		}
+	}
+
 	@Test()
 	public void testDownloadDocument() throws Throwable {
 		log.debug("*** testDownloadDocument ***");
@@ -195,7 +230,7 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 		log.debug("*** testCreateDocumentVersions ***");
 		try {
 			String name = "Aliquam";
-			String criteria = "Aliquam";
+//			String criteria = "Aliquam";
 
 			Document document = createDocument("test-attachment.html",
 					"text/html",
@@ -515,6 +550,39 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 		URI uri = response.getLocation();
 		Assert.assertNotNull(uri);
 		return get(uri, Document.class);
+	}
+
+	private void updateDocument(Document document)
+			throws Throwable {
+		ClientResponse response = resource()
+				.path(RestDocumentService.DOCUMENTS_PATH)
+				.path(RestDocumentService.UPDATE_PATH).cookie(adminCookie)
+				.type(MediaType.APPLICATION_JSON)
+				.put(ClientResponse.class, document);
+		log.debug(String.format("status: %s", response.getStatus()));
+		Assert.assertTrue(response.getStatus() == Status.OK
+				.getStatusCode());
+	}
+
+	private Document getDocument(String id) throws Throwable {
+		Document document = get(id, Document.class,
+				RestDocumentService.DOCUMENTS_PATH);
+		Assert.assertNotNull(document);
+		return document;
+	}
+
+	private Document getMetadata(String id) throws Throwable {
+		ClientResponse response = resource()
+				.path(RestDocumentService.DOCUMENTS_PATH).path(id)
+				.path(RestDocumentService.METADATA_PATH).cookie(adminCookie)
+				.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+				.get(ClientResponse.class);
+		log.debug(String.format("status: %s", response.getStatus()));
+		Assert.assertTrue(response.getStatus() == Status.OK
+				.getStatusCode());
+		Document document = response.getEntity(Document.class);
+		Assert.assertNotNull(document);
+		return document;
 	}
 
 	private void markDeletedDocument(String id) throws Throwable {

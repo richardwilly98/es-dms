@@ -29,6 +29,7 @@ import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.google.common.collect.ImmutableSet;
 
 /*
  * https://github.com/shairontoledo/elasticsearch-attachment-tests/blob/master/src/test/java/net/hashcode/esattach/AttachmentTest.java
@@ -223,6 +224,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 			Assert.assertNull(document.getCurrentVersion());
 		}
 	}
+
 	@Test
 	public void testCreateDocumentWithAuthor() throws Throwable {
 		log.info("*** testCreateDocumentWithAuthor ***");
@@ -633,6 +635,73 @@ public class DocumentProviderTest extends ProviderTestBase {
 				"Document updated (set current version #1) - %s", newDocument));
 		Version v1 = newDocument.getVersion(1);
 		Assert.assertTrue(v1.isCurrent());
+	}
+
+	@Test
+	public void testDocumentWithTags() throws Throwable {
+		log.info("*** testDocumentWithTags ***");
+		loginAdminUser();
+		String id = String.valueOf(System.currentTimeMillis());
+		String name = "document-" + id;
+		Map<String, Object> attributes = newHashMap();
+		Document document = new DocumentImpl.Builder().attributes(attributes)
+				.id(id).name(name).roles(null).build();
+		document.setId(id);
+		document = documentService.create(document);
+		Assert.assertNotNull(document);
+		log.info(String.format("New document created %s", document));
+		
+		document.addTag("tag1");
+		documentService.update(document);
+		document = documentService.get(document.getId());
+		log.debug(String.format("Add 'tag1' to %s", document));
+		Assert.assertTrue(document.getTags() != null && document.getTags().size() == 1);
+		Assert.assertTrue(document.getTags().iterator().next().equals("tag1"));
+
+		document.addTag("tag2");
+		documentService.update(document);
+		document = documentService.get(document.getId());
+		log.debug(String.format("Add 'tag2' to %s", document));
+		Assert.assertTrue(document.getTags() != null && document.getTags().size() == 2);
+		Assert.assertTrue(document.getTags().equals(newHashSet(ImmutableSet.of("tag1", "tag2"))));
+
+		document.removeTag("tag2");
+		documentService.update(document);
+		document = documentService.get(document.getId());
+		log.debug(String.format("Remove 'tag2' to %s", document));
+		Assert.assertTrue(document.getTags() != null && document.getTags().size() == 1);
+		Assert.assertTrue(document.getTags().iterator().next().equals("tag1"));
+	}
+
+	@Test
+	public void testDocumentMetadata() throws Throwable {
+		log.info("*** testDocumentMetadata ***");
+		loginAdminUser();
+		String name = "test-document-metadata";
+		String id = createDocument(name, "text/html",
+				"/test/github/richardwilly98/services/test-attachment.html");
+		Document document = documentService.get(id);
+		Assert.assertNotNull(document);
+		log.info(String.format("New document created %s", document));
+
+		document.addTag("tag1");
+		document.setAttribute("attribut1", "value1");
+		documentService.update(document);
+
+		document = documentService.get(id);
+		log.info(String.format("Update document %s", document));
+		
+		document = documentService.getMetadata(document.getId());
+		Assert.assertNotNull(document);
+		Assert.assertEquals(document.getId(), id);
+		Assert.assertEquals(document.getName(), name);
+		Assert.assertNotNull(document.getVersions());
+		Assert.assertTrue(document.getVersions().size() == 0);
+		Assert.assertNotNull(document.getAttributes());
+		Assert.assertTrue(document.getAttributes().containsKey("attribut1"));
+		Assert.assertTrue(document.getAttributes().get("attribut1").toString().equals("value1"));
+		Assert.assertNotNull(document.getTags());
+		Assert.assertTrue(document.getTags().equals(newHashSet(ImmutableSet.of("tag1"))));
 	}
 
 	@Test(enabled = false)

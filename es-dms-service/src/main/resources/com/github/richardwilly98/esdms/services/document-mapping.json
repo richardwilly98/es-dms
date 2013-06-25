@@ -40,6 +40,10 @@
 						"type": "string"
 					}
 				}
+			},
+			"tags" : {
+				"type" : "string", 
+				"index_name" : "tag"
 			}
 		}
 	}

@@ -67,6 +67,7 @@ public class RestDocumentService extends RestServiceBase<Document> {
 	public static final String DOWNLOAD_PATH = "download";
 	public static final String VIEW_PATH = "view";
 	public static final String EDIT_PATH = "edit";
+	public static final String METADATA_PATH = "metadata";
 	public static final String PREVIEW_PATH = "preview";
 	public static final String VERSIONS_PATH = "versions";
 	public static final String MARKDELETED_PATH = "deleted";
@@ -81,6 +82,24 @@ public class RestDocumentService extends RestServiceBase<Document> {
 		this.documentService = documentService;
 	}
 
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Path("{id}/" + METADATA_PATH)
+	public Response getMetadata(@PathParam("id") String id) {
+		try {
+			isAuthenticated();
+			if (log.isTraceEnabled()) {
+				log.trace(String.format("getMetadata - %s", id));
+			}
+			Document document = documentService.getMetadata(id);
+			
+			return Response.status(Status.OK).entity(document).build();
+		} catch (ServiceException e) {
+			log.error("getMetadata failed", e);
+			throw new RestServiceException(e.getLocalizedMessage());
+		}
+	}
+	
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path("{id}/" + PREVIEW_PATH)

@@ -1,4 +1,4 @@
-﻿var simpleApp = angular.module('simpleApp', [
+﻿var esDmsApp = angular.module('esDmsApp', [
 	'ui.bootstrap', 
 	'ngResource', 
 	'ngCookies', 
@@ -8,7 +8,7 @@
 	'blueimp.fileupload'
 ]);
 
-simpleApp.directive('authenticationDirective', function($dialog) {
+esDmsApp.directive('authenticationDirective', function($dialog) {
 	console.log('Start authenticationDirective');
     return {
       restrict: 'A',
@@ -28,7 +28,52 @@ simpleApp.directive('authenticationDirective', function($dialog) {
     }
 });
 
-simpleApp.config(function ($routeProvider) {
+esDmsApp.directive('esdmsTagging', function() {
+	console.log('Start esdmsTagging');
+    return {
+        restrict: 'E',
+        scope: { id: '=', tags: '=', newtag: '=' },
+        template:
+            '<div>' +
+            '<div class="input-append">' +
+            '<input class="span1" type="text" placeholder="New tag" ng-model="new_value"></input> ' +
+            '<a class="btn" ng-click="add()"><i class="icon-plus"></i></a>' +
+            '</div>' +
+            '<div class="input-append">' +
+                //'<a ng-repeat="(idx, tag) in tags" class="tag" ng-click="remove(idx)">{{tag}}</a>' +
+            	'<button ng-repeat="(idx, tag) in tags" class="btn btn-info" ng-click="remove(idx)">{{tag}}</button>' +
+            	'</div>' +
+//            '</div>' +
+            '</div>',
+        link: function ( $scope, $element ) {
+            // FIXME: this is lazy and error-prone
+            var input = angular.element( $element.children()[1] );
+            
+            // This adds the new tag to the tags array
+            $scope.add = function() {
+            	console.log('newtag: ' + $scope.new_value + ' for doc: ' + $scope.id);
+        		$scope.$emit('document:addtag', {'id': $scope.id, 'tag': $scope.new_value});
+                $scope.new_value = "";
+            };
+            
+            // This is the ng-click handler to remove an item
+            $scope.remove = function ( idx ) {
+	        	$scope.$emit('document:removetag', {'id': $scope.id, 'tag': idx});
+            };
+            
+            // Capture all keypresses
+            input.bind( 'keypress', function ( event ) {
+                // But we only care when Enter was pressed
+                if ( event.keyCode == 13 ) {
+                    // There's probably a better way to handle this...
+                    $scope.$apply( $scope.add );
+                }
+            });
+        }
+    };
+});
+
+esDmsApp.config(function ($routeProvider) {
     $routeProvider
 		.when('/login', {
 		    controller: 'loginController',
@@ -73,7 +118,7 @@ simpleApp.config(function ($routeProvider) {
 		.otherwise({ redirectTo: '/search-view' })
 });
 
-simpleApp.factory('sharedService', function($rootScope) {
+esDmsApp.factory('sharedService', function($rootScope) {
     var sharedService = {};
     
     sharedService.message = '';
@@ -90,7 +135,7 @@ simpleApp.factory('sharedService', function($rootScope) {
     return sharedService;
 });
 
-simpleApp.factory('userService', function ($rootScope, $resource, $http) {
+esDmsApp.factory('userService', function ($rootScope, $resource, $http) {
 	var resource = $resource('api/users/:verb/:name', {}, {});
 	var users = [];
 	var editedUser = null;
@@ -131,7 +176,7 @@ simpleApp.factory('userService', function ($rootScope, $resource, $http) {
 	};
 });
 
-simpleApp.factory('roleService', function ($rootScope, $resource, $http) {
+esDmsApp.factory('roleService', function ($rootScope, $resource, $http) {
 	var resource = $resource('api/roles/:verb/:name', {}, {});
 	var roles = [];
 	var editedRole = null;
@@ -172,20 +217,23 @@ simpleApp.factory('roleService', function ($rootScope, $resource, $http) {
 	};
 });
 
-simpleApp.factory('documentService', function ($resource, $http) {
+esDmsApp.factory('documentService', function ($resource, $http) {
 	var resource = $resource('api/documents/:verb/:name', {}, {
 	});
-	var documentResource = $resource('api/documents/:id/:action/:parameter' , {}, {
+	var documentResource = $resource('api/documents/:id/:action/:parameter' , {id:'@id'}, {
 		checkout: {method:'POST', params: {action: 'checkout'}},
 		checkin: {method:'POST', params: {action: 'checkin'}},
-		preview: {method:'GET', params: {action: 'preview'}}
+		preview: {method:'GET', params: {action: 'preview'}},
+		metadata: {method:'GET', params: {action: 'metadata'}},
+		update: {method:'PUT', params: {}}
 	})
-	var documents = {};
+//	var documents = {};
 	return {
 		find: function(first, pageSize, criteria, callback) {
 			console.log('Document search ' + first + ' - ' + pageSize + ' - ' + criteria)
 //			documents = resource.query({ verb: 'search', name: criteria });
 				$http.get('api/documents/search/' + criteria + '?fi=' + first + '&ps=' + pageSize).success(function (data, status) {
+//					documents = data.items;
 					callback(data);
 //					console.log('status: ' + status);
 //					console.log('result: ' + data);
@@ -208,6 +256,32 @@ simpleApp.factory('documentService', function ($resource, $http) {
 			var doc = new documentResource.get({'id': id})
 			doc.$checkin({'id': id});
 		},
+		addTag: function(id, tag, callback) {
+			console.log('addTag document: ' + id + ' - tag: ' + tag);
+			var document = new documentResource.metadata({'id': id}, function() {
+				console.log('get document: ' + JSON.stringify(document))
+				if (document.tags === undefined) {
+					document.tags = [];
+				}
+				document.tags.push(tag);
+				console.log('save document: ' + JSON.stringify(document))
+				document.$update();
+				callback(document);
+			});
+		},
+		removeTag: function(id, tag, callback) {
+			console.log('removeTag document: ' + id + ' - tag: ' + tag);
+			var document = new documentResource.metadata({'id': id}, function() {
+				console.log('get document: ' + JSON.stringify(document))
+				if (document.tags === undefined) {
+					document.tags = [];
+				}
+				document.tags.splice(tag, 1);
+				console.log('save document: ' + JSON.stringify(document))
+				document.$update();
+				callback(document);
+			});
+		},
 		delete: function(id) {
 			console.log('delete document: ' + id);
 			var doc = new documentResource.get({'id': id})
@@ -219,25 +293,25 @@ simpleApp.factory('documentService', function ($resource, $http) {
 				callback(response.content);
 			});
 		},
-		getDocument: function(id) {
-			for (i in documents) {
-				if (documents[i].id == id) {
-					return documents[i];
-				}
-			}
-		},
-		getIndexOf: function(id) {
-			for (i in documents) {
-				if (documents[i].id == id) {
-					return i;
-				}
-			}
-		}
+//		getDocument: function(id) {
+//			for (i in documents) {
+//				if (documents[i].id == id) {
+//					return documents[i];
+//				}
+//			}
+//		},
+//		getIndexOf: function(id) {
+//			for (i in documents) {
+//				if (documents[i].id == id) {
+//					return i;
+//				}
+//			}
+//		}
 	};
     
 });
 
-simpleApp.factory('authenticationService', function ($http) {
+esDmsApp.factory('authenticationService', function ($http) {
 	return {
 		login: function(username, password, rememberMe, callback) {
 			var payload = {username: username, password: password, rememberMe: rememberMe};

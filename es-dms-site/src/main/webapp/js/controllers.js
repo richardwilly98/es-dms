@@ -1,11 +1,11 @@
-﻿simpleApp.controller('MainCtrl', function ($scope, $window, $location) {
+﻿esDmsApp.controller('MainCtrl', function ($scope, $window, $location) {
     $scope.$location = $location;
 });
 
-simpleApp.controller('adminController', function ($scope) {
+esDmsApp.controller('adminController', function ($scope) {
 });
 
-simpleApp.controller('userController', function ($scope, userService) {
+esDmsApp.controller('userController', function ($scope, userService) {
     $scope.users = [];
     $scope.totalHits = 0;
     $scope.elapsedTime = 0;
@@ -38,7 +38,7 @@ simpleApp.controller('userController', function ($scope, userService) {
     };
 });
 
-simpleApp.controller('roleController', function ($scope, roleService) {
+esDmsApp.controller('roleController', function ($scope, roleService) {
     $scope.roles = [];
     $scope.totalHits = 0;
     $scope.elapsedTime = 0;
@@ -71,7 +71,7 @@ simpleApp.controller('roleController', function ($scope, roleService) {
     };
 });
 
-simpleApp.controller('userEditController', function ($scope, $rootScope, $http, userService) {
+esDmsApp.controller('userEditController', function ($scope, $rootScope, $http, userService) {
 	$scope.user = null;
 	$scope.newUser = false;
 	$scope.uid = '';
@@ -140,7 +140,7 @@ simpleApp.controller('userEditController', function ($scope, $rootScope, $http, 
 	};
 });
 
-simpleApp.controller('roleEditController', function ($scope, $rootScope, roleService) {
+esDmsApp.controller('roleEditController', function ($scope, $rootScope, roleService) {
 	$scope.role = {};
 	$rootScope.$on('role:edit', function() {
 		var editRole = roleService.currentRole();
@@ -159,7 +159,7 @@ simpleApp.controller('roleEditController', function ($scope, $rootScope, roleSer
 	};
 });
 
-simpleApp.controller('simpleController', function ($scope, userService) {
+esDmsApp.controller('simpleController', function ($scope, userService) {
     $scope.customers = [];
 
     init();
@@ -182,7 +182,7 @@ simpleApp.controller('simpleController', function ($scope, userService) {
     };
 });
 
-simpleApp.controller('loginController', function ($scope, /* $cookieStore, */ authenticationService, authService, sharedService) {
+esDmsApp.controller('loginController', function ($scope, /* $cookieStore, */ authenticationService, authService, sharedService) {
 
     $scope.shouldBeOpen = true;
 
@@ -213,7 +213,7 @@ simpleApp.controller('loginController', function ($scope, /* $cookieStore, */ au
     };
 });
 
-simpleApp.controller('documentController', function ($scope, documentService) {
+esDmsApp.controller('documentController', function ($scope, documentService) {
     $scope.alerts = [];
 
     $scope.documents = [];
@@ -223,6 +223,8 @@ simpleApp.controller('documentController', function ($scope, documentService) {
     $scope.totalPages = 0;
     $scope.currentPage = 1;
     $scope.pageSize = 20;
+    $scope.newtag = {};
+    
     var currentDocument = null;
 
     init();
@@ -255,9 +257,6 @@ simpleApp.controller('documentController', function ($scope, documentService) {
 			if (updatePagination) {
 				setPagination(result);
 			}
-    		console.log(result);
-    		console.log('totalHits: ' + result.totalHits);
-    		console.log('elapsedTime: ' + result.elapsedTime);
         	$scope.documents = result.items;
         	$scope.totalHits = result.totalHits;
         	$scope.elapsedTime = result.elapsedTime;
@@ -273,6 +272,22 @@ simpleApp.controller('documentController', function ($scope, documentService) {
     	console.log('totalPages: ' + $scope.totalPages + ' - currentPage: ' + $scope.currentPage);
     }
     
+	function getDocument(id) {
+		var documents = $scope.documents;
+		for (i in documents) {
+			if (documents[i].id == id) {
+				return documents[i];
+			}
+		}
+	}
+	function getIndexOf(id) {
+		for (i in $scope.documents) {
+			if ($scope.documents[i].id == id) {
+				return i;
+			}
+		}
+	}
+    
     $scope.setPage = function () {
     	console.log('setPage');
     	if ($scope.criteria === undefined ) {
@@ -283,7 +298,42 @@ simpleApp.controller('documentController', function ($scope, documentService) {
       
     $scope.$watch('currentPage', $scope.setPage );
       
+    $scope.$on('document:addtag', function(evt, args) {
+    	if (args.id === undefined || args.tag === undefined) {
+    		return;
+    	}
+    	console.log('*** addTag: ' + args.id + ' - ' + args.tag);
+    	var id = args.id;
+    	var tag = args.tag;
+    	var document = getDocument(id);
+    	documentService.addTag(id, tag, function(doc) {
+        	var index = getIndexOf(id);
+        	$scope.documents[index] = doc;
+    	});
+      });
+
+    $scope.$on('document:removetag', function(evt, args) {
+    	if (args.id === undefined || args.tag === undefined) {
+    		return;
+    	}
+    	console.log('*** removetag: ' + args.id + ' - ' + args.tag);
+    	var id = args.id;
+    	var tag = args.tag;
+    	var document = getDocument(id);
+    	documentService.removeTag(id, tag, function(doc) {
+        	var index = getIndexOf(id);
+        	$scope.documents[index] = doc;
+    	});
+      });
     
+//    function addTag(id, tag) {
+//    	var document = getDocument(id);
+//    	documentService.addTag(id, tag, function(doc) {
+//        	var index = getIndexOf(id);
+//        	$scope.documents[index] = doc;
+//    	});
+//    }
+    	
     $scope.closeAlert = function (index) {
         $scope.alerts.splice(index, 1);
     };
@@ -294,7 +344,7 @@ simpleApp.controller('documentController', function ($scope, documentService) {
 
     $scope.checkout = function(id) {
     	documentService.checkout(id);
-    	var document = documentService.getDocument(id);
+    	var document = getDocument(id);
     	if (document) {
     		document.attributes.status = 'L';
     	}
@@ -302,7 +352,7 @@ simpleApp.controller('documentController', function ($scope, documentService) {
 
     $scope.checkin = function(id) {
     	documentService.checkin(id);
-    	var document = documentService.getDocument(id);
+    	var document = getDocument(id);
     	if (document) {
     		document.attributes.status = 'A';
     	}
@@ -310,14 +360,14 @@ simpleApp.controller('documentController', function ($scope, documentService) {
 
     $scope.delete = function(id) {
     	documentService.delete(id);
-    	var index = documentService.getIndexOf(id);
+    	var index = getIndexOf(id);
     	if (index) {
     		$scope.documents.splice(index, 1);
     	}
     };
     
     $scope.preview = function(id) {
-		var document = documentService.getDocument(id);
+		var document = getDocument(id);
 		if (currentDocument != document) {
 	    	documentService.preview(id, $scope.criteria, function(response) {
 	        		console.log('Preview document - ' + document.id);
@@ -330,7 +380,7 @@ simpleApp.controller('documentController', function ($scope, documentService) {
     }
 });
 
-simpleApp.controller('AlertDemoCtrl', function ($scope) {
+esDmsApp.controller('AlertDemoCtrl', function ($scope) {
     $scope.alerts = [
     { type: 'error', msg: 'Oh snap! Change a few things up and try submitting again.' },
     { type: 'success', msg: 'Well done! You successfully read this important alert message.' }
@@ -346,7 +396,7 @@ simpleApp.controller('AlertDemoCtrl', function ($scope) {
 
 });
 
-simpleApp.controller('newDocumentController', function ($scope) {
+esDmsApp.controller('newDocumentController', function ($scope) {
 	$scope.showAlert = false;
 	$scope.alert = {};
 	$scope.newDocument = {};
@@ -373,7 +423,7 @@ simpleApp.controller('newDocumentController', function ($scope) {
     };
 });
 
-simpleApp.controller('modalCtrl', function ($scope) {
+esDmsApp.controller('modalCtrl', function ($scope) {
 	$scope.open = function() {
 		$scope.shouldBeOpen = true;
 	};
@@ -393,7 +443,7 @@ simpleApp.controller('modalCtrl', function ($scope) {
 	
 });
 
-simpleApp.controller('navbarController', function ($scope, sharedService, authenticationService) {
+esDmsApp.controller('navbarController', function ($scope, sharedService, authenticationService) {
 	$scope.showLogout = false;
 	$scope.$on('handleBroadcast', function() {
         $scope.showLogout = sharedService.message.logout;
@@ -419,7 +469,7 @@ simpleApp.controller('navbarController', function ($scope, sharedService, authen
 	}
 });
 
-simpleApp.controller('fileUploadController', function ($scope, $http, fileUpload) {
+esDmsApp.controller('fileUploadController', function ($scope, $http, fileUpload) {
 	var url = 'api/documents/upload';
 	$scope.loadingFiles = false;
 	$scope.options = {
@@ -440,7 +490,7 @@ simpleApp.controller('fileUploadController', function ($scope, $http, fileUpload
     };
 });
 
-simpleApp.controller('fileDestroyController', function ($scope, $http) {
+esDmsApp.controller('fileDestroyController', function ($scope, $http) {
 	var file = $scope.file, state;
 	if (file.url) {
 		file.$state = function () {
