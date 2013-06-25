@@ -1,0 +1,59 @@
+
+<div class="container">
+	<h2>My Documents Search</h2>
+	<form class="form-search">
+		<input type="text" data-ng-model="criteria" />
+		<button type="button" class="btn btn-primary" data-ng-click="mySearch()">Search</button>
+	</form>
+	<br />
+	<div data-ng-show="totalHits">
+		About {{ totalHits }} results - search took {{ elapsedTime }} ms
+		<pagination num-pages="totalPages" current-page="currentPage" max-size="maxPages"></pagination>
+	</div>
+	<alert data-ng-repeat="alert in alerts" type="alert.type"
+		close="closeAlert($index)">{{alert.msg}}</alert>
+	<table class="table table-condensed">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Name</th>
+				<th>Author</th>
+				<th>Status</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr data-ng-repeat="document in documents">
+				<td>{{ document.id }}</td>
+				<td>
+					<div popover="{{ document.preview }}" popover-placement="bottom"
+						popover-title="Preview" popover-trigger="mouseenter"
+						popover-popup-delay="1000" data-ng-mouseover="preview(document.id)">{{
+						document.name }}</div>
+				</td>
+				<td>{{ document.attributes.author }}</td>
+				<td>{{ document.attributes.status }}</td>
+				<td>
+					<div data-ng-switch="document.attributes.status" class="btn-group">
+						<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
+							href="#"> Action <span class="caret"></span>
+						</a>
+						<ul data-ng-switch-when="A" class="dropdown-menu">
+							<li><a href="api/documents/{{ document.id }}/view"
+								target="_blank">View</a></li>
+							<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
+							<li><a data-ng-click="checkout(document.id)">Check-Out</a></li>
+							<li><a data-ng-click="delete(document.id)">Delete</a></li>
+						</ul>
+						<ul data-ng-switch-when="L" class="dropdown-menu">
+							<li><a href="api/documents/{{ document.id }}/view"
+								target="_blank">View</a></li>
+							<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
+							<li><a data-ng-click="checkin(document.id)">Check-In</a></li>
+						</ul>
+					</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

@@ -54,6 +54,10 @@ simpleApp.config(function ($routeProvider) {
 		    controller: 'documentController',
 		    templateUrl: 'views/documents/search-view.html'
 		})
+		.when('/my-documents-view', {
+		    controller: 'documentController',
+		    templateUrl: 'views/documents/my-documents-view.html'
+		})
 		.when('/edit-view', {
 		    controller: 'documentController',
 		    templateUrl: 'views/documents/edit-view.html'

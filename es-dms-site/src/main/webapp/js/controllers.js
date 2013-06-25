@@ -230,6 +230,16 @@ simpleApp.controller('documentController', function ($scope, documentService) {
     function init() {
     }
     
+    $scope.mySearch = function() {
+    	console.log('mySearch');
+    	if ($scope.criteria == '' || $scope.criteria == '*') {
+    		$scope.alerts.push({ msg: "Empty or wildcard not allowed" });
+    		$scope.documents = [];
+    	} else {
+    		find(0,  'document.attributes.author: "' + $scope.criteria + '"', true);
+    	}
+    }
+    
     $scope.search = function() {
     	console.log('search');
     	if ($scope.criteria == '' || $scope.criteria == '*') {
@@ -391,6 +401,7 @@ simpleApp.controller('navbarController', function ($scope, sharedService, authen
 	
 	$scope.tabs = [
 	    { "view": "/search-view", title: "Search" },
+	    { "view": "/my-documents-view", title: "My documents" },
 	    { "view": "/edit-view", title: "Edit" },
         { "view": "/view1", title: "View #1" },
         { "view": "/view2", title: "View #2" },
