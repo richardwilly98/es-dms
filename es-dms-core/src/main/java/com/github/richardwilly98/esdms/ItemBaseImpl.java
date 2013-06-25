@@ -80,9 +80,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
 			this.disabled = builder.disabled;
 			this.description = builder.description;
 			if (builder.attributes != null) {
-				for (String key : builder.attributes.keySet()) {
-					this.attributes.put(key, builder.attributes.get(key));
-				}
+				this.attributes.putAll(builder.attributes);
 			}
 		}
 	}

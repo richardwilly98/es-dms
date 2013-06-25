@@ -60,17 +60,11 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 		super(builder);
 		if (builder != null) {
 			if (builder.tags != null) {
-				for (String tag : builder.tags) {
-					this.tags.add(tag);
-				}
+				this.tags.addAll(builder.tags);
 			}
 			if (builder.versions != null) {
-				for (Version version : builder.versions) {
-					this.versions.add(version);
-				}
+				this.versions.addAll(builder.versions);
 			}
-			// this.tags = builder.tags;
-			// this.versions = builder.versions;
 		}
 		readOnlyAttributeKeys = readOnlyAttributes;
 	}
