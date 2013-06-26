@@ -40,10 +40,8 @@ esDmsApp.directive('esdmsTagging', function() {
             '<a class="btn" ng-click="add()"><i class="icon-plus"></i></a>' +
             '</div>' +
             '<div class="input-append">' +
-                //'<a ng-repeat="(idx, tag) in tags" class="tag" ng-click="remove(idx)">{{tag}}</a>' +
             	'<button ng-repeat="(idx, tag) in tags" class="btn btn-info" ng-click="remove(idx)">{{tag}}</button>' +
             	'</div>' +
-//            '</div>' +
             '</div>',
         link: function ( $scope, $element ) {
             // FIXME: this is lazy and error-prone
@@ -143,6 +141,7 @@ esDmsApp.factory('userService', function ($rootScope, $resource, $http) {
 	return {
 		find: function(criteria, callback) {
 			$http.get('api/users/search/' + criteria).success(function (data, status) {
+				users = data.items;
 				callback(data);
 			});
 		},
@@ -184,6 +183,7 @@ esDmsApp.factory('roleService', function ($rootScope, $resource, $http) {
 	return {
 		find: function(criteria, callback) {
 			$http.get('api/roles/search/' + criteria).success(function (data, status) {
+				roles = data.items;
 				callback(data);
 			});
 		},
