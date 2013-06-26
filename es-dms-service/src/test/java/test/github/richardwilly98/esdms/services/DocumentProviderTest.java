@@ -671,6 +671,12 @@ public class DocumentProviderTest extends ProviderTestBase {
 		log.debug(String.format("Remove 'tag2' to %s", document));
 		Assert.assertTrue(document.getTags() != null && document.getTags().size() == 1);
 		Assert.assertTrue(document.getTags().iterator().next().equals("tag1"));
+
+		document.removeTag("tag1");
+		documentService.update(document);
+		document = documentService.get(document.getId());
+		log.debug(String.format("Remove 'tag1' to %s", document));
+		Assert.assertTrue(document.getTags() != null && document.getTags().size() == 0);
 	}
 
 	@Test
