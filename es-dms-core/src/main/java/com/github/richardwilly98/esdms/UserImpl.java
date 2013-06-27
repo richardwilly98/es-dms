@@ -203,18 +203,23 @@ public class UserImpl extends PersonImpl implements User {
 			return false;
 		}
 
-		UserImpl guest = (UserImpl) obj;
+		UserImpl obj2 = (UserImpl) obj;
 		return (super.equals(obj) 
-				&& (login == guest.getLogin() || (login != null && login
-						.equals(guest.getLogin()))));
+				&& (hash == obj2.getHash() || (hash != null && hash
+				.equals(obj2.getHash())))
+				&& (login == obj2.getLogin() || (login != null && login
+						.equals(obj2.getLogin())))
+				&& (roles == obj2.getRoles() || (roles != null && roles
+						.equals(obj2.getRoles()))));
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((login == null) ? 0 : login.hashCode());
 		result = prime * result + ((hash == null) ? 0 : hash.hashCode());
+		result = prime * result + ((login == null) ? 0 : login.hashCode());
+		result = prime * result + ((roles == null) ? 0 : roles.hashCode());
 		return result;
 	}
 

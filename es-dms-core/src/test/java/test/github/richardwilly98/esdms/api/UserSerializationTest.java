@@ -9,8 +9,10 @@ import org.junit.Assert;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.richardwilly98.esdms.PermissionImpl;
 import com.github.richardwilly98.esdms.RoleImpl;
 import com.github.richardwilly98.esdms.UserImpl;
+import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.User;
 import com.google.common.collect.ImmutableSet;
@@ -57,5 +59,22 @@ public class UserSerializationTest {
 		log.debug("user2: " + user2);
 		Assert.assertEquals(user, user2);
 		Assert.assertTrue(user2.hasRole(role));
+	}
+
+	@Test
+	public void testSerializeDeserializePermission() throws Throwable {
+		log.debug("*** testSerializeDeserializePermission ***");
+		String id = "permission-" + System.currentTimeMillis();
+		String name = id;
+		Permission permission = new PermissionImpl.Builder().id(id).name(name).access("access1").build();
+		log.debug(permission);
+		String json = mapper.writeValueAsString(permission);
+		log.debug(json);
+		Assert.assertNotNull(json);
+		Permission permission2 = mapper.readValue(json, Permission.class);
+		log.debug(permission2);
+		Assert.assertEquals(permission, permission2);
+		Permission permission3 = new PermissionImpl.Builder().id(id).name(name).access("access1").build();
+		Assert.assertNotSame(permission3, permission2);
 	}
 }
