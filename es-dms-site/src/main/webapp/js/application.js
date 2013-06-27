@@ -2,7 +2,6 @@
 	'ui.bootstrap', 
 	'ngResource', 
 	'ngCookies', 
-	/*'$strap.directives',*/ 
 	'ngUpload', 
 	'http-auth-interceptor',
 	'blueimp.fileupload'

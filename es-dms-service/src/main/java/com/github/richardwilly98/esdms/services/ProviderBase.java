@@ -117,27 +117,12 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	public SearchResult<T> search(String criteria, int first, int pageSize)
 			throws ServiceException {
 		try {
-//			Set<T> items = newHashSet();
-
 			SearchResponse searchResponse = client.prepareSearch(index)
 					.setTypes(type)
 					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
 					.setFrom(first).setSize(pageSize)
 					.setQuery(new QueryStringQueryBuilder(criteria)).execute()
 					.actionGet();
-//			long totalHits = searchResponse.getHits().totalHits();
-//			long elapsedTime = searchResponse.getTookInMillis();
-//			log.debug("totalHits: " + totalHits);
-//			for (SearchHit hit : searchResponse.getHits().hits()) {
-//				String json = hit.getSourceAsString();
-//				T item = mapper.readValue(json, clazz);
-//				items.add(item);
-//			}
-//
-//			SearchResult<T> searchResult = new SearchResultImpl.Builder<T>()
-//					.totalHits(totalHits).elapsedTime(elapsedTime).items(items)
-//					.firstIndex(first).pageSize(pageSize).build();
-//			return searchResult;
 			return getSearchResult(searchResponse, first, pageSize);
 		} catch (Throwable t) {
 			log.error("search failed", t);
@@ -147,7 +132,6 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 
 	protected SearchResult<T> getSearchResult(SearchResponse searchResponse,
 			int first, int pageSize) throws ServiceException {
-		log.trace("** getSearchResult **");
 		try {
 			Set<T> items = newHashSet();
 			long totalHits = searchResponse.getHits().totalHits();
@@ -202,7 +186,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 			json = mapper.writeValueAsString(item);
 			UpdateResponse response = client
 					.prepareUpdate(index, type, item.getId())
-					.setScript("ctx._source.remove('attributes');").execute()
+					.setScript("ctx._source.remove('attributes'); ctx._source.remove('tags');").execute()
 					.actionGet();
 			response = client.prepareUpdate(index, type, item.getId())
 					.setDoc(json).execute().actionGet();

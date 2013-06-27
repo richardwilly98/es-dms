@@ -8,9 +8,6 @@
 	<br />
 	<div data-ng-show="totalHits">
 		About {{ totalHits }} results - search took {{ elapsedTime }} ms
-		<div data-ng-show="totalPages > 1">
-			<pagination num-pages="totalPages" current-page="currentPage" max-size="maxPages"></pagination>
-		</div>
 	</div>
 	<alert data-ng-repeat="alert in alerts" type="alert.type"
 		close="closeAlert($index)">{{alert.msg}}</alert>
@@ -28,8 +25,7 @@
 			<tr data-ng-repeat="document in documents">
 				<td>
 					<esdms-tagging id="document.id" tags="document.tags" newtag="newtag"></esdms-tagging>
-					<!-- div>{{ document.id }}</div -->
-					</td>
+				</td>
 				<td>
 					<div popover="{{ document.preview }}" popover-placement="bottom"
 						popover-title="Preview" popover-trigger="mouseenter"
@@ -61,4 +57,7 @@
 			</tr>
 		</tbody>
 	</table>
+	<div data-ng-show="totalPages > 1">
+		<pagination num-pages="totalPages" current-page="currentPage" max-size="maxPages"></pagination>
+	</div>
 </div>

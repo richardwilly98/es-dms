@@ -222,7 +222,7 @@ esDmsApp.controller('documentController', function ($scope, documentService) {
     $scope.maxPages = 10;
     $scope.totalPages = 0;
     $scope.currentPage = 1;
-    $scope.pageSize = 20;
+    $scope.pageSize = 12;
     $scope.newtag = {};
     
     var currentDocument = null;
