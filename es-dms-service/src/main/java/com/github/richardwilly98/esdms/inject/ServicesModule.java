@@ -1,5 +1,6 @@
 package com.github.richardwilly98.esdms.inject;
 
+import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.services.AuthenticationProvider;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.DocumentProvider;
@@ -10,11 +11,14 @@ import com.github.richardwilly98.esdms.services.PermissionService;
 import com.github.richardwilly98.esdms.services.RoleProvider;
 import com.github.richardwilly98.esdms.services.RoleService;
 import com.github.richardwilly98.esdms.services.SHA512HashProvider;
+import com.github.richardwilly98.esdms.services.SearchProvider;
+import com.github.richardwilly98.esdms.services.SearchService;
 import com.github.richardwilly98.esdms.services.UserProvider;
 import com.github.richardwilly98.esdms.services.UserService;
 import com.github.richardwilly98.esdms.services.VersionProvider;
 import com.github.richardwilly98.esdms.services.VersionService;
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
 
 public class ServicesModule extends AbstractModule {
 
@@ -29,6 +33,7 @@ public class ServicesModule extends AbstractModule {
 		bind(UserService.class).to(UserProvider.class).asEagerSingleton();
 		bind(DocumentService.class).to(DocumentProvider.class).asEagerSingleton();
 		bind(VersionService.class).to(VersionProvider.class).asEagerSingleton();
+		bind(new TypeLiteral<SearchService<Document>>() {}).to(SearchProvider.class).asEagerSingleton();
 	}
 
 }

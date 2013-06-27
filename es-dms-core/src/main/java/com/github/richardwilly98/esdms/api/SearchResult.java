@@ -1,5 +1,6 @@
 package com.github.richardwilly98.esdms.api;
 
+import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -37,5 +38,10 @@ public interface SearchResult <T extends ItemBase>{
 	 * optional: returns the complete result set
 	 */
 	public abstract Set<T> getItems();
+	
+	/*
+	 * optional: returns the facets associated with the result set
+	 */
+	public abstract Map<String, Facet> getFacets();
 
 }
