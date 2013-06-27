@@ -24,15 +24,37 @@
 	</dependencies>
 
 	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>1.5</version>
+				<configuration>
+					<licenseName>gpl-v3-license</licenseName>
+					<licenseResolver>${project.baseUri}/src/license</licenseResolver>
+					<roots>
+						<root>src/main/java</root>
+					</roots>
+				</configuration>
+				<executions>
+					<execution>
+						<id>first</id>
+						<goals>
+							<goal>update-file-header</goal>
+						</goals>
+						<phase>process-sources</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 		<testResources>
 			<testResource>
 				<directory>${basedir}/src/test/resources</directory>
-				<filtering>true</filtering> 
+				<filtering>true</filtering>
 				<includes>
 					<include>**/*.*</include>
 				</includes>
 			</testResource>
 		</testResources>
 	</build>
-
 </project>
