@@ -1,4 +1,4 @@
-﻿esDmsApp.controller('MainCtrl', function ($scope, $window, $location) {
+esDmsApp.controller('MainCtrl', function ($scope, $window, $location) {
     $scope.$location = $location;
 });
 
@@ -24,8 +24,8 @@ esDmsApp.controller('userController', function ($scope, userService) {
 		}
 	}
 
-	$scope.find = function() {
-    	var result = userService.find($scope.criteria, function(result) {
+	$scope.search = function() {
+    	var result = userService.search($scope.criteria, function(result) {
         	$scope.users = result.items;
         	$scope.totalHits = result.totalHits;
         	$scope.elapsedTime = result.elapsedTime;
@@ -65,8 +65,8 @@ esDmsApp.controller('roleController', function ($scope, roleService) {
     function init() {
     }
 
-    $scope.find = function() {
-    	var result = roleService.find($scope.criteria, function(result) {
+    $scope.search = function() {
+    	var result = roleService.search($scope.criteria, function(result) {
         	$scope.roles = result.items;
         	$scope.totalHits = result.totalHits;
         	$scope.elapsedTime = result.elapsedTime;

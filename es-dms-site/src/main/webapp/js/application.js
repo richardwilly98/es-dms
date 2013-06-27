@@ -1,4 +1,4 @@
-﻿var esDmsApp = angular.module('esDmsApp', [
+var esDmsApp = angular.module('esDmsApp', [
 	'ui.bootstrap', 
 	'ngResource', 
 	'ngCookies', 
@@ -94,7 +94,7 @@ esDmsApp.config(function ($routeProvider) {
 		})
 		.when('/search-view', {
 		    controller: 'documentController',
-		    templateUrl: 'views/documents/search-view.html'
+		    templateUrl: 'views/documents/search-documents.html'
 		})
 		.when('/my-documents-view', {
 		    controller: 'documentController',
@@ -106,11 +106,11 @@ esDmsApp.config(function ($routeProvider) {
 		})
 		.when('/admin/users', {
 		    controller: 'adminController',
-		    templateUrl: 'views/users/search.html'
+		    templateUrl: 'views/users/search-users.html'
 		})
 		.when('/admin/roles', {
 		    controller: 'adminController',
-		    templateUrl: 'views/role-list.html'
+		    templateUrl: 'views/roles/search-roles.html'
 		})
 		.otherwise({ redirectTo: '/search-view' })
 });
@@ -143,7 +143,7 @@ esDmsApp.factory('userService', function ($rootScope, $resource, $http) {
 	var editedUser = null;
 	
 	return {
-		find: function(criteria, callback) {
+		search: function(criteria, callback) {
 			$http.get('api/users/search/' + criteria).success(function (data, status) {
 				users = data.items;
 				callback(data);
@@ -190,7 +190,7 @@ esDmsApp.factory('roleService', function ($rootScope, $resource, $http) {
 	var editedRole = null;
 	
 	return {
-		find: function(criteria, callback) {
+		search: function(criteria, callback) {
 			$http.get('api/roles/search/' + criteria).success(function (data, status) {
 				roles = data.items;
 				callback(data);
