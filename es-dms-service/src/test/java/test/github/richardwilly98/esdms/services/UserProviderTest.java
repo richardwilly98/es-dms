@@ -1,6 +1,5 @@
 package test.github.richardwilly98.esdms.services;
 
-import java.util.List;
 import java.util.Set;
 
 import org.testng.Assert;
@@ -9,6 +8,7 @@ import org.testng.annotations.Test;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
+import com.github.richardwilly98.esdms.services.RoleService;
 
 public class UserProviderTest extends ProviderTestBase {
 
@@ -22,7 +22,12 @@ public class UserProviderTest extends ProviderTestBase {
 		Assert.assertEquals(description, user.getDescription());
 		Assert.assertEquals(disabled, user.isDisabled());
 		Assert.assertEquals(email, user.getEmail());
-		Assert.assertEquals(roles, user.getRoles());
+		if (roles != null) {
+			Assert.assertTrue(user.getRoles().equals(roles));
+		} else {
+			Role defaultRole = roleService.get(RoleService.WRITER_ROLE);
+			Assert.assertTrue(user.getRoles().contains(defaultRole));
+		}
 		return user.getId();
 	}
 
