@@ -8,7 +8,7 @@ import com.github.richardwilly98.esdms.services.RoleService;
 import com.google.inject.Inject;
 
 @Path(RestRoleService.ROLES_PATH)
-public class RestRoleService extends RestServiceBase<Role> {
+public class RestRoleService extends RestItemBaseService<Role> {
 
 	public static final String ROLES_PATH = "roles";
 
