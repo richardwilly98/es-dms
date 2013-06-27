@@ -43,11 +43,6 @@ public class PermissionImpl extends ItemBaseImpl implements Permission {
 		}
 	}
 
-	// public PermissionImpl(String name) {
-	// super(name);
-	// setName(name);
-	// }
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -67,7 +62,7 @@ public class PermissionImpl extends ItemBaseImpl implements Permission {
 	public String getAccess() {
 		return access;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == this) {
@@ -78,11 +73,10 @@ public class PermissionImpl extends ItemBaseImpl implements Permission {
 		}
 
 		PermissionImpl obj2 = (PermissionImpl) obj;
-		return (super.equals(obj) 
-				&& (access == obj2.getAccess() || (access != null && access
-						.equals(obj2.getAccess()))));
+		return (super.equals(obj) && (access == obj2.getAccess() || (access != null && access
+				.equals(obj2.getAccess()))));
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

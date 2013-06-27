@@ -7,14 +7,11 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.User;
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 
-@JsonInclude(Include.NON_NULL)
 public class UserImpl extends PersonImpl implements User {
 
 	private static final long serialVersionUID = 1L;
@@ -204,13 +201,12 @@ public class UserImpl extends PersonImpl implements User {
 		}
 
 		UserImpl obj2 = (UserImpl) obj;
-		return (super.equals(obj) 
-				&& (hash == obj2.getHash() || (hash != null && hash
-				.equals(obj2.getHash())))
+		return (super.equals(obj)
+				&& (hash == obj2.getHash() || (hash != null && hash.equals(obj2
+						.getHash())))
 				&& (login == obj2.getLogin() || (login != null && login
-						.equals(obj2.getLogin())))
-				&& (roles == obj2.getRoles() || (roles != null && roles
-						.equals(obj2.getRoles()))));
+						.equals(obj2.getLogin()))) && (roles == obj2.getRoles() || (roles != null && roles
+				.equals(obj2.getRoles()))));
 	}
 
 	@Override
