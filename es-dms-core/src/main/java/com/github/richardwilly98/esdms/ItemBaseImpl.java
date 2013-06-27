@@ -279,6 +279,38 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+		if (obj == null || obj.getClass() != this.getClass()) {
+			return false;
+		}
+
+		UserImpl guest = (UserImpl) obj;
+		return (disabled == guest.isDisabled())
+				&& (id == guest.getId() || (id != null && id.equals(guest
+						.getId())))
+				&& (name == guest.getName() || (name != null && name
+						.equals(guest.getName())))
+				&& (description == guest.getDescription() || (description != null && description
+						.equals(guest.getDescription())));
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result
+				+ ((description == null) ? 0 : description.hashCode());
+		result = prime * result
+				+ ((attributes == null) ? 0 : attributes.hashCode());
+		return result;
+	}
+
+	@Override
 	public String toString() {
 		return Objects.toStringHelper(this).add("id", id).add("name", name)
 				.add("description", description).add("attributes", attributes)

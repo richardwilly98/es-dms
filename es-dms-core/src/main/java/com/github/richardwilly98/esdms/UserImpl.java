@@ -1,6 +1,9 @@
 package com.github.richardwilly98.esdms;
 
-import java.util.HashSet;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Sets.newHashSet;
+
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -9,64 +12,69 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.User;
 import com.google.common.base.Objects;
+import com.google.common.collect.Iterables;
 
 @JsonInclude(Include.NON_NULL)
 public class UserImpl extends PersonImpl implements User {
 
 	private static final long serialVersionUID = 1L;
 
-	private Set<Role> roles;
+	private final Set<Role> roles = newHashSet();
 	private String hash;
 	private String password;
 	@JsonIgnore
 	private String login;
 
 	public static class Builder extends PersonImpl.Builder<Builder> {
-		
-		private Set<Role> roles;
+
+		private Set<Role> roles = newHashSet();
 		private String hash;
 		private String password;
-		
-        public Builder password(String password) {
-        	this.password = password;
-        	return getThis();
-        }
 
-        public Builder roles(Set<Role> roles) {
-        	this.roles = roles;
-            return getThis();
-        }
-
-        public Builder hash(String hash) {
-        	this.hash = hash;
-            return getThis();
-        }
-
-        @Override
-		protected Builder getThis() {
-			return this;		
+		public Builder password(String password) {
+			this.password = password;
+			return getThis();
 		}
-        
-		public UserImpl build(){
-            return new UserImpl(this);
-        }
+
+		public Builder roles(Set<Role> roles) {
+			this.roles = roles;
+			return getThis();
+		}
+
+		public Builder hash(String hash) {
+			this.hash = hash;
+			return getThis();
+		}
+
+		@Override
+		protected Builder getThis() {
+			return this;
+		}
+
+		public UserImpl build() {
+			return new UserImpl(this);
+		}
 	}
-	
+
 	UserImpl() {
 		this(null);
 	}
-	
+
 	protected UserImpl(Builder builder) {
 		super(builder);
 		if (builder != null) {
 			this.password = builder.password;
-			this.roles = builder.roles;
+			if (builder.roles != null) {
+				this.roles.addAll(builder.roles);
+			}
 			this.hash = builder.hash;
 			this.login = builder.email;
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.User#getLogin()
 	 */
 	@Override
@@ -80,7 +88,9 @@ public class UserImpl extends PersonImpl implements User {
 		super.setEmail(email);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.User#getRoles()
 	 */
 	@Override
@@ -88,20 +98,24 @@ public class UserImpl extends PersonImpl implements User {
 		return roles;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.User#setRoles(java.util.Set)
 	 */
 	@Override
 	public void setRoles(Set<Role> roles) {
 		if (roles != null) {
-			if (this.roles == null) {
-				this.roles = new HashSet<Role>();
-			}
+			// if (this.roles == null) {
+			// this.roles = new HashSet<Role>();
+			// }
 			this.roles.addAll(roles);
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.User#getHash()
 	 */
 	@Override
@@ -109,7 +123,9 @@ public class UserImpl extends PersonImpl implements User {
 		return hash;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.User#setHash(java.lang.String)
 	 */
 	@Override
@@ -117,7 +133,9 @@ public class UserImpl extends PersonImpl implements User {
 		this.hash = hash;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.User#getPassword()
 	 */
 	@Override
@@ -125,7 +143,9 @@ public class UserImpl extends PersonImpl implements User {
 		return password;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.api.User#setPassword(java.lang.String)
 	 */
 	@Override
@@ -133,21 +153,29 @@ public class UserImpl extends PersonImpl implements User {
 		this.password = password;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.github.richardwilly98.api.User#addRole(com.github.richardwilly98.api.Role)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.github.richardwilly98.api.User#addRole(com.github.richardwilly98.
+	 * api.Role)
 	 */
 	@Override
 	public void addRole(Role role) {
 		if (role != null) {
-			if (this.roles == null) {
-				this.roles = new HashSet<Role>();
-			}
+			// if (this.roles == null) {
+			// this.roles = new HashSet<Role>();
+			// }
 			roles.add(role);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.github.richardwilly98.api.User#removeRole(com.github.richardwilly98.api.Role)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.github.richardwilly98.api.User#removeRole(com.github.richardwilly98
+	 * .api.Role)
 	 */
 	@Override
 	public void removeRole(Role role) {
@@ -156,9 +184,44 @@ public class UserImpl extends PersonImpl implements User {
 	}
 
 	@Override
+	@JsonIgnore
+	public boolean hasRole(Role role) {
+		try {
+			checkNotNull(role);
+			return Iterables.contains(roles, role);
+		} catch (NoSuchElementException ex) {
+			return false;
+		}
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+		if (obj == null || obj.getClass() != this.getClass()) {
+			return false;
+		}
+
+		UserImpl guest = (UserImpl) obj;
+		return (super.equals(obj) 
+				&& (login == guest.getLogin() || (login != null && login
+						.equals(guest.getLogin()))));
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((login == null) ? 0 : login.hashCode());
+		result = prime * result + ((hash == null) ? 0 : hash.hashCode());
+		return result;
+	}
+
+	@Override
 	public String toString() {
 		return Objects.toStringHelper(this.getClass()).add("id", getId())
-				.add("name", getName()).add("login", login).add("email", getEmail())
-				.toString();
+				.add("name", getName()).add("login", login)
+				.add("email", getEmail()).add("roles", getRoles()).toString();
 	}
 }
