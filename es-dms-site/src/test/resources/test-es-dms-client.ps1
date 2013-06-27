@@ -18,6 +18,9 @@ Add-Type @"
         }
     }
 "@
+
+Add-Type -AssemblyName System.Web
+
 [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 
 #$baseuri = "https://localhost:8443"
@@ -27,6 +30,11 @@ $cookieContainer = New-Object System.Net.CookieContainer
 $session.Cookies = $cookieContainer
 $headers = @{}
 [string] $token = $null
+[hashtable] $mimeTypes = @{};
+
+function UrlEncode([string]$url) {
+  [Web.Httputility]::UrlEncode($url)
+}
 
 function setToken() {
     Write-Debug "Cookie header: ($session.Cookies.GetCookieHeader($uri))"
@@ -120,9 +128,33 @@ function importFile($file) {
 #$file | Get-Member
     if (Test-Path $file.FullName) {
         $mimeType = Get-MimeType -extension $file.Extension 
-        Write-Host "Import file extension " $file.Extension " - " $mimeType
-        if ($mimeType -ne $null) {
-            upload $file.FullName $mimeType
+        
+        if ($mimeType -eq $null) {
+            $mimeType = "text/plain"
+            Write-Host "Mime type not found using: " $mimeType
+        }
+
+        Write-Host "Importing file: " $file.Name " - MIME: " $mimeType " - from location: " $file.FullName
+        upload $file.FullName $mimeType
+    }
+}
+
+function readMimeTypes([string] $mineTypesFile) {
+    [xml]$file = Get-Content  $mineTypesFile
+    
+    Write-Host "MIME file: " $mineTypesFile
+
+    foreach( $mimetype in $file.Worksheet.'row') {
+
+        $Ext = $mimetype.'Ext';
+        if ($Ext){
+            try{
+                $mimeTypes.Add($Ext, $mimetype.Data);
+                write-host $Ext "-" $mimetype.Data; 
+            }
+            catch{
+                write-host $_.Exception.Message
+            }
         }
     }
 }
@@ -131,24 +163,33 @@ function Get-MimeType()
 {
   param($extension = $null);
   $mimeType = $null;
+  #write-host "Looking for extension: " $extension
   if ( $null -ne $extension )
   {
-    $drive = Get-PSDrive HKCR -ErrorAction SilentlyContinue;
-    if ( $null -eq $drive )
-    {
-      $drive = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
-    }
-    $mimeType = (Get-ItemProperty HKCR:$extension)."Content Type";
+    #$drive = Get-PSDrive HKCR -ErrorAction SilentlyContinue;
+    #if ( $null -eq $drive )
+    #{
+    #  $drive = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
+    #}
+    #$mimeType = (Get-ItemProperty HKCR:$extension)."Content Type";
+
+    $mimeType = $mimeTypes.Get_Item($extension);
+    #write-host $mimeType " found"
   }
   $mimeType;
 }
 
 cls
+$username = "danilo";
+$password = "secret"
 login $username $password
 #search "vaadin"
 #upload "test.pdf" "application/pdf"
 #upload "test.txt"
 #search "FilterTcpDropDown"
 #search "Escalation"
+
+$mimefilepath = Resolve-Path "mimeTypes.xml";
+readMimeTypes $mimefilepath #"C:\Users\admin\Documents\GitHub\es-dms\es-dms-site\src\test\resources\mimeTypes.xml"
 import $path #"D:\Users\Richard\Documents\OpenText"
 #logout
