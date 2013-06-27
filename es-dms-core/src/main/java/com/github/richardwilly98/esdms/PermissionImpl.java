@@ -67,4 +67,27 @@ public class PermissionImpl extends ItemBaseImpl implements Permission {
 	public String getAccess() {
 		return access;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+		if (obj == null || obj.getClass() != this.getClass()) {
+			return false;
+		}
+
+		PermissionImpl obj2 = (PermissionImpl) obj;
+		return (super.equals(obj) 
+				&& (access == obj2.getAccess() || (access != null && access
+						.equals(obj2.getAccess()))));
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((access == null) ? 0 : access.hashCode());
+		return result;
+	}
 }

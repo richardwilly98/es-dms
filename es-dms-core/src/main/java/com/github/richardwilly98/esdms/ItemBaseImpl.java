@@ -287,14 +287,14 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
 			return false;
 		}
 
-		UserImpl guest = (UserImpl) obj;
-		return (disabled == guest.isDisabled())
-				&& (id == guest.getId() || (id != null && id.equals(guest
+		ItemBaseImpl obj2 = (ItemBaseImpl) obj;
+		return (disabled == obj2.isDisabled())
+				&& (id == obj2.getId() || (id != null && id.equals(obj2
 						.getId())))
-				&& (name == guest.getName() || (name != null && name
-						.equals(guest.getName())))
-				&& (description == guest.getDescription() || (description != null && description
-						.equals(guest.getDescription())));
+				&& (name == obj2.getName() || (name != null && name
+						.equals(obj2.getName())))
+				&& (description == obj2.getDescription() || (description != null && description
+						.equals(obj2.getDescription())));
 	}
 
 	@Override
