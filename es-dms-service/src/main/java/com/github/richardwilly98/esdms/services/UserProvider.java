@@ -67,7 +67,20 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 				}
 				user.setHash(encodedHash);
 				user.setPassword(null);
+
 			}
+
+			if (user.getRoles().isEmpty()) {
+				Role role = roleService.get(RoleService.WRITER_ROLE);
+				if (role != null) {
+					user.addRole(role);
+				} else {
+					throw new ServiceException(
+							"Could not find default role "
+									+ RoleService.WRITER_ROLE);
+				}
+			}
+
 			User newUser = super.create(user);
 			return newUser;
 		} catch (Throwable t) {

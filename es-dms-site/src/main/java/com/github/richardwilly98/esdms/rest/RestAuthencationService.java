@@ -18,7 +18,7 @@ import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.google.inject.Inject;
 
 @Path(RestAuthencationService.AUTH_PATH)
-public class RestAuthencationService extends RestServiceBase<SessionImpl> {
+public class RestAuthencationService extends RestItemBaseService<SessionImpl> {
 
 	public static final String LOGOUT_PATH = "logout";
 	public static final String LOGIN_PATH = "login";
