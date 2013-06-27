@@ -27,4 +27,5 @@ public interface User extends Person, Principal {
 
 	public abstract void removeRole(Role role);
 
+	public abstract boolean hasRole(Role role);
 }
