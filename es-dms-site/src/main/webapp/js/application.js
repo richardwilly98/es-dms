@@ -106,7 +106,7 @@ esDmsApp.config(function ($routeProvider) {
 		})
 		.when('/admin/users', {
 		    controller: 'adminController',
-		    templateUrl: 'views/user-list.html'
+		    templateUrl: 'views/users/search.html'
 		})
 		.when('/admin/roles', {
 		    controller: 'adminController',
@@ -134,6 +134,11 @@ esDmsApp.factory('sharedService', function($rootScope) {
 
 esDmsApp.factory('userService', function ($rootScope, $resource, $http) {
 	var resource = $resource('api/users/:verb/:name', {}, {});
+	var userResource = $resource('api/users/:id/:action/:parameter' , {id:'@id'}, {
+		metadata: {method:'GET', params: {action: 'metadata'}},
+		update: {method:'PUT', params: {}}
+	})
+	
 	var users = [];
 	var editedUser = null;
 	
@@ -152,6 +157,11 @@ esDmsApp.factory('userService', function ($rootScope, $resource, $http) {
 				editedUser = id;
 			}
 			$rootScope.$broadcast('user:edit');
+		},
+		delete: function(id) {
+			console.log('delete document: ' + id);
+			var user = new userResource.get({'id': id})
+			user.$delete({'id': id});
 		},
 		currentUser: function() {
 			if (editedUser) {
@@ -225,7 +235,7 @@ esDmsApp.factory('documentService', function ($resource, $http) {
 		preview: {method:'GET', params: {action: 'preview'}},
 		metadata: {method:'GET', params: {action: 'metadata'}},
 		update: {method:'PUT', params: {}}
-	})
+	});
 //	var documents = {};
 	return {
 		find: function(first, pageSize, criteria, callback) {

@@ -16,7 +16,15 @@ esDmsApp.controller('userController', function ($scope, userService) {
     function init() {
     }
 
-    $scope.find = function() {
+	function getIndexOf(id) {
+		for (i in $scope.users) {
+			if ($scope.users[i].id == id) {
+				return i;
+			}
+		}
+	}
+
+	$scope.find = function() {
     	var result = userService.find($scope.criteria, function(result) {
         	$scope.users = result.items;
         	$scope.totalHits = result.totalHits;
@@ -28,6 +36,14 @@ esDmsApp.controller('userController', function ($scope, userService) {
     	userService.edit(id);
     };
     
+    $scope.delete = function(id) {
+    	userService.delete(id);
+    	var index = getIndexOf(id);
+    	if (index) {
+    		$scope.users.splice(index, 1);
+    	}
+    };
+
     $scope.add = function () {
 // var user = new userService();
 // user.name = $scope.name;
