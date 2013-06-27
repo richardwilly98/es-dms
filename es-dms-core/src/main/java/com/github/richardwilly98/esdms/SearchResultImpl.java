@@ -1,13 +1,16 @@
 package com.github.richardwilly98.esdms;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.richardwilly98.esdms.api.Facet;
 import com.github.richardwilly98.esdms.api.ItemBase;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.google.common.base.Objects;
@@ -21,7 +24,8 @@ public class SearchResultImpl<T extends ItemBase> implements SearchResult<T> {
 	private int firstIndex;
 	private int pageSize;
 	private long totalHits;
-
+	private final Map<String, Facet> facets = newHashMap();
+	
 	public static class Builder<T extends ItemBase> {
 
 		private long elapsedTime;
@@ -29,6 +33,7 @@ public class SearchResultImpl<T extends ItemBase> implements SearchResult<T> {
 		private int firstIndex;
 		private int pageSize;
 		private long totalHits;
+		private final Map<String, Facet> facets = newHashMap();
 
 		public Builder<T> elapsedTime(long elapsedTime) {
 			this.elapsedTime = elapsedTime;
@@ -56,6 +61,12 @@ public class SearchResultImpl<T extends ItemBase> implements SearchResult<T> {
 			return this;
 		}
 
+		public Builder<T> facets(Map<String, Facet> facets) {
+			checkNotNull(facets);
+			this.facets.putAll(facets);
+			return this;
+		}
+
 		public SearchResultImpl<T> build() {
 			return new SearchResultImpl<T> (this);
 		}
@@ -72,6 +83,7 @@ public class SearchResultImpl<T extends ItemBase> implements SearchResult<T> {
 			this.pageSize = builder.pageSize;
 			this.totalHits = builder.totalHits;
 			this.items.addAll(builder.items);
+			this.facets.putAll(builder.facets);
 		}
 	}
 
@@ -110,6 +122,11 @@ public class SearchResultImpl<T extends ItemBase> implements SearchResult<T> {
 		return Objects.toStringHelper(this).add("firstIndex", firstIndex)
 				.add("pageSize", pageSize).add("elapsedTime", elapsedTime)
 				.add("totalHits", totalHits).toString();
+	}
+
+	@Override
+	public Map<String, Facet> getFacets() {
+		return facets;
 	}
 
 }

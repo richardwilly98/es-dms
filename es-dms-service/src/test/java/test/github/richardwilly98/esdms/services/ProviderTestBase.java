@@ -22,6 +22,7 @@ import com.github.richardwilly98.esdms.PermissionImpl;
 import com.github.richardwilly98.esdms.RoleImpl;
 import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.Credential;
+import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.User;
@@ -30,6 +31,7 @@ import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.DocumentService;
 import com.github.richardwilly98.esdms.services.PermissionService;
 import com.github.richardwilly98.esdms.services.RoleService;
+import com.github.richardwilly98.esdms.services.SearchService;
 import com.github.richardwilly98.esdms.services.UserService;
 import com.google.inject.Inject;
 
@@ -93,6 +95,9 @@ public class ProviderTestBase {
 
 	@Inject
 	DocumentService documentService;
+
+	@Inject
+	SearchService<Document> searchService;
 
 	@Inject
 	RoleService roleService;
