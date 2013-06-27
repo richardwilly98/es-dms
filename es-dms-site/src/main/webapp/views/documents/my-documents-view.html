@@ -1,21 +1,24 @@
 
 <div class="container">
-	<h2>My Documents Search</h2>
+	<h2>My Documents</h2>
 	<form class="form-search">
 		<input type="text" data-ng-model="criteria" />
 		<button type="button" class="btn btn-primary" data-ng-click="mySearch()">Search</button>
+		<input type="checkbox" data-ng-model="advanced" />
 	</form>
 	<br />
 	<div data-ng-show="totalHits">
 		About {{ totalHits }} results - search took {{ elapsedTime }} ms
-		<pagination num-pages="totalPages" current-page="currentPage" max-size="maxPages"></pagination>
 	</div>
 	<alert data-ng-repeat="alert in alerts" type="alert.type"
 		close="closeAlert($index)">{{alert.msg}}</alert>
+	<div data-ng-show="totalPages > 1">
+		<pagination num-pages="totalPages" current-page="currentPage" max-size="maxPages"></pagination>
+	</div>
 	<table class="table table-condensed">
 		<thead>
 			<tr>
-				<th>Id</th>
+				<th>Tags</th>
 				<th>Name</th>
 				<th>Author</th>
 				<th>Status</th>
@@ -24,7 +27,9 @@
 		</thead>
 		<tbody>
 			<tr data-ng-repeat="document in documents">
-				<td>{{ document.id }}</td>
+				<td>
+					<esdms-tagging id="document.id" tags="document.tags" newtag="newtag"></esdms-tagging>
+				</td>
 				<td>
 					<div popover="{{ document.preview }}" popover-placement="bottom"
 						popover-title="Preview" popover-trigger="mouseenter"
@@ -56,4 +61,7 @@
 			</tr>
 		</tbody>
 	</table>
+	<div data-ng-show="totalPages > 1">
+		<pagination num-pages="totalPages" current-page="currentPage" max-size="maxPages"></pagination>
+	</div>
 </div>
