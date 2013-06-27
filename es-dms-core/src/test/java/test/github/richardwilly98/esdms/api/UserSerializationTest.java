@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +23,11 @@ public class UserSerializationTest {
 	private static Logger log = Logger.getLogger(UserSerializationTest.class);
 	
 	private static final ObjectMapper mapper = new ObjectMapper();
+	
+	@BeforeClass
+	public void initialize() {
+		log.info("*** initialize ***");
+	}
 
 	@Test
 	public void testSerializeDeserializeUser() throws Throwable {

@@ -25,7 +25,7 @@ public class UserProviderTest extends ProviderTestBase {
 		if (roles != null) {
 			Assert.assertTrue(user.getRoles().equals(roles));
 		} else {
-			Role defaultRole = roleService.get(RoleService.WRITER_ROLE);
+			Role defaultRole = roleService.get(RoleService.WRITER_ROLE_ID);
 			Assert.assertTrue(user.getRoles().contains(defaultRole));
 		}
 		return user.getId();

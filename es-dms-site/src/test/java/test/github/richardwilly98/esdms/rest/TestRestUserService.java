@@ -7,13 +7,10 @@ import javax.ws.rs.core.MediaType;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.github.richardwilly98.esdms.RoleImpl;
 import com.github.richardwilly98.esdms.UserImpl;
-import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
-import com.github.richardwilly98.esdms.rest.RestDocumentService;
 import com.github.richardwilly98.esdms.rest.RestItemBaseService;
 import com.github.richardwilly98.esdms.rest.RestRoleService;
 import com.github.richardwilly98.esdms.rest.RestUserService;
@@ -71,7 +68,7 @@ public class TestRestUserService extends GuiceAndJettyTestBase<UserImpl> {
 			UserImpl user1 = createUser(login, password);
 			Assert.assertNotNull(user1);
 			Assert.assertNotNull(user1.getRoles());
-			Role defaultRole = getRole(RoleService.WRITER_ROLE);
+			Role defaultRole = getRole(RoleService.WRITER_ROLE_ID);
 			Assert.assertTrue(user1.getRoles().contains(defaultRole));
 			UserImpl user2 = get(user1.getId(), UserImpl.class, RestUserService.USERS_PATH);
 			Assert.assertEquals(user1.getName(), user2.getName());

@@ -25,18 +25,18 @@ public class RoleProvider extends ProviderBase<Role> implements RoleService {
 	@Override
 	protected void loadInitialData() throws ServiceException {
 		
-		Role role = new RoleImpl.Builder().id(READER_ROLE).name("Reader").build();
+		Role role = new RoleImpl.Builder().id(READER_ROLE_ID).name(READER_ROLE_NAME).build();
 		role.addPermission(new PermissionImpl.Builder().id(DocumentService.READ_PERMISSION).name(DocumentService.READ_PERMISSION).build());
 		super.create(role);
 
-		role = new RoleImpl.Builder().id(WRITER_ROLE).name("Writer").build();
+		role = new RoleImpl.Builder().id(WRITER_ROLE_ID).name(WRITER_ROLE_NAME).build();
 		role.addPermission(new PermissionImpl.Builder().id(DocumentService.READ_PERMISSION).name(DocumentService.READ_PERMISSION).build());
 		role.addPermission(new PermissionImpl.Builder().id(DocumentService.EDIT_PERMISSION).name(DocumentService.EDIT_PERMISSION).build());
 		role.addPermission(new PermissionImpl.Builder().id(DocumentService.CREATE_PERMISSION).name(DocumentService.CREATE_PERMISSION).build());
 		role.addPermission(new PermissionImpl.Builder().id(DocumentService.DELETE_PERMISSION).name(DocumentService.DELETE_PERMISSION).build());
 		super.create(role);
 
-		role = new RoleImpl.Builder().id(ADMINISTRATOR_ROLE).name("Administrator").build();
+		role = new RoleImpl.Builder().id(ADMINISTRATOR_ROLE_ID).name(ADMINISTRATOR_ROLE_NAME).build();
 		role.addPermission(new PermissionImpl.Builder().id(DocumentService.READ_PERMISSION).name(DocumentService.READ_PERMISSION).build());
 		role.addPermission(new PermissionImpl.Builder().id(DocumentService.EDIT_PERMISSION).name(DocumentService.EDIT_PERMISSION).build());
 		role.addPermission(new PermissionImpl.Builder().id(DocumentService.CREATE_PERMISSION).name(DocumentService.CREATE_PERMISSION).build());

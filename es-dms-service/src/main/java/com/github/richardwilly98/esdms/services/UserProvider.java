@@ -36,7 +36,7 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 				.id(DEFAULT_ADMIN_LOGIN).name(DEFAULT_ADMIN_LOGIN)
 				.description(DEFAULT_ADMIN_DESCRIPTION)
 				.email(DEFAULT_ADMIN_LOGIN).build();
-		Role role = roleService.get(RoleService.ADMINISTRATOR_ROLE);
+		Role role = roleService.get(RoleService.ADMINISTRATOR_ROLE_ID);
 		user.addRole(role);
 		super.create(user);
 	}
@@ -71,13 +71,13 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 			}
 
 			if (user.getRoles().isEmpty()) {
-				Role role = roleService.get(RoleService.WRITER_ROLE);
+				Role role = roleService.get(RoleService.WRITER_ROLE_ID);
 				if (role != null) {
 					user.addRole(role);
 				} else {
 					throw new ServiceException(
 							"Could not find default role "
-									+ RoleService.WRITER_ROLE);
+									+ RoleService.WRITER_ROLE_ID);
 				}
 			}
 

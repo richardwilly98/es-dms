@@ -149,9 +149,7 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 
 	@Override
 	public boolean equals(Object role) {
-		log.debug("Role.equals");
 		if (role != null && role instanceof Role) {
-			log.debug("compare role");
 			if (((Role) role).getId().equals(id)) {
 				return true;
 			}
