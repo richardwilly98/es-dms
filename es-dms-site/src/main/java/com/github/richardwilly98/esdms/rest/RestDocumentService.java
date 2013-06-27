@@ -54,7 +54,7 @@ import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataParam;
 
 @Path(RestDocumentService.DOCUMENTS_PATH)
-public class RestDocumentService extends RestServiceBase<Document> {
+public class RestDocumentService extends RestItemBaseService<Document> {
 
 	public static final String PREVIEW_FRAGMENT_SIZE_PARAMETER = "fs";
 	public static final String PREVIEW_CRITERIA_PARAMETER = "cr";

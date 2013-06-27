@@ -25,11 +25,11 @@ public class RoleProvider extends ProviderBase<Role> implements RoleService {
 	@Override
 	protected void loadInitialData() throws ServiceException {
 		
-		Role role = new RoleImpl.Builder().id("reader").name("Reader").build();
+		Role role = new RoleImpl.Builder().id(READER_ROLE).name("Reader").build();
 		role.addPermission(new PermissionImpl.Builder().id(DocumentService.READ_PERMISSION).name(DocumentService.READ_PERMISSION).build());
 		super.create(role);
 
-		role = new RoleImpl.Builder().id("writer").name("Writer").build();
+		role = new RoleImpl.Builder().id(WRITER_ROLE).name("Writer").build();
 		role.addPermission(new PermissionImpl.Builder().id(DocumentService.READ_PERMISSION).name(DocumentService.READ_PERMISSION).build());
 		role.addPermission(new PermissionImpl.Builder().id(DocumentService.EDIT_PERMISSION).name(DocumentService.EDIT_PERMISSION).build());
 		role.addPermission(new PermissionImpl.Builder().id(DocumentService.CREATE_PERMISSION).name(DocumentService.CREATE_PERMISSION).build());

@@ -18,7 +18,7 @@ import com.github.richardwilly98.esdms.services.UserService;
 import com.google.inject.Inject;
 
 @Path(RestUserService.USERS_PATH)
-public class RestUserService extends RestServiceBase<User> {
+public class RestUserService extends RestItemBaseService<User> {
 
 	public static final String USERS_PATH = "users";
 	private final HashService hashService;

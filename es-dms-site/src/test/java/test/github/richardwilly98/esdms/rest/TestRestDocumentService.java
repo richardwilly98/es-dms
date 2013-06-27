@@ -17,7 +17,7 @@ import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.rest.RestDocumentService;
-import com.github.richardwilly98.esdms.rest.RestServiceBase;
+import com.github.richardwilly98.esdms.rest.RestItemBaseService;
 import com.google.common.collect.ImmutableSet;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
@@ -209,7 +209,7 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			Assert.assertNotNull(document);
 			ClientResponse response = resource()
 					.path(RestDocumentService.DOCUMENTS_PATH)
-					.path(RestServiceBase.SEARCH_PATH).path(criteria)
+					.path(RestItemBaseService.SEARCH_PATH).path(criteria)
 					.cookie(adminCookie).accept(MediaType.APPLICATION_JSON)
 					.get(ClientResponse.class);
 			log.debug(String.format("status: %s", response.getStatus()));
@@ -380,7 +380,7 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 
 			ClientResponse response = resource()
 					.path(RestDocumentService.DOCUMENTS_PATH)
-					.path(RestServiceBase.SEARCH_PATH).path(criteria)
+					.path(RestItemBaseService.SEARCH_PATH).path(criteria)
 					.cookie(adminCookie).accept(MediaType.APPLICATION_JSON)
 					.get(ClientResponse.class);
 			log.debug(String.format("status: %s", response.getStatus()));

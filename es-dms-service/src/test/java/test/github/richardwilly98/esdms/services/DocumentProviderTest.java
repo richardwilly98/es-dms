@@ -79,6 +79,12 @@ public class DocumentProviderTest extends ProviderTestBase {
 			throw sEx;
 		}
 	}
+	
+	private void deleteDocument(Document document) throws ServiceException {
+		documentService.markDeleted(document);
+		document = documentService.get(document.getId());
+		documentService.delete(document);
+	}
 
 	@Test
 	public void testCreateDocument() throws Throwable {
@@ -200,8 +206,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		log.info(String.format("document preview: %s", preview));
 	}
 
-	//Gingerbread
-	@Test(enabled = false)
+	@Test
 	public void testSearchDocument() throws Throwable {
 		
 		log.info("Start testSearchDocument");
@@ -212,6 +217,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 		createDocument("test-attachment.html", "text/html",
 				"/test/github/richardwilly98/services/test-attachment.html");
 		}
+		i = 0;
 		while (i++ < max) {
 		createDocument("Gingerbread", "text/plain",
 				"/test/github/richardwilly98/services/test-attachment.txt");
@@ -677,6 +683,8 @@ public class DocumentProviderTest extends ProviderTestBase {
 		document = documentService.get(document.getId());
 		log.debug(String.format("Remove 'tag1' to %s", document));
 		Assert.assertTrue(document.getTags() != null && document.getTags().size() == 0);
+		
+		deleteDocument(document);
 	}
 
 	@Test
@@ -708,6 +716,8 @@ public class DocumentProviderTest extends ProviderTestBase {
 		Assert.assertTrue(document.getAttributes().get("attribut1").toString().equals("value1"));
 		Assert.assertNotNull(document.getTags());
 		Assert.assertTrue(document.getTags().equals(newHashSet(ImmutableSet.of("tag1"))));
+		
+		deleteDocument(document);
 	}
 
 	@Test(enabled = false)

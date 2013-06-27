@@ -7,11 +7,17 @@ import javax.ws.rs.core.MediaType;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.github.richardwilly98.esdms.RoleImpl;
 import com.github.richardwilly98.esdms.UserImpl;
+import com.github.richardwilly98.esdms.api.Document;
+import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
-import com.github.richardwilly98.esdms.rest.RestServiceBase;
+import com.github.richardwilly98.esdms.rest.RestDocumentService;
+import com.github.richardwilly98.esdms.rest.RestItemBaseService;
+import com.github.richardwilly98.esdms.rest.RestRoleService;
 import com.github.richardwilly98.esdms.rest.RestUserService;
+import com.github.richardwilly98.esdms.services.RoleService;
 import com.github.richardwilly98.esdms.services.UserService;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.ClientResponse.Status;
@@ -24,13 +30,24 @@ public class TestRestUserService extends GuiceAndJettyTestBase<UserImpl> {
 		super();
 	}
 
+	private Role getRole(String id) throws Throwable {
+		ClientResponse response = resource().path(RestRoleService.ROLES_PATH).path(id)
+				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		log.debug(String.format("status: %s", response.getStatus()));
+		if (response.getStatus() == Status.OK.getStatusCode()) {
+			return response.getEntity(Role.class);
+		}
+		return null;
+	}
+
 	@Test
 	public void testGetUsers() throws Throwable {
 		log.debug("*** testGetUsers ***");
 		try {
 			ClientResponse response;
 			log.debug("Resource: " + resource());
-			response = resource().path(RestUserService.USERS_PATH).path(RestServiceBase.SEARCH_PATH)
+			response = resource().path(RestUserService.USERS_PATH).path(RestItemBaseService.SEARCH_PATH)
 					.path(UserService.DEFAULT_ADMIN_LOGIN).cookie(adminCookie)
 					.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
 			log.debug("status: " + response.getStatus());
@@ -53,6 +70,9 @@ public class TestRestUserService extends GuiceAndJettyTestBase<UserImpl> {
 			String login = "user-" + System.currentTimeMillis();
 			UserImpl user1 = createUser(login, password);
 			Assert.assertNotNull(user1);
+			Assert.assertNotNull(user1.getRoles());
+			Role defaultRole = getRole(RoleService.WRITER_ROLE);
+			Assert.assertTrue(user1.getRoles().contains(defaultRole));
 			UserImpl user2 = get(user1.getId(), UserImpl.class, RestUserService.USERS_PATH);
 			Assert.assertEquals(user1.getName(), user2.getName());
 			String newName = "user-2-" + System.currentTimeMillis();

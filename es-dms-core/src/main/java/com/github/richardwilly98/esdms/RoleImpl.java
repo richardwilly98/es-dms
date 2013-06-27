@@ -15,8 +15,8 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 
 	public static class Builder extends BuilderBase<Builder> {
 
-		Set<String> scopes;
-		Set<Permission> permissions;
+		private Set<String> scopes;
+		private Set<Permission> permissions;
 
 		public Builder scopes(Set<String> scopes) {
 			this.scopes = scopes;
@@ -45,8 +45,6 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 	protected RoleImpl(Builder builder) {
 		super(builder);
 		if (builder != null) {
-//			this.scopes = builder.scopes;
-//			this.permissions = builder.permissions;
 			if (builder.scopes != null) {
 				for (String scope : builder.scopes) {
 					this.scopes.add(scope);
@@ -61,7 +59,9 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 	}
 
 	// methods on scope
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.esdms.Role#getScopes()
 	 */
 	@Override
@@ -69,33 +69,33 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 		return scopes;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.esdms.Role#setScopes(java.util.Set)
 	 */
 	@Override
 	public void setScopes(Set<String> scopes) {
 		if (scopes != null) {
-//			if (this.scopes == null) {
-//				this.scopes = newHashSet();
-//			}
 			this.scopes.addAll(scopes);
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.esdms.Role#addScope(java.lang.String)
 	 */
 	@Override
 	public void addScope(String scope) {
-//		if (scopes == null) {
-//			scopes = newHashSet();
-//		}
 		if (!scopes.contains(scope)) {
 			scopes.add(scope);
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.esdms.Role#removeScope(java.lang.String)
 	 */
 	@Override
@@ -108,7 +108,9 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 	// end of methods on scopes
 
 	// methods on permissions
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.esdms.Role#getPermissions()
 	 */
 	@Override
@@ -116,37 +118,62 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 		return permissions;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.github.richardwilly98.esdms.Role#setPermissions(java.util.Set)
 	 */
 	@Override
 	public void setPermissions(Set<Permission> permissions) {
 		if (permissions != null) {
-//			if (this.permissions == null) {
-//				this.permissions = newHashSet();
-//			}
 			this.permissions.addAll(permissions);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.github.richardwilly98.esdms.Role#addPermission(com.github.richardwilly98.esdms.PermissionImpl)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.github.richardwilly98.esdms.Role#addPermission(com.github.richardwilly98
+	 * .esdms.PermissionImpl)
 	 */
 	@Override
 	public void addPermission(Permission permission) {
 		if (permission == null) {
 			return;
 		}
-//		if (this.permissions == null) {
-//			this.permissions = newHashSet();
-//		}
 		if (!this.permissions.contains(permission)) {
 			permissions.add(permission);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see com.github.richardwilly98.esdms.Role#removePermission(com.github.richardwilly98.esdms.api.Permission)
+	@Override
+	public boolean equals(Object role) {
+		log.debug("Role.equals");
+		if (role != null && role instanceof Role) {
+			log.debug("compare role");
+			if (((Role) role).getId().equals(id)) {
+				return true;
+			}
+		}
+		return super.equals(role);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((scopes == null) ? 0 : scopes.hashCode());
+		result = prime * result
+				+ ((permissions == null) ? 0 : permissions.hashCode());
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.richardwilly98.esdms.Role#removePermission(com.github.
+	 * richardwilly98.esdms.api.Permission)
 	 */
 	@Override
 	public void removePermission(Permission permission) {
