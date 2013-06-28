@@ -38,8 +38,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
-import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.SessionImpl;
+import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.google.inject.Inject;
@@ -61,7 +61,7 @@ public class RestAuthencationService extends RestItemBaseService<SessionImpl> {
 	@Path(LOGIN_PATH)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces({ MediaType.APPLICATION_JSON })
-	public Response login(CredentialImpl credential) {
+	public Response login(Credential credential) {
 		try {
 			checkNotNull(credential);
 			if (log.isTraceEnabled()) {
