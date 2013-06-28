@@ -180,7 +180,7 @@ function Get-MimeType()
 }
 
 cls
-$username = "danilo";
+$username = "peter";
 $password = "secret"
 login $username $password
 #search "vaadin"

@@ -54,9 +54,9 @@ public class PersonImpl extends ItemBaseImpl implements Person {
 		@Override
 		protected abstract T getThis();
 		
-//		public PersonImpl build(){
-//            return new PersonImpl(this);
-//        }
+		public PersonImpl build(){
+            return new PersonImpl(this);
+        }
 	}
 
 	protected PersonImpl(Builder<?> builder) {
