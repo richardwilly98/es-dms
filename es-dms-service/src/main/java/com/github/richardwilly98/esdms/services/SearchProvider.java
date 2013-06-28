@@ -48,9 +48,7 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.base.Stopwatch;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.OrFilterBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -90,11 +88,7 @@ public class SearchProvider implements SearchService<Document> {
 		checkNotNull(type);
 		this.client = client;
 		this.settings = bootstrapService.loadSettings();
-		// if (index != null) {
-		// this.index = index;
-		// } else {
 		this.index = settings.getLibrary();
-		// }
 	}
 
 	protected void isAuthenticated() throws ServiceException {
@@ -137,6 +131,7 @@ public class SearchProvider implements SearchService<Document> {
 			Set<Document> items = newHashSet();
 			long totalHits = searchResponse.getHits().totalHits();
 			long elapsedTime = searchResponse.getTookInMillis();
+			log.trace(String.format("Total hist: %s - item count: %s", totalHits, searchResponse.getHits().hits().length));
 			for (SearchHit hit : searchResponse.getHits().hits()) {
 				String json = convertFieldAsString(hit, "document");
 				Document item = mapper.readValue(json, Document.class);
@@ -167,8 +162,8 @@ public class SearchProvider implements SearchService<Document> {
 			}
 			SearchResult<Document> searchResult = builder.build();
 			watch.stop();
-			log.debug("Elapsed time to build document list "
-					+ watch.elapsed(TimeUnit.MILLISECONDS));
+			log.debug(String.format("Elapsed time to build document list - %s ms"
+					, watch.elapsed(TimeUnit.MILLISECONDS)));
 			return searchResult;
 		} catch (Throwable t) {
 			log.error("parseSearchResult failed", t);
@@ -219,15 +214,15 @@ public class SearchProvider implements SearchService<Document> {
 						.field(facet).size(10));
 			}
 			if (filters != null && filters.size() > 0) {
-				OrFilterBuilder filterBuilder = FilterBuilders.orFilter();
+//				OrFilterBuilder filterBuilder = FilterBuilders.orFilter();
 				for (String key : filters.keySet()) {
-//					searchRequestBuilder.setFilter(FilterBuilders.termFilter(
-//							key, filters.get(key)));
-					FilterBuilder termFilter = FilterBuilders.termFilter(
-							key, filters.get(key)); 
-					filterBuilder.add(termFilter);
+					searchRequestBuilder.setFilter(FilterBuilders.termFilter(
+							key, filters.get(key)));
+//					FilterBuilder termFilter = FilterBuilders.termFilter(
+//							key, filters.get(key)); 
+//					filterBuilder.add(termFilter);
 				}
-				searchRequestBuilder.setFilter(filterBuilder);
+//				searchRequestBuilder.setFilter(filterBuilder);
 			}
 			log.debug("Search request builder: " + searchRequestBuilder);
 			SearchResponse searchResponse = searchRequestBuilder.execute()

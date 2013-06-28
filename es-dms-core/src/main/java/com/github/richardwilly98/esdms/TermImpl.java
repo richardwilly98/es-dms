@@ -26,14 +26,13 @@ package com.github.richardwilly98.esdms;
  * #L%
  */
 
-
 import com.github.richardwilly98.esdms.api.Term;
 import com.google.common.base.Objects;
 
 public class TermImpl implements Term {
 
-	private final String term;
-	private final int count;
+	private String term;
+	private int count;
 
 	public static class Builder {
 
@@ -54,18 +53,16 @@ public class TermImpl implements Term {
 			return new TermImpl(this);
 		}
 	}
-	
+
 	TermImpl() {
 		this(null);
 	}
 
 	public TermImpl(Builder builder) {
-		//checkNotNull(builder);
-		
-		//if (builder != null) {
+		if (builder != null) {
 			this.term = builder.term;
 			this.count = builder.count;
-		//}
+		}
 	}
 
 	@Override
@@ -78,30 +75,40 @@ public class TermImpl implements Term {
 		return count;
 	}
 
+	void setTerm(String term) {
+		this.term = term;
+	}
+
+	void setCount(int count) {
+		this.count = count;
+	}
+
 	@Override
 	public String toString() {
 		return Objects.toStringHelper(this).add("term", term)
 				.add("count", count).toString();
 	}
-	
-//	@Override
-//	public boolean equals(Object obj) {
-//		if (obj == this) {
-//			return true;
-//		}
-//		if (obj == null || obj.getClass() != this.getClass()) {
-//			return false;
-//		}
-//
-//		TermImpl obj2 = (TermImpl) obj;
-//		return (super.equals(obj) && (count == obj2.getCount()));
-//	}
-//
-//	@Override
-//	public int hashCode() {
-//		final int prime = 31;
-//		int result = super.hashCode();
-//		result = prime * result + count;
-//		return result;
-//	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+		if (obj == null || obj.getClass() != this.getClass()) {
+			return false;
+		}
+
+		TermImpl obj2 = (TermImpl) obj;
+		return ((count == obj2.getCount()) && (term == obj2.getTerm() || (term != null && term
+				.equals(obj2.getTerm()))));
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + count;
+		result = prime * result + ((term == null) ? 0 : term.hashCode());
+		return result;
+	}
 }

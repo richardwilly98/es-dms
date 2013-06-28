@@ -1,8 +1,8 @@
-package com.github.richardwilly98.esdms.api;
+package com.github.richardwilly98.esdms.rest.entity;
 
 /*
  * #%L
- * es-dms-core
+ * es-dms-site
  * %%
  * Copyright (C) 2013 es-dms
  * %%
@@ -27,19 +27,26 @@ package com.github.richardwilly98.esdms.api;
  */
 
 
-import java.util.Set;
+import java.util.Map;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.github.richardwilly98.esdms.FacetImpl;
+public class FacetedQuery {
 
-@JsonDeserialize(as = FacetImpl.class)
-public interface Facet {
+	String facet;
+	Map<String, Object> filters;
 
-	public abstract Set<Term> getTerms();
-	
-	public abstract long getMissingCount();
-	
-	public abstract long getOtherCount();
-	
-	public abstract long getTotalCount();
+	public String getFacet() {
+		return facet;
+	}
+
+	public void setFacet(String facet) {
+		this.facet = facet;
+	}
+
+	public Map<String, Object> getFilters() {
+		return filters;
+	}
+
+	public void setFilters(Map<String, Object> filters) {
+		this.filters = filters;
+	}
 }

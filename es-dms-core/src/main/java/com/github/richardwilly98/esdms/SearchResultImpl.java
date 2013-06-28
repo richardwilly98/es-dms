@@ -34,17 +34,14 @@ import static com.google.common.collect.Sets.newHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.richardwilly98.esdms.api.Facet;
 import com.github.richardwilly98.esdms.api.ItemBase;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.google.common.base.Objects;
+import com.google.common.primitives.Longs;
 
 public class SearchResultImpl<T extends ItemBase> implements SearchResult<T> {
-
-	private static Logger log = Logger.getLogger(SearchResultImpl.class);
 
 	private final Set<T> items = newHashSet();
 	private long elapsedTime;
@@ -145,6 +142,41 @@ public class SearchResultImpl<T extends ItemBase> implements SearchResult<T> {
 		throw new UnsupportedOperationException();
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+		if (obj == null || obj.getClass() != this.getClass()) {
+			return false;
+		}
+
+		SearchResultImpl<T> obj2 = (SearchResultImpl<T>) obj;
+		return ((firstIndex == obj2.getFirstIndex())
+				&& (pageSize == obj2.getPageSize())
+				&& (elapsedTime == obj2.getElapsedTime()) 
+				&& (totalHits == obj2.getTotalHits())
+				&& (facets == obj2
+				.getFacets() || (facets != null && facets.equals(obj2.getFacets())))
+				&& (items == obj2
+				.getItems() || (items != null && items.equals(obj2.getItems()))));
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + firstIndex;
+		result = prime * result + pageSize;
+		result = prime * result + Longs.hashCode(elapsedTime);
+		result = prime * result + Longs.hashCode(totalHits);
+		result = prime * result + ((items == null) ? 0 : items.hashCode());
+		result = prime * result + ((facets == null) ? 0 : facets.hashCode());
+		return result;
+	}
+
+	@Override
 	public String toString() {
 		return Objects.toStringHelper(this).add("firstIndex", firstIndex)
 				.add("pageSize", pageSize).add("elapsedTime", elapsedTime)
