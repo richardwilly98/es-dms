@@ -27,25 +27,6 @@ package test.github.richardwilly98.esdms.services;
  */
 
 
-import static org.elasticsearch.common.io.Streams.copyToByteArray;
-
-import java.util.concurrent.TimeUnit;
-
-import org.apache.tika.mime.MimeType;
-import org.apache.tika.mime.MimeTypes;
-import org.testng.Assert;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Guice;
-import org.testng.annotations.Test;
-
-import test.github.richardwilly98.esdms.inject.ProviderModule2;
-
-import com.github.richardwilly98.esdms.DocumentImpl;
-import com.github.richardwilly98.esdms.FileImpl;
-import com.github.richardwilly98.esdms.api.Document;
-import com.github.richardwilly98.esdms.api.File;
-import com.google.common.base.Stopwatch;
 
 //@Test(enabled = false)
 //@Guice(modules = ProviderModule2.class)
