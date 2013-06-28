@@ -1,5 +1,8 @@
 package com.github.richardwilly98.esdms.api;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.github.richardwilly98.esdms.TermImpl;
+
 /*
  * #%L
  * es-dms-core
@@ -27,7 +30,7 @@ package com.github.richardwilly98.esdms.api;
  */
 
 
-
+@JsonDeserialize(as = TermImpl.class)
 public interface Term {
 	public abstract String getTerm();
 

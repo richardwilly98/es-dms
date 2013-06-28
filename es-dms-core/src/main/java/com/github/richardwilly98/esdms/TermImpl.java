@@ -27,8 +27,6 @@ package com.github.richardwilly98.esdms;
  */
 
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.github.richardwilly98.esdms.api.Term;
 import com.google.common.base.Objects;
 
@@ -56,11 +54,18 @@ public class TermImpl implements Term {
 			return new TermImpl(this);
 		}
 	}
+	
+	TermImpl() {
+		this(null);
+	}
 
 	public TermImpl(Builder builder) {
-		checkNotNull(builder);
-		this.term = builder.term;
-		this.count = builder.count;
+		//checkNotNull(builder);
+		
+		//if (builder != null) {
+			this.term = builder.term;
+			this.count = builder.count;
+		//}
 	}
 
 	@Override
@@ -78,4 +83,25 @@ public class TermImpl implements Term {
 		return Objects.toStringHelper(this).add("term", term)
 				.add("count", count).toString();
 	}
+	
+//	@Override
+//	public boolean equals(Object obj) {
+//		if (obj == this) {
+//			return true;
+//		}
+//		if (obj == null || obj.getClass() != this.getClass()) {
+//			return false;
+//		}
+//
+//		TermImpl obj2 = (TermImpl) obj;
+//		return (super.equals(obj) && (count == obj2.getCount()));
+//	}
+//
+//	@Override
+//	public int hashCode() {
+//		final int prime = 31;
+//		int result = super.hashCode();
+//		result = prime * result + count;
+//		return result;
+//	}
 }

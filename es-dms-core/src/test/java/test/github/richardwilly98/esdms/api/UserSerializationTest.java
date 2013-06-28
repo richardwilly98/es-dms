@@ -29,6 +29,7 @@ package test.github.richardwilly98.esdms.api;
 
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.Date;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -38,10 +39,16 @@ import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.esdms.PermissionImpl;
+import com.github.richardwilly98.esdms.PersonImpl;
 import com.github.richardwilly98.esdms.RoleImpl;
+import com.github.richardwilly98.esdms.SessionImpl;
+import com.github.richardwilly98.esdms.TermImpl;
 import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.Permission;
+import com.github.richardwilly98.esdms.api.Person;
 import com.github.richardwilly98.esdms.api.Role;
+import com.github.richardwilly98.esdms.api.Session;
+import com.github.richardwilly98.esdms.api.Term;
 import com.github.richardwilly98.esdms.api.User;
 import com.google.common.collect.ImmutableSet;
 
@@ -72,6 +79,60 @@ public class UserSerializationTest {
 		log.debug(user2);
 		Assert.assertEquals(user, user2);
 	}
+	
+//	@Test
+//	public void testSerializeDeserializeSession() throws Throwable {
+//		log.debug("*** testSerializeDeserializeSession ***");
+//		String userId = "user-" + System.currentTimeMillis();
+//		
+//		boolean active = true;
+//		boolean secure = true ;
+//		Date createTime = Date.parse(System.currentTimeMillis());
+//		Date lastAccessTime;
+//		long timeout;
+//		
+//		Session item = new SessionImpl.Builder().password(password).id(id).name(name).email(email).build();
+//		log.debug(item);
+//		String json = mapper.writeValueAsString(item);
+//		log.debug(json);
+//		Assert.assertNotNull(json);
+//		User item2 = mapper.readValue(json, User.class);
+//		log.debug(item2);
+//		Assert.assertEquals(item, item2);
+//	}
+	
+//	@Test
+//	public void testSerializeDeserializePerson() throws Throwable {
+//		log.debug("*** testSerializeDeserializePerson ***");
+//		String id = "person-" + System.currentTimeMillis();
+//		String name = id;
+//		String city = "some place";
+//		String email = id + "@gmail.com";
+//		String password = "secret";
+//		Person person = new PersonImpl.Builder().city(city).email(email).build();
+//		log.debug(person);
+//		String json = mapper.writeValueAsString(person);
+//		log.debug(json);
+//		Assert.assertNotNull(json);
+//		Person person2 = mapper.readValue(json, Person.class);
+//		log.debug(person2);
+//		Assert.assertEquals(person, person2);
+//	}
+	
+//	@Test
+//	public void testSerializeDeserializeTerm() throws Throwable {
+//		log.debug("*** testSerializeDeserializeTerm ***");
+//		int count = 1;
+//		String term = "term";
+//		Term item = new TermImpl.Builder().term(term).count(count).build();
+//		log.debug(item);
+//		String json = mapper.writeValueAsString(item);
+//		log.debug(json);
+//		Assert.assertNotNull(json);
+//		Term item2 = mapper.readValue(json, Term.class);
+//		log.debug(item2);
+//		Assert.assertEquals(item, item2);
+//	}
 	
 	@Test
 	public void testUserHasRole() throws Throwable {
