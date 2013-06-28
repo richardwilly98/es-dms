@@ -1,5 +1,11 @@
-esDmsApp.controller('MainCtrl', function ($scope, $window, $location) {
+esDmsApp.controller('mainController', function ($scope, $window, $location, sharedService) {
     $scope.$location = $location;
+    $scope.username = '';
+	$scope.$on('handleBroadcast', function() {
+		console.log('Receive brodcast message');
+        //$scope.showLogout = sharedService.message.logout;
+	    $scope.username = sharedService.message.user;
+    }); 
 });
 
 esDmsApp.controller('adminController', function ($scope) {
@@ -216,6 +222,8 @@ esDmsApp.controller('loginController', function ($scope, /* $cookieStore, */ aut
 // console.log('Cookie ES_DMS_TICKET: ' + $cookieStore.get('_ES_DMS_TICKET'));
         		$scope.shouldBeOpen = false;
         		sharedService.prepForBroadcast({logout: true});
+        		sharedService.prepForBroadcast({user: $scope.username});
+//        		sharedService.user = $scope.username;
     		}
     	});
     };
@@ -229,16 +237,18 @@ esDmsApp.controller('loginController', function ($scope, /* $cookieStore, */ aut
     };
 });
 
-esDmsApp.controller('documentController', function ($scope, documentService) {
+esDmsApp.controller('documentController', function ($scope, documentService, searchService) {
     $scope.alerts = [];
-
     $scope.documents = [];
+    $scope.facet;
+    $scope.facets = [];
     $scope.totalHits = 0;
     $scope.elapsedTime = 0;
     $scope.maxPages = 10;
     $scope.totalPages = 0;
     $scope.currentPage = 1;
     $scope.pageSize = 12;
+    $scope.pageSizeList = [12, 24, 48, 96];
     $scope.newtag = {};
     
     var currentDocument = null;
@@ -258,27 +268,39 @@ esDmsApp.controller('documentController', function ($scope, documentService) {
     	}
     }
     
-    $scope.search = function() {
+    $scope.search = function(term) {
     	console.log('search');
     	if ($scope.criteria == '' || $scope.criteria == '*') {
     		$scope.alerts.push({ msg: "Empty or wildcard not allowed" });
     		$scope.documents = [];
     	} else {
-    		find(0, $scope.criteria, true);
+    		$scope.facet = 'tags';
+    		find(0, $scope.criteria, term, true);
     	}
     }
 
-    function find(first, criteria, updatePagination) {
-		documentService.find(first, $scope.pageSize, criteria, function(result) {
+    function find(first, criteria, term, updatePagination) {
+    	var filters = getFilter(term);
+    	searchService.facetedSearch(first, $scope.pageSize, criteria, $scope.facet, filters, function(result) {    	
+//		documentService.find(first, $scope.pageSize, criteria, function(result) {
 			if (updatePagination) {
 				setPagination(result);
 			}
         	$scope.documents = result.items;
         	$scope.totalHits = result.totalHits;
         	$scope.elapsedTime = result.elapsedTime;
+        	$scope.facets = result.facets[$scope.facet];
 		});
     }
     
+    function getFilter(term) {
+    	if ($scope.facet == undefined || term == undefined) {
+    		return null;
+    	}
+    	var filter = {};
+    	filter[$scope.facet] = term;
+    	return filter;
+    }
     function setPagination(result) {
     	var pageSize = result.pageSize;
     	var totalHits = result.totalHits;
@@ -460,9 +482,9 @@ esDmsApp.controller('modalCtrl', function ($scope) {
 });
 
 esDmsApp.controller('navbarController', function ($scope, sharedService, authenticationService) {
-	$scope.showLogout = false;
+	$scope.showLogout = true;
 	$scope.$on('handleBroadcast', function() {
-        $scope.showLogout = sharedService.message.logout;
+        //$scope.showLogout = sharedService.message.logout;
     }); 
 	
 	$scope.tabs = [

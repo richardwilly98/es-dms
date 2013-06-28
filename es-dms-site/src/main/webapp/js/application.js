@@ -128,6 +128,8 @@ esDmsApp.factory('sharedService', function($rootScope) {
     sharedService.broadcastItem = function() {
         $rootScope.$broadcast('handleBroadcast');
     };
+    
+//    sharedService.user = '';
 
     return sharedService;
 });
@@ -236,21 +238,12 @@ esDmsApp.factory('documentService', function ($resource, $http) {
 		metadata: {method:'GET', params: {action: 'metadata'}},
 		update: {method:'PUT', params: {}}
 	});
-//	var documents = {};
 	return {
 		find: function(first, pageSize, criteria, callback) {
 			console.log('Document search ' + first + ' - ' + pageSize + ' - ' + criteria)
-//			documents = resource.query({ verb: 'search', name: criteria });
 				$http.get('api/documents/search/' + criteria + '?fi=' + first + '&ps=' + pageSize).success(function (data, status) {
-//					documents = data.items;
 					callback(data);
-//					console.log('status: ' + status);
-//					console.log('result: ' + data);
-//		           return data;
 		       });
-//			var response = JSON.parse(documents);
-//			console.log('totalHits: ' + documents.totalHits);
-//			return documents;
 		},
 		edit: function(id) {
 			console.log('edit document: ' + id);
@@ -318,6 +311,18 @@ esDmsApp.factory('documentService', function ($resource, $http) {
 //		}
 	};
     
+});
+
+esDmsApp.factory('searchService', function ($http) {
+	return {
+		facetedSearch: function(first, pageSize, criteria, facet, filters, callback) {
+			var payload = {facet: facet, filters: filters};
+			var config = {
+					headers: {'Content-Type':'application/json; charset=UTF-8'}
+			};
+			$http.post('api/search/_facet_search/' + criteria + '?fi=' + first + '&ps=' + pageSize, payload, config).success(callback);
+		},
+	};
 });
 
 esDmsApp.factory('authenticationService', function ($http) {
