@@ -27,9 +27,10 @@ package test.github.richardwilly98.esdms.api;
  */
 
 
+import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 
-import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -37,19 +38,21 @@ import org.junit.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.richardwilly98.esdms.FacetImpl;
 import com.github.richardwilly98.esdms.PermissionImpl;
-import com.github.richardwilly98.esdms.PersonImpl;
 import com.github.richardwilly98.esdms.RoleImpl;
-import com.github.richardwilly98.esdms.SessionImpl;
+import com.github.richardwilly98.esdms.SearchResultImpl;
 import com.github.richardwilly98.esdms.TermImpl;
 import com.github.richardwilly98.esdms.UserImpl;
+import com.github.richardwilly98.esdms.api.Facet;
 import com.github.richardwilly98.esdms.api.Permission;
-import com.github.richardwilly98.esdms.api.Person;
 import com.github.richardwilly98.esdms.api.Role;
-import com.github.richardwilly98.esdms.api.Session;
+import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Term;
 import com.github.richardwilly98.esdms.api.User;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 public class UserSerializationTest {
@@ -119,20 +122,59 @@ public class UserSerializationTest {
 //		Assert.assertEquals(person, person2);
 //	}
 	
-//	@Test
-//	public void testSerializeDeserializeTerm() throws Throwable {
-//		log.debug("*** testSerializeDeserializeTerm ***");
-//		int count = 1;
-//		String term = "term";
-//		Term item = new TermImpl.Builder().term(term).count(count).build();
-//		log.debug(item);
-//		String json = mapper.writeValueAsString(item);
-//		log.debug(json);
-//		Assert.assertNotNull(json);
-//		Term item2 = mapper.readValue(json, Term.class);
-//		log.debug(item2);
-//		Assert.assertEquals(item, item2);
-//	}
+	@Test
+	public void testSerializeDeserializeTerm() throws Throwable {
+		log.debug("*** testSerializeDeserializeTerm ***");
+		int count = 1;
+		String term = "term";
+		Term item = new TermImpl.Builder().term(term).count(count).build();
+		log.debug(item);
+		String json = mapper.writeValueAsString(item);
+		log.debug(json);
+		Assert.assertNotNull(json);
+		Term item2 = mapper.readValue(json, Term.class);
+		log.debug(item2);
+		Assert.assertEquals(item, item2);
+	}
+	
+	@Test
+	public void testSerializeDeserializeSearchResult() throws Throwable {
+		log.debug("*** testSerializeDeserializeSearchResult ***");
+		Set<User> users = newHashSet();
+		users.add(new UserImpl.Builder().password("test").id("test").name("test").email("test@test").build());
+		long elapsedTime = 1;
+		String term = "term";
+		Set<Term> terms = newHashSet();
+		terms.add(new TermImpl.Builder().term(term).count(1).build());
+		Facet facet = new FacetImpl.Builder().missingCount(0).otherCount(0).totalCount(0).terms(terms).build();
+		Map<String, Facet> facets = newHashMap(ImmutableMap.of("facet1", facet));
+		SearchResult<User> items = new SearchResultImpl.Builder<User>().items(users).elapsedTime(elapsedTime).firstIndex(0).pageSize(10).facets(facets).build();
+		log.debug(items);
+		String json = mapper.writeValueAsString(items);
+		log.debug(json);
+		Assert.assertNotNull(json);
+		SearchResult<User> items2 = mapper.readValue(json, new TypeReference<SearchResultImpl<User>>() {});
+		log.debug(items2);
+		Assert.assertEquals(items, items2);
+	}
+	
+	@Test
+	public void testSerializeDeserializeFacet() throws Throwable {
+		log.debug("*** testSerializeDeserializeFacet ***");
+		long missingCount = 1;
+		long otherCount = 0;
+		long totalCount = 10;
+		Set<Term> terms = newHashSet();
+		terms.add(new TermImpl.Builder().term("term").count(1).build());
+		Facet item = new FacetImpl.Builder().missingCount(missingCount).otherCount(otherCount).totalCount(totalCount).terms(terms).build();
+		log.debug(item);
+		String json = mapper.writeValueAsString(item);
+		log.debug(json);
+		Assert.assertNotNull(json);
+		Facet item2 = mapper.readValue(json, Facet.class);
+		log.debug(item2);
+		Assert.assertEquals(item, item2);
+	}
 	
 	@Test
 	public void testUserHasRole() throws Throwable {
