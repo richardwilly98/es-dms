@@ -12,7 +12,7 @@
 		<link rel="stylesheet" href="css/jquery.fileupload-ui-noscript.css" />
 	</noscript>
 </head>
-<body data-authentication-directive="" data-ng-controller="MainCtrl">
+<body data-authentication-directive="" data-ng-controller="mainController">
 	    <!-- Navigation bar -->
 	    <div class="navbar" data-ng-controller="navbarController" data-bs-navbar="">
 	        <div class="navbar-inner">
@@ -30,8 +30,11 @@
 			                </li>
 	                	</ul>
 	              	</li>
-					<li ng-show="showLogout"><a href="#" data-ng-click="logout()">Logout</a></li>
+					<li data-ng-show="showLogout"><a href="#" data-ng-click="logout()">Logout</a></li>
 	            </ul>
+	            <p data-ng-show="username" class="navbar-text pull-right">
+              		Logged in as <a href="#" class="navbar-link">{{ username }}</a>
+            	</p>
 	        </div>
 	    </div>
 	    <div>
