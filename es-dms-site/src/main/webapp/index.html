@@ -34,6 +34,61 @@
 	            </ul>
 	            <p data-ng-show="username" class="navbar-text pull-right">
               		Logged in as <a href="#" class="navbar-link">{{ username }}</a>
+              		
+              		<!--  Danilo start -->
+              		<div class="popover-markup" style="margin-top:10px">
+
+						        <a href="#" class="trigger">Welcome: {{ username }}</a>
+						        
+						        <div class="head hide">
+						        	{{ username }} - profile
+						        	</div>
+						        
+						        <div class="content hide" >
+						            <div class="control-group"> <!-- Name -->
+							        		<label class="control-label">Name:</label>
+							        		<div class="controls">
+							          			<input type="text" ng-model="user.name" ng-disabled="!newUser" placeholder="Name" autofocus="autofocus" />
+							        		</div>
+							      	</div>
+							      					
+										<div class="control-group">  <!-- Email -->
+							        		<label class="control-label">Email:</label>
+							        		<div class="controls">
+							          			<input type="text" ng-model="user.email" placeholder="Email" />
+							        		</div>
+							      	</div>
+						           
+						            
+						            <div class="control-group"> <!-- Roles -->
+							        		<label class="control-label">Roles:</label>
+							        		<div class="controls">
+							        			<select multiple="multiple">
+							        				<option data-ng-repeat="role in user.roles">{{
+							            				role.id }}</option>
+							        			</select>
+							        		</div>
+						      		</div>
+						            
+						             <div class="editable-buttons">
+						            	<button type="submit" class="btn btn-primary editsble-submit">
+						            		<i class="icon-ok icon-white"></i>
+						            	</button>
+						            	<button type="button" class="btn editsble-cancel">
+						            		<i class="icon-remove"></i>
+						            	</button>
+						            </div>
+
+						        </div>
+								  <div class="footer hide">
+								  		<!-- div class="modal-footer">
+										    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+										    <button class="btn btn-primary">Save changes</button>
+										 </div-->
+										 test
+								  </div>
+						</div>
+						<!--  Danilo end -->              		
             	</p>
 	        </div>
 	    </div>
@@ -82,5 +137,7 @@
 
     <script type="text/javascript" src="js/application.js"></script>
     <script type="text/javascript" src="js/controllers.js"></script>
+    
+    <script type="text/javascript" src="js/custom.js"></script></script>
 </body>
 </html>
