@@ -55,7 +55,7 @@ public abstract class RestServiceBase {
 	}
 
 	protected boolean isAuthenticated() {
-		return (getCurrentUser() == null);
+		return (getCurrentUser() != null);
 	}
 
 	protected String getCurrentUser() {
