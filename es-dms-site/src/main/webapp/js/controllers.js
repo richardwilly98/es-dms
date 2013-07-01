@@ -1,10 +1,10 @@
-esDmsApp.controller('mainController', function ($scope, $window, $location, sharedService) {
+esDmsApp.controller('mainController', function ($log, $scope, $window, $location, sharedService) {
     $scope.$location = $location;
     $scope.username = '';
 	$scope.$on('handleBroadcast', function() {
-		console.log('Receive brodcast message');
+		$log.log('Receive brodcast message');
         //$scope.showLogout = sharedService.message.logout;
-	    $scope.username = sharedService.message.user;
+		$scope.username = sharedService.message.user;
     }); 
 });
 
@@ -23,7 +23,7 @@ esDmsApp.controller('userController', function ($scope, userService) {
     }
 
 	function getIndexOf(id) {
-		for (i in $scope.users) {
+		for (var i in $scope.users) {
 			if ($scope.users[i].id == id) {
 				return i;
 			}
@@ -31,23 +31,23 @@ esDmsApp.controller('userController', function ($scope, userService) {
 	}
 
 	$scope.search = function() {
-    	var result = userService.search($scope.criteria, function(result) {
-        	$scope.users = result.items;
-        	$scope.totalHits = result.totalHits;
-        	$scope.elapsedTime = result.elapsedTime;
-    	});
+		var result = userService.search($scope.criteria, function(result) {
+			$scope.users = result.items;
+			$scope.totalHits = result.totalHits;
+			$scope.elapsedTime = result.elapsedTime;
+		});
     };
     
     $scope.edit = function(id) {
-    	userService.edit(id);
+		userService.edit(id);
     };
     
     $scope.delete = function(id) {
-    	userService.delete(id);
-    	var index = getIndexOf(id);
-    	if (index) {
-    		$scope.users.splice(index, 1);
-    	}
+		userService.delete(id);
+		var index = getIndexOf(id);
+		if (index) {
+			$scope.users.splice(index, 1);
+		}
     };
 
     $scope.add = function () {
@@ -72,15 +72,15 @@ esDmsApp.controller('roleController', function ($scope, roleService) {
     }
 
     $scope.search = function() {
-    	var result = roleService.search($scope.criteria, function(result) {
-        	$scope.roles = result.items;
-        	$scope.totalHits = result.totalHits;
-        	$scope.elapsedTime = result.elapsedTime;
-    	});
+		var result = roleService.search($scope.criteria, function(result) {
+			$scope.roles = result.items;
+			$scope.totalHits = result.totalHits;
+			$scope.elapsedTime = result.elapsedTime;
+		});
     };
     
     $scope.edit = function(id) {
-    	roleService.edit(id);
+		roleService.edit(id);
     };
     
     $scope.add = function () {
@@ -102,22 +102,19 @@ esDmsApp.controller('userEditController', function ($scope, $rootScope, $http, u
 	$scope.pw2 = '';
 	$scope.pwError = false;
 	$scope.incomplete = false;
-	  
+
 	$rootScope.$on('user:edit', function() {
 		var editUser = userService.currentUser();
-	    if (editUser.id) {
-	    	$scope.user = editUser;
-	    	$scope.newUser = false;
-	    	// $scope.uid = editUser.id;
-// $scope.user.roles = [{id: 'reader', name: 'Reader'}, {id: 'writer', name:
-// 'Writer'}];
-	    } else {
-	    	$scope.newUser = true;
-	    	$scope.incomplete = true;
-	    	$scope.user = {};
-	    	$scope.pw1 = '';
-	    	$scope.pw2 = '';
-	    }
+		if (editUser.id) {
+			$scope.user = editUser;
+			$scope.newUser = false;
+		} else {
+			$scope.newUser = true;
+			$scope.incomplete = true;
+			$scope.user = {};
+			$scope.pw1 = '';
+			$scope.pw2 = '';
+		}
 	});
 	
 	$scope.save = function() {
@@ -132,8 +129,8 @@ esDmsApp.controller('userEditController', function ($scope, $rootScope, $http, u
 			$scope.pwError = true;
 		} else {
 			$scope.pwError = false;
-	    }
-	    $scope.incompleteTest();
+		}
+		$scope.incompleteTest();
 	});
 	
 	$scope.$watch('pw2', function() {
@@ -142,13 +139,13 @@ esDmsApp.controller('userEditController', function ($scope, $rootScope, $http, u
 		} else {
 			$scope.pwError = false;
 		}
-	    $scope.incompleteTest();
+		$scope.incompleteTest();
 	});
 
 	$scope.$watch('username', function() {
 		$scope.incompleteTest();
 	});
-	  
+
 	$scope.incompleteTest = function() {
 		if ($scope.newUser) {
 			if (!$scope.user.name.length || !$scope.pw1.length || !$scope.pw2.length) {
@@ -158,7 +155,7 @@ esDmsApp.controller('userEditController', function ($scope, $rootScope, $http, u
 			}
 		} else {
 			$scope.incomplete = false;
-	    }
+		}
 	};
 });
 
@@ -166,14 +163,14 @@ esDmsApp.controller('roleEditController', function ($scope, $rootScope, roleServ
 	$scope.role = {};
 	$rootScope.$on('role:edit', function() {
 		var editRole = roleService.currentRole();
-	    if (editRole.id) {
-	    	$scope.role = editRole;
-	    	$scope.newRole = false;
-	    } else {
-	    	$scope.newRole = true;
-	    	$scope.incomplete = true;
-	    	$scope.role = {};
-	    }
+		if (editRole.id) {
+			$scope.role = editRole;
+			$scope.newRole = false;
+		} else {
+			$scope.newRole = true;
+			$scope.incomplete = true;
+			$scope.role = {};
+		}
 	});
 	
 	$scope.save = function() {
@@ -187,10 +184,9 @@ esDmsApp.controller('simpleController', function ($scope, userService) {
     init();
 
     function init() {
-        // $scope.customers = userService.query({ verb: 'find', name: '*' });
-    	userService.find('*', function(result) {
-    		 $scope.customers = result.items;
-    	});
+		userService.find('*', function(result) {
+			$scope.customers = result.items;
+		});
     }
     $scope.addCustomer = function () {
         var user = new userService();
@@ -204,28 +200,23 @@ esDmsApp.controller('simpleController', function ($scope, userService) {
     };
 });
 
-esDmsApp.controller('loginController', function ($scope, /* $cookieStore, */ authenticationService, authService, sharedService) {
+esDmsApp.controller('loginController', function ($log, $scope, /* $cookieStore, */ authenticationService, authService, sharedService) {
 
     $scope.shouldBeOpen = true;
 
     $scope.login = function() {
-    	console.log('loginController - login');
-    	authenticationService.login($scope.username, $scope.password, $scope.rememberMe, function(data) {
-    		console.log('data: ' + data);
-// var response = JSON.parse(data);
-// console.log('response: ' + response);
-    		if (data.status === 'AUTHENTICATED') {
-        		authService.loginConfirmed();
-        		var token = data.token;
-        		console.log(token);
-// $cookieStore.put('_ES_DMS_TICKET', unescape(token))
-// console.log('Cookie ES_DMS_TICKET: ' + $cookieStore.get('_ES_DMS_TICKET'));
-        		$scope.shouldBeOpen = false;
-        		sharedService.prepForBroadcast({logout: true});
-        		sharedService.prepForBroadcast({user: $scope.username});
-//        		sharedService.user = $scope.username;
-    		}
-    	});
+		$log.log('loginController - login');
+		authenticationService.login($scope.username, $scope.password, $scope.rememberMe, function(data) {
+			$log.log('data: ' + data);
+			if (data.status === 'AUTHENTICATED') {
+				authService.loginConfirmed();
+				var token = data.token;
+				$log.info(token);
+				$scope.shouldBeOpen = false;
+				sharedService.prepForBroadcast({logout: true});
+				sharedService.prepForBroadcast({user: $scope.username});
+			}
+		});
     };
 
     $scope.open = function () {
@@ -237,10 +228,10 @@ esDmsApp.controller('loginController', function ($scope, /* $cookieStore, */ aut
     };
 });
 
-esDmsApp.controller('documentController', function ($scope, documentService, searchService) {
+esDmsApp.controller('documentController', function ($log, $scope, documentService, searchService) {
     $scope.alerts = [];
     $scope.documents = [];
-    $scope.facet;
+	$scope.facet = null;
     $scope.facets = [];
     $scope.totalHits = 0;
     $scope.elapsedTime = 0;
@@ -250,6 +241,7 @@ esDmsApp.controller('documentController', function ($scope, documentService, sea
     $scope.pageSize = 12;
     $scope.pageSizeList = [12, 24, 48, 96];
     $scope.newtag = {};
+    $scope.terms = [];
     
     var currentDocument = null;
 
@@ -259,67 +251,71 @@ esDmsApp.controller('documentController', function ($scope, documentService, sea
     }
     
     $scope.mySearch = function() {
-    	console.log('mySearch');
-    	if ($scope.criteria == '' || $scope.criteria == '*') {
-    		$scope.alerts.push({ msg: "Empty or wildcard not allowed" });
-    		$scope.documents = [];
-    	} else {
-    		find(0,  'document.attributes.author: "' + $scope.criteria + '"', true);
-    	}
-    }
+		$log.log('mySearch');
+		if ($scope.criteria === '' || $scope.criteria === '*') {
+			$scope.alerts.push({ msg: "Empty or wildcard not allowed" });
+			$scope.documents = [];
+		} else {
+			find(0,  'document.attributes.author: "' + $scope.criteria + '"', true);
+		}
+	};
     
-    $scope.search = function(term) {
-    	console.log('search');
-    	if ($scope.criteria == '' || $scope.criteria == '*') {
-    		$scope.alerts.push({ msg: "Empty or wildcard not allowed" });
-    		$scope.documents = [];
-    	} else {
-    		$scope.facet = 'tags';
-    		find(0, $scope.criteria, term, true);
-    	}
-    }
+    $scope.search = function(/*term*/) {
+		$log.log('search');
+		if ($scope.criteria === '' || $scope.criteria === '*') {
+			$scope.alerts.push({ msg: "Empty or wildcard not allowed" });
+			$scope.documents = [];
+		} else {
+			$scope.facet = 'tags';
+			find(0, $scope.criteria, /*term,*/ true);
+		}
+    };
 
-    function find(first, criteria, term, updatePagination) {
-    	var filters = getFilter(term);
-    	searchService.facetedSearch(first, $scope.pageSize, criteria, $scope.facet, filters, function(result) {    	
-//		documentService.find(first, $scope.pageSize, criteria, function(result) {
+    function find(first, criteria, /*term,*/ updatePagination) {
+		$log.log('find - terms: ' + $scope.terms);
+		var filters = getFilter(/*term*/);
+		searchService.facetedSearch(first, $scope.pageSize, criteria, $scope.facet, filters, function(result) {
 			if (updatePagination) {
 				setPagination(result);
 			}
-        	$scope.documents = result.items;
-        	$scope.totalHits = result.totalHits;
-        	$scope.elapsedTime = result.elapsedTime;
-        	$scope.facets = result.facets[$scope.facet];
+			$scope.documents = result.items;
+			$scope.totalHits = result.totalHits;
+			$scope.elapsedTime = result.elapsedTime;
+			$scope.facets = result.facets[$scope.facet];
+			for (var i in $scope.facets[$scope.facet].terms) {
+				
+			}
 		});
     }
     
-    function getFilter(term) {
-    	if ($scope.facet == undefined || term == undefined) {
-    		return null;
-    	}
-    	var filter = {};
-    	filter[$scope.facet] = term;
-    	return filter;
+    function getFilter() {
+		if ($scope.facet === undefined || $scope.terms === [] || $scope.terms.length === 0) {
+			return null;
+		}
+		var filter = {};
+		filter[$scope.facet] = $scope.terms;
+		return filter;
     }
+
     function setPagination(result) {
-    	var pageSize = result.pageSize;
-    	var totalHits = result.totalHits;
-    	var firstIndex = result.firstIndex;
-    	$scope.totalPages = Math.ceil(totalHits / pageSize);
-    	$scope.currentPage = 1 + (firstIndex / pageSize);
-    	console.log('totalPages: ' + $scope.totalPages + ' - currentPage: ' + $scope.currentPage);
+		var pageSize = result.pageSize;
+		var totalHits = result.totalHits;
+		var firstIndex = result.firstIndex;
+		$scope.totalPages = Math.ceil(totalHits / pageSize);
+		$scope.currentPage = 1 + (firstIndex / pageSize);
+		$log.log('totalPages: ' + $scope.totalPages + ' - currentPage: ' + $scope.currentPage);
     }
     
 	function getDocument(id) {
 		var documents = $scope.documents;
-		for (i in documents) {
+		for (var i in documents) {
 			if (documents[i].id == id) {
 				return documents[i];
 			}
 		}
 	}
 	function getIndexOf(id) {
-		for (i in $scope.documents) {
+		for (var i in $scope.documents) {
 			if ($scope.documents[i].id == id) {
 				return i;
 			}
@@ -327,95 +323,105 @@ esDmsApp.controller('documentController', function ($scope, documentService, sea
 	}
     
     $scope.setPage = function () {
-    	console.log('setPage');
-    	if ($scope.criteria === undefined ) {
-    		return;
-    	}
+		$log.log('setPage');
+		if ($scope.criteria === undefined ) {
+			return;
+		}
         find( ($scope.currentPage - 1) * $scope.pageSize, $scope.criteria );
       };
       
     $scope.$watch('currentPage', $scope.setPage );
       
     $scope.$on('document:addtag', function(evt, args) {
-    	if (args.id === undefined || args.tag === undefined) {
-    		return;
-    	}
-    	console.log('*** addTag: ' + args.id + ' - ' + args.tag);
-    	var id = args.id;
-    	var tag = args.tag;
-    	var document = getDocument(id);
-    	documentService.addTag(id, tag, function(doc) {
-        	var index = getIndexOf(id);
-        	$scope.documents[index] = doc;
-    	});
+		if (args.id === undefined || args.tag === undefined) {
+			return;
+		}
+		$log.log('*** addTag: ' + args.id + ' - ' + args.tag);
+		var id = args.id;
+		var tag = args.tag;
+		var document = getDocument(id);
+		documentService.addTag(id, tag, function(doc) {
+			var index = getIndexOf(id);
+			$scope.documents[index] = doc;
+		});
       });
 
     $scope.$on('document:removetag', function(evt, args) {
-    	if (args.id === undefined || args.tag === undefined) {
-    		return;
-    	}
-    	console.log('*** removetag: ' + args.id + ' - ' + args.tag);
-    	var id = args.id;
-    	var tag = args.tag;
-    	var document = getDocument(id);
-    	documentService.removeTag(id, tag, function(doc) {
-        	var index = getIndexOf(id);
-        	$scope.documents[index] = doc;
-    	});
+		if (args.id === undefined || args.tag === undefined) {
+			return;
+		}
+		$log.log('*** removetag: ' + args.id + ' - ' + args.tag);
+		var id = args.id;
+		var tag = args.tag;
+		var document = getDocument(id);
+		documentService.removeTag(id, tag, function(doc) {
+			var index = getIndexOf(id);
+			$scope.documents[index] = doc;
+		});
       });
     
-//    function addTag(id, tag) {
-//    	var document = getDocument(id);
-//    	documentService.addTag(id, tag, function(doc) {
-//        	var index = getIndexOf(id);
-//        	$scope.documents[index] = doc;
-//    	});
-//    }
-    	
+    $scope.$on('search:applyfacet', function(evt, args) {
+		if (args.term === undefined || args.selected === undefined) {
+			return;
+		}
+		$log.log('*** applyfacet: ' + args.term + ' - ' + args.selected);
+		if (args.selected) {
+			$scope.terms.push(args.term);
+		} else {
+			for (var i in $scope.terms) {
+				if ($scope.terms[i] == term) {
+					$scope.terms.splice(i, 1);
+					break;
+				}
+			}
+		}
+		find(0, $scope.criteria, /*term,*/ true);
+      });
+
     $scope.closeAlert = function (index) {
         $scope.alerts.splice(index, 1);
     };
 
     $scope.edit = function(id) {
-    	documentService.edit(id);
+		documentService.edit(id);
     };
 
     $scope.checkout = function(id) {
-    	documentService.checkout(id);
-    	var document = getDocument(id);
-    	if (document) {
-    		document.attributes.status = 'L';
-    	}
+		documentService.checkout(id);
+		var document = getDocument(id);
+		if (document) {
+			document.attributes.status = 'L';
+		}
     };
 
     $scope.checkin = function(id) {
-    	documentService.checkin(id);
-    	var document = getDocument(id);
-    	if (document) {
-    		document.attributes.status = 'A';
-    	}
+		documentService.checkin(id);
+		var document = getDocument(id);
+		if (document) {
+			document.attributes.status = 'A';
+		}
     };
 
     $scope.delete = function(id) {
-    	documentService.delete(id);
-    	var index = getIndexOf(id);
-    	if (index) {
-    		$scope.documents.splice(index, 1);
-    	}
+		documentService.delete(id);
+		var index = getIndexOf(id);
+		if (index) {
+			$scope.documents.splice(index, 1);
+		}
     };
     
     $scope.preview = function(id) {
 		var document = getDocument(id);
 		if (currentDocument != document) {
-	    	documentService.preview(id, $scope.criteria, function(response) {
-	        		console.log('Preview document - ' + document.id);
-	        		document.preview = response;
-	    	});
+			documentService.preview(id, $scope.criteria, function(response) {
+				$log.log('Preview document - ' + document.id);
+					document.preview = response;
+			});
 		} else {
-			console.log('Do not fetch preview again!');
+			$log.log('Do not fetch preview again!');
 		}
 		currentDocument = document;
-    }
+    };
 });
 
 esDmsApp.controller('AlertDemoCtrl', function ($scope) {
@@ -434,16 +440,16 @@ esDmsApp.controller('AlertDemoCtrl', function ($scope) {
 
 });
 
-esDmsApp.controller('newDocumentController', function ($scope) {
+esDmsApp.controller('newDocumentController', function ($log, $scope) {
 	$scope.showAlert = false;
 	$scope.alert = {};
 	$scope.newDocument = {};
     $scope.uploadComplete = function (content, completed) {
-    	console.log('uploadComplete ' + content + ' - ' + completed);
+		$log.log('uploadComplete ' + content + ' - ' + completed);
         if (completed && content.length > 0)
         {
-        	var response = JSON.parse(content);
-        	console.log(response);
+			var response = JSON.parse(content);
+			$log.log(response);
             
             // Clear form (reason for using the 'ng-model' directive on the
 			// input elements)
@@ -456,18 +462,18 @@ esDmsApp.controller('newDocumentController', function ($scope) {
         }
     };
     $scope.closeAlert = function() {
-    	$scope.showAlert = false;
-    	$scope.alert = {};
+		$scope.showAlert = false;
+		$scope.alert = {};
     };
 });
 
-esDmsApp.controller('modalCtrl', function ($scope) {
+esDmsApp.controller('modalCtrl', function ($log, $scope) {
 	$scope.open = function() {
 		$scope.shouldBeOpen = true;
 	};
 	$scope.close = function () {
 		$scope.closeMsg = 'I was closed at: ' + new Date();
-	    $scope.shouldBeOpen = false;
+		$scope.shouldBeOpen = false;
 	};
 	$scope.opts = {
 			backdropFade: true,
@@ -475,7 +481,7 @@ esDmsApp.controller('modalCtrl', function ($scope) {
 	};
 
 	$scope.testHttp401 = function() {
-		console.log('broadcast - event:auth-loginRequired');
+		$log.log('broadcast - event:auth-loginRequired');
 		$scope.$broadcast('event:auth-loginRequired');
 	};
 	
@@ -488,9 +494,9 @@ esDmsApp.controller('navbarController', function ($scope, sharedService, authent
     }); 
 	
 	$scope.tabs = [
-	    { "view": "/search-view", title: "Search" },
-	    { "view": "/my-documents-view", title: "My documents" },
-	    { "view": "/edit-view", title: "Edit" },
+		{ "view": "/search-view", title: "Search" },
+		{ "view": "/my-documents-view", title: "My documents" },
+		{ "view": "/edit-view", title: "Edit" },
         { "view": "/view1", title: "View #1" },
         { "view": "/view2", title: "View #2" },
         { "view": "/view3", title: "Test View"},
@@ -498,16 +504,16 @@ esDmsApp.controller('navbarController', function ($scope, sharedService, authent
     ];
 	
 	$scope.adminTabs = [
-		 { "view": "/admin/users", title: "Users" },
-		 { "view": "/admin/roles", title: "Roles" }
+		{ "view": "/admin/users", title: "Users" },
+		{ "view": "/admin/roles", title: "Roles" }
 	];
 	
 	$scope.logout = function() {
 		authenticationService.logout();
-	}
+	};
 });
 
-esDmsApp.controller('fileUploadController', function ($scope, $http, fileUpload) {
+esDmsApp.controller('fileUploadController', function ($log, $scope, $http, fileUpload) {
 	var url = 'api/documents/upload';
 	$scope.loadingFiles = false;
 	$scope.options = {
@@ -524,7 +530,7 @@ esDmsApp.controller('fileUploadController', function ($scope, $http, fileUpload)
 				}
 		);
 	fileUpload.fileuploaddone = function(e, data) {
-    	console.log('fileuploaddone - ' + e + ' - ' + data);    	
+		$log.log('fileuploaddone - ' + e + ' - ' + data);
     };
 });
 
