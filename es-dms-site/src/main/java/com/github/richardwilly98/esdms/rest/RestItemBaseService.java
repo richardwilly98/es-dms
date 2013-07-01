@@ -84,34 +84,36 @@ public abstract class RestItemBaseService<T extends ItemBase> extends RestServic
 		this.service = service;
 	}
 
-	private String currentUser;
+//	private String currentUser;
 
-	protected void isAuthenticated() {
-		try {
-			log.debug("*** isAuthenticated ***");
-			Subject currentSubject = SecurityUtils.getSubject();
-			log.debug("currentSubject.isAuthenticated(): "
-					+ currentSubject.isAuthenticated());
-			log.debug("Principal: " + currentSubject.getPrincipal());
-			if (currentSubject.getPrincipal() == null) {
-				throw new UnauthorizedException("Unauthorize request",
-						url.getPath());
-			} else {
-				if (currentUser == null) {
-					currentUser = currentSubject.getPrincipal().toString();
-				}
-			}
-		} catch (Throwable t) {
-			throw new UnauthorizedException();
-		}
-	}
+//	protected String isAuthenticated() {
+//		try {
+//			log.debug("*** isAuthenticated ***");
+//			Subject currentSubject = SecurityUtils.getSubject();
+//			log.debug("currentSubject.isAuthenticated(): "
+//					+ currentSubject.isAuthenticated());
+//			log.debug("Principal: " + currentSubject.getPrincipal());
+//			if (currentSubject.getPrincipal() == null) {
+//				throw new UnauthorizedException("Unauthorize request",
+//						url.getPath());
+//			} else {
+////				if (currentUser == null) {
+////					currentUser = currentSubject.getPrincipal().toString();
+//				return currentSubject.getPrincipal().toString();
+////				}
+//			}
+//		} catch (Throwable t) {
+//			throw new UnauthorizedException();
+//		}
+//	}
 
-	protected String getCurrentUser() {
-		if (currentUser == null) {
-			isAuthenticated();
-		}
-		return currentUser;
-	}
+//	protected String getCurrentUser() {
+//		return isAuthenticated();
+////		if (currentUser == null) {
+////			isAuthenticated();
+////		}
+////		return currentUser;
+//	}
 
 	protected URI getItemUri(T item) {
 		checkNotNull(item);

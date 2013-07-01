@@ -23,14 +23,13 @@ Add-Type -AssemblyName System.Web
 
 [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 
-#$baseuri = "https://localhost:8443"
 $uri = New-Object System.Uri ($baseuri + "/es-dms-site")
 $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
 $cookieContainer = New-Object System.Net.CookieContainer
 $session.Cookies = $cookieContainer
 $headers = @{}
 [string] $token = $null
-[hashtable] $mimeTypes = @{};
+$mimeTypes = @{};
 
 function UrlEncode([string]$url) {
   [Web.Httputility]::UrlEncode($url)
@@ -54,7 +53,7 @@ function getUri([string] $path) {
 }
 
 function login([string] $user, [string] $password) {
-    Write-Host "*** login ***" -ForegroundColor Yellow
+    Write-Host "*** login wit $user ***" -ForegroundColor Yellow
     $jsonCredential = @{username=$user;password=$password} | ConvertTo-Json
     $response = Invoke-RestMethod -Uri (getUri "/api/auth/login") -Method Post -Body $jsonCredential -ContentType "application/json" -Verbose -SessionVariable session
     setToken

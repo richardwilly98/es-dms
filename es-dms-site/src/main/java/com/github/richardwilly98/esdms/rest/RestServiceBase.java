@@ -54,33 +54,26 @@ public abstract class RestServiceBase {
 		this.authenticationService = authenticationService;
 	}
 
-	private String currentUser;
+	protected boolean isAuthenticated() {
+		return (getCurrentUser() == null);
+	}
 
-	protected void isAuthenticated() {
+	protected String getCurrentUser() {
 		try {
-			log.debug("*** isAuthenticated ***");
+			log.trace("*** getCurrentUser ***");
 			Subject currentSubject = SecurityUtils.getSubject();
-			log.debug("currentSubject.isAuthenticated(): "
-					+ currentSubject.isAuthenticated());
-			log.debug("Principal: " + currentSubject.getPrincipal());
+			log.trace(String.format("currentSubject.isAuthenticated(): %s"
+					, currentSubject.isAuthenticated()));
+			log.trace(String.format("Principal: %s", currentSubject.getPrincipal()));
 			if (currentSubject.getPrincipal() == null) {
 				throw new UnauthorizedException("Unauthorize request",
 						url.getPath());
 			} else {
-				if (currentUser == null) {
-					currentUser = currentSubject.getPrincipal().toString();
-				}
+				return currentSubject.getPrincipal().toString();
 			}
 		} catch (Throwable t) {
 			throw new UnauthorizedException();
 		}
-	}
-
-	protected String getCurrentUser() {
-		if (currentUser == null) {
-			isAuthenticated();
-		}
-		return currentUser;
 	}
 
 }
