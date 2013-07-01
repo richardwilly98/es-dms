@@ -36,58 +36,7 @@
               		Logged in as <a href="#" class="navbar-link">{{ username }}</a>
               		
               		<!--  Danilo start -->
-              		<div class="popover-markup" style="margin-top:10px">
-
-						        <a href="#" class="trigger">Welcome: {{ username }}</a>
-						        
-						        <div class="head hide">
-						        	{{ username }} - profile
-						        	</div>
-						        
-						        <div class="content hide" >
-						            <div class="control-group"> <!-- Name -->
-							        		<label class="control-label">Name:</label>
-							        		<div class="controls">
-							          			<input type="text" ng-model="user.name" ng-disabled="!newUser" placeholder="Name" autofocus="autofocus" />
-							        		</div>
-							      	</div>
-							      					
-										<div class="control-group">  <!-- Email -->
-							        		<label class="control-label">Email:</label>
-							        		<div class="controls">
-							          			<input type="text" ng-model="user.email" placeholder="Email" />
-							        		</div>
-							      	</div>
-						           
-						            
-						            <div class="control-group"> <!-- Roles -->
-							        		<label class="control-label">Roles:</label>
-							        		<div class="controls">
-							        			<select multiple="multiple">
-							        				<option data-ng-repeat="role in user.roles">{{
-							            				role.id }}</option>
-							        			</select>
-							        		</div>
-						      		</div>
-						            
-						             <div class="editable-buttons">
-						            	<button type="submit" class="btn btn-primary editsble-submit">
-						            		<i class="icon-ok icon-white"></i>
-						            	</button>
-						            	<button type="button" class="btn editsble-cancel">
-						            		<i class="icon-remove"></i>
-						            	</button>
-						            </div>
-
-						        </div>
-								  <div class="footer hide">
-								  		<!-- div class="modal-footer">
-										    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-										    <button class="btn btn-primary">Save changes</button>
-										 </div-->
-										 test
-								  </div>
-						</div>
+              		<div id="userprofile" data-ng-include src="views/users/user-profile.html">
 						<!--  Danilo end -->              		
             	</p>
 	        </div>
@@ -103,6 +52,13 @@
 			<a id="loginButton" ng-show="false" href="#loginHolder" role="button" class="btn btn-primary" data-toggle="modal">Login</a>
 	              
 	    </div>
+	    <!--  Danilo start --> 
+	    <button class="btn btn-success" ng-click="edit('new')" data-toggle="modal" href="#editModal">
+	        <i class="icon-user icon-white"></i>&nbsp;New User
+		 </button>
+		
+		 <div class="modal hide fade" ng-include="'views/users/edit-user.html'" id="editModal"></div>
+		<!--  Danilo end -->
 	<div class="container">
 	</div>
     <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
