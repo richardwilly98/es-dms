@@ -159,6 +159,28 @@ function readMimeTypes([string] $mineTypesFile) {
     }
 }
 
+function readTikaMimeTypes([string] $xmlFile) {
+    Write-Host "MIME file: " $xmlFile
+
+    [xml]$file = Get-Content  $xmlFile
+    
+    foreach( $mimetype in $file.'mime-info'.'mime-type') {
+        if ($mimetype.glob -eq $null) {
+            continue
+        }
+        foreach($ext in $mimetype.glob) {
+            [string] $msg = "type {0} - extension {1}" -f $mimetype.type, $ext.pattern
+            Write-Debug $msg
+            try {
+                $mimeTypes.Add($ext.pattern, $mimetype.type);
+            }
+            catch{
+                Write-Warning $_.Exception.Message
+            }
+        }
+    }
+}
+
 function Get-MimeType()
 {
   param($extension = $null);
@@ -180,8 +202,6 @@ function Get-MimeType()
 }
 
 cls
-$username = "peter";
-$password = "secret"
 login $username $password
 #search "vaadin"
 #upload "test.pdf" "application/pdf"
@@ -189,7 +209,10 @@ login $username $password
 #search "FilterTcpDropDown"
 #search "Escalation"
 
-$mimefilepath = Resolve-Path "mimeTypes.xml";
-readMimeTypes $mimefilepath #"C:\Users\admin\Documents\GitHub\es-dms\es-dms-site\src\test\resources\mimeTypes.xml"
-import $path #"D:\Users\Richard\Documents\OpenText"
+readTikaMimeTypes "tika-mimetypes.xml"
+#$mimefilepath = Resolve-Path "mimeTypes.xml";
+#readMimeTypes $mimefilepath #"C:\Users\admin\Documents\GitHub\es-dms\es-dms-site\src\test\resources\mimeTypes.xml"
+import $path
 #logout
+
+#cls
