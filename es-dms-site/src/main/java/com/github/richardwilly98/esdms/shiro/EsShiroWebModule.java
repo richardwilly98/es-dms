@@ -57,7 +57,9 @@ public class EsShiroWebModule extends ShiroWebModule {
 		bind(SessionDAO.class).to(EsSessionDAO.class);
 		bind(EsSessionDAO.class);
 		
-		addFilterChain("/api/auth/**", config(SSL, "8443"));
+		// TODO: SSL currently does not work with grunt-connect-proxy
+//		addFilterChain("/api/auth/**", config(SSL, "8443"));
+		addFilterChain("/api/auth/**", ANON);
 		addFilterChain("/api/**", Key.get(EsAuthenticationFilter.class));
 	}
 	

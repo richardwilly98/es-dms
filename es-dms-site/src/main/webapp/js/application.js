@@ -141,7 +141,12 @@ esDmsApp.config(function ($routeProvider) {
 });
 
 esDmsApp.factory('sharedService', function($rootScope) {
-    var sharedService = {};
+  var sharedService = {};
+  sharedService.currentUser = {};
+  sharedService.getCurrentUser = function () {
+    return sharedService.currentUser;
+  };
+	
     
     sharedService.message = '';
 
