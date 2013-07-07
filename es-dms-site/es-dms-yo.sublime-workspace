@@ -1,0 +1,313 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"$lo",
+				"$log.log	AngularJS"
+			],
+			[
+				"grunt.lo",
+				"grunt.log.writeln"
+			],
+			[
+				"uplo",
+				"uploadService"
+			],
+			[
+				"$",
+				"$dialog"
+			],
+			[
+				"auth",
+				"authService"
+			],
+			[
+				"ctrl",
+				"data-ng-controller"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 380.0,
+		"selected_items":
+		[
+			[
+				"pack",
+				"Package Control: Install Package"
+			],
+			[
+				"git",
+				"Github: Open File"
+			],
+			[
+				"package",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 512.0
+	},
+	"console":
+	{
+		"height": 125.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/es-dms-yo.sublime-project",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/index.html",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/scripts/app.js",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/karma.conf.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/index.html",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/es-dms-yo.sublime-project",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/directives/esdmsUpload.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/views/authentication/login.html",
+		"/D/Apps/apache-tomcat-7.0.42/webapps/es-dms-site/views/main.html",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/test/spec/controllers/search-view.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/directives/esdmsAuthentication.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/app.js",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/bower_components/blueimp-file-upload/bower.json",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/karma-e2e.conf.js",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/bower.json",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/views/documents/edit.html",
+		"/D/Apps/apache-tomcat-7.0.42/webapps/es-dms-site/scripts/139d8c72.modules.js",
+		"/D/Apps/apache-tomcat-7.0.42/webapps/es-dms-site/scripts/1b43700d.scripts.js",
+		"/D/Apps/apache-tomcat-7.0.42/webapps/es-dms-site/views/authentication/login.html",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/views/main.html",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/target/es-dms-site/scripts/139d8c72.modules.js",
+		"/D/Apps/apache-tomcat-7.0.42/webapps/es-dms-site/scripts/06bed523.modules.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/services/userService.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/controllers/main.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/controllers/login.js",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/node_modules/grunt-contrib-htmlmin/tasks/htmlmin.js",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/dist/views/main.html",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/node_modules/grunt-connect-proxy/tasks/connect_proxy.js",
+		"/D/Apps/apache-tomcat-7.0.42/webapps/es-dms-site/styles/7e3987dc.main.css",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/services/uploadService.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/controllers/documents/FileUpload.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/controllers/search/options.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/controllers/documents/new.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/controllers/documents/upload.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/services/roleService.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/controllers/roleEdit.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/controllers/role.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/controllers/userEdit.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/controllers/user.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/services/searchService.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/services/documentService.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/services/authenticationService.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/services/sharedService.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/controllers/navbar.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/controllers/search-view.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/directives/esdmsTagging.js",
+		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/directives/esdmsFacet.js"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"loginController"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"replace":
+	{
+		"height": 0.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"app",
+				"scripts/app.js"
+			],
+			[
+				"index",
+				"index.html"
+			],
+			[
+				"esdm",
+				"scripts/directives/esdmsAuthentication.js"
+			],
+			[
+				"main",
+				"views/main.html"
+			],
+			[
+				"login",
+				"views/authentication/login.html"
+			],
+			[
+				"esdmsu",
+				"scripts/directives/esdmsUpload.js"
+			],
+			[
+				"uploadser",
+				"scripts/services/uploadService.js"
+			],
+			[
+				"fileup",
+				"scripts/controllers/documents/FileUpload.js"
+			],
+			[
+				"options",
+				"scripts/controllers/search/options.js"
+			],
+			[
+				"new",
+				"scripts/controllers/documents/new.js"
+			],
+			[
+				"upload",
+				"scripts/controllers/documents/upload.js"
+			],
+			[
+				"roless",
+				"scripts/services/roleService.js"
+			],
+			[
+				"rolee",
+				"scripts/controllers/roleEdit.js"
+			],
+			[
+				"role",
+				"scripts/controllers/role.js"
+			],
+			[
+				"usere",
+				"scripts/controllers/userEdit.js"
+			],
+			[
+				"users",
+				"scripts/services/userService.js"
+			],
+			[
+				"user",
+				"scripts/controllers/user.js"
+			],
+			[
+				"search",
+				"scripts/services/searchService.js"
+			],
+			[
+				"document",
+				"scripts/services/documentService.js"
+			],
+			[
+				"authen",
+				"scripts/services/authenticationService.js"
+			],
+			[
+				"shared",
+				"scripts/services/sharedService.js"
+			],
+			[
+				"nav",
+				"scripts/controllers/navbar.js"
+			],
+			[
+				"esdms",
+				"scripts/directives/esdmsTagging.js"
+			],
+			[
+				"controll",
+				"scripts/controllers/login.js"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true
+}

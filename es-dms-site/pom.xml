@@ -138,11 +138,51 @@
 			</resource>
 		</resources>
 		<plugins>
+			<!-- Declare the maven yeoman plugin to launch npm, grunt and bower during 
+				the build -->
+			<plugin>
+				<groupId>com.github.trecloux</groupId>
+				<artifactId>yeoman-maven-plugin</artifactId>
+				<version>0.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>build</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.1.1</version>
 				<configuration>
 					<packagingExcludes>WEB-INF/web.xml</packagingExcludes>
+					<webResources>
+						<resource>
+							<directory>yo/dist</directory>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+			<!-- Configure the clean plugin in order to delete generated directories -->
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>yo/dist</directory>
+						</fileset>
+						<fileset>
+							<directory>yo/.tmp</directory>
+						</fileset>
+						<fileset>
+							<directory>yo/app/components</directory>
+						</fileset>
+						<fileset>
+							<directory>yo/node_modules</directory>
+						</fileset>
+					</filesets>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -151,9 +191,8 @@
 				<version>2.0</version>
 				<configuration>
 					<path>/${project.build.finalName}</path>
-					<!-- <httpsPort>8443</httpsPort>
-					<keystoreFile>${basedir}/.keystore</keystoreFile>
-					<keystorePass>secret</keystorePass> -->
+					<!-- <httpsPort>8443</httpsPort> <keystoreFile>${basedir}/.keystore</keystoreFile> 
+						<keystorePass>secret</keystorePass> -->
 				</configuration>
 			</plugin>
 			<plugin>

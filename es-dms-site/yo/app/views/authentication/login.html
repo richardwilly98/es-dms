@@ -1,0 +1,24 @@
+<div>
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="close()">&times;</button>
+		<h3>Please sign in</h3>
+	</div>
+	<div class="modal-body">
+		<div id="loginbox">
+			<form>
+				<fieldset>
+					<label>Username</label> 
+					<input type="text" name="username" data-ng-model="username" placeholder="Username" autofocus="autofocus" required />
+					<label>Password</label>
+					<input type="password" name="password" data-ng-model="password" placeholder="Password" required /> 
+					<label class="checkbox">
+	          			<input type="checkbox" value="rememberMe" data-ng-model="rememberMe" /> Remember me
+	        		</label>
+					<input type="submit" class="btn btn-success" value="Login" data-dismiss="modal" ng-click="login()" />
+				</fieldset>
+			</form>
+		</div>
+	</div>
+	<div class="modal-footer">
+	</div>
+</div>

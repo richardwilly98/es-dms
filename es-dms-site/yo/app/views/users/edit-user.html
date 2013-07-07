@@ -1,0 +1,71 @@
+<div data-ng-controller="UserEditCtrl" modal="shouldBeOpen" options="opts" close="close()">
+	<div class="modal-header">
+		<button type="button" class="close" data-ng-click="close()"
+			aria-hidden="true">&times;</button>
+		<h3 data-ng-show="newUser">New user</h3>
+		<h3 data-ng-hide="newUser">Edit User: {{ user.name }}</h3>
+	</div>
+	<div class="modal-body">
+		<form class="form-horizontal">
+			<div class="control-group">
+        		<label class="control-label">Name:</label>
+        		<div class="controls">
+          			<input type="text" ng-model="user.name" ng-disabled="!newUser" placeholder="Name" autofocus="autofocus" />
+        		</div>
+      		</div>				
+			<div class="control-group">
+        		<label class="control-label">Email:</label>
+        		<div class="controls">
+          			<input type="text" ng-model="user.email" placeholder="Email" />
+        		</div>
+      		</div>				
+			<div class="control-group">
+        		<label class="control-label">City:</label>
+        		<div class="controls">
+          			<input type="text" ng-model="user.city" placeholder="City" />
+        		</div>
+      		</div>
+			<div class="control-group">
+        		<label class="control-label">Roles:</label>
+        		<div class="controls">
+        			<select multiple="multiple">
+        				<option data-ng-repeat="role in user.roles">{{
+            				role.id }}</option>
+        			</select>
+        		</div>
+      		</div>
+      		
+      		<legend ng-hide="newUser">Change Password</legend>
+			<div class="control-group{{pwError && ' error' || ''}}">
+				<label class="control-label">Password:</label>
+				<div class="controls">
+					<div class="input-prepend">
+						<span class="add-on"><i class="icon-lock"></i></span>
+						<input type="password" data-ng-model="pw1" placeholder="Password" />
+					</div>
+				</div>
+			</div>
+			<div class="control-group{{pwError && ' error' || ''}}">
+				<label class="control-label">Repeat Password:</label>
+				<div class="controls">
+					<div class="input-prepend">
+						<span class="add-on"><i class="icon-lock"></i></span>
+						<input type="password" data-ng-model="pw2" placeholder="Password" />
+					</div>
+			  </div>
+			</div>
+
+			<div class="control-group">
+				<div class="controls">
+      				<label class="checkbox">
+						<input type="checkbox" value="disabled" data-ng-model="user.disabled"/> Disabled
+					</label>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn" data-ng-click="close()">Close</button>
+		<button class="btn btn-primary" data-ng-click="save()">Save</button>
+	</div>
+</div>
