@@ -1,0 +1,18 @@
+/* Main Stylesheet */
+/* Import Bootstrap styles and Responsive styles */
+@import url('../bower_components/bootstrap-sass/bootstrap-2.3.2.css');
+@import url('../bower_components/bootstrap-sass/bootstrap-responsive-2.3.2.css');
+@import url('../bower_components/blueimp-file-upload/css/jquery.fileupload-ui.css');
+
+/* Add top padding for navbar-top-fixed */
+/*body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}*/
+
+/* Remove top padding when top navbar goes static in narrow viewports */
+@media (max-width: 979px) {
+  body {
+    padding-top: 0;
+  }
+}
