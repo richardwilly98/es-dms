@@ -32,7 +32,7 @@ module.exports = function (grunt) {
       options : {
         // es-dms: Set environment variable for PhantomJS
         // TODO add switch for linux
-        PHANTOMJS_BIN : './node_modules/phantomjs/lib/phantom/phantomjs.exe'
+        PHANTOMJS_BIN : process.platform === 'win32'? './node_modules/phantomjs/lib/phantom/phantomjs.exe': './node_modules/phantomjs/bin/phantomjs'
       },
       dev : {
       }
