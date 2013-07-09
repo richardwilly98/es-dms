@@ -1,23 +1,24 @@
-<div modal="shouldBeOpen" close="close()" options="opts">
-	<div class="modal-header">
-		<button type="button" class="close" data-ng-click="close()"
-			aria-hidden="true">&times;</button>
-		<h3 data-ng-show="newUser">Search options</h3>
-	</div>
-	<div class="modal-body">
-		<form class="form-horizontal">
-			<div class="control-group">
-        		<label class="control-label">Page size: {{ pageSize }}</label>
-        		<div class="controls">
-          			<select ng-model="pageSize" ng-options="ps for ps in pageSizeList"></select>
-        		</div>
-      		</div>				
-		</form>
-	</div>
-	<div class="modal-footer">
-		<button type="button" class="btn" data-ng-click="close()">Close</button>
-		<button class="btn btn-primary" data-ng-click="save()">Save</button>
+<div data-ng-controller="SearchOptionsCtrl">
+	<a data-ng-click="open()">Options</a>
+	<div modal="shouldBeOpen" close="close()" options="opts">
+		<div class="modal-header">
+			<button type="button" class="close" data-ng-click="close()"
+				aria-hidden="true">&times;</button>
+			<h3>Search options</h3>
+		</div>
+		<div class="modal-body">
+			<form class="form-horizontal">
+				<div class="control-group">
+	        		<label class="control-label">Page size: {{ pageSize }}</label>
+	        		<div class="controls">
+	          			<select ng-model="pageSize" ng-options="ps for ps in pageSizeList"></select>
+	        		</div>
+	      		</div>				
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn" data-ng-click="close()">Close</button>
+			<button class="btn btn-primary" data-ng-click="save()">Save</button>
+		</div>
 	</div>
 </div>
-
-<a data-ng-click="open()">Options</a>

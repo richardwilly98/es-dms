@@ -1,6 +1,6 @@
 'use strict';
 
-esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService, searchService) {
+esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService, searchService, sharedService) {
   $scope.alerts = [];
   $scope.documents = [];
   $scope.facet = null;
@@ -10,10 +10,10 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
   $scope.maxPages = 10;
   $scope.totalPages = 0;
   $scope.currentPage = 1;
-  $scope.pageSize = 12;
-  $scope.pageSizeList = [12, 24, 48, 96];
   $scope.newtag = {};
   $scope.terms = [];
+  $scope.service = sharedService;
+  $scope.pageSize = $scope.service.getSettings().user.pageSize;
 
   var currentDocument = null;
 
@@ -21,6 +21,14 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
   }
 
   init();
+
+  $scope.$watch('service.getSettings()',
+    function(newValue) {
+      $log.log('watch - settings: ' + newValue.user.pageSize);
+      if (newValue) {
+        $scope.pageSize = newValue.user.pageSize;
+      }
+    });
 
   $scope.mySearch = function() {
 		$log.log('mySearch');
@@ -31,7 +39,7 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 			find(0,  'document.attributes.author: "' + $scope.criteria + '"', true);
 		}
 	};
-    
+
   $scope.search = function(/*term*/) {
 		$log.log('search');
 		if ($scope.criteria === '' || $scope.criteria === '*') {
@@ -59,7 +67,7 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 			}*/
 		});
   }
-    
+
   function getFilter() {
 		if ($scope.facet === undefined || $scope.terms === [] || $scope.terms.length === 0) {
 			return null;
@@ -77,7 +85,7 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 		$scope.currentPage = 1 + (firstIndex / pageSize);
 		$log.log('totalPages: ' + $scope.totalPages + ' - currentPage: ' + $scope.currentPage);
   }
-    
+
 	function getDocument(id) {
 		var documents = $scope.documents;
 		for (var i in documents) {
@@ -86,7 +94,7 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 			}
 		}
 	}
-  
+
 	function getIndexOf(id) {
 		for (var i in $scope.documents) {
 			if ($scope.documents[i].id === id) {
@@ -94,7 +102,7 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 			}
 		}
 	}
-    
+
   $scope.setPage = function () {
 		$log.log('setPage');
 		if ($scope.criteria === undefined ) {
@@ -102,9 +110,9 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 		}
     find( ($scope.currentPage - 1) * $scope.pageSize, $scope.criteria );
   };
-      
+
   $scope.$watch('currentPage', $scope.setPage );
-      
+
   $scope.$on('document:addtag', function(evt, args) {
 		if (args.id === undefined || args.tag === undefined) {
 			return;
@@ -132,7 +140,7 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 			$scope.documents[index] = doc;
 		});
   });
-    
+
   $scope.$on('search:applyfacet', function(evt, args) {
 		if (args.term === undefined || args.selected === undefined) {
 			return;
@@ -182,7 +190,7 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 			$scope.documents.splice(index, 1);
 		}
   };
-    
+
   $scope.preview = function(id) {
 		var document = getDocument(id);
 		if (currentDocument !== document) {

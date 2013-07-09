@@ -3,7 +3,7 @@
 	<form data-ng-submit="search()" class="form-search">
 		<input type="text" data-ng-model="criteria" />
 		<button type="button" class="btn btn-primary" data-ng-click="search()">Search</button>
-		<div data-ng-include src="'views/search/options.html'" data-ng-controller="SearchOptionsCtrl"></div>
+		<div data-ng-include src="'views/search/options.html'"></div>
 	</form>
 	<br />
 	<div data-ng-show="totalHits">
