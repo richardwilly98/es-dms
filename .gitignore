@@ -167,3 +167,6 @@ target/
 
 #TestNg
 test-output/
+
+# SublimeText project files
+*.sublime-workspace
