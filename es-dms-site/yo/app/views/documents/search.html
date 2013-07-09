@@ -25,9 +25,8 @@
 				</div>
     		</div>
     		<div class="span10">
-      			<!--Body content-->
-	<alert data-ng-repeat="alert in alerts" type="alert.type"
-		close="closeAlert($index)">{{alert.msg}}</alert>
+	<!--Body content-->
+	<alert data-ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
 	<table class="table table-condensed">
 		<thead>
 			<tr>
