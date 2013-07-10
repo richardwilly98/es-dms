@@ -3,7 +3,7 @@
 Test web app using AngujarJS, Jersey and ElasticSearch
 
 ## Build status##
-[![Build Status](https://buildhive.cloudbees.com/job/richardwilly98/job/es-dms/badge/icon)](https://buildhive.cloudbees.com/job/richardwilly98/job/es-dms/)
+[![Build Status](https://drone.io/github.com/richardwilly98/es-dms/status.png)](https://drone.io/github.com/richardwilly98/es-dms/latest)
 
 ## How to compile and run ##
 
