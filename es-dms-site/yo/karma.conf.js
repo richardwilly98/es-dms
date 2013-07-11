@@ -11,7 +11,7 @@ files = [
   'app/bower_components/angular-mocks/angular-mocks.js',
   'app/bower_components/angular-resource/angular-resource.js',
   'app/bower_components/angular-bootstrap/ui-bootstrap.js',
-  //'app/scripts/vendors/angular-ui-router/angular-ui-router.js',
+  'app/bower_components/angular-ui-router/release/angular-ui-router.js',
   'app/bower_components/angular-authentication/js/angular-authentication.js',
   'app/bower_components/angular-http-auth/src/angular-http-auth.js',
   'app/bower_components/blueimp-file-upload/js/jquery.fileupload-angular.js',
