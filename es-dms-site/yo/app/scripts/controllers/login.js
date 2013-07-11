@@ -7,11 +7,11 @@ esDmsSiteApp.controller('LoginCtrl', ['$log', '$scope', 'authenticationService',
 		authenticationService.login($scope.username, $scope.password, $scope.rememberMe, function(data) {
 			$log.log('data: ' + data);
 			if (data.status === 'AUTHENTICATED') {
-				authService.loginConfirmed();
-				var token = data.token;
-				$log.log('Authentication token: ' + token);
-				sharedService.prepForBroadcast({logout: true});
-				sharedService.prepForBroadcast({user: $scope.username});
+				// authService.loginConfirmed();
+				// var token = data.token;
+				// $log.log('Authentication token: ' + token);
+				// sharedService.prepForBroadcast({logout: true});
+    //     sharedService.updateUserSettings('name', $scope.username);
         dialog.close();
 			}
 		});

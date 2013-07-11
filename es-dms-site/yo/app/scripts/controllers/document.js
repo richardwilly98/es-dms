@@ -22,11 +22,11 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 
   init();
 
-  $scope.$watch('service.getSettings()',
+  $scope.$watch('service.getUserSettings()',
     function(newValue) {
-      $log.log('watch - settings: ' + newValue.user.pageSize);
+      $log.log('watch - pageSize: ' + newValue.pageSize);
       if (newValue) {
-        $scope.pageSize = newValue.user.pageSize;
+        $scope.pageSize = newValue.pageSize;
       }
     });
 

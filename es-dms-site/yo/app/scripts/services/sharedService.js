@@ -9,35 +9,24 @@ esDmsSiteApp.service('sharedService', function ($log, $rootScope) {
   };
   var currentUser = {};
   var message = '';
-  /*return {
+  return {
     getCurrentUser: function () {
       return currentUser;
     },
     prepForBroadcast: function(msg) {
-      this.message = msg;
+      message = msg;
       $rootScope.$broadcast('handleBroadcast');
     },
-    updateSettings: function(name, val) {
-      $log.log('updateSettings: ' + name + ' - ' + val);
-      settings.user[name] = val;
+    updateUserSettings: function(name, val) {
+      var _user = angular.copy(settings.user);
+      _user[name] = val;
+      settings.user = _user;
+    },
+    getUserSettings: function() {
+      return settings.user;
     },
     getSettings: function() {
       return settings;
     }
-  };*/
-  this.getCurrentUser = function () {
-    return currentUser;
   };
-  this.prepForBroadcast = function(msg) {
-    message = msg;
-    $rootScope.$broadcast('handleBroadcast');
-  };
-  this.updateUserSettings = function(name, val) {
-    $log.log('updateUserSettings: ' + name + ' - ' + val);
-    settings.user[name] = val;
-  };
-  this.getSettings = function() {
-    return settings;
-  };
-
 });

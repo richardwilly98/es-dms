@@ -1,16 +1,20 @@
 'use strict';
 
-esDmsSiteApp.service('authenticationService', ['$http', function authenticationService($http) {
+esDmsSiteApp.service('authenticationService', ['esdmsAuthenticationService', 'authService', 'sharedService', function (esdmsAuthenticationService, authService, sharedService) {
 	return {
 		login: function(username, password, rememberMe, callback) {
-			var payload = {username: username, password: password, rememberMe: rememberMe};
-			var config = {
-        headers: {'Content-Type':'application/json; charset=UTF-8'}
-      };
-			$http.post('api/auth/login', payload, config).success(callback);
+			esdmsAuthenticationService.login(username, password, rememberMe, function(data){
+				if (data.status === 'AUTHENTICATED') {
+					authService.loginConfirmed();
+					sharedService.prepForBroadcast({logout: true});
+	        sharedService.updateUserSettings('name', username);
+				}
+        callback(data);
+			});
 		},
 		logout: function() {
-			$http.post('api/auth/logout');
+			esdmsAuthenticationService.logout();
+			sharedService.updateUserSettings('name', null);
 		}
 	};
 }]);

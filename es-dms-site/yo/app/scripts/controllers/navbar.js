@@ -1,6 +1,6 @@
 'use strict';
 
-esDmsSiteApp.controller('NavbarCtrl', ['$scope', 'authenticationService', function ($scope, authenticationService) {
+esDmsSiteApp.controller('NavbarCtrl', ['$scope', function ($scope) {
 	$scope.showLogout = true;
 	$scope.$on('handleBroadcast', function() {
     //$scope.showLogout = sharedService.message.logout;
@@ -18,7 +18,4 @@ esDmsSiteApp.controller('NavbarCtrl', ['$scope', 'authenticationService', functi
 		{ 'view': '/index.admin-users', title: 'Users' },
 		{ 'view': '/index.admin-roles', title: 'Roles' }
 	];
-	$scope.logout = function() {
-		authenticationService.logout();
-	};
 }]);

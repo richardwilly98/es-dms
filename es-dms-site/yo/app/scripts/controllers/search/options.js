@@ -1,6 +1,6 @@
 'use strict';
 
-esDmsSiteApp.controller('SearchOptionsCtrl', ['$log', '$scope', 'sharedService', function ($log, $scope, sharedService) {
+esDmsSiteApp.controller('SearchOptionsCtrl', function ($log, $scope, sharedService) {
 	$scope.shouldBeOpen = false;
   $scope.pageSizeList = [12, 24, 48, 96];
   $scope.pageSize = sharedService.getSettings().user.pageSize;
@@ -22,4 +22,4 @@ esDmsSiteApp.controller('SearchOptionsCtrl', ['$log', '$scope', 'sharedService',
     backdropFade: true,
     dialogFade:true
   };
-}]);
+});
