@@ -1,7 +1,7 @@
 /* exported esDmsSiteApp */
 'use strict';
 
-var esDmsSiteApp = angular.module('esDmsSiteApp', ['ngResource', 'authentication', 'ui.state', 'http-auth-interceptor', 'ui.bootstrap']);
+var esDmsSiteApp = angular.module('esDmsSiteApp', ['ngResource', 'authentication', 'ui.state', 'http-auth-interceptor', 'ui.bootstrap', 'ui.select2']);
 
 esDmsSiteApp.config(function ($routeProvider, $stateProvider) {
 

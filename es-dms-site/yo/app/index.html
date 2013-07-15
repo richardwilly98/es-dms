@@ -15,6 +15,7 @@
         <!-- build:css({.tmp,app}) styles/main.css -->
         <link rel="stylesheet" href="styles/bootstrap.css">
         <link rel="stylesheet" href="styles/bootstrap-responsive.css">
+        <link rel="stylesheet" href="bower_components/select2/select2.css">
         <link rel="stylesheet" href="styles/main.css">
         <!-- endbuild -->
 		
@@ -46,6 +47,8 @@
 
 	<script type="text/javascript" src="bower_components/lodash/lodash.js"></script>
 
+  <script type="text/javascript" src="bower_components/select2/select2.js"></script>
+
 	<script type="text/javascript" src="bower_components/angular/angular.js"></script>
 
 	<script type="text/javascript" src="bower_components/angular-resource/angular-resource.js"></script>
@@ -71,12 +74,15 @@
 	<!-- The basic File Upload plugin -->
 	<script type="text/javascript" src="bower_components/blueimp-file-upload/js/jquery.fileupload.js"></script>
 
+  <!-- Add ui-select2 -->
+  <script type="text/javascript" src="bower_components/angular-ui-select2/src/select2.js"></script>
+
 	<!-- endbuild -->
 
 	<!-- build:js({.tmp,app}) scripts/scripts.js -->
-    <script type="text/javascript" src="scripts/app.js"></script>
-    <script type="text/javascript" src="scripts/controllers/main.js"></script>
-    <!-- endbuild -->
+  <script type="text/javascript" src="scripts/app.js"></script>
+  <script type="text/javascript" src="scripts/controllers/main.js"></script>
+  <!-- endbuild -->
 
 	<!-- build:js scripts/modules.js -->
 	<script type="text/javascript" src="scripts/directives/esdmsAuthentication.js"></script>
@@ -100,13 +106,12 @@
 	<script type="text/javascript" src="scripts/controllers/documents/new.js"></script>
 	<script type="text/javascript" src="scripts/controllers/search/options.js"></script>
 	<script type="text/javascript" src="scripts/controllers/documents/FileUpload.js"></script>
-	<script src="scripts/services/uploadService.js"></script>
-	<script src="scripts/directives/esdmsUpload.js"></script>
+  <script type="text/javascript" src="scripts/services/esdmsAuthenticationService.js"></script>
+	<script type="text/javascript" src="scripts/services/uploadService.js"></script>
+	<script type="text/javascript" src="scripts/directives/esdmsUpload.js"></script>
 
 	<!-- test accordion -->
 	<script type="text/javascript" src="scripts/controllers/test/accordion.js"></script>
-
-<script src="scripts/services/esdmsAuthenticationService.js"></script>
 	<!-- endbuild -->
 
 </body>
