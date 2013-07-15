@@ -120,6 +120,13 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 		var tag = args.tag;
 		documentService.addTag(id, tag, function(doc) {
 			var index = getIndexOf(id);
+      // Update facets
+      var term = _.find($scope.facets.terms, {'term': tag});
+      if (term !== undefined) {
+        term.count++;
+      } else {
+        $scope.facets.terms.push({'term': tag, 'count': 1});
+      }
 			$scope.documents[index] = doc;
 		});
   });
@@ -133,6 +140,15 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 		var tag = args.tag;
 		documentService.removeTag(id, tag, function(doc) {
 			var index = getIndexOf(id);
+      // Update facets
+      var term = _.find($scope.facets.terms, {'term': tag});
+      if (term !== undefined) {
+        if (term.count > 1) {
+          term.count--;
+        } else {
+          $scope.facets.terms.splice(_.indexOf($scope.facets.terms, term), 1);
+        }
+      }
 			$scope.documents[index] = doc;
 		});
   });
