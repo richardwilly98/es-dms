@@ -25,8 +25,9 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
   $scope.$watch('service.getUserSettings()',
     function(newValue) {
       $log.log('watch - pageSize: ' + newValue.pageSize);
-      if (newValue) {
+      if (newValue && $scope.pageSize !== newValue.pageSize) {
         $scope.pageSize = newValue.pageSize;
+        $scope.search();
       }
     });
 
@@ -51,7 +52,7 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 		}
   };
 
-  function find(first, criteria, /*term,*/ updatePagination) {
+  function find(first, criteria, updatePagination) {
 		$log.log('find - terms: ' + $scope.terms);
 		var filters = getFilter(/*term*/);
 		searchService.facetedSearch(first, $scope.pageSize, criteria, $scope.facet, filters, function(result) {
@@ -62,9 +63,6 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 			$scope.totalHits = result.totalHits;
 			$scope.elapsedTime = result.elapsedTime;
 			$scope.facets = result.facets[$scope.facet];
-			/*for (var i in $scope.facets[$scope.facet].terms) {
-				
-			}*/
 		});
   }
 
@@ -120,7 +118,6 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 		$log.log('*** addTag: ' + args.id + ' - ' + args.tag);
 		var id = args.id;
 		var tag = args.tag;
-		//var document = getDocument(id);
 		documentService.addTag(id, tag, function(doc) {
 			var index = getIndexOf(id);
 			$scope.documents[index] = doc;
@@ -134,7 +131,6 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 		$log.log('*** removetag: ' + args.id + ' - ' + args.tag);
 		var id = args.id;
 		var tag = args.tag;
-		//var document = getDocument(id);
 		documentService.removeTag(id, tag, function(doc) {
 			var index = getIndexOf(id);
 			$scope.documents[index] = doc;
