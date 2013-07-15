@@ -20,8 +20,9 @@
   "smarttabs": true,
   "globals": {
     "angular": false,
-	"_": false,
-	"$": false,
-	"esDmsSiteApp": true
+    "_": false,
+    "$": false,
+    "jQuery": false,
+    "esDmsSiteApp": true
   }
 }
