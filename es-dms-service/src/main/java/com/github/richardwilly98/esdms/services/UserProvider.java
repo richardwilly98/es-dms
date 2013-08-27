@@ -27,6 +27,9 @@ package com.github.richardwilly98.esdms.services;
  */
 
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.util.ByteSource;
 import org.elasticsearch.client.Client;
@@ -35,12 +38,8 @@ import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
-import com.github.richardwilly98.esdms.services.BootstrapService;
-import com.github.richardwilly98.esdms.services.HashService;
-import com.github.richardwilly98.esdms.services.RoleService;
-import com.github.richardwilly98.esdms.services.UserService;
-import com.google.inject.Inject;
 
+@Singleton
 public class UserProvider extends ProviderBase<User> implements UserService {
 
 	private final static String type = "user";

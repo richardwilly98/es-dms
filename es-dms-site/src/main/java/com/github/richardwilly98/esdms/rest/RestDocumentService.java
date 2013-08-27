@@ -71,14 +71,15 @@ import com.github.richardwilly98.esdms.rest.exception.PreconditionException;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.DocumentService;
+import com.github.richardwilly98.esdms.web.Audit;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
-import com.sun.jersey.core.header.ContentDisposition;
-import com.sun.jersey.core.header.ContentDisposition.ContentDispositionBuilder;
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
-import com.sun.jersey.multipart.FormDataBodyPart;
-import com.sun.jersey.multipart.FormDataParam;
+
+import org.glassfish.jersey.media.multipart.ContentDisposition;
+import org.glassfish.jersey.media.multipart.ContentDisposition.ContentDispositionBuilder;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 @Path(RestDocumentService.DOCUMENTS_PATH)
 public class RestDocumentService extends RestItemBaseService<Document> {
@@ -217,7 +218,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 				contentDisposition.creationDate(version.getFile().getDate()
 						.toDate());
 			}
-			ResponseBuilder rb = new ResponseBuilderImpl();
+			ResponseBuilder rb = Response.ok();
 			rb.type(version.getFile().getContentType());
 			log.debug("Document: " + id + " Content type: " + version.getFile().getContentType());
 			/********************************
@@ -247,6 +248,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 	@Path(UPLOAD_PATH)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces({ MediaType.APPLICATION_JSON })
+	@Audit("upload")
 	public Response upload(@FormDataParam("name") String name,
 			@FormDataParam("file") InputStream uploadedInputStream,
 			@FormDataParam("file") FormDataBodyPart body) {
@@ -609,7 +611,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 				contentDisposition.creationDate(version.getFile().getDate()
 						.toDate());
 			}
-			ResponseBuilder rb = new ResponseBuilderImpl();
+			ResponseBuilder rb = Response.ok();
 			rb.type(version.getFile().getContentType());
 			InputStream stream = new ByteArrayInputStream(version.getFile()
 					.getContent());
@@ -649,7 +651,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 				contentDisposition.creationDate(version.getFile().getDate()
 						.toDate());
 			}
-			ResponseBuilder rb = new ResponseBuilderImpl();
+			ResponseBuilder rb = Response.ok();
 			rb.type(version.getFile().getContentType());
 			InputStream stream = new ByteArrayInputStream(version.getFile()
 					.getContent());

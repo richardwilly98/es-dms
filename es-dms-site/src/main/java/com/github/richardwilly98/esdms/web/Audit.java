@@ -1,8 +1,8 @@
-package com.github.richardwilly98.esdms.inject;
+package com.github.richardwilly98.esdms.web;
 
 /*
  * #%L
- * es-dms-service
+ * es-dms-site
  * %%
  * Copyright (C) 2013 es-dms
  * %%
@@ -27,22 +27,16 @@ package com.github.richardwilly98.esdms.inject;
  */
 
 
-import org.apache.log4j.Logger;
-import org.apache.shiro.guice.aop.ShiroAopModule;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import com.google.inject.AbstractModule;
+import javax.ws.rs.NameBinding;
 
-public class ProviderModule extends AbstractModule {
-
-	private final Logger log = Logger.getLogger(this.getClass());
-	
-	@Override
-	protected void configure() {
-		log.info("*** configure ***");
-		install(new BootstrapModule());
-		install(new EsClientModule());
-		install(new ServicesModule());
-		install(new ShiroAopModule());
-	}
-
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE, ElementType.METHOD })
+@NameBinding
+public @interface Audit {
+	String value() default "";
 }

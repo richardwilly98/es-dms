@@ -40,6 +40,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -66,8 +69,8 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
-import com.google.inject.Inject;
 
+@Singleton
 public class DocumentProvider extends ProviderBase<Document> implements
 		DocumentService {
 

@@ -27,6 +27,9 @@ package com.github.richardwilly98.esdms.services;
  */
 
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.client.Client;
 
@@ -34,12 +37,8 @@ import com.github.richardwilly98.esdms.PermissionImpl;
 import com.github.richardwilly98.esdms.RoleImpl;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.exception.ServiceException;
-import com.github.richardwilly98.esdms.services.BootstrapService;
-import com.github.richardwilly98.esdms.services.DocumentService;
-import com.github.richardwilly98.esdms.services.RoleService;
-import com.github.richardwilly98.esdms.services.UserService;
-import com.google.inject.Inject;
 
+@Singleton
 public class RoleProvider extends ProviderBase<Role> implements RoleService {
 
 	private final static String type = "role";

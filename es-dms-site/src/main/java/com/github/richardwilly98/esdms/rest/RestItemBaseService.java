@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.net.URI;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -55,7 +56,7 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.BaseService;
-import com.google.inject.Inject;
+//import com.google.inject.Inject;
 
 /*
  * CRUD methods MUST follow http response status code from http://www.restapitutorial.com/lessons/httpmethods.html

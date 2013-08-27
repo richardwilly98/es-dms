@@ -26,15 +26,13 @@ package com.github.richardwilly98.esdms.shiro;
  * #L%
  */
 
-
 import javax.servlet.ServletContext;
 
+import org.apache.log4j.Logger;
 import org.apache.shiro.guice.web.ShiroWebModule;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 
-import com.github.richardwilly98.esdms.shiro.EsRealm;
-import com.github.richardwilly98.esdms.shiro.EsSessionDAO;
 import com.google.inject.Key;
 import com.google.inject.Scopes;
 import com.google.inject.binder.AnnotatedBindingBuilder;
@@ -43,33 +41,39 @@ import com.google.inject.name.Names;
 public class EsShiroWebModule extends ShiroWebModule {
 
 	private final String securityFilterPath;
-	
-	public EsShiroWebModule(ServletContext servletContext, String securityFilterPath) {
+	private final Logger log = Logger.getLogger(this.getClass());
+
+	public EsShiroWebModule(ServletContext servletContext,
+			String securityFilterPath) {
 		super(servletContext);
+		log.debug("*** constructor ***");
 		this.securityFilterPath = securityFilterPath;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void configureShiroWeb() {
-		
+
+		log.debug("*** configureShiroWeb ***");
 		bindRealm().to(EsRealm.class).asEagerSingleton();
 		bind(SessionDAO.class).to(EsSessionDAO.class);
 		bind(EsSessionDAO.class);
-		
+
 		// TODO: SSL currently does not work with grunt-connect-proxy
-//		addFilterChain("/api/auth/**", config(SSL, "8443"));
+		// addFilterChain("/api/auth/**", config(SSL, "8443"));
 		addFilterChain("/api/auth/**", ANON);
 		addFilterChain("/api/**", Key.get(EsAuthenticationFilter.class));
 	}
-	
+
 	@Override
 	protected void bindSessionManager(
 			AnnotatedBindingBuilder<SessionManager> bind) {
+		log.debug("*** bindSessionManager ***");
 		bind.to(EsWebSessionManager.class).in(Scopes.SINGLETON);
-		bindConstant().annotatedWith(Names.named("shiro.globalSessionTimeout")).to(30000L);
+		bindConstant().annotatedWith(Names.named("shiro.globalSessionTimeout"))
+				.to(30000L);
 		bind(EsWebSessionManager.class);
-		
+
 	}
-	
+
 }

@@ -27,6 +27,7 @@ package com.github.richardwilly98.esdms.rest;
  */
 
 
+import javax.inject.Inject;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
@@ -36,7 +37,7 @@ import org.apache.shiro.subject.Subject;
 
 import com.github.richardwilly98.esdms.rest.exception.UnauthorizedException;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
-import com.google.inject.Inject;
+//import com.google.inject.Inject;
 
 /*
  * CRUD methods MUST follow http response status code from http://www.restapitutorial.com/lessons/httpmethods.html

@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.web;
  * #L%
  */
 
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
@@ -41,23 +40,26 @@ import com.mycila.inject.jsr250.Jsr250;
 
 public class RestGuiceServletConfig extends GuiceServletContextListener {
 
-	Logger log = Logger.getLogger(this.getClass());
+	private final Logger log = Logger.getLogger(this.getClass());
 
 	private ServletContext servletContext;
 
+	public static Injector injector;
+
 	@Override
 	protected Injector getInjector() {
+		log.debug("*** getInjector ***");
 		String securityFilterPath = "/api/*";
-		return Jsr250.createInjector(new EsShiroWebModule(servletContext,
-				securityFilterPath), new ShiroAopModule(), new EsJerseyServletModule(
-						securityFilterPath)/*, ShiroWebModule.guiceFilterModule()*/);
-//		return Jsr250.createInjector(new EsConfigModule(servletContext,
-//				securityFilterPath), new EsJerseyServletModule(
-//						securityFilterPath)/*, ShiroWebModule.guiceFilterModule()*/);
+		injector = Jsr250.createInjector(new EsShiroWebModule(servletContext,
+				securityFilterPath), new ShiroAopModule(),
+				new EsJerseyServletModule(securityFilterPath));
+
+		return injector;
 	}
 
 	@Override
 	public void contextInitialized(ServletContextEvent servletContextEvent) {
+		log.debug("*** contextInitialized ***");
 		servletContext = servletContextEvent.getServletContext();
 		super.contextInitialized(servletContextEvent);
 	}

@@ -27,18 +27,16 @@ package com.github.richardwilly98.esdms.services;
  */
 
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.elasticsearch.client.Client;
 
 import com.github.richardwilly98.esdms.PermissionImpl;
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.exception.ServiceException;
-import com.github.richardwilly98.esdms.services.BootstrapService;
-import com.github.richardwilly98.esdms.services.DocumentService;
-import com.github.richardwilly98.esdms.services.PermissionService;
-import com.github.richardwilly98.esdms.services.RoleService;
-import com.github.richardwilly98.esdms.services.UserService;
-import com.google.inject.Inject;
 
+@Singleton
 public class PermissionProvider extends ProviderBase<Permission> implements PermissionService {
 
 	private final static String type = "permission";

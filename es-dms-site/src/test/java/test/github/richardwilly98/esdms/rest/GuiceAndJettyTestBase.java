@@ -26,19 +26,27 @@ package test.github.richardwilly98.esdms.rest;
  * #L%
  */
 
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.net.URI;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
@@ -49,7 +57,6 @@ import test.github.richardwilly98.esdms.web.TestRestGuiceServletConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.cfg.Annotations;
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.api.ItemBase;
@@ -57,12 +64,6 @@ import com.github.richardwilly98.esdms.rest.RestAuthencationService;
 import com.github.richardwilly98.esdms.services.UserService;
 import com.google.inject.Inject;
 import com.google.inject.servlet.GuiceFilter;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 /*
  * TODO: Investigate why SSL does not work.
@@ -93,12 +94,15 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
 		server = new Server(HTTP_PORT);
 		// Connector secureConnector = createSecureConnector();
 		// server.setConnectors(new Connector[] {secureConnector});
-		ClientConfig config = new DefaultClientConfig();
+		// ClientConfig config = new DefaultClientConfig();
 		// config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING,
 		// Boolean.TRUE);
-		config.getClasses().add(JacksonJaxbJsonProvider.class);
 		// config.getFeatures().add(JacksonJsonProvider.class);
-		restClient = Client.create(config);
+		// restClient = Client.create(config);
+		Configuration configuration = new ClientConfig();
+		// configuration.register(new JacksonFeature());
+		restClient = ClientBuilder.newClient(configuration);
+		restClient.register(new JacksonFeature());
 		// restClient = Client.create(new DefaultClientConfig(
 		// JacksonJaxbJsonProvider.class));
 		// securedClient = createSecuredClient();
@@ -106,33 +110,26 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
 
 	final static Annotations[] BASIC_ANNOTATIONS = { Annotations.JACKSON };
 
-	// private void dump() {
-	// JsonMapperConfigurator configurator = new JsonMapperConfigurator(mapper,
-	// BASIC_ANNOTATIONS);
-	// configurator.configure(f, state)
-	// }
-
 	protected T get(String id, Class<T> type, String path) throws Throwable {
-		ClientResponse response = resource().path(path).path(id)
-				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		Response response = target().path(path).path(id).request()
+				.cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
 		log.debug(String.format("status: %s", response.getStatus()));
 		if (response.getStatus() == Status.OK.getStatusCode()) {
-			return response.getEntity(type);
+			return response.readEntity(type);
 		}
 		return null;
 	}
 
 	protected T get(URI uri, Class<T> type) throws Throwable {
 		log.debug(String.format("getItem - %s", uri));
-		ClientResponse response = client().resource(uri).cookie(adminCookie)
-				.type(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		Response response = client().target(uri).request().cookie(adminCookie)
+				.accept(MediaType.APPLICATION_JSON).get();
 		log.debug(String.format("status: %s", response.getStatus()));
 		// log.debug(String.format("get - body: %s",
 		// response.getEntity(String.class)));
 		if (response.getStatus() == Status.OK.getStatusCode()) {
 			// return deserialize(response.getEntity(String.class), type);
-			return response.getEntity(type);
+			return response.readEntity(type);
 		}
 		return null;
 	}
@@ -150,18 +147,17 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
 
 	protected T update(ItemBase item, Class<T> type, String path)
 			throws Throwable {
-		ClientResponse response = resource().path(path).path(item.getId())
-				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
-				.put(ClientResponse.class, item);
+		Response response = target().path(path).path(item.getId())
+				.request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+				.put(Entity.json(item));
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-		return response.getEntity(type);
+		return response.readEntity(type);
 	}
 
 	protected void delete(String id, String path) throws Throwable {
-		ClientResponse response = resource().path(path).path(id)
-				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
-				.delete(ClientResponse.class);
+		Response response = target().path(path).path(id).request()
+				.cookie(adminCookie).delete();
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
 	}
@@ -244,8 +240,8 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
 	 * 
 	 * @return the created web resource
 	 */
-	protected WebResource resource() {
-		return restClient.resource(getBaseURI(false));
+	protected WebTarget target() {
+		return restClient.target(getBaseURI(false));
 	}
 
 	// public WebResource securedResource() {
@@ -277,14 +273,14 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
 	protected Cookie login(Credential credential) {
 		try {
 			log.debug("*** login ***");
-			WebResource webResource = resource().path("auth").path("login");
+			WebTarget webResource = target().path("auth").path("login");
 			log.debug(webResource);
-			ClientResponse response = webResource.type(
-					MediaType.APPLICATION_JSON).post(ClientResponse.class,
-					credential);
+			Response response = webResource
+					.request(MediaType.APPLICATION_JSON)
+					.post(Entity.entity(credential, MediaType.APPLICATION_JSON));
 			log.debug("status: " + response.getStatus());
 			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-			for (NewCookie cookie : response.getCookies()) {
+			for (NewCookie cookie : response.getCookies().values()) {
 				if (RestAuthencationService.ES_DMS_TICKET.equals(cookie
 						.getName())) {
 					return new Cookie(cookie.getName(), cookie.getValue());
@@ -300,9 +296,9 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
 	protected void logout(Cookie cookie) {
 		log.debug("*** logout ***");
 		checkNotNull(cookie);
-		WebResource webResource = resource().path("auth").path("logout");
-		ClientResponse response = webResource.cookie(cookie).post(
-				ClientResponse.class);
+		WebTarget webResource = target().path("auth").path("logout");
+		Response response = webResource.request().cookie(cookie)
+				.post(Entity.json(null));
 		log.debug("status: " + response.getStatus());
 		Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
 	}

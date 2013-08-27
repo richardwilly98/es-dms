@@ -32,6 +32,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -58,8 +61,8 @@ import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Session;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
-import com.google.inject.Inject;
 
+@Singleton
 public class AuthenticationProvider implements AuthenticationService {
 
 	public static final String ES_DMS_LOGIN_ATTRIBUTE = "ES_DMS_LOGIN";

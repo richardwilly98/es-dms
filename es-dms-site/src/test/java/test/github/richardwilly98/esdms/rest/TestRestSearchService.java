@@ -35,8 +35,14 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -49,11 +55,6 @@ import com.github.richardwilly98.esdms.rest.RestSearchService;
 import com.github.richardwilly98.esdms.rest.entity.FacetedQuery;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.multipart.FormDataBodyPart;
-import com.sun.jersey.multipart.FormDataMultiPart;
 
 public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
 	// public class TestRestDocumentService extends
@@ -76,22 +77,27 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
 
 		Document document = createDocument(name, contentType, file);
 		addTag(document.getId(), "tag1", "tag2");
-		log.trace(String.format("Document created - %s", getMetadata(document.getId())));
+		log.trace(String.format("Document created - %s",
+				getMetadata(document.getId())));
 
 		document = createDocument(name, contentType, file);
 		addTag(document.getId(), "tag1", "tag2", "tag3");
-		log.trace(String.format("Document created - %s", getMetadata(document.getId())));
+		log.trace(String.format("Document created - %s",
+				getMetadata(document.getId())));
 
 		document = createDocument(name, contentType, file);
 		addTag(document.getId(), "tag2", "tag3");
-		log.trace(String.format("Document created - %s", getMetadata(document.getId())));
+		log.trace(String.format("Document created - %s",
+				getMetadata(document.getId())));
 
 		document = createDocument(name, contentType, file);
 		addTag(document.getId(), "tag3", "tag4");
-		log.trace(String.format("Document created - %s", getMetadata(document.getId())));
+		log.trace(String.format("Document created - %s",
+				getMetadata(document.getId())));
 
 		document = createDocument(name, contentType, file);
-		log.trace(String.format("Document created - %s", getMetadata(document.getId())));
+		log.trace(String.format("Document created - %s",
+				getMetadata(document.getId())));
 
 		SearchResult<Document> result = searchDocument(name, 0, max);
 		log.debug(String.format("Search - total hits: %s - item count: %s",
@@ -168,16 +174,14 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
 		FacetedQuery query = new FacetedQuery();
 		query.setFacet(facet);
 		query.setFilters(filters);
-		ClientResponse response = resource()
-				.path(RestSearchService.SEARCH_PATH)
+		Response response = target().path(RestSearchService.SEARCH_PATH)
 				.path(RestSearchService.FACET_SEARCH_ACTION).path(criteria)
-				.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON)
-				.post(ClientResponse.class, query);
+				.request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+				.accept(MediaType.APPLICATION_JSON).post(Entity.json(query));
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
 		SearchResult<Document> searchResult = response
-				.getEntity(new GenericType<SearchResult<Document>>() {
+				.readEntity(new GenericType<SearchResult<Document>>() {
 				});
 		Assert.assertNotNull(searchResult);
 		return searchResult;
@@ -205,11 +209,10 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
 				MediaType.valueOf(contentType));
 		form.bodyPart(p);
 
-		ClientResponse response = resource()
-				.path(RestDocumentService.DOCUMENTS_PATH)
-				.path(RestDocumentService.UPLOAD_PATH).cookie(adminCookie)
-				.type(MediaType.MULTIPART_FORM_DATA)
-				.post(ClientResponse.class, form);
+		Response response = target().path(RestDocumentService.DOCUMENTS_PATH)
+				.path(RestDocumentService.UPLOAD_PATH)
+				.request(MediaType.MULTIPART_FORM_DATA).cookie(adminCookie)
+				.post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA));
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.CREATED
 				.getStatusCode());
@@ -219,31 +222,22 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
 	}
 
 	private void updateDocument(Document document) throws Throwable {
-		ClientResponse response = resource()
-				.path(RestDocumentService.DOCUMENTS_PATH)
-				.path(RestDocumentService.UPDATE_PATH).cookie(adminCookie)
-				.type(MediaType.APPLICATION_JSON)
-				.put(ClientResponse.class, document);
+		Response response = target().path(RestDocumentService.DOCUMENTS_PATH)
+				.path(RestDocumentService.UPDATE_PATH)
+				.request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+				.put(Entity.json(document));
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-	}
-
-	private Document getDocument(String id) throws Throwable {
-		Document document = get(id, Document.class,
-				RestDocumentService.DOCUMENTS_PATH);
-		Assert.assertNotNull(document);
-		return document;
 	}
 
 	private Document getMetadata(String id) throws Throwable {
-		ClientResponse response = resource()
-				.path(RestDocumentService.DOCUMENTS_PATH).path(id)
-				.path(RestDocumentService.METADATA_PATH).cookie(adminCookie)
-				.type(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+		Response response = target().path(RestDocumentService.DOCUMENTS_PATH)
+				.path(id).path(RestDocumentService.METADATA_PATH)
+				.request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+				.accept(MediaType.APPLICATION_JSON).get();
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-		Document document = response.getEntity(Document.class);
+		Document document = response.readEntity(Document.class);
 		Assert.assertNotNull(document);
 		return document;
 	}

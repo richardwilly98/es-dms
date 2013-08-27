@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
@@ -68,6 +69,7 @@ import com.github.richardwilly98.esdms.api.Term;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.google.common.base.Strings;
 
+@Singleton
 public class SearchProvider implements SearchService<Document> {
 
 	final static Logger log = Logger.getLogger(SearchProvider.class);

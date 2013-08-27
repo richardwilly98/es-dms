@@ -27,25 +27,23 @@ package com.github.richardwilly98.esdms.services;
  */
 
 
-import static com.google.common.collect.Sets.newHashSet;
 import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
 import static org.elasticsearch.index.query.QueryBuilders.fieldQuery;
 
 import java.io.IOException;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.base.Stopwatch;
-import org.elasticsearch.search.SearchHit;
 
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
-import com.google.inject.Inject;
 
+@Singleton
 public class VersionProvider extends ProviderBase<Version> implements
 		VersionService {
 

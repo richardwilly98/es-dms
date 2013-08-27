@@ -27,6 +27,8 @@ package com.github.richardwilly98.esdms.services;
  */
 
 
+import javax.inject.Singleton;
+
 import org.apache.log4j.Logger;
 import org.apache.shiro.crypto.hash.DefaultHashService;
 import org.apache.shiro.crypto.hash.Hash;
@@ -34,8 +36,7 @@ import org.apache.shiro.crypto.hash.HashRequest;
 import org.apache.shiro.crypto.hash.SimpleHashRequest;
 import org.apache.shiro.util.ByteSource;
 
-import com.github.richardwilly98.esdms.services.HashService;
-
+@Singleton
 public class SHA512HashProvider implements HashService {
 
 	private static Logger log = Logger.getLogger(SHA512HashProvider.class);

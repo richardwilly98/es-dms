@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.inject;
  * #L%
  */
 
-
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.services.AuthenticationProvider;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
@@ -52,15 +51,18 @@ public class ServicesModule extends AbstractModule {
 	@Override
 	protected void configure() {
 
-		bind(HashService.class).to(SHA512HashProvider.class)
+		bind(HashService.class).to(SHA512HashProvider.class).asEagerSingleton();
+		bind(AuthenticationService.class).to(AuthenticationProvider.class)
 				.asEagerSingleton();
-		bind(AuthenticationService.class).to(AuthenticationProvider.class).asEagerSingleton();
-		bind(PermissionService.class).to(PermissionProvider.class).asEagerSingleton();
+		bind(PermissionService.class).to(PermissionProvider.class)
+				.asEagerSingleton();
 		bind(RoleService.class).to(RoleProvider.class).asEagerSingleton();
 		bind(UserService.class).to(UserProvider.class).asEagerSingleton();
-		bind(DocumentService.class).to(DocumentProvider.class).asEagerSingleton();
+		bind(DocumentService.class).to(DocumentProvider.class)
+				.asEagerSingleton();
 		bind(VersionService.class).to(VersionProvider.class).asEagerSingleton();
-		bind(new TypeLiteral<SearchService<Document>>() {}).to(SearchProvider.class).asEagerSingleton();
+		bind(new TypeLiteral<SearchService<Document>>() {
+		}).to(SearchProvider.class).asEagerSingleton();
 	}
 
 }

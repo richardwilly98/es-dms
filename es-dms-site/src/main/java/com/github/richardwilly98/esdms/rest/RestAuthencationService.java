@@ -29,6 +29,7 @@ package com.github.richardwilly98.esdms.rest;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.POST;
@@ -42,8 +43,10 @@ import com.github.richardwilly98.esdms.SessionImpl;
 import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
-import com.google.inject.Inject;
+//import com.google.inject.Inject;
+//import com.google.inject.servlet.RequestScoped;
 
+//@RequestScoped
 @Path(RestAuthencationService.AUTH_PATH)
 public class RestAuthencationService extends RestItemBaseService<SessionImpl> {
 

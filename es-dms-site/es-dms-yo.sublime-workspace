@@ -4,6 +4,22 @@
 		"selected_items":
 		[
 			[
+				"rivr",
+				"riverResource"
+			],
+			[
+				"string",
+				"stringify"
+			],
+			[
+				"ne",
+				"newValue"
+			],
+			[
+				"user",
+				"_user"
+			],
+			[
 				"$lo",
 				"$log.log	AngularJS"
 			],
@@ -31,31 +47,187 @@
 	},
 	"buffers":
 	[
+		{
+			"file": "yo/app/scripts/services/sharedService.js",
+			"settings":
+			{
+				"buffer_size": 701,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "yo/app/views/documents/search.html",
+			"settings":
+			{
+				"buffer_size": 3065,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "yo/app/scripts/controllers/login.js",
+			"settings":
+			{
+				"buffer_size": 811,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "yo/app/scripts/services/esdmsAuthenticationService.js",
+			"settings":
+			{
+				"buffer_size": 510,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "yo/app/views/main.html",
+			"settings":
+			{
+				"buffer_size": 1214,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "yo/app/scripts/controllers/navbar.js",
+			"settings":
+			{
+				"buffer_size": 740,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "yo/app/scripts/directives/esdmsTagging.js",
+			"settings":
+			{
+				"buffer_size": 2399,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "yo/app/scripts/controllers/document.js",
+			"settings":
+			{
+				"buffer_size": 5688,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Dev/elasticsearch/plugins/river-mongodb/_site/index.html",
+			"settings":
+			{
+				"buffer_size": 1981,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/C/Dev/elasticsearch/plugins/river-mongodb/_site/scripts/app.js",
+			"settings":
+			{
+				"buffer_size": 1165,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "yo/app/scripts/services/documentService.js",
+			"settings":
+			{
+				"buffer_size": 2748,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "Hi,\n\nIt was a mistake from my end regarding setting _last_ts. I was not building the JSON in the proper format.\nBut setting _last_ts is not making any difference in my indexing process.\n\nIn my oplog the number of documents(inserted) for a collection called \"queryreadyproducts\" are  811499. I set the _last_ts from an operation which happened towards the end of the collection.\n\nI am having the following problems:\n1. When I executed the steps below its not indexing at all.\n2. If I changed the id in step 5 from \"brandviewdata.queryreadyproducts\" to \"_meta\" its indexing everything from oplog not filtering on \"_last_ts\" parameter set.\n\nPlease go through the steps and let me know where I am making a mistake.\n\nHere are the log of steps I followed from the beginning:\n\n1. HEAD http://localhost:9200/queryreadyproducts \n\n2. Updating index settings\n\nPUT http://localhost:9200/queryreadyproducts \n```{\n    \"index\": {\n        \"analysis\": {\n            \"filter\": {\n                \"replacementfilter\": {\n                    \"type\": \"pattern_replace\",\n                    \"pattern\": \"'\",\n                    \"replacement\": \"\"\n                },\n                \"stopfilter\": {\n                    \"type\": \"stop\",\n                    \"stopwords\": [\n                        \"and\",\n                        \"or\"\n                    ]\n                }\n            },\n            \"analyzer\": {\n                \"fulltext\": {\n                    \"type\": \"custom\",\n                    \"tokenizer\": \"standard\",\n                    \"filter\": [\n                        \"replacementfilter\",\n                        \"stopfilter\",\n                        \"lowercase\"\n                    ]\n                }\n            }\n        }\n    }\n}```\n\n3. Put Mapping \n\nPUT http://localhost:9200/queryreadyproducts/queryreadyproduct/_mapping \n```{\n    \"queryreadyproduct\": {\n        \"type\": \"object\",\n        \"_all\": {\n            \"enabled\": false\n        },\n        \"dynamic\": false,\n        \"properties\": {\n            \"Name\": {\n                \"type\": \"string\",\n                \"analyzer\": \"fulltext\",\n                \"index\": \"analyzed\"\n            },\n            \"CustomerId\": {\n                \"type\": \"string\",\n                \"index\": \"not_analyzed\"\n            },\n            \"ProductId\": {\n                \"type\": \"string\",\n                \"index\": \"not_analyzed\"\n            },\n            \"CategoryId\": {\n                \"type\": \"string\",\n                \"index\": \"not_analyzed\"\n            },\n            \"CustomHierarchyId\": {\n                \"type\": \"string\",\n                \"null_value\": \"\",\n                \"index\": \"not_analyzed\"\n            },\n            \"ContextualSKU\": {\n                \"type\": \"string\",\n                \"analyzer\": \"standard\",\n                \"null_value\": \"\"\n            },\n            \"Volume\": {\n                \"type\": \"double\",\n                \"null_value\": \"0\",\n                \"index\": \"not_analyzed\"\n            },\n            \"VolumeMeasureId\": {\n                \"type\": \"string\",\n                \"null_value\": \"\",\n                \"index\": \"not_analyzed\"\n            },\n            \"VolumeString\": {\n                \"type\": \"string\",\n                \"null_value\": \"\",\n                \"analyzer\": \"standard\"\n            },\n            \"BrandId\": {\n                \"type\": \"string\",\n                \"index\": \"not_analyzed\"\n            },\n            \"ManufacturerId\": {\n                \"type\": \"string\",\n                \"index\": \"not_analyzed\"\n            },\n            \"Branded\": {\n                \"type\": \"boolean\",\n                \"index\": \"not_analyzed\"\n            },\n            \"SupplierId\": {\n                \"type\": \"string\",\n                \"null_value\": \"\",\n                \"index\": \"not_analyzed\"\n            },\n            \"ImageId\": {\n                \"type\": \"string\",\n                \"null_value\": \"\",\n                \"index\": \"not_analyzed\"\n            },\n            \"GTIN\": {\n                \"type\": \"string\",\n                \"null_value\": \"\",\n                \"analyzer\": \"keyword\"\n            },\n            \"CreatedOn\": {\n                \"type\": \"date\",\n                \"index\": \"not_analyzed\"\n            }\n        }\n    }\n}```\n\n4.  For setting _last_ts\n\nPUT http://192.168.100.34:9200/_river/queryreadyproducts/brandviewdata.queryreadyproducts?pretty=true \n```{\n    \"_index\": \"_river\",\n    \"type\": \"queryreadyproducts\",\n    \"_id\": \"brandviewdata.queryreadyproducts\",\n    \"exists\": true,\n    \"_source\": {\n        \"mongodb\": {\n            \"_last_ts\": {\n                \"$ts\": 1373647861,\n                \"$inc\": 1\n            }\n        }\n    }\n}```\n\n5. Creating river\n\nPUT http://localhost:9200/_river/queryreadyproducts/brandviewdata.queryreadyproducts \n```{\n    \"type\": \"mongodb\",\n    \"mongodb\": {\n        \"servers\": [\n            {\n                \"host\": \"localhost\",\n                \"port\": \"27017\"\n            }\n        ],\n        \"db\": \"brandviewdata\",\n        \"collection\": \"queryreadyproducts\",\n        \"options\": {\n            \"exclude_fields\": [\n                \"Attributes\",\n                \"Mappings\"\n            ],\n            \"drop_collection\": false\n        }\n    },\n    \"index\": {\n        \"name\": \"queryreadyproducts\",\n        \"type\": \"queryreadyproduct\"\n    }\n}```\n\nThanks,\n\nAditya A",
+			"settings":
+			{
+				"buffer_size": 5242,
+				"line_ending": "Windows",
+				"name": "Hi,"
+			}
+		},
+		{
+			"file": "/C/Dev/elasticsearch/config/templates/template_1.json",
+			"settings":
+			{
+				"buffer_size": 374,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/C/Dev/elasticsearch/plugins/head/_site/index.html",
+			"settings":
+			{
+				"buffer_size": 1890,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "yo/app/scripts/app.js",
+			"settings":
+			{
+				"buffer_size": 1006,
+				"line_ending": "Windows"
+			}
+		}
 	],
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 380.0,
+		"height": 353.0,
 		"selected_items":
 		[
 			[
+				"mark",
+				"Markdown Preview: preview in Browser"
+			],
+			[
+				"makr",
+				"Markdown Preview: preview in Browser"
+			],
+			[
+				"makrdo",
+				"Markdown Preview: preview in Browser"
+			],
+			[
+				"markdo",
+				"Markdown Preview: preview in Browser"
+			],
+			[
+				"packae",
+				"Package Control: Remove Package"
+			],
+			[
+				"markd",
+				"Markdown Preview: preview in Browser"
+			],
+			[
+				"package",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Remove Package"
+			],
+			[
 				"pack",
+				"Package Control: Remove Package"
+			],
+			[
+				"pckage",
 				"Package Control: Install Package"
 			],
 			[
 				"git",
 				"Github: Open File"
-			],
-			[
-				"package",
-				"Package Control: Install Package"
 			]
 		],
-		"width": 512.0
+		"width": 545.0
 	},
 	"console":
 	{
-		"height": 125.0
+		"height": 125.0,
+		"history":
+		[
+		]
 	},
 	"distraction_free":
 	{
@@ -68,10 +240,53 @@
 	},
 	"file_history":
 	[
-		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/es-dms-yo.sublime-project",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb.wiki/Home.markdown",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb.wiki/Home.textile",
+		"/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/pom.xml",
+		"/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/src/main/java/org/elasticsearch/plugin/river/jdbc/JDBCRiverPlugin.java",
+		"/C/Dev/elasticsearch/config/logging.yml",
+		"/Z/Backup/My Documents/Microsoft/keys.xml",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/22/mongodb-river-script-filters.json",
+		"/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/src/main/assemblies/plugin.xml",
+		"/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/src/main/resources/es-plugin.properties",
+		"/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/src/site/site.xml",
+		"/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/nb-configuration.xml",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/index.html",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/85/$ES_HOME/config/templates/template_1.json",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/101/02_test-issue-101.bat",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/101/test-issue-101.js",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/README.md",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/79/mongodb-river-simple.json",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/101/01_create-river.bat",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/101/mongodb-river-simple.json",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/79/test-issue-79-1.js",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/79/02_test-issue-79.bat",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/79/test-issue-79-2.js",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/79/test-issue-79.js",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/79/test-issue-76.js",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/76/mongodb-river-simple.json",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/bower_components/angular-ui-select2/src/select2.js",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/scripts/services/documentService.js",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/scripts/services/authenticationService.js",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/scripts/controllers/document.js",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/scripts/controllers/search/options.js",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/.gitignore",
+		"/D/Users/Richard/Documents/GitHub/test-jav8/.gitignore",
+		"/D/Users/Richard/Documents/GitHub/test-jav8/README.md",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/bower_components/angular-ui-select2/docs/index.html",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/views/search/options.html",
+		"/D/Users/Richard/.m2/repository/lu/flier/jav8/0.6/jav8-0.6.pom",
+		"/D/Users/Richard/.m2/repository/lu/flier/jav8/maven-metadata-local.xml",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/bower_components/angular-ui-select2/test/select2Spec.js",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/scripts/app.js",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/scripts/controllers/main.js",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/bower_components/select2/select2.js",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/karma.conf.js",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/.jshintrc",
+		"/D/Users/Richard/Desktop/Junk/Danilo/npm-debug.log",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/es-dms-yo.sublime-project",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/README.md",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/es-dms-yo.sublime-project",
 		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/index.html",
 		"/D/Users/Richard/Documents/GitHub/es-dms-yo/es-dms-yo.sublime-project",
 		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/directives/esdmsUpload.js",
@@ -118,7 +333,7 @@
 	],
 	"find":
 	{
-		"height": 34.0
+		"height": 43.0
 	},
 	"find_in_files":
 	{
@@ -133,6 +348,20 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"’",
+			"~~",
+			"‘",
+			"”",
+			"“",
+			"1.6.9",
+			"79",
+			"terms",
+			"tags",
+			"simple",
+			"newtag",
+			"_",
+			"documents",
+			"ng-model",
 			"loginController"
 		],
 		"highlight": true,
@@ -141,6 +370,11 @@
 		"regex": false,
 		"replace_history":
 		[
+			"'",
+			"-",
+			"'",
+			"\"",
+			"101"
 		],
 		"reverse": false,
 		"show_context": true,
@@ -151,8 +385,425 @@
 	"groups":
 	[
 		{
+			"selected": 9,
 			"sheets":
 			[
+				{
+					"buffer": 0,
+					"file": "yo/app/scripts/services/sharedService.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 701,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								340,
+								340
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "yo/app/views/documents/search.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3065,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								962,
+								971
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 159.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "yo/app/scripts/controllers/login.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 811,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								367,
+								367
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "yo/app/scripts/services/esdmsAuthenticationService.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 510,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								37,
+								63
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "yo/app/views/main.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1214,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								936,
+								942
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "yo/app/scripts/controllers/navbar.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 740,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								216,
+								216
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "yo/app/scripts/directives/esdmsTagging.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2399,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2382,
+								2382
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "yo/app/scripts/controllers/document.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5688,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15,
+								127
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "/C/Dev/elasticsearch/plugins/river-mongodb/_site/index.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1981,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1480,
+								1480
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "/C/Dev/elasticsearch/plugins/river-mongodb/_site/scripts/app.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1165,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1017,
+								1017
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "yo/app/scripts/services/documentService.js",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 2748,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								222,
+								214
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5242,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5242,
+								5242
+							]
+						],
+						"settings":
+						{
+							"auto_name": "Hi,",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2642.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "/C/Dev/elasticsearch/config/templates/template_1.json",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 374,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "/C/Dev/elasticsearch/plugins/head/_site/index.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1890,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1856,
+								1789
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 300.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "yo/app/scripts/app.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1006,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								28,
+								195
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
 			]
 		}
 	],
@@ -187,9 +838,10 @@
 		]
 	},
 	"menu_visible": true,
+	"project": "es-dms-yo.sublime-project",
 	"replace":
 	{
-		"height": 0.0
+		"height": 80.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -198,20 +850,68 @@
 		"selected_items":
 		[
 			[
+				"select2.js",
+				"app\\bower_components\\angular-ui-select2\\src\\select2.js"
+			],
+			[
+				"docum",
+				"app\\scripts\\controllers\\document.js"
+			],
+			[
+				".j",
+				".jshintrc"
+			],
+			[
+				"select2",
+				"app\\bower_components\\select2\\select2.js"
+			],
+			[
+				"karma",
+				"karma.conf.js"
+			],
+			[
+				"esdmst",
+				"app\\scripts\\directives\\esdmsTagging.js"
+			],
+			[
 				"app",
-				"scripts/app.js"
+				"app\\scripts\\app.js"
+			],
+			[
+				"options",
+				"app\\views\\search\\options.html"
 			],
 			[
 				"index",
-				"index.html"
+				"app\\index.html"
+			],
+			[
+				"esdmsa",
+				"app\\scripts\\directives\\esdmsAuthentication.js"
+			],
+			[
+				"authenticationservice",
+				"app\\scripts\\services\\authenticationService.js"
+			],
+			[
+				"navab",
+				"app\\scripts\\controllers\\navbar.js"
+			],
+			[
+				"main",
+				"app\\scripts\\controllers\\main.js"
+			],
+			[
+				"document",
+				"app\\scripts\\controllers\\document.js"
+			],
+			[
+				"option",
+				"app\\scripts\\controllers\\search\\options.js"
 			],
 			[
 				"esdm",
 				"scripts/directives/esdmsAuthentication.js"
-			],
-			[
-				"main",
-				"views/main.html"
 			],
 			[
 				"login",
@@ -228,10 +928,6 @@
 			[
 				"fileup",
 				"scripts/controllers/documents/FileUpload.js"
-			],
-			[
-				"options",
-				"scripts/controllers/search/options.js"
 			],
 			[
 				"new",
@@ -270,10 +966,6 @@
 				"scripts/services/searchService.js"
 			],
 			[
-				"document",
-				"scripts/services/documentService.js"
-			],
-			[
 				"authen",
 				"scripts/services/authenticationService.js"
 			],
@@ -304,10 +996,24 @@
 		],
 		"width": 380.0
 	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
 	"show_minimap": true,
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 150.0,
-	"status_bar_visible": true
+	"side_bar_width": 214.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
 }

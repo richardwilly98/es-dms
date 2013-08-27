@@ -30,13 +30,20 @@ package test.github.richardwilly98.esdms.rest;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.elasticsearch.common.io.Streams.copyToBytesFromClasspath;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -46,15 +53,6 @@ import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.rest.RestDocumentService;
 import com.github.richardwilly98.esdms.rest.RestItemBaseService;
 import com.google.common.collect.ImmutableSet;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.multipart.FormDataBodyPart;
-import com.sun.jersey.multipart.FormDataMultiPart;
-//import javax.ws.rs.PathParam;
-//import javax.ws.rs.core.Response;
-
-//import com.sun.jersey.multipart.FormDataParam;
 
 public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 	// public class TestRestDocumentService extends
@@ -104,11 +102,11 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			Assert.assertNotNull(document);
 			log.debug("New document: " + document);
 
-			ClientResponse response = resource()
+			Response response = target()
 					.path(RestDocumentService.DOCUMENTS_PATH)
 					.path(document.getId()).path("checkout")
-					.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
-					.post(ClientResponse.class);
+					.request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+					.post(null);
 			log.debug(String.format("status: %s", response.getStatus()));
 			Assert.assertTrue(response.getStatus() == Status.NO_CONTENT
 					.getStatusCode());
@@ -125,18 +123,17 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 					adminCredential.getUsername()));
 			Assert.assertNotNull(attributes.get(Document.MODIFIED_DATE));
 
-			response = resource().path(RestDocumentService.DOCUMENTS_PATH)
+			response = target().path(RestDocumentService.DOCUMENTS_PATH)
 					.path(document.getId()).path("checkout")
-					.cookie(adminCookie).type(MediaType.APPLICATION_JSON)
-					.post(ClientResponse.class);
+					.request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+					.post(null);
 			log.debug(String.format("status: %s", response.getStatus()));
 			Assert.assertTrue(response.getStatus() == Status.CONFLICT
 					.getStatusCode());
 
-			response = resource().path(RestDocumentService.DOCUMENTS_PATH)
-					.path(document.getId()).path("checkin").cookie(adminCookie)
-					.type(MediaType.APPLICATION_JSON)
-					.post(ClientResponse.class);
+			response = target().path(RestDocumentService.DOCUMENTS_PATH)
+					.path(document.getId()).path("checkin").request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+					.post(null);
 			log.debug(String.format("status: %s", response.getStatus()));
 			Assert.assertTrue(response.getStatus() == Status.NO_CONTENT
 					.getStatusCode());
@@ -149,10 +146,9 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 					.equals(Document.DocumentStatus.AVAILABLE.getStatusCode()));
 			Assert.assertFalse(attributes.containsKey(Document.LOCKED_BY));
 
-			response = resource().path(RestDocumentService.DOCUMENTS_PATH)
-					.path(document.getId()).path("checkin").cookie(adminCookie)
-					.type(MediaType.APPLICATION_JSON)
-					.post(ClientResponse.class);
+			response = target().path(RestDocumentService.DOCUMENTS_PATH)
+					.path(document.getId()).path("checkin").request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+					.post(null);
 			log.debug(String.format("status: %s", response.getStatus()));
 			Assert.assertTrue(response.getStatus() == Status.CONFLICT
 					.getStatusCode());
@@ -207,18 +203,20 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			Assert.assertNotNull(document);
 			log.debug("New document: " + document);
 
-			ClientResponse response = resource()
+			Response response = target()
 					.path(RestDocumentService.DOCUMENTS_PATH)
 					.path(document.getId()).path("download")
+					.request()
 					.cookie(adminCookie)
-					// .type(MediaType.APPLICATION_JSON)
-					.get(ClientResponse.class);
+					.get();
+			
 			log.debug(String.format("status: %s", response.getStatus()));
 			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
 
-			log.debug("Content type: " + response.getType().getType());
-			InputStream stream = response.getEntityInputStream();
+			//log.debug("Content type: " + response.getType().getType());
+			InputStream stream = response.readEntity(BufferedInputStream.class);
 			Assert.assertNotNull(stream);
+			stream.close();
 		} catch (Throwable t) {
 			log.error("testDownloadDocument fail", t);
 			Assert.fail();
@@ -234,15 +232,15 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 					"text/html",
 					"/test/github/richardwilly98/services/test-attachment.html");
 			Assert.assertNotNull(document);
-			ClientResponse response = resource()
+			Response response = target()
 					.path(RestDocumentService.DOCUMENTS_PATH)
-					.path(RestItemBaseService.SEARCH_PATH).path(criteria)
+					.path(RestItemBaseService.SEARCH_PATH).path(criteria).request()
 					.cookie(adminCookie).accept(MediaType.APPLICATION_JSON)
-					.get(ClientResponse.class);
+					.get();
 			log.debug(String.format("status: %s", response.getStatus()));
 			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
 			SearchResult<Document> documents = response
-					.getEntity(new GenericType<SearchResult<Document>>() {
+					.readEntity(new GenericType<SearchResult<Document>>() {
 					});
 			Assert.assertNotNull(documents);
 			Assert.assertTrue(documents.getTotalHits() >= 1);
@@ -405,15 +403,15 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 					+ new String(version.getFile().getContent(), "UTF-8")
 					+ "<<<<<<");
 
-			ClientResponse response = resource()
+			Response response = target()
 					.path(RestDocumentService.DOCUMENTS_PATH)
-					.path(RestItemBaseService.SEARCH_PATH).path(criteria)
+					.path(RestItemBaseService.SEARCH_PATH).path(criteria).request()
 					.cookie(adminCookie).accept(MediaType.APPLICATION_JSON)
-					.get(ClientResponse.class);
+					.get();
 			log.debug(String.format("status: %s", response.getStatus()));
 			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
 			SearchResult<Document> documents = response
-					.getEntity(new GenericType<SearchResult<Document>>() {
+					.readEntity(new GenericType<SearchResult<Document>>() {
 					});
 			Assert.assertNotNull(documents);
 			Assert.assertTrue(documents.getTotalHits() >= 1);
@@ -428,11 +426,11 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			throws Throwable {
 		log.debug("******* setCurrentVersion  *********");
 
-		ClientResponse response = resource()
+		Response response = target()
 				.path(RestDocumentService.DOCUMENTS_PATH).path(documentId)
 				.path(RestDocumentService.VERSIONS_PATH).path(versionId)
-				.path(RestDocumentService.CURRENT_PATH).cookie(adminCookie)
-				.post(ClientResponse.class);
+				.path(RestDocumentService.CURRENT_PATH).request().cookie(adminCookie)
+				.post(null);
 		log.debug(String.format(
 				"setCurrentVersion clientResponse location: %s",
 				response.getLocation()));
@@ -462,12 +460,11 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 				MediaType.valueOf(contentType));
 		form.bodyPart(p);
 
-		ClientResponse response = resource()
+		Response response = target()
 				.path(RestDocumentService.DOCUMENTS_PATH).path(documentId)
 				.path(RestDocumentService.VERSIONS_PATH).path(versionId)
-				.path(RestDocumentService.UPDATE_PATH).cookie(adminCookie)
-				.type(MediaType.MULTIPART_FORM_DATA)
-				.post(ClientResponse.class, form);
+				.path(RestDocumentService.UPDATE_PATH).request(MediaType.MULTIPART_FORM_DATA_TYPE).cookie(adminCookie)
+				.post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE));
 		log.debug(String.format("updateVersion clientResponse location: %s",
 				response.getLocation()));
 		log.debug(String.format("updateVersion clientResponse cookie: %s",
@@ -497,11 +494,10 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 				MediaType.valueOf(contentType));
 		form.bodyPart(p);
 
-		ClientResponse response = resource()
+		Response response = target()
 				.path(RestDocumentService.DOCUMENTS_PATH).path(documentId)
-				.path(RestDocumentService.UPLOAD_PATH).cookie(adminCookie)
-				.type(MediaType.MULTIPART_FORM_DATA)
-				.post(ClientResponse.class, form);
+				.path(RestDocumentService.UPLOAD_PATH).request().cookie(adminCookie)
+				.post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA));
 		log.debug(String.format("createVersion clientResponse location: %s",
 				response.getLocation()));
 		log.debug(String.format("createVersion clientResponse cookie: %s",
@@ -531,12 +527,11 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 				MediaType.valueOf(contentType));
 		form.bodyPart(p);
 
-		ClientResponse response = resource()
+		Response response = target()
 				.path(RestDocumentService.DOCUMENTS_PATH).path(documentId)
 				.path(RestDocumentService.VERSIONS_PATH).path(versionId)
-				.path(RestDocumentService.UPLOAD_PATH).cookie(adminCookie)
-				.type(MediaType.MULTIPART_FORM_DATA)
-				.post(ClientResponse.class, form);
+				.path(RestDocumentService.UPLOAD_PATH).request().cookie(adminCookie)
+				.post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE));
 		log.debug(String.format(
 				"createFromVersion clientResponse location: %s",
 				response.getLocation()));
@@ -566,11 +561,10 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 				MediaType.valueOf(contentType));
 		form.bodyPart(p);
 
-		ClientResponse response = resource()
+		Response response = target()
 				.path(RestDocumentService.DOCUMENTS_PATH)
-				.path(RestDocumentService.UPLOAD_PATH).cookie(adminCookie)
-				.type(MediaType.MULTIPART_FORM_DATA)
-				.post(ClientResponse.class, form);
+				.path(RestDocumentService.UPLOAD_PATH).request().cookie(adminCookie)
+				.post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE));
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.CREATED
 				.getStatusCode());
@@ -581,11 +575,10 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 
 	private void updateDocument(Document document)
 			throws Throwable {
-		ClientResponse response = resource()
+		Response response = target()
 				.path(RestDocumentService.DOCUMENTS_PATH)
-				.path(RestDocumentService.UPDATE_PATH).cookie(adminCookie)
-				.type(MediaType.APPLICATION_JSON)
-				.put(ClientResponse.class, document);
+				.path(RestDocumentService.UPDATE_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+				.put(Entity.entity(document, MediaType.APPLICATION_JSON));
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.OK
 				.getStatusCode());
@@ -599,24 +592,23 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 	}
 
 	private Document getMetadata(String id) throws Throwable {
-		ClientResponse response = resource()
+		Response response = target()
 				.path(RestDocumentService.DOCUMENTS_PATH).path(id)
-				.path(RestDocumentService.METADATA_PATH).cookie(adminCookie)
-				.type(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-				.get(ClientResponse.class);
+				.path(RestDocumentService.METADATA_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+				.get();
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.OK
 				.getStatusCode());
-		Document document = response.getEntity(Document.class);
+		Document document = response.readEntity(Document.class);
 		Assert.assertNotNull(document);
 		return document;
 	}
 
 	private void markDeletedDocument(String id) throws Throwable {
-		ClientResponse response = resource()
+		Response response = target()
 				.path(RestDocumentService.DOCUMENTS_PATH).path(id)
-				.path(RestDocumentService.MARKDELETED_PATH).cookie(adminCookie)
-				.type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
+				.path(RestDocumentService.MARKDELETED_PATH).request().cookie(adminCookie)
+				.post(null);
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.NO_CONTENT
 				.getStatusCode());

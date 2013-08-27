@@ -29,12 +29,15 @@ package com.github.richardwilly98.esdms.services;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import javax.inject.Singleton;
+
 import org.apache.log4j.Logger;
 import org.elasticsearch.common.settings.ImmutableSettings;
 
 import com.github.richardwilly98.esdms.SettingsImpl;
 import com.github.richardwilly98.esdms.api.Settings;
 
+@Singleton
 public class BootstrapProvider implements BootstrapService {
 
 	private static Logger log = Logger.getLogger(BootstrapProvider.class);
