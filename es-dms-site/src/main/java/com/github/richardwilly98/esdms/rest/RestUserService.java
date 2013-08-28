@@ -29,6 +29,7 @@ package com.github.richardwilly98.esdms.rest;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -42,7 +43,6 @@ import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.HashService;
 import com.github.richardwilly98.esdms.services.UserService;
-import com.google.inject.Inject;
 
 @Path(RestUserService.USERS_PATH)
 public class RestUserService extends RestItemBaseService<User> {

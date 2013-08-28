@@ -26,6 +26,7 @@ package com.github.richardwilly98.esdms.rest;
  * #L%
  */
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -48,7 +49,6 @@ import com.github.richardwilly98.esdms.rest.entity.FacetedQuery;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.SearchService;
-import com.google.inject.Inject;
 
 @Path(RestSearchService.SEARCH_PATH)
 public class RestSearchService extends RestServiceBase {

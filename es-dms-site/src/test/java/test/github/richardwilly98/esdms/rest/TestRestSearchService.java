@@ -209,10 +209,10 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
 				MediaType.valueOf(contentType));
 		form.bodyPart(p);
 
-		Response response = target().path(RestDocumentService.DOCUMENTS_PATH)
-				.path(RestDocumentService.UPLOAD_PATH)
-				.request(MediaType.MULTIPART_FORM_DATA).cookie(adminCookie)
-				.post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA));
+		Response response = target()
+				.path(RestDocumentService.DOCUMENTS_PATH)
+				.path(RestDocumentService.UPLOAD_PATH).request().cookie(adminCookie)
+				.post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE));
 		log.debug(String.format("status: %s", response.getStatus()));
 		Assert.assertTrue(response.getStatus() == Status.CREATED
 				.getStatusCode());

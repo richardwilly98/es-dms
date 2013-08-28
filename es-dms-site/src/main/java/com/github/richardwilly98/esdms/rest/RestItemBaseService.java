@@ -56,7 +56,6 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.BaseService;
-//import com.google.inject.Inject;
 
 /*
  * CRUD methods MUST follow http response status code from http://www.restapitutorial.com/lessons/httpmethods.html

@@ -213,10 +213,12 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			log.debug(String.format("status: %s", response.getStatus()));
 			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
 
-			//log.debug("Content type: " + response.getType().getType());
-			InputStream stream = response.readEntity(BufferedInputStream.class);
+			// TODO: Check how binary content is provided in Jersey 2
+//			log.debug("Media type: " + response.getMediaType());
+//			log.debug("Entity: " + response.getEntity());
+			String stream = response.readEntity(String.class);
 			Assert.assertNotNull(stream);
-			stream.close();
+//			stream.close();
 		} catch (Throwable t) {
 			log.error("testDownloadDocument fail", t);
 			Assert.fail();
@@ -463,7 +465,7 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 		Response response = target()
 				.path(RestDocumentService.DOCUMENTS_PATH).path(documentId)
 				.path(RestDocumentService.VERSIONS_PATH).path(versionId)
-				.path(RestDocumentService.UPDATE_PATH).request(MediaType.MULTIPART_FORM_DATA_TYPE).cookie(adminCookie)
+				.path(RestDocumentService.UPDATE_PATH).request().cookie(adminCookie)
 				.post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE));
 		log.debug(String.format("updateVersion clientResponse location: %s",
 				response.getLocation()));

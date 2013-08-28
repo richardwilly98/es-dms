@@ -84,8 +84,8 @@ public class EsJerseyServletModule extends ServletModule {
 
 	private void bindings() {
 		/* bind jackson converters for JAXB/JSON serialization */
-//		bind(MessageBodyReader.class).to(JacksonJsonProvider.class);
-//		bind(MessageBodyWriter.class).to(JacksonJsonProvider.class);
+		bind(MessageBodyReader.class).to(JacksonJsonProvider.class);
+		bind(MessageBodyWriter.class).to(JacksonJsonProvider.class);
 
 		// Route all requests through GuiceContainer
 //		serve(this.securityFilterPath).with(GuiceContainer.class, params);

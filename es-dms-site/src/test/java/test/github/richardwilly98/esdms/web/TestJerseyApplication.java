@@ -1,4 +1,4 @@
-package com.github.richardwilly98.esdms.web;
+package test.github.richardwilly98.esdms.web;
 
 /*
  * #%L
@@ -34,10 +34,10 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.jvnet.hk2.guice.bridge.api.GuiceBridge;
 import org.jvnet.hk2.guice.bridge.api.GuiceIntoHK2Bridge;
 
-public class JerseyApplication extends ResourceConfig {
+public class TestJerseyApplication extends ResourceConfig {
 
 	@Inject
-	public JerseyApplication(ServiceLocator serviceLocator) {
+	public TestJerseyApplication(ServiceLocator serviceLocator) {
 		super(MultiPartFeature.class);
 		packages("com.github.richardwilly98.esdms.rest",
 				"com.fasterxml.jackson.jaxrs");
@@ -51,7 +51,7 @@ public class JerseyApplication extends ResourceConfig {
 		// guiceBridge
 		// .bridgeGuiceInjector(Guice.createInjector(new
 		// EsJerseyServletModule("/api/*")));
-		guiceBridge.bridgeGuiceInjector(RestGuiceServletConfig.injector);
+		guiceBridge.bridgeGuiceInjector(TestRestGuiceServletConfig.injector);
 	}
 
 }

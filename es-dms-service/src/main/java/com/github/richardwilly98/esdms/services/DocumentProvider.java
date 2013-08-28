@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.services;
  * #L%
  */
 
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Maps.newHashMap;
@@ -35,7 +34,6 @@ import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -117,6 +115,7 @@ public class DocumentProvider extends ProviderBase<Document> implements
 	}
 
 	// @RequiresPermissions(PROFILE_READ_PERMISSION)
+	@SuppressWarnings("unchecked")
 	@Override
 	public Document getMetadata(String id) throws ServiceException {
 		try {
@@ -130,6 +129,25 @@ public class DocumentProvider extends ProviderBase<Document> implements
 				log.info(String.format("Cannot find item %s", id));
 				return null;
 			}
+			// else {
+			// for(String key :response.getFields().keySet() ){
+			// log.info(String.format("1. Field %s - %s - %s", key,
+			// response.getField(key).getValue().getClass(),
+			// response.getField(key).getValue()));
+			// log.info(String.format("2. Field %s - %s - %s", key,
+			// response.getField(key).getValues().getClass(),
+			// response.getField(key).getValues()));
+			// if (response.getField(key).getValues() != null &&
+			// response.getField(key).getValues().size() > 0) {
+			// log.info(String.format("3. Field %s - %s", key,
+			// response.getField(key).getValues().get(0)));
+			// }
+			// }
+			// }
+			// XContentBuilder builder = JsonXContent.contentBuilder();
+			// response.toXContent(builder, null);
+			// log.info(String.format("get- response: %s",
+			// builder.prettyPrint().string()));
 
 			checkNotNull(response.getField("name"));
 			String name = response.getField("name").getValue().toString();
@@ -142,10 +160,18 @@ public class DocumentProvider extends ProviderBase<Document> implements
 			}
 			Set<String> tags = newHashSet();
 			if (response.getField("tags") != null
-					&& response.getField("tags").getValue() instanceof List<?>) {
-				tags.addAll((List<String>) response.getField("tags").getValue());
+					&& response.getField("tags").getValues().size() > 0) {
+				for (Object tag : response.getField("tags")) {
+					tags.add(String.valueOf(tag));
+				}
+				// tags.addAll((List<String>)
+				// response.getField("tags").getValue());
 
 			}
+			// else if (response.getField("tags") != null &&
+			// response.getField("tags").getValue() instanceof String) {
+			// tags.add(String.valueOf(response.getField("tags").getValue()));
+			// }
 			Document document = new DocumentImpl.Builder().tags(tags).id(id)
 					.name(name).attributes(attributes).roles(null).build();
 			return document;

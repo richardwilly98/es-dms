@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.rest;
  * #L%
  */
 
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.inject.Inject;
@@ -43,10 +42,7 @@ import com.github.richardwilly98.esdms.SessionImpl;
 import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
-//import com.google.inject.Inject;
-//import com.google.inject.servlet.RequestScoped;
 
-//@RequestScoped
 @Path(RestAuthencationService.AUTH_PATH)
 public class RestAuthencationService extends RestItemBaseService<SessionImpl> {
 
@@ -74,10 +70,14 @@ public class RestAuthencationService extends RestItemBaseService<SessionImpl> {
 			log.trace("getPath: " + url.getPath());
 			String token = authenticationService.login(credential);
 			if (log.isTraceEnabled()) {
-				log.trace(String.format("Create cookie %s: [%s]", ES_DMS_TICKET, token));
+				log.trace(String.format("Create cookie %s: [%s]",
+						ES_DMS_TICKET, token));
 			}
-			return Response.ok().entity(new AuthenticationResponse("AUTHENTICATED", token))
-					.cookie(new NewCookie(ES_DMS_TICKET, token, "/", null, 1, url.getBaseUri().getHost(), 30000, false)).build();
+			return Response
+					.ok()
+					.entity(new AuthenticationResponse("AUTHENTICATED", token))
+					.cookie(new NewCookie(ES_DMS_TICKET, token, "/", null, 1,
+							url.getBaseUri().getHost(), 30000, false)).build();
 		} catch (Throwable t) {
 			log.error("login failed", t);
 			throw new RestServiceException(t.getLocalizedMessage());
@@ -101,7 +101,7 @@ public class RestAuthencationService extends RestItemBaseService<SessionImpl> {
 			throw new RestServiceException(t.getLocalizedMessage());
 		}
 	}
-	
+
 	private class AuthenticationResponse {
 		private final String status;
 		private final String token;
@@ -110,10 +110,12 @@ public class RestAuthencationService extends RestItemBaseService<SessionImpl> {
 			this.status = status;
 			this.token = token;
 		}
+
 		@SuppressWarnings("unused")
 		public String getToken() {
 			return token;
 		}
+
 		@SuppressWarnings("unused")
 		public String getStatus() {
 			return status;

@@ -44,9 +44,10 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
@@ -99,10 +100,11 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
 		// Boolean.TRUE);
 		// config.getFeatures().add(JacksonJsonProvider.class);
 		// restClient = Client.create(config);
-		Configuration configuration = new ClientConfig();
+		ClientConfig configuration = new ClientConfig();
+		configuration.register(MultiPartFeature.class);
 		// configuration.register(new JacksonFeature());
 		restClient = ClientBuilder.newClient(configuration);
-		restClient.register(new JacksonFeature());
+		//restClient.register(new JacksonFeature());
 		// restClient = Client.create(new DefaultClientConfig(
 		// JacksonJaxbJsonProvider.class));
 		// securedClient = createSecuredClient();
@@ -202,6 +204,11 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
 		webAppContext.setParentLoaderPriority(true);
 		webAppContext.addEventListener(new TestRestGuiceServletConfig());
 		webAppContext.addFilter(GuiceFilter.class, "/*", null);
+		ServletHolder servlet = new ServletHolder();
+		servlet.setName("jersey-servlet");
+		servlet.setClassName("org.glassfish.jersey.servlet.ServletContainer");
+		servlet.getInitParameters().put("javax.ws.rs.Application", "test.github.richardwilly98.esdms.web.TestJerseyApplication");
+		webAppContext.addServlet(servlet, "/*");
 
 		server.setHandler(webAppContext);
 		server.start();
