@@ -39,7 +39,7 @@ public class JerseyApplication extends ResourceConfig {
 	@Inject
 	public JerseyApplication(ServiceLocator serviceLocator) {
 		super(MultiPartFeature.class);
-		packages("com.github.richardwilly98.esdms.rest",
+		packages("com.github.richardwilly98.esdms.rest", "com.github.richardwilly98.esdms.web",
 				"com.fasterxml.jackson.jaxrs");
 
 		System.out.println("Registering injectables...");
@@ -48,9 +48,6 @@ public class JerseyApplication extends ResourceConfig {
 
 		GuiceIntoHK2Bridge guiceBridge = serviceLocator
 				.getService(GuiceIntoHK2Bridge.class);
-		// guiceBridge
-		// .bridgeGuiceInjector(Guice.createInjector(new
-		// EsJerseyServletModule("/api/*")));
 		guiceBridge.bridgeGuiceInjector(RestGuiceServletConfig.injector);
 	}
 

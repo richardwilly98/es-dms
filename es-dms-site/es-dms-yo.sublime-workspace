@@ -48,14 +48,6 @@
 	"buffers":
 	[
 		{
-			"file": "yo/app/scripts/services/sharedService.js",
-			"settings":
-			{
-				"buffer_size": 701,
-				"line_ending": "Windows"
-			}
-		},
-		{
 			"file": "yo/app/views/documents/search.html",
 			"settings":
 			{
@@ -112,18 +104,72 @@
 			}
 		},
 		{
+			"contents": "<!doctype html>\n<html lang=\"en\" data-ng-app=\"mongoDBRiverApp\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>MongoDB River Plugin for ElasticSearch</title>\n   <link rel=\"stylesheet\" href=\"//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc1/css/bootstrap.min.css\">\n  <script type=\"text/javascript\" src=\"https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js\"></script>\n  <script type=\"text/javascript\" src=\"https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-resource.min.js\"></script>\n  <script type=\"text/javascript\" src=\"https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-cookies.min.js\"></script>\n  <script type=\"text/javascript\" src=\"//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.5.0/ui-bootstrap-tpls.min.js\"></script>\n  <script type=\"text/javascript\" src=\"//cdnjs.cloudflare.com/ajax/libs/lodash.js/1.3.1/lodash.min.js\"></script>\n  <link rel=\"icon\" href=\"images/favicon.ico\" type=\"image/x-icon\">\n</head>\n<body>\n	<h3>MongoDB River Administration</h3>\n	<div data-ng-controller=\"MainCtrl\">\n		<tabset>\n			<tab heading=\"Home\">\n				<div class=\"content\">\n          <div class=\"content\">Click \"List\" to get the mongodb river list installed.</div>\n					<button type=\"button\" class=\"btn btn-small btn-primary\" data-ng-click=\"list('mongodb')\">List</button>\n          <hr/>\n          <div data-ng-repeat=\"river in rivers\">\n            <div class=\"panel panel-info\">\n              <div class=\"panel-heading\">River: {{ river._name }} - Status: \n                <span data-ng-show=\"!river._enabled\" class=\"label label-warning\">Disabled</span>\n                <span data-ng-show=\"river._enabled\" class=\"label label-success\">Enabled</span>\n              </div>\n              Settings: \n                <pre>{{ toString(river) }}</pre>\n              <br/>\n              Actions: \n              <span class=\"btn btn-small btn-success\" ng-disabled=\"river._enabled\" data-ng-click=\"start(river._name)\">Start</span>\n              <span class=\"btn btn-small btn-danger\" ng-disabled=\"!river._enabled\" data-ng-click=\"stop(river._name)\">Stop</span>\n            </div>\n          </div>\n				</div>\n			</tab>\n			<tab heading=\"Logging\">Logging</tab>\n		</tabset>\n	</div>\n	<script type=\"text/javascript\" src=\"scripts/app.js\"></script>\n</body>\n</html>",
 			"file": "/C/Dev/elasticsearch/plugins/river-mongodb/_site/index.html",
+			"file_size": 2299,
+			"file_write_time": 130204516837396961,
 			"settings":
 			{
-				"buffer_size": 1981,
+				"buffer_size": 2257,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/C/Dev/elasticsearch/plugins/river-mongodb/_site/scripts/app.js",
+			"file": "/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/src/test/java/org/elasticsearch/river/jdbc/strategy/simple/SimpleRiverMouthTests.java",
 			"settings":
 			{
-				"buffer_size": 1165,
+				"buffer_size": 2146,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/src/test/java/org/elasticsearch/river/jdbc/strategy/simple/AbstractRiverTest.java",
+			"settings":
+			{
+				"buffer_size": 5848,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/D/temp/test-jersey-2.0/pom.xml",
+			"settings":
+			{
+				"buffer_size": 2098,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/src/main/java/org/elasticsearch/river/mongodb/MongoDBRiver.java",
+			"settings":
+			{
+				"buffer_size": 53207,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/D/Users/Richard/Documents/GitHub/jersey/examples/json-jackson/pom.xml",
+			"settings":
+			{
+				"buffer_size": 4040,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/README.md",
+			"settings":
+			{
+				"buffer_size": 6293,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "'use strict';\n\nvar mongoDBRiverApp = angular.module('mongoDBRiverApp', ['ngResource', 'ui.bootstrap']);\n\nmongoDBRiverApp.controller('MainCtrl', function ($log, $scope, $resource) {\n  var riverResource = $resource('/_river/:type/:river/:action' , {type:'@type', river:'@river'}, {\n	  list: {method:'GET', params: {action: '_list'}, isArray: true},\n      start: {method:'POST', params: {action: '_start'}},\n      stop: {method:'POST', params: {action: '_stop'}}\n    });\n\n  $scope.rivers = [];\n  $scope.type = null;\n  $scope.list = function(type){\n    $log.log('list river type: ' + type);\n    $scope.type = type;\n    var rivers = riverResource.list({'type': type}, function() {\n      $log.log('rivers count: ' + rivers.length);\n      $scope.rivers = rivers;\n    });\n  };\n  $scope.start = function(name){\n    $log.log('start: ' + name);\n    riverResource.start({'type': $scope.type, 'river': name}, function(river, response) {\n      setRiverEnabled(name, true);\n      // var river = _.find($scope.rivers, {'_name': name});\n      // if (river !== undefined) {\n      //   river._enabled = true;\n      // }\n    });\n  };\n  $scope.stop = function(name){\n    $log.log('stop: ' + name);\n    riverResource.stop({'type': $scope.type, 'river': name}, function() {\n            setRiverEnabled(name, false);\n    });\n  };\n  $scope.toString = function(object){\n    var value = JSON.stringify(angular.copy(object), undefined, 2);\n    return value;\n  };\n  function setRiverEnabled(name, enabled) {\n      var river = _.find($scope.rivers, {'_name': name});\n      if (river !== undefined) {\n        river._enabled = enabled;\n      }\n  }\n});\n",
+			"file": "/C/Dev/elasticsearch/plugins/river-mongodb/_site/scripts/app.js",
+			"file_size": 1668,
+			"file_write_time": 130204513379309170,
+			"settings":
+			{
+				"buffer_size": 1620,
 				"line_ending": "Windows"
 			}
 		},
@@ -133,31 +179,6 @@
 			{
 				"buffer_size": 2748,
 				"line_ending": "Windows"
-			}
-		},
-		{
-			"contents": "Hi,\n\nIt was a mistake from my end regarding setting _last_ts. I was not building the JSON in the proper format.\nBut setting _last_ts is not making any difference in my indexing process.\n\nIn my oplog the number of documents(inserted) for a collection called \"queryreadyproducts\" are  811499. I set the _last_ts from an operation which happened towards the end of the collection.\n\nI am having the following problems:\n1. When I executed the steps below its not indexing at all.\n2. If I changed the id in step 5 from \"brandviewdata.queryreadyproducts\" to \"_meta\" its indexing everything from oplog not filtering on \"_last_ts\" parameter set.\n\nPlease go through the steps and let me know where I am making a mistake.\n\nHere are the log of steps I followed from the beginning:\n\n1. HEAD http://localhost:9200/queryreadyproducts \n\n2. Updating index settings\n\nPUT http://localhost:9200/queryreadyproducts \n```{\n    \"index\": {\n        \"analysis\": {\n            \"filter\": {\n                \"replacementfilter\": {\n                    \"type\": \"pattern_replace\",\n                    \"pattern\": \"'\",\n                    \"replacement\": \"\"\n                },\n                \"stopfilter\": {\n                    \"type\": \"stop\",\n                    \"stopwords\": [\n                        \"and\",\n                        \"or\"\n                    ]\n                }\n            },\n            \"analyzer\": {\n                \"fulltext\": {\n                    \"type\": \"custom\",\n                    \"tokenizer\": \"standard\",\n                    \"filter\": [\n                        \"replacementfilter\",\n                        \"stopfilter\",\n                        \"lowercase\"\n                    ]\n                }\n            }\n        }\n    }\n}```\n\n3. Put Mapping \n\nPUT http://localhost:9200/queryreadyproducts/queryreadyproduct/_mapping \n```{\n    \"queryreadyproduct\": {\n        \"type\": \"object\",\n        \"_all\": {\n            \"enabled\": false\n        },\n        \"dynamic\": false,\n        \"properties\": {\n            \"Name\": {\n                \"type\": \"string\",\n                \"analyzer\": \"fulltext\",\n                \"index\": \"analyzed\"\n            },\n            \"CustomerId\": {\n                \"type\": \"string\",\n                \"index\": \"not_analyzed\"\n            },\n            \"ProductId\": {\n                \"type\": \"string\",\n                \"index\": \"not_analyzed\"\n            },\n            \"CategoryId\": {\n                \"type\": \"string\",\n                \"index\": \"not_analyzed\"\n            },\n            \"CustomHierarchyId\": {\n                \"type\": \"string\",\n                \"null_value\": \"\",\n                \"index\": \"not_analyzed\"\n            },\n            \"ContextualSKU\": {\n                \"type\": \"string\",\n                \"analyzer\": \"standard\",\n                \"null_value\": \"\"\n            },\n            \"Volume\": {\n                \"type\": \"double\",\n                \"null_value\": \"0\",\n                \"index\": \"not_analyzed\"\n            },\n            \"VolumeMeasureId\": {\n                \"type\": \"string\",\n                \"null_value\": \"\",\n                \"index\": \"not_analyzed\"\n            },\n            \"VolumeString\": {\n                \"type\": \"string\",\n                \"null_value\": \"\",\n                \"analyzer\": \"standard\"\n            },\n            \"BrandId\": {\n                \"type\": \"string\",\n                \"index\": \"not_analyzed\"\n            },\n            \"ManufacturerId\": {\n                \"type\": \"string\",\n                \"index\": \"not_analyzed\"\n            },\n            \"Branded\": {\n                \"type\": \"boolean\",\n                \"index\": \"not_analyzed\"\n            },\n            \"SupplierId\": {\n                \"type\": \"string\",\n                \"null_value\": \"\",\n                \"index\": \"not_analyzed\"\n            },\n            \"ImageId\": {\n                \"type\": \"string\",\n                \"null_value\": \"\",\n                \"index\": \"not_analyzed\"\n            },\n            \"GTIN\": {\n                \"type\": \"string\",\n                \"null_value\": \"\",\n                \"analyzer\": \"keyword\"\n            },\n            \"CreatedOn\": {\n                \"type\": \"date\",\n                \"index\": \"not_analyzed\"\n            }\n        }\n    }\n}```\n\n4.  For setting _last_ts\n\nPUT http://192.168.100.34:9200/_river/queryreadyproducts/brandviewdata.queryreadyproducts?pretty=true \n```{\n    \"_index\": \"_river\",\n    \"type\": \"queryreadyproducts\",\n    \"_id\": \"brandviewdata.queryreadyproducts\",\n    \"exists\": true,\n    \"_source\": {\n        \"mongodb\": {\n            \"_last_ts\": {\n                \"$ts\": 1373647861,\n                \"$inc\": 1\n            }\n        }\n    }\n}```\n\n5. Creating river\n\nPUT http://localhost:9200/_river/queryreadyproducts/brandviewdata.queryreadyproducts \n```{\n    \"type\": \"mongodb\",\n    \"mongodb\": {\n        \"servers\": [\n            {\n                \"host\": \"localhost\",\n                \"port\": \"27017\"\n            }\n        ],\n        \"db\": \"brandviewdata\",\n        \"collection\": \"queryreadyproducts\",\n        \"options\": {\n            \"exclude_fields\": [\n                \"Attributes\",\n                \"Mappings\"\n            ],\n            \"drop_collection\": false\n        }\n    },\n    \"index\": {\n        \"name\": \"queryreadyproducts\",\n        \"type\": \"queryreadyproduct\"\n    }\n}```\n\nThanks,\n\nAditya A",
-			"settings":
-			{
-				"buffer_size": 5242,
-				"line_ending": "Windows",
-				"name": "Hi,"
-			}
-		},
-		{
-			"file": "/C/Dev/elasticsearch/config/templates/template_1.json",
-			"settings":
-			{
-				"buffer_size": 374,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/C/Dev/elasticsearch/plugins/head/_site/index.html",
-			"settings":
-			{
-				"buffer_size": 1890,
-				"line_ending": "Unix"
 			}
 		},
 		{
@@ -240,6 +261,27 @@
 	},
 	"file_history":
 	[
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/bower_components/angular/angular.js",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/bower_components/angular/.bower.json",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/bower_components/angular/bower.json",
+		"/D/Users/Richard/Desktop/consoleText.txt",
+		"/C/Users/Richard/.mongorc.js",
+		"/C/Users/Richard/.dbshell",
+		"/D/Users/Richard/Documents/GitHub/jersey2-guice-example/pom.xml",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/bower.json",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/node_modules/grunt-karma/package.json",
+		"/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/src/test/java/org/elasticsearch/river/jdbc/strategy/simple/AbstractRiverNodeTest.java",
+		"/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/src/test/java/org/elasticsearch/river/jdbc/strategy/simple/SimpleRiverSourceDataTests.java",
+		"/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/src/test/java/org/elasticsearch/river/jdbc/strategy/simple/SimpleRiverSourceTests.java",
+		"/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/src/test/java/org/elasticsearch/river/jdbc/strategy/Listener.java",
+		"/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/src/test/resources/org/elasticsearch/river/jdbc/strategy/simple/csv/river-1.json",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/README.md",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/87/$ES_HOME/config/scripts/testscript.groovy",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/target/config/scripts/advanced-transformation-groovy-script.groovy",
+		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/87/mongodb-river-groovy-jodatime.json",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/scripts/services/sharedService.js",
+		"/C/Dev/elasticsearch/plugins/head/_site/index.html",
+		"/C/Dev/elasticsearch/config/templates/template_1.json",
 		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb.wiki/Home.markdown",
 		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb.wiki/Home.textile",
 		"/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/pom.xml",
@@ -255,7 +297,6 @@
 		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/85/$ES_HOME/config/templates/template_1.json",
 		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/101/02_test-issue-101.bat",
 		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/101/test-issue-101.js",
-		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/README.md",
 		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/79/mongodb-river-simple.json",
 		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/101/01_create-river.bat",
 		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/resources/issues/101/mongodb-river-simple.json",
@@ -297,7 +338,6 @@
 		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/scripts/app.js",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/bower_components/blueimp-file-upload/bower.json",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/karma-e2e.conf.js",
-		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/bower.json",
 		"/D/Users/Richard/Documents/GitHub/es-dms-yo/app/views/documents/edit.html",
 		"/D/Apps/apache-tomcat-7.0.42/webapps/es-dms-site/scripts/139d8c72.modules.js",
 		"/D/Apps/apache-tomcat-7.0.42/webapps/es-dms-site/scripts/1b43700d.scripts.js",
@@ -348,6 +388,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"script",
 			"’",
 			"~~",
 			"‘",
@@ -385,40 +426,11 @@
 	"groups":
 	[
 		{
-			"selected": 9,
+			"selected": 13,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "yo/app/scripts/services/sharedService.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 701,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								340,
-								340
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
 					"file": "yo/app/views/documents/search.html",
 					"semi_transient": false,
 					"settings":
@@ -446,7 +458,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 1,
 					"file": "yo/app/scripts/controllers/login.js",
 					"semi_transient": false,
 					"settings":
@@ -473,7 +485,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 2,
 					"file": "yo/app/scripts/services/esdmsAuthenticationService.js",
 					"semi_transient": false,
 					"settings":
@@ -500,7 +512,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 3,
 					"file": "yo/app/views/main.html",
 					"semi_transient": false,
 					"settings":
@@ -528,7 +540,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 4,
 					"file": "yo/app/scripts/controllers/navbar.js",
 					"semi_transient": false,
 					"settings":
@@ -555,7 +567,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 5,
 					"file": "yo/app/scripts/directives/esdmsTagging.js",
 					"semi_transient": false,
 					"settings":
@@ -584,7 +596,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 6,
 					"file": "yo/app/scripts/controllers/document.js",
 					"semi_transient": false,
 					"settings":
@@ -596,8 +608,8 @@
 						"selection":
 						[
 							[
-								15,
-								127
+								3405,
+								3430
 							]
 						],
 						"settings":
@@ -605,26 +617,26 @@
 							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2032.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 7,
 					"file": "/C/Dev/elasticsearch/plugins/river-mongodb/_site/index.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1981,
+						"buffer_size": 2257,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1480,
-								1480
+								152,
+								152
 							]
 						],
 						"settings":
@@ -638,20 +650,191 @@
 					"type": "text"
 				},
 				{
-					"buffer": 9,
-					"file": "/C/Dev/elasticsearch/plugins/river-mongodb/_site/scripts/app.js",
+					"buffer": 8,
+					"file": "/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/src/test/java/org/elasticsearch/river/jdbc/strategy/simple/SimpleRiverMouthTests.java",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1165,
+						"buffer_size": 2146,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1017,
-								1017
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 360.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/src/test/java/org/elasticsearch/river/jdbc/strategy/simple/AbstractRiverTest.java",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5848,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4997,
+								5147
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2400.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "/D/temp/test-jersey-2.0/pom.xml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2098,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1124,
+								1114
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/XML/XML.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 240.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/src/main/java/org/elasticsearch/river/mongodb/MongoDBRiver.java",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 53207,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Java/Java.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 13882.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "/D/Users/Richard/Documents/GitHub/jersey/examples/json-jackson/pom.xml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4040,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2944,
+								2919
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/XML/XML.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 840.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/README.md",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6293,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								249,
+								249
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "/C/Dev/elasticsearch/plugins/river-mongodb/_site/scripts/app.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1620,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1290,
+								1290
 							]
 						],
 						"settings":
@@ -665,7 +848,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 10,
+					"buffer": 15,
 					"file": "yo/app/scripts/services/documentService.js",
 					"semi_transient": true,
 					"settings":
@@ -694,91 +877,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 11,
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 5242,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								5242,
-								5242
-							]
-						],
-						"settings":
-						{
-							"auto_name": "Hi,",
-							"syntax": "Packages/Text/Plain text.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 2642.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "/C/Dev/elasticsearch/config/templates/template_1.json",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 374,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "/C/Dev/elasticsearch/plugins/head/_site/index.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1890,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1856,
-								1789
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 300.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 14,
+					"buffer": 16,
 					"file": "yo/app/scripts/app.js",
 					"semi_transient": false,
 					"settings":

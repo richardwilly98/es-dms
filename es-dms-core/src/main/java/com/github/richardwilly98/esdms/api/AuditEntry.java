@@ -1,8 +1,8 @@
-package com.github.richardwilly98.esdms.web;
+package com.github.richardwilly98.esdms.api;
 
 /*
  * #%L
- * es-dms-site
+ * es-dms-core
  * %%
  * Copyright (C) 2013 es-dms
  * %%
@@ -26,19 +26,35 @@ package com.github.richardwilly98.esdms.web;
  * #L%
  */
 
+import java.util.Date;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.github.richardwilly98.esdms.AuditEntryImpl;
 
-import javax.ws.rs.NameBinding;
+@JsonDeserialize(as = AuditEntryImpl.class)
+public interface AuditEntry extends ItemBase {
 
-import com.github.richardwilly98.esdms.api.AuditEntry;
+	public enum Event {
+		UNDEFINED("undefined"), CUSTOM("custom"), UPLOAD("upload"), CHECKOUT("checkout"), CHECKIN("checkin");
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD })
-@NameBinding
-public @interface Audit {
-	AuditEntry.Event value() default AuditEntry.Event.UNDEFINED;
+		private String eventName;
+
+		private Event(String eventName) {
+			this.eventName = eventName;
+		}
+
+		public String getEventName() {
+			return eventName;
+		}
+
+	}
+
+	public abstract String getUser();
+
+	public abstract Date getDate();
+
+	public abstract Event getEvent();
+	
+	public abstract String getItemId();
+
 }

@@ -27,6 +27,8 @@ package com.github.richardwilly98.esdms.inject;
  */
 
 import com.github.richardwilly98.esdms.api.Document;
+import com.github.richardwilly98.esdms.services.AuditProvider;
+import com.github.richardwilly98.esdms.services.AuditService;
 import com.github.richardwilly98.esdms.services.AuthenticationProvider;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.DocumentProvider;
@@ -43,6 +45,8 @@ import com.github.richardwilly98.esdms.services.UserProvider;
 import com.github.richardwilly98.esdms.services.UserService;
 import com.github.richardwilly98.esdms.services.VersionProvider;
 import com.github.richardwilly98.esdms.services.VersionService;
+import com.github.richardwilly98.esdms.services.audit.AuditStrategy;
+import com.github.richardwilly98.esdms.services.audit.SimpleAuditStrategy;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 
@@ -61,6 +65,8 @@ public class ServicesModule extends AbstractModule {
 		bind(DocumentService.class).to(DocumentProvider.class)
 				.asEagerSingleton();
 		bind(VersionService.class).to(VersionProvider.class).asEagerSingleton();
+		bind(AuditService.class).to(AuditProvider.class).asEagerSingleton();
+		bind(AuditStrategy.class).to(SimpleAuditStrategy.class).asEagerSingleton();
 		bind(new TypeLiteral<SearchService<Document>>() {
 		}).to(SearchProvider.class).asEagerSingleton();
 	}

@@ -30,7 +30,6 @@ package test.github.richardwilly98.esdms.rest;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.elasticsearch.common.io.Streams.copyToBytesFromClasspath;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;

@@ -54,6 +54,7 @@ import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.services.AuditService;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.DocumentService;
 import com.github.richardwilly98.esdms.services.PermissionService;
@@ -116,6 +117,9 @@ public class ProviderTestBase {
 
 	@Inject
 	AuthenticationService authenticationService;
+
+	@Inject
+	AuditService auditService;
 
 	@Inject
 	UserService userService;

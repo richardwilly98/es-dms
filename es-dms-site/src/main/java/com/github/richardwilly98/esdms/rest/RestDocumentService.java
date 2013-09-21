@@ -64,6 +64,7 @@ import org.joda.time.DateTime;
 import com.github.richardwilly98.esdms.DocumentImpl;
 import com.github.richardwilly98.esdms.FileImpl;
 import com.github.richardwilly98.esdms.VersionImpl;
+import com.github.richardwilly98.esdms.api.AuditEntry;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Version;
@@ -248,7 +249,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 	@Path(UPLOAD_PATH)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces({ MediaType.APPLICATION_JSON })
-	@Audit("upload")
+	@Audit(AuditEntry.Event.UPLOAD)
 	public Response upload(@FormDataParam("name") String name,
 			@FormDataParam("file") InputStream uploadedInputStream,
 			@FormDataParam("file") FormDataBodyPart body) {
@@ -285,9 +286,9 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 //				.versionId(1).build());
 			Document document = new DocumentImpl.Builder().versions(new HashSet<Version>()).name(name).attributes(attributes).roles(null).build();
 			document = service.create(document);
-			Response response = Response
+			Response response = includeItemIdInHeaders(Response
 					.created(
-							getItemUri(document)).build();
+							getItemUri(document)), document) .build();
 			Version version = new VersionImpl.Builder()
 			.documentId(document.getId()).current(true)
 			.file(file)
@@ -566,11 +567,12 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 	@Path("{id}/" + CHECKOUT_PATH)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces({ MediaType.APPLICATION_JSON })
+	@Audit(AuditEntry.Event.CHECKOUT)
 	public Response checkout(@PathParam("id") String id) {
 		try {
 			Document document = service.get(id);
 			documentService.checkout(document);
-			return Response.noContent().build();
+			return includeItemIdInHeaders(Response.noContent(), document).build();
 		} catch (Throwable t) {
 			log.error("checkout failed", t);
 			return Response.status(Status.CONFLICT).build();
@@ -581,12 +583,13 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 	@Path("{id}/" + CHECKIN_PATH)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces({ MediaType.APPLICATION_JSON })
+	@Audit(AuditEntry.Event.CHECKIN)
 	public Response checkin(@PathParam("id") String id) {
 		try {
 			Document document = service.get(id);
 			checkNotNull(document);
 			documentService.checkin(document);
-			return Response.noContent().build();
+			return includeItemIdInHeaders(Response.noContent(), document).build();
 		} catch (Throwable t) {
 			log.error("checkin failed", t);
 			return Response.status(Status.CONFLICT).build();

@@ -1,8 +1,8 @@
-package com.github.richardwilly98.esdms.web;
+package com.github.richardwilly98.esdms.services;
 
 /*
  * #%L
- * es-dms-site
+ * es-dms-core
  * %%
  * Copyright (C) 2013 es-dms
  * %%
@@ -26,19 +26,20 @@ package com.github.richardwilly98.esdms.web;
  * #L%
  */
 
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-import javax.ws.rs.NameBinding;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.List;
 
 import com.github.richardwilly98.esdms.api.AuditEntry;
+import com.github.richardwilly98.esdms.exception.ServiceException;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD })
-@NameBinding
-public @interface Audit {
-	AuditEntry.Event value() default AuditEntry.Event.UNDEFINED;
+public interface AuditService extends BaseService<AuditEntry> {
+
+	public abstract EnumSet<AuditEntry.Event> getEvents();
+
+	public abstract void clear(List<String> ids) throws ServiceException;
+
+	public abstract void clear(Date from, Date to) throws ServiceException;
+	
+	public abstract AuditEntry create(AuditEntry.Event event, String itemId, String user) throws ServiceException;
 }

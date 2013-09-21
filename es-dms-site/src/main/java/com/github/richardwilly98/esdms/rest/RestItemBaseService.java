@@ -62,6 +62,7 @@ import com.github.richardwilly98.esdms.services.BaseService;
  */
 public abstract class RestItemBaseService<T extends ItemBase> extends RestServiceBase {
 
+	public static final String ITEM_ID_HEADER = "esdms-id";
 	public static final String SEARCH_PATH = "search";
 	public static final String SEARCH_FIRST_PARAMETER = "fi";
 	public static final String SEARCH_PAGE_SIZE_PARAMETER = "ps";
@@ -116,6 +117,12 @@ public abstract class RestItemBaseService<T extends ItemBase> extends RestServic
 		checkNotNull(item);
 		return url.getBaseUriBuilder().path(getClass()).path(item.getId())
 				.build();
+	}
+	
+	protected Response.ResponseBuilder includeItemIdInHeaders(Response.ResponseBuilder builder, T item) {
+		checkNotNull(builder);
+		checkNotNull(item);
+		return builder.header(ITEM_ID_HEADER, item.getId());
 	}
 
 	@GET

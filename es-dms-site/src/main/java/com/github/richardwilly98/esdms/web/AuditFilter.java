@@ -26,35 +26,80 @@ package com.github.richardwilly98.esdms.web;
  * #L%
  */
 
-
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 
+import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.log4j.Logger;
-import org.glassfish.jersey.server.ContainerRequest;
-import org.glassfish.jersey.server.ContainerResponse;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+
+import com.github.richardwilly98.esdms.api.User;
+import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.rest.RestItemBaseService;
+import com.github.richardwilly98.esdms.services.AuditService;
 
 @Audit
 @Provider
-public class AuditFilter implements 
-		ContainerResponseFilter {
+public class AuditFilter implements ContainerResponseFilter {
 
 	private static Logger log = Logger.getLogger(AuditFilter.class);
-	
-	public ContainerResponse filter(ContainerRequest request,
-			ContainerResponse response) {
-		log.info("*** filter - request - response ***");
-		return response;
+	private final AuditService service;
+
+	@Inject
+	public AuditFilter(final AuditService service) {
+		this.service = service;
 	}
 
 	@Override
 	public void filter(ContainerRequestContext requestContext,
 			ContainerResponseContext responseContext) throws IOException {
-		log.info("*** filter - request - response ***");
+		Annotation[] annotations = responseContext.getEntityAnnotations();
+		if (annotations == null) {
+			log.info("No annotation found.");
+		} else {
+			for (Annotation annotation : annotations) {
+				if (annotation.annotationType() == Audit.class) {
+					String id = responseContext
+							.getHeaderString(RestItemBaseService.ITEM_ID_HEADER);
+					if (id != null) {
+						String currentUser = getCurrentUser();
+						if (currentUser != null) {
+							try {
+								if (log.isDebugEnabled()) {
+									log.debug("Audit value: "
+											+ ((Audit) annotation).value()
+											+ " - id: " + id
+											+ " - current user: " + currentUser);
+								}
+								service.create(((Audit) annotation).value(),
+										id, currentUser);
+							} catch (ServiceException sEx) {
+								log.error("Create audit failed.", sEx);
+							}
+						}
+					}
+					break;
+				}
+			}
+		}
 	}
 
+	private String getCurrentUser() {
+		try {
+			Subject currentSubject = SecurityUtils.getSubject();
+			if (currentSubject.getPrincipal() == null) {
+				return null;
+			} else {
+				return ((User) currentSubject.getPrincipal()).getId();
+			}
+		} catch (Throwable t) {
+			return null;
+		}
+	}
 }

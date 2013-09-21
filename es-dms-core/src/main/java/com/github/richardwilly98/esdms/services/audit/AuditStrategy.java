@@ -1,8 +1,8 @@
-package com.github.richardwilly98.esdms.web;
+package com.github.richardwilly98.esdms.services.audit;
 
 /*
  * #%L
- * es-dms-site
+ * es-dms-core
  * %%
  * Copyright (C) 2013 es-dms
  * %%
@@ -26,19 +26,11 @@ package com.github.richardwilly98.esdms.web;
  * #L%
  */
 
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-import javax.ws.rs.NameBinding;
-
 import com.github.richardwilly98.esdms.api.AuditEntry;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD })
-@NameBinding
-public @interface Audit {
-	AuditEntry.Event value() default AuditEntry.Event.UNDEFINED;
+public interface AuditStrategy {
+
+	public abstract AuditEntry convert(AuditEntry.Event event,
+			String itemId, String user);
+
 }

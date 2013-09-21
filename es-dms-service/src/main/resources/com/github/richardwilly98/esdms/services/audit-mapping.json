@@ -1,0 +1,22 @@
+{
+	"audit": {
+		"properties": {
+				"id" : {
+					"type": "string"
+				},
+				"item_id" : {
+					"type": "string"
+				},
+				"user" : {
+					"type": "string"
+				},
+				"event" : {
+					"type": "string"
+				},
+				"date": {
+					"type": "date"
+				}
+			}
+		}
+	}
+}

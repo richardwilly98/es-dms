@@ -1,8 +1,8 @@
-package com.github.richardwilly98.esdms.web;
+package com.github.richardwilly98.esdms.services.audit;
 
 /*
  * #%L
- * es-dms-site
+ * es-dms-core
  * %%
  * Copyright (C) 2013 es-dms
  * %%
@@ -27,18 +27,23 @@ package com.github.richardwilly98.esdms.web;
  */
 
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.ws.rs.NameBinding;
+import java.util.Date;
 
+import com.github.richardwilly98.esdms.AuditEntryImpl;
 import com.github.richardwilly98.esdms.api.AuditEntry;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD })
-@NameBinding
-public @interface Audit {
-	AuditEntry.Event value() default AuditEntry.Event.UNDEFINED;
+public class SimpleAuditStrategy implements AuditStrategy {
+
+	@Override
+	public AuditEntry convert(AuditEntry.Event event, String itemId, String user) {
+		checkNotNull(event);
+		checkNotNull(itemId);
+		checkNotNull(user);
+		AuditEntry audit = new AuditEntryImpl.Builder().event(event).user(user)
+				.itemId(itemId).date(new Date()).build();
+		return audit;
+	}
+
 }

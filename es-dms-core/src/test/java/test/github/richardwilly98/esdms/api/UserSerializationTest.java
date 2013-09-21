@@ -30,6 +30,7 @@ package test.github.richardwilly98.esdms.api;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,12 +41,14 @@ import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.richardwilly98.esdms.AuditEntryImpl;
 import com.github.richardwilly98.esdms.FacetImpl;
 import com.github.richardwilly98.esdms.PermissionImpl;
 import com.github.richardwilly98.esdms.RoleImpl;
 import com.github.richardwilly98.esdms.SearchResultImpl;
 import com.github.richardwilly98.esdms.TermImpl;
 import com.github.richardwilly98.esdms.UserImpl;
+import com.github.richardwilly98.esdms.api.AuditEntry;
 import com.github.richardwilly98.esdms.api.Facet;
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
@@ -212,5 +215,24 @@ public class UserSerializationTest {
 		Assert.assertEquals(permission, permission2);
 		Permission permission3 = new PermissionImpl.Builder().id(id).name(name).access("access1").build();
 		Assert.assertNotSame(permission3, permission2);
+	}
+
+	@Test
+	public void testSerializeDeserializeAuditEntry() throws Throwable {
+		log.debug("*** testSerializeDeserializeAuditEntry ***");
+		String id = "audit-entry-" + System.currentTimeMillis();
+		String name = id;
+		String itemId = "document-" + System.currentTimeMillis();
+		String user = "user-" + System.currentTimeMillis();
+		AuditEntry entry = new AuditEntryImpl.Builder().id(id).name(name).date(new Date()).event(AuditEntry.Event.UPLOAD).itemId(itemId).user(user).build();
+		log.debug(entry);
+		String json = mapper.writeValueAsString(entry);
+		log.debug(json);
+		Assert.assertNotNull(json);
+		AuditEntry entry2 = mapper.readValue(json, AuditEntry.class);
+		log.debug(entry2);
+		Assert.assertEquals(entry, entry2);
+		AuditEntry entry3 = new AuditEntryImpl.Builder().id(id).name(name).date(new Date()).event(AuditEntry.Event.UPLOAD).itemId(itemId).user(user).build();
+		Assert.assertNotSame(entry2, entry3);
 	}
 }
