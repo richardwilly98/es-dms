@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.services;
  * #L%
  */
 
-
 import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
 
 import java.io.IOException;
@@ -38,7 +37,13 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.log4j.Logger;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
 
 import com.github.richardwilly98.esdms.api.AuditEntry;
 import com.github.richardwilly98.esdms.exception.ServiceException;
@@ -58,7 +63,8 @@ public class AuditProvider extends ProviderBase<AuditEntry> implements
 
 	@Inject
 	AuditProvider(Client client, BootstrapService bootstrapService,
-			final UserService userService, final AuditStrategy strategy) throws ServiceException {
+			final UserService userService, final AuditStrategy strategy)
+			throws ServiceException {
 		super(client, bootstrapService, bootstrapService.loadSettings()
 				.getLibrary() + "-archive", AuditProvider.type,
 				AuditEntry.class);
@@ -67,22 +73,45 @@ public class AuditProvider extends ProviderBase<AuditEntry> implements
 
 	@Override
 	public void clear(List<String> ids) throws ServiceException {
-		// TODO Auto-generated method stub
-
+		for (String id : ids) {
+			AuditEntry audit = super.get(id);
+			if (audit != null) {
+				super.delete(audit);
+			}
+		}
 	}
 
 	@Override
 	public void clear(Date from, Date to) throws ServiceException {
-		// TODO Auto-generated method stub
-
+		try {
+			QueryBuilder query = QueryBuilders.rangeQuery("date").from(from)
+					.to(to).includeLower(true).includeUpper(true);
+			SearchRequestBuilder searchRequestBuilder = client
+					.prepareSearch(index).setTypes(type)
+					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+					.setQuery(query);
+			log.debug("Search request builder: " + searchRequestBuilder);
+			SearchResponse searchResponse = searchRequestBuilder.execute()
+					.actionGet();
+			for (SearchHit hit : searchResponse.getHits().hits()) {
+				String json = hit.getSourceAsString();
+				AuditEntry audit;
+				audit = mapper.readValue(json, AuditEntry.class);
+				super.delete(audit);
+			}
+		} catch (Throwable t) {
+			log.error("clear failed", t);
+			throw new ServiceException(t.getLocalizedMessage());
+		}
 	}
 
 	@Override
-	public AuditEntry create(AuditEntry.Event event, String itemId, String user) throws ServiceException {
+	public AuditEntry create(AuditEntry.Event event, String itemId, String user)
+			throws ServiceException {
 		AuditEntry audit = strategy.convert(event, itemId, user);
 		return super.create(audit);
 	}
-	
+
 	@Override
 	protected void loadInitialData() throws ServiceException {
 	}

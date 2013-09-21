@@ -26,7 +26,10 @@ package test.github.richardwilly98.esdms.services;
  * #L%
  */
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.Date;
+import java.util.List;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -119,5 +122,45 @@ public class AuditProviderTest extends ProviderTestBase {
 		auditService.delete(audit);
 		audit = auditService.get(id);
 		Assert.assertNull(audit);
+	}
+
+	@Test
+	public void testClearAuditByIds() throws Throwable {
+		log.info("Start testClearAuditByIds");
+		List<String> ids = newArrayList();
+		AuditEntry audit = testCreateAudit(AuditEntry.Event.UPLOAD,
+				UserService.DEFAULT_ADMIN_LOGIN,
+				"document-" + System.currentTimeMillis(), new Date());
+		ids.add(audit.getId());
+		audit = testCreateAudit(AuditEntry.Event.CHECKOUT,
+				UserService.DEFAULT_ADMIN_LOGIN,
+				"document-" + System.currentTimeMillis(), new Date());
+		ids.add(audit.getId());
+		auditService.clear(ids);
+		for(String id: ids) {
+			audit = auditService.get(id);
+			Assert.assertNull(audit);
+		}
+	}
+
+	@Test
+	public void testClearAuditByDateRange() throws Throwable {
+		log.info("Start testClearAuditByDateRange");
+		List<String> ids = newArrayList();
+		Date from = new Date(8000);
+		Date to = new Date(9000);
+		AuditEntry audit = testCreateAudit(AuditEntry.Event.UPLOAD,
+				UserService.DEFAULT_ADMIN_LOGIN,
+				"document-" + System.currentTimeMillis(), from);
+		ids.add(audit.getId());
+		audit = testCreateAudit(AuditEntry.Event.CHECKOUT,
+				UserService.DEFAULT_ADMIN_LOGIN,
+				"document-" + System.currentTimeMillis(), to);
+		ids.add(audit.getId());
+		auditService.clear(from, to);
+		for(String id: ids) {
+			audit = auditService.get(id);
+			Assert.assertNull(audit);
+		}
 	}
 }
