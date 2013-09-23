@@ -1,0 +1,25 @@
+<div modal="shouldBeOpen" close="close()" options="opts">
+	<div class="modal-header">
+		<button type="button" class="close" data-ng-click="close()" aria-hidden="true">&times;</button>
+		<h2>Details - {{document.id}}</h2>
+	</div>
+		<div class="modal-body">
+			<div class="control-group">
+				<label class="control-label">Name:</label>
+    		<div class="controls">
+      			<input type="text" ng-model="document.name" />
+    		</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Attributes:</label>
+				<ul>
+					<li ng-repeat="(name, value) in document.attributes">{{name}} - {{value}}</li>
+				</ul>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn" data-ng-click="close()">Close</button>
+		</div>
+</div>
+
+

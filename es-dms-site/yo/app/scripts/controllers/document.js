@@ -175,8 +175,8 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
     $scope.alerts.splice(index, 1);
   };
 
-  $scope.edit = function(id) {
-    documentService.edit(id);
+  $scope.showDetails = function(id) {
+    documentService.showDetails(id);
   };
 
   $scope.checkout = function(id) {

@@ -1,6 +1,6 @@
 'use strict';
 
-esDmsSiteApp.service('documentService', ['$log', '$resource', '$http', function documentService($log, $resource, $http) {
+esDmsSiteApp.service('documentService', ['$log', '$rootScope', '$resource', '$http', function documentService($log, $rootScope, $resource, $http) {
   var documentResource = $resource('api/documents/:id/:action/:parameter' , {id:'@id'}, {
       checkout: {method:'POST', params: {action: 'checkout'}},
       checkin: {method:'POST', params: {action: 'checkin'}},
@@ -9,6 +9,7 @@ esDmsSiteApp.service('documentService', ['$log', '$resource', '$http', function 
       update: {method:'PUT', params: {}}
     });
 
+  var currentDocumentId = null;
   return {
     find: function(first, pageSize, criteria, callback) {
       $log.log('Document search ' + first + ' - ' + pageSize + ' - ' + criteria);
@@ -16,8 +17,17 @@ esDmsSiteApp.service('documentService', ['$log', '$resource', '$http', function 
         callback(data);
       });
     },
-    edit: function(id) {
-      $log.log('edit document: ' + id);
+    showDetails: function(id) {
+      $log.log('showDetails document: ' + id);
+      if (id === 'new') {
+        currentDocumentId = null;
+      } else {
+        currentDocumentId = id;
+      }
+      $rootScope.$broadcast('document:showDetails');
+    },
+    current: function() {
+      return currentDocumentId;
     },
     checkout: function(id) {
       $log.log('checkout document: ' + id);
@@ -28,6 +38,13 @@ esDmsSiteApp.service('documentService', ['$log', '$resource', '$http', function 
       $log.log('checkin document: ' + id);
       var doc = new documentResource.get({'id': id});
       doc.$checkin({'id': id});
+    },
+    metadata: function(id, callback) {
+      $log.log('metadata document: ' + id);
+      var document = new documentResource.metadata({'id': id}, function() {
+        $log.log('get document: ' + JSON.stringify(document));
+        callback(document);
+      });
     },
     addTag: function(id, tag, callback) {
       $log.log('addTag document: ' + id + ' - tag: ' + tag);
