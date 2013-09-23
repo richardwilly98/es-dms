@@ -51,6 +51,7 @@ import org.elasticsearch.common.base.Stopwatch;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.facet.FacetBuilders;
@@ -230,6 +231,27 @@ public class SearchProvider implements SearchService<Document> {
 			SearchResponse searchResponse = searchRequestBuilder.execute()
 					.actionGet();
 			return parseSearchResult(searchResponse, first, pageSize, facet);
+		} catch (Throwable t) {
+			log.error("search failed", t);
+			throw new ServiceException(t.getLocalizedMessage());
+		}
+	}
+	
+	public SearchResult<Document> moreLikeThis(String criteria, int minTermFrequency, int maxItems) throws ServiceException {
+		try {
+			log.trace(String.format("moreLikeThis %s - %s - %s", criteria,
+					minTermFrequency, maxItems));
+			log.trace(String.format("index: %s - type: %s", index, type));
+			QueryBuilder query = QueryBuilders.moreLikeThisQuery().likeText(criteria).minTermFreq(minTermFrequency).maxQueryTerms(maxItems);
+			SearchRequestBuilder searchRequestBuilder = client
+					.prepareSearch(index).setTypes(type)
+					.addPartialField("document", null, "versions")
+					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+					.setFrom(0).setSize(5).setQuery(query);
+			log.debug("Search request builder: " + searchRequestBuilder);
+			SearchResponse searchResponse = searchRequestBuilder.execute()
+					.actionGet();
+			return parseSearchResult(searchResponse, 0, 5, null);
 		} catch (Throwable t) {
 			log.error("search failed", t);
 			throw new ServiceException(t.getLocalizedMessage());

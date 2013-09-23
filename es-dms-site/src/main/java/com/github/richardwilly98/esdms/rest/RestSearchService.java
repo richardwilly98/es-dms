@@ -56,9 +56,12 @@ public class RestSearchService extends RestServiceBase {
 	public static final String SEARCH_PATH = "search";
 	public static final String SEARCH_ACTION = "_search";
 	public static final String FACET_SEARCH_ACTION = "_facet_search";
+	public static final String MORE_LIKE_THIS_ACTION = "_more_like_this";
 	public static final String SEARCH_FIRST_PARAMETER = "fi";
 	public static final String SEARCH_PAGE_SIZE_PARAMETER = "ps";
 	public static final String SEARCH_FACET_PARAMETER = "fa";
+	public static final String MORE_LIKE_THIS_MIN_TERM_FREQUENCY_PARAMETER = "mt";
+	public static final String MORE_LIKE_THIS_MAX_ITEMS_PARAMETER = "mi";
 
 	protected final Logger log = Logger.getLogger(getClass());
 	protected final SearchService<Document> service;
@@ -127,4 +130,23 @@ public class RestSearchService extends RestServiceBase {
 		}
 	}
 
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Path(MORE_LIKE_THIS_ACTION + "/{criteria}")
+	public Response moreLikeThis(
+			@PathParam("criteria") String criteria,
+			@QueryParam(MORE_LIKE_THIS_MIN_TERM_FREQUENCY_PARAMETER) @DefaultValue("2") int minTermFrequency,
+			@QueryParam(MORE_LIKE_THIS_MAX_ITEMS_PARAMETER) @DefaultValue("10") int maxItems) {
+		isAuthenticated();
+		if (log.isTraceEnabled()) {
+			log.trace(String.format("moreLikeThis - %s", criteria));
+		}
+		try {
+			SearchResult<Document> items = service.moreLikeThis(criteria, minTermFrequency,
+					maxItems);
+			return Response.ok(items).build();
+		} catch (ServiceException e) {
+			throw new RestServiceException(e.getLocalizedMessage());
+		}
+	}
 }
