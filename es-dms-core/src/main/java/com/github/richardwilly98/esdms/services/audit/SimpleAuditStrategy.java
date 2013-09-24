@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.services.audit;
  * #L%
  */
 
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Date;

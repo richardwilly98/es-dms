@@ -33,6 +33,9 @@
 			"attributes" : {
 				"type": "object",
 				"properties": {
+					"modified": {
+						"type": "date"
+					},
 					"creation": {
 						"type": "date"
 					},

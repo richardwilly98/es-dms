@@ -43,13 +43,13 @@ public class AuditProviderTest extends ProviderTestBase {
 
 	private AuditEntry testCreateAudit(AuditEntry.Event event, String user,
 			String itemId, Date date) throws Throwable {
-//		String id = String.valueOf(System.currentTimeMillis());
-		AuditEntry audit = new AuditEntryImpl.Builder()/*.id(id)*/
-				/*.name(event.toString() + "-" + user + "-" + id)*/.event(event)
+		// String id = String.valueOf(System.currentTimeMillis());
+		AuditEntry audit = new AuditEntryImpl.Builder()/* .id(id) */
+		/* .name(event.toString() + "-" + user + "-" + id) */.event(event)
 				.user(user).itemId(itemId).date(date).build();
 
 		audit = auditService.create(audit);
-//		Assert.assertEquals(id, audit.getId());
+		// Assert.assertEquals(id, audit.getId());
 
 		AuditEntry newAudit = auditService.get(audit.getId());
 		Assert.assertNotNull(newAudit);
@@ -86,7 +86,8 @@ public class AuditProviderTest extends ProviderTestBase {
 		testCreateAudit(AuditEntry.Event.UPLOAD,
 				UserService.DEFAULT_ADMIN_LOGIN, itemId, date);
 
-		SearchResult<AuditEntry> result = auditService.search("item_id:" + itemId, 0, 1);
+		SearchResult<AuditEntry> result = auditService.search("item_id:"
+				+ itemId, 0, 1);
 
 		Assert.assertNotNull(result);
 		Assert.assertTrue(result.getTotalHits() >= 1);
@@ -102,8 +103,8 @@ public class AuditProviderTest extends ProviderTestBase {
 				UserService.DEFAULT_ADMIN_LOGIN,
 				"document-" + System.currentTimeMillis(), new Date());
 
-		result = auditService.search("event:"
-				+ AuditEntry.Event.CHECKOUT.toString(), 0, 1);
+		result = auditService.search(
+				"event:" + AuditEntry.Event.CHECKOUT.toString(), 0, 1);
 
 		Assert.assertNotNull(result);
 		Assert.assertTrue(result.getTotalHits() >= 1);
@@ -137,7 +138,7 @@ public class AuditProviderTest extends ProviderTestBase {
 				"document-" + System.currentTimeMillis(), new Date());
 		ids.add(audit.getId());
 		auditService.clear(ids);
-		for(String id: ids) {
+		for (String id : ids) {
 			audit = auditService.get(id);
 			Assert.assertNull(audit);
 		}
@@ -158,7 +159,7 @@ public class AuditProviderTest extends ProviderTestBase {
 				"document-" + System.currentTimeMillis(), to);
 		ids.add(audit.getId());
 		auditService.clear(from, to);
-		for(String id: ids) {
+		for (String id : ids) {
 			audit = auditService.get(id);
 			Assert.assertNull(audit);
 		}

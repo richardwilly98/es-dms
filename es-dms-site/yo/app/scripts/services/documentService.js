@@ -6,6 +6,7 @@ esDmsSiteApp.service('documentService', ['$log', '$rootScope', '$resource', '$ht
       checkin: {method:'POST', params: {action: 'checkin'}},
       preview: {method:'GET', params: {action: 'preview'}},
       metadata: {method:'GET', params: {action: 'metadata'}},
+      audit: {method:'GET', params: {action: 'audit'}},
       update: {method:'PUT', params: {}}
     });
 
@@ -42,6 +43,13 @@ esDmsSiteApp.service('documentService', ['$log', '$rootScope', '$resource', '$ht
     metadata: function(id, callback) {
       $log.log('metadata document: ' + id);
       var document = new documentResource.metadata({'id': id}, function() {
+        $log.log('get document: ' + JSON.stringify(document));
+        callback(document);
+      });
+    },
+    audit: function(id, callback) {
+      $log.log('audit document: ' + id);
+      var document = new documentResource.audit({'id': id}, function() {
         $log.log('get document: ' + JSON.stringify(document));
         callback(document);
       });

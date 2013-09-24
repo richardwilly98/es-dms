@@ -67,10 +67,12 @@ import com.github.richardwilly98.esdms.VersionImpl;
 import com.github.richardwilly98.esdms.api.AuditEntry;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.File;
+import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.rest.exception.PreconditionException;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
+import com.github.richardwilly98.esdms.services.AuditService;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.DocumentService;
 import com.github.richardwilly98.esdms.web.Audit;
@@ -87,6 +89,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 
 	public static final String PREVIEW_FRAGMENT_SIZE_PARAMETER = "fs";
 	public static final String PREVIEW_CRITERIA_PARAMETER = "cr";
+	public static final String AUDIT_PATH = "audit";
 	public static final String UPLOAD_PATH = "upload";
 	public static final String UPDATE_PATH = "update";
 	public static final String DOCUMENTS_PATH = "documents";
@@ -102,12 +105,15 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 	public static final String MARKDELETED_PATH = "deleted";
 	public static final String UNDELETE_PATH = "undelete";
 	private final DocumentService documentService;
+	private final AuditService auditService;
 
 	@Inject
 	public RestDocumentService(
 			final AuthenticationService authenticationService,
-			final DocumentService documentService) {
+			final DocumentService documentService,
+			final AuditService auditService) {
 		super(authenticationService, documentService);
+		this.auditService = auditService;
 		this.documentService = documentService;
 	}
 
@@ -125,6 +131,26 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 			return Response.status(Status.OK).entity(document).build();
 		} catch (ServiceException e) {
 			log.error("getMetadata failed", e);
+			throw new RestServiceException(e.getLocalizedMessage());
+		}
+	}
+	
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Path("{id}/" + AUDIT_PATH)
+	public Response audit(@PathParam("id") String id, @QueryParam(SEARCH_FIRST_PARAMETER) @DefaultValue("0") int first,
+			@QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("20") int pageSize) {
+		try {
+			isAuthenticated();
+			if (log.isTraceEnabled()) {
+				log.trace(String.format("audit - %s - %s - %s", id, first, pageSize));
+			}
+			String criteria = "item_id:" + id;
+			SearchResult<AuditEntry> auditEntries = auditService.search(criteria, first, pageSize);
+			checkNotNull(auditEntries);
+			return Response.ok(auditEntries).build();
+		} catch (ServiceException e) {
+			log.error("audit failed", e);
 			throw new RestServiceException(e.getLocalizedMessage());
 		}
 	}

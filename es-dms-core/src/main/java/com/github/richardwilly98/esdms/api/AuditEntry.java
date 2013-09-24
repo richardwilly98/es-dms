@@ -35,7 +35,8 @@ import com.github.richardwilly98.esdms.AuditEntryImpl;
 public interface AuditEntry extends ItemBase {
 
 	public enum Event {
-		UNDEFINED("undefined"), CUSTOM("custom"), UPLOAD("upload"), CHECKOUT("checkout"), CHECKIN("checkin");
+		UNDEFINED("undefined"), CUSTOM("custom"), UPLOAD("upload"), CHECKOUT(
+				"checkout"), CHECKIN("checkin");
 
 		private String eventName;
 
@@ -54,7 +55,7 @@ public interface AuditEntry extends ItemBase {
 	public abstract Date getDate();
 
 	public abstract Event getEvent();
-	
+
 	public abstract String getItemId();
 
 }

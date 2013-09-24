@@ -46,6 +46,7 @@ import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.github.richardwilly98.esdms.api.AuditEntry;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Version;
@@ -247,6 +248,32 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 			Assert.assertTrue(documents.getTotalHits() >= 1);
 		} catch (Throwable t) {
 			log.error("testFindDocuments fail", t);
+			Assert.fail();
+		}
+	}
+
+	@Test
+	public void testAuditDocuments() throws Throwable {
+		log.debug("*** testAuditDocuments ***");
+		try {
+			Document document = createDocument("test-attachment.html",
+					"text/html",
+					"/test/github/richardwilly98/services/test-attachment.html");
+			Assert.assertNotNull(document);
+			Response response = target()
+					.path(RestDocumentService.DOCUMENTS_PATH)
+					.path(document.getId()).path(RestDocumentService.AUDIT_PATH).request()
+					.cookie(adminCookie).accept(MediaType.APPLICATION_JSON)
+					.get();
+			log.debug(String.format("status: %s", response.getStatus()));
+			Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+			SearchResult<AuditEntry> auditEntries = response
+					.readEntity(new GenericType<SearchResult<AuditEntry>>() {
+					});
+			Assert.assertNotNull(auditEntries);
+			Assert.assertTrue(auditEntries.getTotalHits() >= 1);
+		} catch (Throwable t) {
+			log.error("testAuditDocuments fail", t);
 			Assert.fail();
 		}
 	}

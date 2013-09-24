@@ -39,7 +39,7 @@ public class TestJerseyApplication extends ResourceConfig {
 	@Inject
 	public TestJerseyApplication(ServiceLocator serviceLocator) {
 		super(MultiPartFeature.class);
-		packages("com.github.richardwilly98.esdms.rest",
+		packages("com.github.richardwilly98.esdms.rest", "com.github.richardwilly98.esdms.web",
 				"com.fasterxml.jackson.jaxrs");
 
 		System.out.println("Registering injectables...");
