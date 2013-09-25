@@ -56,7 +56,7 @@
 							href="#"> Action <span class="caret"></span>
 						</a>
 						<ul data-ng-switch-when="A" class="dropdown-menu">
-							<li><a data-ng-click="showDetails(document.id)" data-toggle="modal" href="#editModal">Details</a></li>
+							<li><a data-ng-click="showDetails(document.id)" data-toggle="modal" href="#details/{{ document.id }}">Details</a></li>
 							<li><a href="api/documents/{{ document.id }}/view"
 								target="_blank">View</a></li>
 							<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
@@ -64,7 +64,7 @@
 							<li><a data-ng-click="remove(document.id)">Delete</a></li>
 						</ul>
 						<ul data-ng-switch-when="L" class="dropdown-menu">
-							<li><a data-ng-click="showDetails(document.id)" data-toggle="modal" href="#editModal">Details</a></li>
+							<li><a data-ng-click="showDetails(document.id)" data-toggle="modal" href="#details/{{ document.id }}">Details</a></li>
 							<li><a href="api/documents/{{ document.id }}/view"
 								target="_blank">View</a></li>
 							<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
@@ -81,5 +81,5 @@
     		</div>
   		</div>
 	</div>
-	<div class="modal hide fade" ng-include="'views/documents/details.html'" id="editModal" data-ng-controller="DocumentsDetailsCtrl"></div>
+	<div class="modal hide fade" ng-include="'views/documents/details.html'" id="details" data-ng-controller="DocumentsDetailsCtrl"></div>
 </div>

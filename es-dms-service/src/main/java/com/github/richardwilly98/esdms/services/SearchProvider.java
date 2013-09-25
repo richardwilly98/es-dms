@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.services;
  * #L%
  */
 
-
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
@@ -134,7 +133,8 @@ public class SearchProvider implements SearchService<Document> {
 			Set<Document> items = newHashSet();
 			long totalHits = searchResponse.getHits().totalHits();
 			long elapsedTime = searchResponse.getTookInMillis();
-			log.trace(String.format("Total hist: %s - item count: %s", totalHits, searchResponse.getHits().hits().length));
+			log.trace(String.format("Total hist: %s - item count: %s",
+					totalHits, searchResponse.getHits().hits().length));
 			for (SearchHit hit : searchResponse.getHits().hits()) {
 				String json = convertFieldAsString(hit, "document");
 				Document item = mapper.readValue(json, Document.class);
@@ -165,8 +165,9 @@ public class SearchProvider implements SearchService<Document> {
 			}
 			SearchResult<Document> searchResult = builder.build();
 			watch.stop();
-			log.debug(String.format("Elapsed time to build document list - %s ms"
-					, watch.elapsed(TimeUnit.MILLISECONDS)));
+			log.debug(String.format(
+					"Elapsed time to build document list - %s ms",
+					watch.elapsed(TimeUnit.MILLISECONDS)));
 			return searchResult;
 		} catch (Throwable t) {
 			log.error("parseSearchResult failed", t);
@@ -217,15 +218,15 @@ public class SearchProvider implements SearchService<Document> {
 						.field(facet).size(10));
 			}
 			if (filters != null && filters.size() > 0) {
-//				OrFilterBuilder filterBuilder = FilterBuilders.orFilter();
+				// OrFilterBuilder filterBuilder = FilterBuilders.orFilter();
 				for (String key : filters.keySet()) {
 					searchRequestBuilder.setFilter(FilterBuilders.termFilter(
 							key, filters.get(key)));
-//					FilterBuilder termFilter = FilterBuilders.termFilter(
-//							key, filters.get(key)); 
-//					filterBuilder.add(termFilter);
+					// FilterBuilder termFilter = FilterBuilders.termFilter(
+					// key, filters.get(key));
+					// filterBuilder.add(termFilter);
 				}
-//				searchRequestBuilder.setFilter(filterBuilder);
+				// searchRequestBuilder.setFilter(filterBuilder);
 			}
 			log.debug("Search request builder: " + searchRequestBuilder);
 			SearchResponse searchResponse = searchRequestBuilder.execute()
@@ -236,22 +237,26 @@ public class SearchProvider implements SearchService<Document> {
 			throw new ServiceException(t.getLocalizedMessage());
 		}
 	}
-	
-	public SearchResult<Document> moreLikeThis(String criteria, int minTermFrequency, int maxItems) throws ServiceException {
+
+	public SearchResult<Document> moreLikeThis(String criteria, int first,
+			int pageSize, int minTermFrequency, int maxItems)
+			throws ServiceException {
 		try {
-			log.trace(String.format("moreLikeThis %s - %s - %s", criteria,
-					minTermFrequency, maxItems));
+			log.trace(String.format("moreLikeThis %s - %s - %s - %s - %s",
+					criteria, first, pageSize, minTermFrequency, maxItems));
 			log.trace(String.format("index: %s - type: %s", index, type));
-			QueryBuilder query = QueryBuilders.moreLikeThisQuery().likeText(criteria).minTermFreq(minTermFrequency).maxQueryTerms(maxItems);
+			QueryBuilder query = QueryBuilders.moreLikeThisQuery()
+					.likeText(criteria).minTermFreq(minTermFrequency)
+					.maxQueryTerms(maxItems);
 			SearchRequestBuilder searchRequestBuilder = client
 					.prepareSearch(index).setTypes(type)
 					.addPartialField("document", null, "versions")
 					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-					.setFrom(0).setSize(5).setQuery(query);
+					.setFrom(first).setSize(pageSize).setQuery(query);
 			log.debug("Search request builder: " + searchRequestBuilder);
 			SearchResponse searchResponse = searchRequestBuilder.execute()
 					.actionGet();
-			return parseSearchResult(searchResponse, 0, 5, null);
+			return parseSearchResult(searchResponse, first, pageSize, null);
 		} catch (Throwable t) {
 			log.error("search failed", t);
 			throw new ServiceException(t.getLocalizedMessage());

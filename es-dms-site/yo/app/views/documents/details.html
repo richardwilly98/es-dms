@@ -44,6 +44,22 @@
 						</tbody>
 					</table>
 		    </tab>
+		    <tab heading="More Like This" select="moreLikeThis()">
+		    	<table class="table table-condensed">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Author</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr data-ng-repeat="document in moreLikeThis">
+								<td>{{ document.name }}</td>
+								<td>{{ document.attributes.author }}</td>
+							</tr>
+						</tbody>
+					</table>
+		    </tab>
 		  </tabset>
   	</div>
 		<div class="modal-footer">

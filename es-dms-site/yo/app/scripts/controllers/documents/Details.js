@@ -1,10 +1,12 @@
 'use strict';
 
 angular.module('esDmsSiteApp')
-  .controller('DocumentsDetailsCtrl', ['$log', '$scope', '$rootScope', 'documentService', function ($log, $scope, $rootScope, documentService) {
+  .controller('DocumentsDetailsCtrl', ['$log', '$scope', '$rootScope', '$state', 'documentService', 'searchService', 
+    function ($log, $scope, $rootScope, $state, documentService, searchService) {
   $scope.shouldBeOpen = false;
   $scope.document = {};
   $scope.auditEntries = {};
+  $scope.moreLikeThis = {};
   $scope.isAvailable = false;
 
   $rootScope.$on('document:showDetails', function() {
@@ -22,6 +24,7 @@ angular.module('esDmsSiteApp')
   
   $scope.loadAudit = function() {
     $log.log('loadAudit: ' + $scope.document.id);
+    $log.log('$state.params: ' + JSON.stringify($state.params));
     documentService.audit($scope.document.id, function(auditEntries) {
       //$scope.auditEntries = auditEntries.items;
       $scope.auditEntries = _.map(auditEntries.items, function(auditEntry) {
@@ -29,6 +32,14 @@ angular.module('esDmsSiteApp')
         return auditEntry;
       });
     });
+  };
+  $scope.moreLikeThis = function() {
+    $log.log('Start moreLikeThis');
+    searchService.moreLikeThis(0, 5, null, 1, 1, function(result) {
+      $log.log('moreLikeThis result: ' + JSON.stringify(result));
+      $scope.moreLikeThis = result.items;
+    });
+    $log.log('End moreLikeThis');
   };
   $scope.close = function() {
     $scope.shouldBeOpen = false;

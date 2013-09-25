@@ -76,12 +76,6 @@ public class RestSearchService extends RestServiceBase {
 		this.service = searchService;
 	}
 
-	// protected URI getItemUri(T item) {
-	// checkNotNull(item);
-	// return url.getBaseUriBuilder().path(getClass()).path(item.getId())
-	// .build();
-	// }
-
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Path(SEARCH_ACTION + "/{criteria}")
@@ -115,7 +109,7 @@ public class RestSearchService extends RestServiceBase {
 		if (log.isTraceEnabled()) {
 			log.trace(String.format("facetedSearch - %s", criteria));
 		}
-		
+
 		try {
 			SearchResult<Document> items;
 			if (query == null) {
@@ -135,15 +129,17 @@ public class RestSearchService extends RestServiceBase {
 	@Path(MORE_LIKE_THIS_ACTION + "/{criteria}")
 	public Response moreLikeThis(
 			@PathParam("criteria") String criteria,
-			@QueryParam(MORE_LIKE_THIS_MIN_TERM_FREQUENCY_PARAMETER) @DefaultValue("2") int minTermFrequency,
+			@QueryParam(SEARCH_FIRST_PARAMETER) @DefaultValue("0") int first,
+			@QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("5") int pageSize,
+			@QueryParam(MORE_LIKE_THIS_MIN_TERM_FREQUENCY_PARAMETER) @DefaultValue("1") int minTermFrequency,
 			@QueryParam(MORE_LIKE_THIS_MAX_ITEMS_PARAMETER) @DefaultValue("10") int maxItems) {
 		isAuthenticated();
 		if (log.isTraceEnabled()) {
 			log.trace(String.format("moreLikeThis - %s", criteria));
 		}
 		try {
-			SearchResult<Document> items = service.moreLikeThis(criteria, minTermFrequency,
-					maxItems);
+			SearchResult<Document> items = service.moreLikeThis(criteria,
+					first, pageSize, minTermFrequency, maxItems);
 			return Response.ok(items).build();
 		} catch (ServiceException e) {
 			throw new RestServiceException(e.getLocalizedMessage());

@@ -46,7 +46,9 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 		if ($scope.criteria === '' || $scope.criteria === '*') {
 			$scope.alerts.push({ msg: 'Empty or wildcard not allowed' });
 			$scope.documents = [];
+      searchService.criteria(null);
 		} else {
+      searchService.criteria($scope.criteria);
 			$scope.facet = 'tags';
 			find(0, $scope.criteria, /*term,*/ true);
 		}
