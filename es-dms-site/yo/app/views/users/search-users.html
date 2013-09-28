@@ -11,7 +11,7 @@
     			<th>Name</th>
     			<th>Email</th>
     			<th>City</th>
-    			<th style="width: 10%">Disabled</th>
+    			<th style="width: 10%">Status</th>
     			<th>Actions</th>
     		</tr>
     	</thead>
@@ -20,7 +20,7 @@
     			<td>{{ user.name }}</td>
     			<td>{{ user.email }}</td>
     			<td>{{ user.city }}</td>
-    			<td>{{ user.disabled }}</td>
+    			<td><span data-ng-show="user.disabled" class="label label-important">Disabled</span></td>
     			<td>
 					<div class="btn-group">
 						<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"

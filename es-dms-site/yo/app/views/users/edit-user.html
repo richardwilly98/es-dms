@@ -28,10 +28,10 @@
 			<div class="control-group">
         		<label class="control-label">Roles:</label>
         		<div class="controls">
-        			<select multiple="multiple">
-        				<option data-ng-repeat="role in user.roles">{{
-            				role.id }}</option>
-        			</select>
+              <select multiple ng-model="selectedRoles" ng-options="role.name for role in roles">
+              </select>
+              <!-- select multiple ng-multiple="true" ng-model="selectedRoles" ng-options="id as role.id for role in roles | orderBy: 'id'">
+              </select -->
         		</div>
       		</div>
       		
