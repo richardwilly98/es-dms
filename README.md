@@ -11,10 +11,10 @@ you will need to compile and run this section first. Once this part is complete,
 
 Elasticsearch is required with mapper-attachment plugin. To install the required plugins in elasticsearch go to the elasticsearch base folder and type:
 
-  Run `bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/1.8.0`
-  Run bin/plugin -install mobz/elasticsearch-head              -- this will install a web based administration interface for elasticsearch
+  bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/1.8.0
+  bin/plugin -install mobz/elasticsearch-head              -- this will install a web based administration interface for elasticsearch
   
-Make sure elasticsearch is running, go to the elasticseach base folder, open a command line shell and type:
+Make sure elasticsearch is running before using the site. To start elasticsearch, go to the elasticseach base folder, open a command line shell and type:
 
 - bin/elasticsearch
 
