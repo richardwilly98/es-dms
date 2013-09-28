@@ -1,6 +1,7 @@
 'use strict';
 
-esDmsSiteApp.service('authenticationService', ['esdmsAuthenticationService', 'authService', 'sharedService', function (esdmsAuthenticationService, authService, sharedService) {
+esDmsSiteApp.service('authenticationService', ['esdmsAuthenticationService', 'authService', 'sharedService', 'userService',
+	function (esdmsAuthenticationService, authService, sharedService, userService) {
 	return {
 		login: function(username, password, rememberMe, callback) {
 			esdmsAuthenticationService.login(username, password, rememberMe, function(data){
@@ -8,6 +9,9 @@ esDmsSiteApp.service('authenticationService', ['esdmsAuthenticationService', 'au
 					authService.loginConfirmed();
 					sharedService.prepForBroadcast({logout: true});
 	        sharedService.updateUserSettings('name', username);
+	        userService.get(username, function(data) {
+						sharedService.setCurrentUser(data);
+	        });
 				}
         callback(data);
 			});
