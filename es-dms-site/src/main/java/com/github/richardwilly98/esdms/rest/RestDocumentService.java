@@ -254,7 +254,8 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 			 **** changed contentype to text/plain
 			 **** needs fixing
 			 ********************************/
-			rb.type("text/plain");
+//			rb.type("text/plain");
+			rb.type(version.getFile().getContentType());
 			InputStream stream = new ByteArrayInputStream(version.getFile()
 					.getContent());
 			rb.entity(stream);
@@ -262,7 +263,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 			rb.header("Content-Disposition", contentDisposition.build());
 			return rb.build();
 		} catch (Throwable t) {
-			log.error("download failed", t);
+			log.error("view failed", t);
 			return Response.status(Status.NOT_FOUND).build();
 		}
 	}
