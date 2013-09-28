@@ -9,14 +9,20 @@ Test web app using AngujarJS, Jersey and ElasticSearch
 
 you will need to compile and run this section first. Once this part is complete, please follow instructions given in the es-dms / es-dms-site / yo / README.md file in order to install, compile and run the yo framework and the grunt server that hosts the site.
 
-- Run: mvn clean install
-- Run: es-dms-site\mvn clean tomcat7:run
-- Open browser: http://localhost:8080/es-dms-site
-- Elasticsearch is required with mapper-attachment plugin.
+Elasticsearch is required with mapper-attachment plugin. To install the required plugins in elasticsearch go to the elasticsearch base folder and type:
 
   Run `bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/1.8.0`
   Run bin/plugin -install mobz/elasticsearch-head              -- this will install a web based administration interface for elasticsearch
   
+Make sure elasticsearch is running, go to the elasticseach base folder, open a command line shell and type:
+
+- bin/elasticsearch
+
+to compile and run the project's code, from the project base folder (es-dms), type the following sequence of coomands: 
+- mvn clean install
+- es-dms-site\mvn clean tomcat7:run
+- Open browser: http://localhost:8080/es-dms-site
+
 - follow instructions at:  https://github.com/richardwilly98/es-dms/blob/master/es-dms-site/yo/README.md
   to complete installation and run site. 
 
