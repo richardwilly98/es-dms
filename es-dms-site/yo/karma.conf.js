@@ -19,7 +19,7 @@ files = [
   'app/bower_components/select2/select2.js',
   'app/bower_components/angular-ui-select2/src/select2.js',
   //'app/bower_components/ngUpload/ng-upload.js',
-  'app/bower_components/lodash/lodash.js',
+  'app/bower_components/lodash/dist/lodash.js',
   'app/scripts/*.js',
   'app/scripts/**/*.js',
   //'test/mock/**/*.js',
