@@ -1,9 +1,9 @@
 /* exported esDmsSiteApp */
 'use strict';
 
-var esDmsSiteApp = angular.module('esDmsSiteApp', ['ngResource', 'authentication', 'ui.state', 'http-auth-interceptor', 'ui.bootstrap', 'ui.select2']);
+var esDmsSiteApp = angular.module('esDmsSiteApp', ['ngResource', 'authentication', /*'ui.state',*/ 'ui.router', 'http-auth-interceptor', 'ui.bootstrap', 'ui.select2']);
 
-esDmsSiteApp.config(function ($routeProvider, $stateProvider) {
+esDmsSiteApp.config(function (/*$routeProvider,*/ $stateProvider) {
 
   $stateProvider
     .state('index', {
@@ -30,5 +30,16 @@ esDmsSiteApp.config(function ($routeProvider, $stateProvider) {
       url: '/index.test-accordion',
       templateUrl: 'views/test/accordion.html'
     })
+    /*.state('documents', {
+      url: '/documents'
+    })
+    .state('documents.details', {
+      url: '/details'
+    })
+    .state('documents.details.item', {
+      url: '/:item',
+      templateUrl: 'views/documents/details.html',
+      controller: 'DocumentsDetailsCtrl'
+    })*/
     ;
 });
