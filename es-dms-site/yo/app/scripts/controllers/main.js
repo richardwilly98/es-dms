@@ -9,14 +9,29 @@ esDmsSiteApp.controller('mainController', function ($log, $scope, $location, sha
   //   //$scope.showLogout = sharedService.message.logout;
 		// // $scope.username = sharedService.message.user;
   // });
-  $scope.$watch('service.getUserSettings()',
+  
+  /*$scope.$watch('service.getUserSettings()',
     function(newValue) {
       $log.log('watch - name: ' + newValue.name);
       if (newValue) {
         $log.log('username ' + newValue.name);
         $scope.user.name = newValue.name;
       }
+    });*/
+
+  $scope.$watch('service.getCurrentUser()',
+    function(newValue) {
+      if (newValue !== null) {
+        $log.log('watch - currentUser: ' + newValue.email);
+        $scope.user = newValue;
+      } else {
+        $scope.user = { name: ''};
+      }
     });
+
+  $scope.hasRole = function(id) {
+    return sharedService.hasRole(id);
+  };
 
   $scope.logout = function() {
     authenticationService.logout();

@@ -10,6 +10,9 @@ esDmsSiteApp.service('sharedService', function ($log, $rootScope) {
   var currentUser = {};
   var message = '';
   return {
+    setCurrentUser: function (cu) {
+      currentUser = cu;
+    },
     getCurrentUser: function () {
       return currentUser;
     },
@@ -27,6 +30,14 @@ esDmsSiteApp.service('sharedService', function ($log, $rootScope) {
     },
     getSettings: function() {
       return settings;
+    },
+    hasRole: function(id) {
+      if (currentUser !== null) {
+        var role = _.find(currentUser.roles, {'id' : id});
+        return (role !== undefined);
+      } else {
+        return false;
+      }
     }
   };
 });

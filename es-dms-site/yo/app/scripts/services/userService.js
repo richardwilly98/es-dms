@@ -48,6 +48,13 @@ esDmsSiteApp.service('userService', ['$log', '$rootScope', '$resource', '$http',
 			if (!editedUser) {
 				users.push(user);
 			}
-		}
+		},
+		get: function(id, callback) {
+			$log.log('get user: ' + id);
+      var user = new userResource.get({'id': id}, function() {
+        $log.log('get user: ' + JSON.stringify(user));
+        callback(user);
+      });
+    }
 	};
 }]);
