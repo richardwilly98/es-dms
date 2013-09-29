@@ -46,7 +46,9 @@ module.exports = function (grunt) {
       coffeeTest: {
         files: ['test/spec/{,*/}*.coffee'],
         tasks: ['coffee:test']
-      },
+      }
+      // es-dms: Start - disabled livereload for IE - comment out this section
+      ,
       livereload: {
         options: {
           livereload: LIVERELOAD_PORT
@@ -58,6 +60,7 @@ module.exports = function (grunt) {
           '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
         ]
       }
+      // es-dms: End - disabled livereload for IE - comment out this section
     },
     connect: {
       // es-dms: set proxy to access REST api
