@@ -4,21 +4,21 @@ esDmsSiteApp.directive('esdmsFacet', ['$log', function ($log) {
 	$log.log('Start esdmsFacet');
 	return {
     restrict: 'E',
-    scope: { term: '=', count: '=', selected: '=' },
+    scope: { term: '=' },
     template:
       '<div>' +
-      '<input type="checkbox" ng-model="selected">' +
-      '<a data-ng-click="search(term)">' +
-      '{{ term }} - ({{ count }})' +
-      '</a>' +
+      '<a data-ng-click="toggle()" class="label">{{ term.term }}</a>' +
+      ' ' + 
+      '<span class="badge badge-info">{{ term.count }}</span>' +
       '</div>',
-    link: function ( scope/*, element*/ ) {
-			scope.$watch('selected', function() {
-				if (scope.selected !== undefined) {
-					$log.log('change - ' + scope.selected + ' - term: ' + scope.term);
-					scope.$emit('search:applyfacet', {'term': scope.term, 'selected': scope.selected});
-				}
-			});
+    link: function ( scope, element ) {
+      scope.toggle = function() {
+        scope.selected = !scope.selected;
+        $log.log('select term: ' + scope.term.term);
+        var label = element.find('.label');
+        label.toggleClass('label-info');
+        scope.$emit('search:applyfacet', {'term': scope.term.term, 'selected': scope.selected});
+      };
     }
 	};
 }]);
