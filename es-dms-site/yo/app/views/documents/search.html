@@ -6,76 +6,74 @@
 		<div data-ng-include src="'views/search/options.html'"></div>
 	</form>
 	<br />
+	<alert data-ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
 	<div data-ng-show="totalHits">
 		About {{ totalHits }} results - search took {{ elapsedTime }} ms - items per page : {{ pageSize }}
 	</div>
 	<div class="container-fluid">
 		<div class="row-fluid">
     		<div class="span2">
-      			<!--Sidebar content-->
-				<div class="well sidebar-nav" data-ng-show="facets">
-					<ul class="nav nav-list">
-						<li class="nav-header">{{ facet }}</li>
-						<li data-ng-repeat="term in facets.terms">
-						<!--a data-ng-click="search(term.term)" data-ng-repeat="term in facets.terms">{{
-			   				term.term }} - ({{ term.count }})<a-->
-			   				<esdms-facet term="term.term" count="term.count" selected="term.selected"></esdms-facet>
-						</li>
-			   		</ul>
-				</div>
+	      	<!--Sidebar content-->
+					<div class="well sidebar-nav" data-ng-show="facets">
+						<ul class="nav nav-list">
+							<li class="nav-header">{{ facet }}</li>
+							<li data-ng-repeat="term in facets.terms">
+			   				<esdms-facet term="term"></esdms-facet>
+							</li>
+				   		</ul>
+					</div>
     		</div>
     		<div class="span10">
-	<!--Body content-->
-	<alert data-ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
-	<table class="table table-condensed">
-		<thead>
-			<tr>
-				<th>Tags</th>
-				<th>Name</th>
-				<th>Author</th>
-				<th>Status</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr data-ng-repeat="document in documents">
-				<td>
-					<esdms-tagging id="document.id" tags="document.tags" newtag="newtag"></esdms-tagging>
-				</td>
-				<td>
-					<div popover="{{ document.preview }}" popover-placement="bottom"
-						popover-title="Preview" popover-trigger="mouseenter"
-						popover-popup-delay="1000" data-ng-mouseover="preview(document.id)">{{
-						document.name }}</div>
-				</td>
-				<td>{{ document.attributes.author }}</td>
-				<td>{{ document.attributes.status }}</td>
-				<td>
-					<div data-ng-switch="document.attributes.status" class="btn-group">
-						<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
-							href="#"> Action <span class="caret"></span>
-						</a>
-						<ul data-ng-switch-when="A" class="dropdown-menu">
-							<li><a data-ng-click="showDetails(document.id)" data-toggle="modal" href="#documents/details/{{ document.id }}">Details</a></li>
-							<li><a href="api/documents/{{ document.id }}/view" target="_blank">View</a></li>
-							<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
-							<li><a data-ng-click="checkout(document.id)">Check-Out</a></li>
-							<li><a data-ng-click="remove(document.id)">Delete</a></li>
-						</ul>
-						<ul data-ng-switch-when="L" class="dropdown-menu">
-							<li><a data-ng-click="showDetails(document.id)" data-toggle="modal" href="#documents/details/{{ document.id }}">Details</a></li>
-							<li><a href="api/documents/{{ document.id }}/view" target="_blank">View</a></li>
-							<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
-							<li><a data-ng-click="checkin(document.id)">Check-In</a></li>
-						</ul>
+					<!--Body content-->
+					<table class="table table-condensed">
+						<thead>
+							<tr>
+								<th>Tags</th>
+								<th>Name</th>
+								<th>Author</th>
+								<th>Status</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr data-ng-repeat="document in documents">
+								<td>
+									<esdms-tagging id="document.id" tags="document.tags" newtag="newtag"></esdms-tagging>
+								</td>
+								<td>
+									<div popover="{{ document.preview }}" popover-placement="bottom"
+										popover-title="Preview" popover-trigger="mouseenter"
+										popover-popup-delay="1000" data-ng-mouseover="preview(document.id)">{{
+										document.name }}</div>
+								</td>
+								<td>{{ document.attributes.author }}</td>
+								<td>{{ document.attributes.status }}</td>
+								<td>
+									<div data-ng-switch="document.attributes.status" class="btn-group">
+										<a class="btn btn-success dropdown-toggle" data-toggle="dropdown"
+											href="#"> Action <span class="caret"></span>
+										</a>
+										<ul data-ng-switch-when="A" class="dropdown-menu">
+											<li><a data-ng-click="showDetails(document.id)" data-toggle="modal" href="#documents/details/{{ document.id }}">Details</a></li>
+											<li><a href="api/documents/{{ document.id }}/view" target="_blank">View</a></li>
+											<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
+											<li><a data-ng-click="checkout(document.id)">Check-Out</a></li>
+											<li><a data-ng-click="remove(document.id)">Delete</a></li>
+										</ul>
+										<ul data-ng-switch-when="L" class="dropdown-menu">
+											<li><a data-ng-click="showDetails(document.id)" data-toggle="modal" href="#documents/details/{{ document.id }}">Details</a></li>
+											<li><a href="api/documents/{{ document.id }}/view" target="_blank">View</a></li>
+											<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
+											<li><a data-ng-click="checkin(document.id)">Check-In</a></li>
+										</ul>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<div data-ng-show="totalPages > 1">
+						<pagination num-pages="totalPages" current-page="currentPage" max-size="maxPages"></pagination>
 					</div>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-	<div data-ng-show="totalPages > 1">
-		<pagination num-pages="totalPages" current-page="currentPage" max-size="maxPages"></pagination>
-	</div>
     		</div>
   		</div>
 	</div>

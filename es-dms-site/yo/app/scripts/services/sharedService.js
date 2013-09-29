@@ -5,8 +5,21 @@ esDmsSiteApp.service('sharedService', function ($log, $rootScope) {
   var settings = {
     user : {
       pageSize: 12
+    },
+    search : {
+      criteria: null,
+      facet: null,
+      facets: [],
+      terms: [],
+      documents: [],
+      totalHits: 0,
+      totalPages: 0,
+      elapsedTime: 0,
+      maxPages: 10,
+      currentPage: 1
     }
   };
+  
   var currentUser = {};
   var message = '';
   return {
