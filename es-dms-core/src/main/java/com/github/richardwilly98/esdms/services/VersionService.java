@@ -26,9 +26,8 @@ package com.github.richardwilly98.esdms.services;
  * #L%
  */
 
-
 import com.github.richardwilly98.esdms.api.Version;
 
-public interface VersionService extends BaseService <Version> {
-	
+public interface VersionService extends BaseService<Version> {
+
 }

@@ -1,5 +1,7 @@
 /* Main Stylesheet */
-@import url('../bower_components/blueimp-file-upload/css/jquery.fileupload-ui.css');
+@import
+	url('../bower_components/blueimp-file-upload/css/jquery.fileupload-ui.css')
+	;
 
 /* Add top padding for navbar-top-fixed */
 /*body {
@@ -8,11 +10,12 @@
 }*/
 
 /* Remove top padding when top navbar goes static in narrow viewports */
-@media (max-width: 979px) {
-  body {
-    padding-top: 0;
-  }
+@media ( max-width : 979px) {
+	body {
+		padding-top: 0;
+	}
 }
+
 .sidebar-nav {
-  padding: 9px 0;
+	padding: 9px 0;
 }

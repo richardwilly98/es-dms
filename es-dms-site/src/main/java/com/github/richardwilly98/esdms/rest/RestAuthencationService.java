@@ -46,79 +46,72 @@ import com.github.richardwilly98.esdms.services.AuthenticationService;
 @Path(RestAuthencationService.AUTH_PATH)
 public class RestAuthencationService extends RestItemBaseService<SessionImpl> {
 
-	public static final String LOGOUT_PATH = "logout";
-	public static final String LOGIN_PATH = "login";
-	public static final String AUTH_PATH = "auth";
-	public static final String ES_DMS_TICKET = "ES_DMS_TICKET";
+    public static final String LOGOUT_PATH = "logout";
+    public static final String LOGIN_PATH = "login";
+    public static final String AUTH_PATH = "auth";
+    public static final String ES_DMS_TICKET = "ES_DMS_TICKET";
 
-	@Inject
-	public RestAuthencationService(AuthenticationService authenticationService) {
-		super(authenticationService, authenticationService);
+    @Inject
+    public RestAuthencationService(AuthenticationService authenticationService) {
+	super(authenticationService, authenticationService);
+    }
+
+    @POST
+    @Path(LOGIN_PATH)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response login(Credential credential) {
+	try {
+	    checkNotNull(credential);
+	    if (log.isTraceEnabled()) {
+		log.trace(String.format("login - %s", credential.getUsername()));
+	    }
+	    log.trace("getHost: " + url.getBaseUri().getHost());
+	    log.trace("getPath: " + url.getPath());
+	    String token = authenticationService.login(credential);
+	    if (log.isTraceEnabled()) {
+		log.trace(String.format("Create cookie %s: [%s]", ES_DMS_TICKET, token));
+	    }
+	    return Response.ok().entity(new AuthenticationResponse("AUTHENTICATED", token))
+		    .cookie(new NewCookie(ES_DMS_TICKET, token, "/", null, 1, url.getBaseUri().getHost(), 30000, false)).build();
+	} catch (Throwable t) {
+	    log.error("login failed", t);
+	    throw new RestServiceException(t.getLocalizedMessage());
+	}
+    }
+
+    @POST
+    @Path(LOGOUT_PATH)
+    public Response logout(@CookieParam(value = ES_DMS_TICKET) String token) {
+	try {
+	    if (log.isTraceEnabled()) {
+		log.trace(String.format("logout: %s", token));
+	    }
+	    authenticationService.logout(token);
+	    return Response.ok().cookie(new NewCookie(ES_DMS_TICKET, "", "/", "", "", -1, false)).build();
+	} catch (Throwable t) {
+	    log.error("logout failed", t);
+	    throw new RestServiceException(t.getLocalizedMessage());
+	}
+    }
+
+    private class AuthenticationResponse {
+	private final String status;
+	private final String token;
+
+	public AuthenticationResponse(String status, String token) {
+	    this.status = status;
+	    this.token = token;
 	}
 
-	@POST
-	@Path(LOGIN_PATH)
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces({ MediaType.APPLICATION_JSON })
-	public Response login(Credential credential) {
-		try {
-			checkNotNull(credential);
-			if (log.isTraceEnabled()) {
-				log.trace(String.format("login - %s", credential.getUsername()));
-			}
-			log.trace("getHost: " + url.getBaseUri().getHost());
-			log.trace("getPath: " + url.getPath());
-			String token = authenticationService.login(credential);
-			if (log.isTraceEnabled()) {
-				log.trace(String.format("Create cookie %s: [%s]",
-						ES_DMS_TICKET, token));
-			}
-			return Response
-					.ok()
-					.entity(new AuthenticationResponse("AUTHENTICATED", token))
-					.cookie(new NewCookie(ES_DMS_TICKET, token, "/", null, 1,
-							url.getBaseUri().getHost(), 30000, false)).build();
-		} catch (Throwable t) {
-			log.error("login failed", t);
-			throw new RestServiceException(t.getLocalizedMessage());
-		}
+	@SuppressWarnings("unused")
+	public String getToken() {
+	    return token;
 	}
 
-	@POST
-	@Path(LOGOUT_PATH)
-	public Response logout(@CookieParam(value = ES_DMS_TICKET) String token) {
-		try {
-			if (log.isTraceEnabled()) {
-				log.trace(String.format("logout: %s", token));
-			}
-			authenticationService.logout(token);
-			return Response
-					.ok()
-					.cookie(new NewCookie(ES_DMS_TICKET, "", "/", "", "", -1,
-							false)).build();
-		} catch (Throwable t) {
-			log.error("logout failed", t);
-			throw new RestServiceException(t.getLocalizedMessage());
-		}
+	@SuppressWarnings("unused")
+	public String getStatus() {
+	    return status;
 	}
-
-	private class AuthenticationResponse {
-		private final String status;
-		private final String token;
-
-		public AuthenticationResponse(String status, String token) {
-			this.status = status;
-			this.token = token;
-		}
-
-		@SuppressWarnings("unused")
-		public String getToken() {
-			return token;
-		}
-
-		@SuppressWarnings("unused")
-		public String getStatus() {
-			return status;
-		}
-	}
+    }
 }

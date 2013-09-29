@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.rest;
  * #L%
  */
 
-
 import javax.inject.Inject;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
@@ -43,37 +42,35 @@ import com.github.richardwilly98.esdms.services.AuthenticationService;
  */
 public abstract class RestServiceBase {
 
-	protected final Logger log = Logger.getLogger(getClass());
-	protected final AuthenticationService authenticationService;
+    protected final Logger log = Logger.getLogger(getClass());
+    protected final AuthenticationService authenticationService;
 
-	@Context
-	UriInfo url;
+    @Context
+    UriInfo url;
 
-	@Inject
-	public RestServiceBase(final AuthenticationService authenticationService) {
-		this.authenticationService = authenticationService;
+    @Inject
+    public RestServiceBase(final AuthenticationService authenticationService) {
+	this.authenticationService = authenticationService;
+    }
+
+    protected boolean isAuthenticated() {
+	return (getCurrentUser() != null);
+    }
+
+    protected String getCurrentUser() {
+	try {
+	    log.trace("*** getCurrentUser ***");
+	    Subject currentSubject = SecurityUtils.getSubject();
+	    log.trace(String.format("currentSubject.isAuthenticated(): %s", currentSubject.isAuthenticated()));
+	    log.trace(String.format("Principal: %s", currentSubject.getPrincipal()));
+	    if (currentSubject.getPrincipal() == null) {
+		throw new UnauthorizedException("Unauthorize request", url.getPath());
+	    } else {
+		return currentSubject.getPrincipal().toString();
+	    }
+	} catch (Throwable t) {
+	    throw new UnauthorizedException();
 	}
-
-	protected boolean isAuthenticated() {
-		return (getCurrentUser() != null);
-	}
-
-	protected String getCurrentUser() {
-		try {
-			log.trace("*** getCurrentUser ***");
-			Subject currentSubject = SecurityUtils.getSubject();
-			log.trace(String.format("currentSubject.isAuthenticated(): %s"
-					, currentSubject.isAuthenticated()));
-			log.trace(String.format("Principal: %s", currentSubject.getPrincipal()));
-			if (currentSubject.getPrincipal() == null) {
-				throw new UnauthorizedException("Unauthorize request",
-						url.getPath());
-			} else {
-				return currentSubject.getPrincipal().toString();
-			}
-		} catch (Throwable t) {
-			throw new UnauthorizedException();
-		}
-	}
+    }
 
 }

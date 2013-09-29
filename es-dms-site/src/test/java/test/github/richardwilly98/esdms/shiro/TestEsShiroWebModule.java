@@ -26,7 +26,6 @@ package test.github.richardwilly98.esdms.shiro;
  * #L%
  */
 
-
 import javax.servlet.ServletContext;
 
 import org.apache.log4j.Logger;
@@ -45,37 +44,36 @@ import com.google.inject.name.Names;
 
 public class TestEsShiroWebModule extends ShiroWebModule {
 
-	private final String securityFilterPath;
-	private final Logger log = Logger.getLogger(this.getClass());
-	
-	public TestEsShiroWebModule(ServletContext servletContext, String securityFilterPath) {
-		super(servletContext);
-		this.securityFilterPath = securityFilterPath;
-	}
+    private final String securityFilterPath;
+    private final Logger log = Logger.getLogger(this.getClass());
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected void configureShiroWeb() {
-		log.debug("*** configureShiroWeb ***");
-		bindConstant().annotatedWith(Names.named("shiro.loginUrl")).to("/#/login");
-		
-		bindRealm().to(EsRealm.class).asEagerSingleton();
-		bind(SessionDAO.class).to(EsSessionDAO.class);
-		bind(EsSessionDAO.class);
-		
-		addFilterChain("/auth/**", ANON);
-//		addFilterChain("/auth/**", SSL);
+    public TestEsShiroWebModule(ServletContext servletContext, String securityFilterPath) {
+	super(servletContext);
+	this.securityFilterPath = securityFilterPath;
+    }
 
-		addFilterChain("/**", Key.get(EsAuthenticationFilter.class));
-	}
-	
-	@Override
-	protected void bindSessionManager(
-			AnnotatedBindingBuilder<SessionManager> bind) {
-		bind.to(EsWebSessionManager.class).in(Scopes.SINGLETON);
-		bindConstant().annotatedWith(Names.named("shiro.globalSessionTimeout")).to(30000L);
-		bind(EsWebSessionManager.class);
-		
-	}
-	
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void configureShiroWeb() {
+	log.debug("*** configureShiroWeb ***");
+	bindConstant().annotatedWith(Names.named("shiro.loginUrl")).to("/#/login");
+
+	bindRealm().to(EsRealm.class).asEagerSingleton();
+	bind(SessionDAO.class).to(EsSessionDAO.class);
+	bind(EsSessionDAO.class);
+
+	addFilterChain("/auth/**", ANON);
+	// addFilterChain("/auth/**", SSL);
+
+	addFilterChain("/**", Key.get(EsAuthenticationFilter.class));
+    }
+
+    @Override
+    protected void bindSessionManager(AnnotatedBindingBuilder<SessionManager> bind) {
+	bind.to(EsWebSessionManager.class).in(Scopes.SINGLETON);
+	bindConstant().annotatedWith(Names.named("shiro.globalSessionTimeout")).to(30000L);
+	bind(EsWebSessionManager.class);
+
+    }
+
 }

@@ -34,28 +34,27 @@ import com.github.richardwilly98.esdms.AuditEntryImpl;
 @JsonDeserialize(as = AuditEntryImpl.class)
 public interface AuditEntry extends ItemBase {
 
-	public enum Event {
-		UNDEFINED("undefined"), CUSTOM("custom"), UPLOAD("upload"), CHECKOUT(
-				"checkout"), CHECKIN("checkin");
+    public enum Event {
+	UNDEFINED("undefined"), CUSTOM("custom"), UPLOAD("upload"), CHECKOUT("checkout"), CHECKIN("checkin");
 
-		private String eventName;
+	private String eventName;
 
-		private Event(String eventName) {
-			this.eventName = eventName;
-		}
-
-		public String getEventName() {
-			return eventName;
-		}
-
+	private Event(String eventName) {
+	    this.eventName = eventName;
 	}
 
-	public abstract String getUser();
+	public String getEventName() {
+	    return eventName;
+	}
 
-	public abstract Date getDate();
+    }
 
-	public abstract Event getEvent();
+    public abstract String getUser();
 
-	public abstract String getItemId();
+    public abstract Date getDate();
+
+    public abstract Event getEvent();
+
+    public abstract String getItemId();
 
 }

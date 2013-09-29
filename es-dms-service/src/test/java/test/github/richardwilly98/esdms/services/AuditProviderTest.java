@@ -41,127 +41,111 @@ import com.github.richardwilly98.esdms.services.UserService;
 
 public class AuditProviderTest extends ProviderTestBase {
 
-	private AuditEntry testCreateAudit(AuditEntry.Event event, String user,
-			String itemId, Date date) throws Throwable {
-		// String id = String.valueOf(System.currentTimeMillis());
-		AuditEntry audit = new AuditEntryImpl.Builder()/* .id(id) */
-		/* .name(event.toString() + "-" + user + "-" + id) */.event(event)
-				.user(user).itemId(itemId).date(date).build();
+    private AuditEntry testCreateAudit(AuditEntry.Event event, String user, String itemId, Date date) throws Throwable {
+	// String id = String.valueOf(System.currentTimeMillis());
+	AuditEntry audit = new AuditEntryImpl.Builder()/* .id(id) */
+	/* .name(event.toString() + "-" + user + "-" + id) */.event(event).user(user).itemId(itemId).date(date).build();
 
-		audit = auditService.create(audit);
-		// Assert.assertEquals(id, audit.getId());
+	audit = auditService.create(audit);
+	// Assert.assertEquals(id, audit.getId());
 
-		AuditEntry newAudit = auditService.get(audit.getId());
-		Assert.assertNotNull(newAudit);
-		Assert.assertEquals(audit.getName(), newAudit.getName());
-		Assert.assertEquals(audit.getDescription(), newAudit.getDescription());
-		Assert.assertEquals(audit.isDisabled(), newAudit.isDisabled());
-		Assert.assertEquals(audit.getEvent(), newAudit.getEvent());
-		Assert.assertEquals(audit.getUser(), newAudit.getUser());
-		Assert.assertEquals(audit.getDate(), newAudit.getDate());
-		Assert.assertEquals(audit.getItemId(), newAudit.getItemId());
-		return newAudit;
+	AuditEntry newAudit = auditService.get(audit.getId());
+	Assert.assertNotNull(newAudit);
+	Assert.assertEquals(audit.getName(), newAudit.getName());
+	Assert.assertEquals(audit.getDescription(), newAudit.getDescription());
+	Assert.assertEquals(audit.isDisabled(), newAudit.isDisabled());
+	Assert.assertEquals(audit.getEvent(), newAudit.getEvent());
+	Assert.assertEquals(audit.getUser(), newAudit.getUser());
+	Assert.assertEquals(audit.getDate(), newAudit.getDate());
+	Assert.assertEquals(audit.getItemId(), newAudit.getItemId());
+	return newAudit;
+    }
+
+    @Test
+    public void testCreateAudit() throws Throwable {
+	log.info("Start testCreateAudit");
+
+	// Make sure to be login with user having sufficient permission
+	loginAdminUser();
+
+	// content permissions
+	AuditEntry audit = testCreateAudit(AuditEntry.Event.UPLOAD, UserService.DEFAULT_ADMIN_LOGIN,
+	        "document-" + System.currentTimeMillis(), new Date());
+	log.debug(audit);
+    }
+
+    @Test
+    public void testFindAudit() throws Throwable {
+	log.info("Start testFindAudit");
+
+	Date date = new Date(0);
+	String itemId = "document-" + System.currentTimeMillis();
+	testCreateAudit(AuditEntry.Event.UPLOAD, UserService.DEFAULT_ADMIN_LOGIN, itemId, date);
+
+	SearchResult<AuditEntry> result = auditService.search("item_id:" + itemId, 0, 1);
+
+	Assert.assertNotNull(result);
+	Assert.assertTrue(result.getTotalHits() >= 1);
+	log.debug(String.format("TotalHits: %s", result.getTotalHits()));
+	for (AuditEntry audit : result.getItems()) {
+	    log.debug("audit found: " + audit);
 	}
 
-	@Test
-	public void testCreateAudit() throws Throwable {
-		log.info("Start testCreateAudit");
+	testCreateAudit(AuditEntry.Event.CHECKOUT, UserService.DEFAULT_ADMIN_LOGIN, "document-" + System.currentTimeMillis(), new Date());
+	testCreateAudit(AuditEntry.Event.CHECKIN, UserService.DEFAULT_ADMIN_LOGIN, "document-" + System.currentTimeMillis(), new Date());
 
-		// Make sure to be login with user having sufficient permission
-		loginAdminUser();
+	result = auditService.search("event:" + AuditEntry.Event.CHECKOUT.toString(), 0, 1);
 
-		// content permissions
-		AuditEntry audit = testCreateAudit(AuditEntry.Event.UPLOAD,
-				UserService.DEFAULT_ADMIN_LOGIN,
-				"document-" + System.currentTimeMillis(), new Date());
-		log.debug(audit);
+	Assert.assertNotNull(result);
+	Assert.assertTrue(result.getTotalHits() >= 1);
+
+	Assert.assertNotNull(result.getItems().iterator().next());
+    }
+
+    @Test
+    public void testDeleteAudit() throws Throwable {
+	log.info("Start testDeleteAudit");
+	AuditEntry audit = testCreateAudit(AuditEntry.Event.UPLOAD, UserService.DEFAULT_ADMIN_LOGIN,
+	        "document-" + System.currentTimeMillis(), new Date());
+	String id = audit.getId();
+	audit = auditService.get(id);
+	auditService.delete(audit);
+	audit = auditService.get(id);
+	Assert.assertNull(audit);
+    }
+
+    @Test
+    public void testClearAuditByIds() throws Throwable {
+	log.info("Start testClearAuditByIds");
+	List<String> ids = newArrayList();
+	AuditEntry audit = testCreateAudit(AuditEntry.Event.UPLOAD, UserService.DEFAULT_ADMIN_LOGIN,
+	        "document-" + System.currentTimeMillis(), new Date());
+	ids.add(audit.getId());
+	audit = testCreateAudit(AuditEntry.Event.CHECKOUT, UserService.DEFAULT_ADMIN_LOGIN, "document-" + System.currentTimeMillis(),
+	        new Date());
+	ids.add(audit.getId());
+	auditService.clear(ids);
+	for (String id : ids) {
+	    audit = auditService.get(id);
+	    Assert.assertNull(audit);
 	}
+    }
 
-	@Test
-	public void testFindAudit() throws Throwable {
-		log.info("Start testFindAudit");
-
-		Date date = new Date(0);
-		String itemId = "document-" + System.currentTimeMillis();
-		testCreateAudit(AuditEntry.Event.UPLOAD,
-				UserService.DEFAULT_ADMIN_LOGIN, itemId, date);
-
-		SearchResult<AuditEntry> result = auditService.search("item_id:"
-				+ itemId, 0, 1);
-
-		Assert.assertNotNull(result);
-		Assert.assertTrue(result.getTotalHits() >= 1);
-		log.debug(String.format("TotalHits: %s", result.getTotalHits()));
-		for (AuditEntry audit : result.getItems()) {
-			log.debug("audit found: " + audit);
-		}
-
-		testCreateAudit(AuditEntry.Event.CHECKOUT,
-				UserService.DEFAULT_ADMIN_LOGIN,
-				"document-" + System.currentTimeMillis(), new Date());
-		testCreateAudit(AuditEntry.Event.CHECKIN,
-				UserService.DEFAULT_ADMIN_LOGIN,
-				"document-" + System.currentTimeMillis(), new Date());
-
-		result = auditService.search(
-				"event:" + AuditEntry.Event.CHECKOUT.toString(), 0, 1);
-
-		Assert.assertNotNull(result);
-		Assert.assertTrue(result.getTotalHits() >= 1);
-
-		Assert.assertNotNull(result.getItems().iterator().next());
+    @Test
+    public void testClearAuditByDateRange() throws Throwable {
+	log.info("Start testClearAuditByDateRange");
+	List<String> ids = newArrayList();
+	Date from = new Date(8000);
+	Date to = new Date(9000);
+	AuditEntry audit = testCreateAudit(AuditEntry.Event.UPLOAD, UserService.DEFAULT_ADMIN_LOGIN,
+	        "document-" + System.currentTimeMillis(), from);
+	ids.add(audit.getId());
+	audit = testCreateAudit(AuditEntry.Event.CHECKOUT, UserService.DEFAULT_ADMIN_LOGIN, "document-" + System.currentTimeMillis(), to);
+	ids.add(audit.getId());
+	auditService.clear(from, to);
+	for (String id : ids) {
+	    audit = auditService.get(id);
+	    Assert.assertNull(audit);
 	}
-
-	@Test
-	public void testDeleteAudit() throws Throwable {
-		log.info("Start testDeleteAudit");
-		AuditEntry audit = testCreateAudit(AuditEntry.Event.UPLOAD,
-				UserService.DEFAULT_ADMIN_LOGIN,
-				"document-" + System.currentTimeMillis(), new Date());
-		String id = audit.getId();
-		audit = auditService.get(id);
-		auditService.delete(audit);
-		audit = auditService.get(id);
-		Assert.assertNull(audit);
-	}
-
-	@Test
-	public void testClearAuditByIds() throws Throwable {
-		log.info("Start testClearAuditByIds");
-		List<String> ids = newArrayList();
-		AuditEntry audit = testCreateAudit(AuditEntry.Event.UPLOAD,
-				UserService.DEFAULT_ADMIN_LOGIN,
-				"document-" + System.currentTimeMillis(), new Date());
-		ids.add(audit.getId());
-		audit = testCreateAudit(AuditEntry.Event.CHECKOUT,
-				UserService.DEFAULT_ADMIN_LOGIN,
-				"document-" + System.currentTimeMillis(), new Date());
-		ids.add(audit.getId());
-		auditService.clear(ids);
-		for (String id : ids) {
-			audit = auditService.get(id);
-			Assert.assertNull(audit);
-		}
-	}
-
-	@Test
-	public void testClearAuditByDateRange() throws Throwable {
-		log.info("Start testClearAuditByDateRange");
-		List<String> ids = newArrayList();
-		Date from = new Date(8000);
-		Date to = new Date(9000);
-		AuditEntry audit = testCreateAudit(AuditEntry.Event.UPLOAD,
-				UserService.DEFAULT_ADMIN_LOGIN,
-				"document-" + System.currentTimeMillis(), from);
-		ids.add(audit.getId());
-		audit = testCreateAudit(AuditEntry.Event.CHECKOUT,
-				UserService.DEFAULT_ADMIN_LOGIN,
-				"document-" + System.currentTimeMillis(), to);
-		ids.add(audit.getId());
-		auditService.clear(from, to);
-		for (String id : ids) {
-			audit = auditService.get(id);
-			Assert.assertNull(audit);
-		}
-	}
+    }
 }

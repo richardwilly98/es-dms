@@ -37,124 +37,121 @@ import com.google.common.primitives.Longs;
 
 public class FacetImpl implements Facet {
 
+    private final Set<Term> terms = newHashSet();
+    private long missingCount;
+    private long otherCount;
+    private long totalCount;
+
+    public static class Builder {
+
 	private final Set<Term> terms = newHashSet();
 	private long missingCount;
 	private long otherCount;
 	private long totalCount;
 
-	public static class Builder {
-
-		private final Set<Term> terms = newHashSet();
-		private long missingCount;
-		private long otherCount;
-		private long totalCount;
-
-		public Builder terms(Set<Term> terms) {
-			if (terms != null) {
-				this.terms.addAll(terms);
-			}
-			return this;
-		}
-
-		public Builder missingCount(long missingCount) {
-			this.missingCount = missingCount;
-			return this;
-		}
-
-		public Builder otherCount(long otherCount) {
-			this.otherCount = otherCount;
-			return this;
-		}
-
-		public Builder totalCount(long totalCount) {
-			this.totalCount = totalCount;
-			return this;
-		}
-
-		public FacetImpl build() {
-			return new FacetImpl(this);
-		}
+	public Builder terms(Set<Term> terms) {
+	    if (terms != null) {
+		this.terms.addAll(terms);
+	    }
+	    return this;
 	}
 
-	FacetImpl() {
-		this(null);
+	public Builder missingCount(long missingCount) {
+	    this.missingCount = missingCount;
+	    return this;
 	}
 
-	protected FacetImpl(Builder builder) {
-		if (builder != null) {
-			this.terms.addAll(builder.terms);
-			this.missingCount = builder.missingCount;
-			this.otherCount = builder.otherCount;
-			this.totalCount = builder.totalCount;
-		}
+	public Builder otherCount(long otherCount) {
+	    this.otherCount = otherCount;
+	    return this;
 	}
 
-	@Override
-	public Set<Term> getTerms() {
-		return terms;
+	public Builder totalCount(long totalCount) {
+	    this.totalCount = totalCount;
+	    return this;
 	}
 
-	@Override
-	public long getMissingCount() {
-		return missingCount;
+	public FacetImpl build() {
+	    return new FacetImpl(this);
+	}
+    }
+
+    FacetImpl() {
+	this(null);
+    }
+
+    protected FacetImpl(Builder builder) {
+	if (builder != null) {
+	    this.terms.addAll(builder.terms);
+	    this.missingCount = builder.missingCount;
+	    this.otherCount = builder.otherCount;
+	    this.totalCount = builder.totalCount;
+	}
+    }
+
+    @Override
+    public Set<Term> getTerms() {
+	return terms;
+    }
+
+    @Override
+    public long getMissingCount() {
+	return missingCount;
+    }
+
+    @Override
+    public long getOtherCount() {
+	return otherCount;
+    }
+
+    @Override
+    public long getTotalCount() {
+	return totalCount;
+    }
+
+    void setMissingCount(long missingCount) {
+	this.missingCount = missingCount;
+    }
+
+    void setOtherCount(long otherCount) {
+	this.otherCount = otherCount;
+    }
+
+    void setTotalCount(long totalCount) {
+	this.totalCount = totalCount;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (obj == this) {
+	    return true;
+	}
+	if (obj == null || obj.getClass() != this.getClass()) {
+	    return false;
 	}
 
-	@Override
-	public long getOtherCount() {
-		return otherCount;
-	}
+	FacetImpl obj2 = (FacetImpl) obj;
+	return ((missingCount == obj2.getMissingCount()) && (otherCount == obj2.getOtherCount()) && (totalCount == obj2.getTotalCount()) && (terms == obj2
+	        .getTerms() || (terms != null && terms.equals(obj2.getTerms()))));
+    }
 
-	@Override
-	public long getTotalCount() {
-		return totalCount;
-	}
+    @Override
+    public int hashCode() {
+	final int prime = 31;
+	int result = 1;
+	// INFO:
+	// http://stackoverflow.com/questions/4045063/how-should-i-map-long-to-int-in-hashcode
+	result = prime * result + Longs.hashCode(missingCount);
+	result = prime * result + Longs.hashCode(otherCount);
+	result = prime * result + Longs.hashCode(totalCount);
+	result = prime * result + ((terms == null) ? 0 : terms.hashCode());
+	return result;
+    }
 
-	void setMissingCount(long missingCount) {
-		this.missingCount = missingCount;
-	}
-
-	void setOtherCount(long otherCount) {
-		this.otherCount = otherCount;
-	}
-
-	void setTotalCount(long totalCount) {
-		this.totalCount = totalCount;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == this) {
-			return true;
-		}
-		if (obj == null || obj.getClass() != this.getClass()) {
-			return false;
-		}
-
-		FacetImpl obj2 = (FacetImpl) obj;
-		return ((missingCount == obj2.getMissingCount())
-				&& (otherCount == obj2.getOtherCount())
-				&& (totalCount == obj2.getTotalCount()) && (terms == obj2
-				.getTerms() || (terms != null && terms.equals(obj2.getTerms()))));
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		// INFO: http://stackoverflow.com/questions/4045063/how-should-i-map-long-to-int-in-hashcode
-		result = prime * result + Longs.hashCode(missingCount);
-		result = prime * result + Longs.hashCode(otherCount);
-		result = prime * result + Longs.hashCode(totalCount);
-		result = prime * result + ((terms == null) ? 0 : terms.hashCode());
-		return result;
-	}
-
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this).add("terms", terms)
-				.add("missingCount", missingCount)
-				.add("otherCount", otherCount).add("totalCount", totalCount)
-				.toString();
-	}
+    @Override
+    public String toString() {
+	return Objects.toStringHelper(this).add("terms", terms).add("missingCount", missingCount).add("otherCount", otherCount)
+	        .add("totalCount", totalCount).toString();
+    }
 
 }

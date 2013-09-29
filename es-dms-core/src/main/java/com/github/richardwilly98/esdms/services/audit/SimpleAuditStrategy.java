@@ -35,14 +35,13 @@ import com.github.richardwilly98.esdms.api.AuditEntry;
 
 public class SimpleAuditStrategy implements AuditStrategy {
 
-	@Override
-	public AuditEntry convert(AuditEntry.Event event, String itemId, String user) {
-		checkNotNull(event);
-		checkNotNull(itemId);
-		checkNotNull(user);
-		AuditEntry audit = new AuditEntryImpl.Builder().event(event).user(user)
-				.itemId(itemId).date(new Date()).build();
-		return audit;
-	}
+    @Override
+    public AuditEntry convert(AuditEntry.Event event, String itemId, String user) {
+	checkNotNull(event);
+	checkNotNull(itemId);
+	checkNotNull(user);
+	AuditEntry audit = new AuditEntryImpl.Builder().event(event).user(user).itemId(itemId).date(new Date()).build();
+	return audit;
+    }
 
 }

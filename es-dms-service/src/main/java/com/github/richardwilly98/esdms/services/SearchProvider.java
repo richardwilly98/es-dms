@@ -72,195 +72,164 @@ import com.google.common.base.Strings;
 @Singleton
 public class SearchProvider implements SearchService<Document> {
 
-	final static Logger log = Logger.getLogger(SearchProvider.class);
+    final static Logger log = Logger.getLogger(SearchProvider.class);
 
-	final static ObjectMapper mapper = new ObjectMapper();
-	final Client client;
-	final Settings settings;
-	final String index;
-	private final static String type = "document";
+    final static ObjectMapper mapper = new ObjectMapper();
+    final Client client;
+    final Settings settings;
+    final String index;
+    private final static String type = "document";
 
-	private String currentUser;
+    private String currentUser;
 
-	@Inject
-	SearchProvider(final Client client, final BootstrapService bootstrapService)
-			throws ServiceException {
-		checkNotNull(client);
-		checkNotNull(bootstrapService);
-		checkNotNull(type);
-		this.client = client;
-		this.settings = bootstrapService.loadSettings();
-		this.index = settings.getLibrary();
-	}
+    @Inject
+    SearchProvider(final Client client, final BootstrapService bootstrapService) throws ServiceException {
+	checkNotNull(client);
+	checkNotNull(bootstrapService);
+	checkNotNull(type);
+	this.client = client;
+	this.settings = bootstrapService.loadSettings();
+	this.index = settings.getLibrary();
+    }
 
-	protected void isAuthenticated() throws ServiceException {
-		try {
-			log.debug("*** isAuthenticated ***");
-			Subject currentSubject = SecurityUtils.getSubject();
-			log.debug("currentSubject.isAuthenticated(): "
-					+ currentSubject.isAuthenticated());
-			log.debug("Principal: " + currentSubject.getPrincipal());
-			if (currentSubject.getPrincipal() == null) {
-				throw new ServiceException("Unauthorize request");
-			} else {
-				if (currentUser == null) {
-					if (currentSubject.getPrincipal() instanceof UserImpl) {
-						currentUser = ((UserImpl) currentSubject.getPrincipal())
-								.getId();
-					}
-				}
-			}
-		} catch (Throwable t) {
-			throw new ServiceException();
-		}
-	}
-
-	protected String getCurrentUser() throws ServiceException {
+    protected void isAuthenticated() throws ServiceException {
+	try {
+	    log.debug("*** isAuthenticated ***");
+	    Subject currentSubject = SecurityUtils.getSubject();
+	    log.debug("currentSubject.isAuthenticated(): " + currentSubject.isAuthenticated());
+	    log.debug("Principal: " + currentSubject.getPrincipal());
+	    if (currentSubject.getPrincipal() == null) {
+		throw new ServiceException("Unauthorize request");
+	    } else {
 		if (currentUser == null) {
-			isAuthenticated();
+		    if (currentSubject.getPrincipal() instanceof UserImpl) {
+			currentUser = ((UserImpl) currentSubject.getPrincipal()).getId();
+		    }
 		}
-		return currentUser;
+	    }
+	} catch (Throwable t) {
+	    throw new ServiceException();
 	}
+    }
 
-	protected SearchResult<Document> parseSearchResult(
-			SearchResponse searchResponse, int first, int pageSize, String facet)
-			throws ServiceException {
-		log.trace("*** parseSearchResult ***");
-		try {
-			// log.debug("searchResponse: " + searchResponse.toString());
-			Stopwatch watch = new Stopwatch();
-			watch.start();
-			Set<Document> items = newHashSet();
-			long totalHits = searchResponse.getHits().totalHits();
-			long elapsedTime = searchResponse.getTookInMillis();
-			log.trace(String.format("Total hist: %s - item count: %s",
-					totalHits, searchResponse.getHits().hits().length));
-			for (SearchHit hit : searchResponse.getHits().hits()) {
-				String json = convertFieldAsString(hit, "document");
-				Document item = mapper.readValue(json, Document.class);
-				items.add(item);
-			}
-			SearchResultImpl.Builder<Document> builder = new SearchResultImpl.Builder<Document>()
-					.totalHits(totalHits).elapsedTime(elapsedTime).items(items)
-					.firstIndex(first).pageSize(pageSize);
-			if (searchResponse.getFacets() != null
-					&& searchResponse.getFacets().facetsAsMap() != null) {
-				if (searchResponse.getFacets().facetsAsMap().containsKey(facet)) {
-					TermsFacet tf = (TermsFacet) searchResponse.getFacets()
-							.facetsAsMap().get(facet);
-					Set<Term> terms = newHashSet();
-					for (TermsFacet.Entry entry : tf) {
-						terms.add(new TermImpl.Builder()
-								.term(entry.getTerm().string())
-								.count(entry.getCount()).build());
-					}
-					Facet f = new FacetImpl.Builder().terms(terms)
-							.missingCount(tf.getMissingCount())
-							.otherCount(tf.getOtherCount())
-							.totalCount(tf.getTotalCount()).build();
-					Map<String, Facet> facets = newHashMap();
-					facets.put(facet, f);
-					builder.facets(facets);
-				}
-			}
-			SearchResult<Document> searchResult = builder.build();
-			watch.stop();
-			log.debug(String.format(
-					"Elapsed time to build document list - %s ms",
-					watch.elapsed(TimeUnit.MILLISECONDS)));
-			return searchResult;
-		} catch (Throwable t) {
-			log.error("parseSearchResult failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
+    protected String getCurrentUser() throws ServiceException {
+	if (currentUser == null) {
+	    isAuthenticated();
+	}
+	return currentUser;
+    }
+
+    protected SearchResult<Document> parseSearchResult(SearchResponse searchResponse, int first, int pageSize, String facet)
+	    throws ServiceException {
+	log.trace("*** parseSearchResult ***");
+	try {
+	    // log.debug("searchResponse: " + searchResponse.toString());
+	    Stopwatch watch = new Stopwatch();
+	    watch.start();
+	    Set<Document> items = newHashSet();
+	    long totalHits = searchResponse.getHits().totalHits();
+	    long elapsedTime = searchResponse.getTookInMillis();
+	    log.trace(String.format("Total hist: %s - item count: %s", totalHits, searchResponse.getHits().hits().length));
+	    for (SearchHit hit : searchResponse.getHits().hits()) {
+		String json = convertFieldAsString(hit, "document");
+		Document item = mapper.readValue(json, Document.class);
+		items.add(item);
+	    }
+	    SearchResultImpl.Builder<Document> builder = new SearchResultImpl.Builder<Document>().totalHits(totalHits)
+		    .elapsedTime(elapsedTime).items(items).firstIndex(first).pageSize(pageSize);
+	    if (searchResponse.getFacets() != null && searchResponse.getFacets().facetsAsMap() != null) {
+		if (searchResponse.getFacets().facetsAsMap().containsKey(facet)) {
+		    TermsFacet tf = (TermsFacet) searchResponse.getFacets().facetsAsMap().get(facet);
+		    Set<Term> terms = newHashSet();
+		    for (TermsFacet.Entry entry : tf) {
+			terms.add(new TermImpl.Builder().term(entry.getTerm().string()).count(entry.getCount()).build());
+		    }
+		    Facet f = new FacetImpl.Builder().terms(terms).missingCount(tf.getMissingCount()).otherCount(tf.getOtherCount())
+			    .totalCount(tf.getTotalCount()).build();
+		    Map<String, Facet> facets = newHashMap();
+		    facets.put(facet, f);
+		    builder.facets(facets);
 		}
+	    }
+	    SearchResult<Document> searchResult = builder.build();
+	    watch.stop();
+	    log.debug(String.format("Elapsed time to build document list - %s ms", watch.elapsed(TimeUnit.MILLISECONDS)));
+	    return searchResult;
+	} catch (Throwable t) {
+	    log.error("parseSearchResult failed", t);
+	    throw new ServiceException(t.getLocalizedMessage());
 	}
+    }
 
-	private String convertFieldAsString(SearchHit hit, String name)
-			throws IOException {
-		XContentBuilder builder = jsonBuilder();
-		if (hit.getFields().containsKey(name)) {
-			builder.value(hit.getFields().get(name).getValue());
+    private String convertFieldAsString(SearchHit hit, String name) throws IOException {
+	XContentBuilder builder = jsonBuilder();
+	if (hit.getFields().containsKey(name)) {
+	    builder.value(hit.getFields().get(name).getValue());
+	}
+	return builder.string();
+    }
+
+    @Override
+    public SearchResult<Document> search(String criteria, int first, int pageSize) throws ServiceException {
+	return search(criteria, first, pageSize, null);
+    }
+
+    @Override
+    public SearchResult<Document> search(String criteria, int first, int pageSize, String facet) throws ServiceException {
+	return search(criteria, first, pageSize, facet, null);
+    }
+
+    @Override
+    public SearchResult<Document> search(String criteria, int first, int pageSize, String facet, Map<String, Object> filters)
+	    throws ServiceException {
+	try {
+	    // QueryBuilder query = new MultiMatchQueryBuilder(criteria, "file",
+	    // "name");
+	    // QueryBuilder query = fieldQuery("file", criteria);
+	    log.trace(String.format("search %s - %s - %s - %s - %s", criteria, first, pageSize, facet, filters));
+	    log.trace(String.format("index: %s - type: %s", index, type));
+	    QueryBuilder query = new QueryStringQueryBuilder(criteria);
+	    SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(type)
+		    .addPartialField("document", null, "versions").setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(first)
+		    .setSize(pageSize).setQuery(query);
+	    if (!Strings.isNullOrEmpty(facet)) {
+		searchRequestBuilder.addFacet(FacetBuilders.termsFacet(facet).field(facet).size(10));
+	    }
+	    if (filters != null && filters.size() > 0) {
+		// OrFilterBuilder filterBuilder = FilterBuilders.orFilter();
+		for (String key : filters.keySet()) {
+		    searchRequestBuilder.setFilter(FilterBuilders.termFilter(key, filters.get(key)));
+		    // FilterBuilder termFilter = FilterBuilders.termFilter(
+		    // key, filters.get(key));
+		    // filterBuilder.add(termFilter);
 		}
-		return builder.string();
+		// searchRequestBuilder.setFilter(filterBuilder);
+	    }
+	    log.debug("Search request builder: " + searchRequestBuilder);
+	    SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
+	    return parseSearchResult(searchResponse, first, pageSize, facet);
+	} catch (Throwable t) {
+	    log.error("search failed", t);
+	    throw new ServiceException(t.getLocalizedMessage());
 	}
+    }
 
-	@Override
-	public SearchResult<Document> search(String criteria, int first,
-			int pageSize) throws ServiceException {
-		return search(criteria, first, pageSize, null);
+    public SearchResult<Document> moreLikeThis(String criteria, int first, int pageSize, int minTermFrequency, int maxItems)
+	    throws ServiceException {
+	try {
+	    log.trace(String.format("moreLikeThis %s - %s - %s - %s - %s", criteria, first, pageSize, minTermFrequency, maxItems));
+	    log.trace(String.format("index: %s - type: %s", index, type));
+	    QueryBuilder query = QueryBuilders.moreLikeThisQuery().likeText(criteria).minTermFreq(minTermFrequency).maxQueryTerms(maxItems);
+	    SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(type)
+		    .addPartialField("document", null, "versions").setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(first)
+		    .setSize(pageSize).setQuery(query);
+	    log.debug("Search request builder: " + searchRequestBuilder);
+	    SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
+	    return parseSearchResult(searchResponse, first, pageSize, null);
+	} catch (Throwable t) {
+	    log.error("search failed", t);
+	    throw new ServiceException(t.getLocalizedMessage());
 	}
-
-	@Override
-	public SearchResult<Document> search(String criteria, int first,
-			int pageSize, String facet) throws ServiceException {
-		return search(criteria, first, pageSize, facet, null);
-	}
-
-	@Override
-	public SearchResult<Document> search(String criteria, int first,
-			int pageSize, String facet, Map<String, Object> filters)
-			throws ServiceException {
-		try {
-			// QueryBuilder query = new MultiMatchQueryBuilder(criteria, "file",
-			// "name");
-			// QueryBuilder query = fieldQuery("file", criteria);
-			log.trace(String.format("search %s - %s - %s - %s - %s", criteria,
-					first, pageSize, facet, filters));
-			log.trace(String.format("index: %s - type: %s", index, type));
-			QueryBuilder query = new QueryStringQueryBuilder(criteria);
-			SearchRequestBuilder searchRequestBuilder = client
-					.prepareSearch(index).setTypes(type)
-					.addPartialField("document", null, "versions")
-					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-					.setFrom(first).setSize(pageSize).setQuery(query);
-			if (!Strings.isNullOrEmpty(facet)) {
-				searchRequestBuilder.addFacet(FacetBuilders.termsFacet(facet)
-						.field(facet).size(10));
-			}
-			if (filters != null && filters.size() > 0) {
-				// OrFilterBuilder filterBuilder = FilterBuilders.orFilter();
-				for (String key : filters.keySet()) {
-					searchRequestBuilder.setFilter(FilterBuilders.termFilter(
-							key, filters.get(key)));
-					// FilterBuilder termFilter = FilterBuilders.termFilter(
-					// key, filters.get(key));
-					// filterBuilder.add(termFilter);
-				}
-				// searchRequestBuilder.setFilter(filterBuilder);
-			}
-			log.debug("Search request builder: " + searchRequestBuilder);
-			SearchResponse searchResponse = searchRequestBuilder.execute()
-					.actionGet();
-			return parseSearchResult(searchResponse, first, pageSize, facet);
-		} catch (Throwable t) {
-			log.error("search failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
-	}
-
-	public SearchResult<Document> moreLikeThis(String criteria, int first,
-			int pageSize, int minTermFrequency, int maxItems)
-			throws ServiceException {
-		try {
-			log.trace(String.format("moreLikeThis %s - %s - %s - %s - %s",
-					criteria, first, pageSize, minTermFrequency, maxItems));
-			log.trace(String.format("index: %s - type: %s", index, type));
-			QueryBuilder query = QueryBuilders.moreLikeThisQuery()
-					.likeText(criteria).minTermFreq(minTermFrequency)
-					.maxQueryTerms(maxItems);
-			SearchRequestBuilder searchRequestBuilder = client
-					.prepareSearch(index).setTypes(type)
-					.addPartialField("document", null, "versions")
-					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-					.setFrom(first).setSize(pageSize).setQuery(query);
-			log.debug("Search request builder: " + searchRequestBuilder);
-			SearchResponse searchResponse = searchRequestBuilder.execute()
-					.actionGet();
-			return parseSearchResult(searchResponse, first, pageSize, null);
-		} catch (Throwable t) {
-			log.error("search failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
-	}
+    }
 
 }

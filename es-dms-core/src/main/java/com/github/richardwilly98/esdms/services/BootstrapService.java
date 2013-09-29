@@ -26,10 +26,9 @@ package com.github.richardwilly98.esdms.services;
  * #L%
  */
 
-
 import com.github.richardwilly98.esdms.api.Settings;
 
 public interface BootstrapService {
 
-	public abstract Settings loadSettings();
+    public abstract Settings loadSettings();
 }

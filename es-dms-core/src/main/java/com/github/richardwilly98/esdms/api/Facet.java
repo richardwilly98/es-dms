@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.api;
  * #L%
  */
 
-
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -35,11 +34,11 @@ import com.github.richardwilly98.esdms.FacetImpl;
 @JsonDeserialize(as = FacetImpl.class)
 public interface Facet {
 
-	public abstract Set<Term> getTerms();
-	
-	public abstract long getMissingCount();
-	
-	public abstract long getOtherCount();
-	
-	public abstract long getTotalCount();
+    public abstract Set<Term> getTerms();
+
+    public abstract long getMissingCount();
+
+    public abstract long getOtherCount();
+
+    public abstract long getTotalCount();
 }

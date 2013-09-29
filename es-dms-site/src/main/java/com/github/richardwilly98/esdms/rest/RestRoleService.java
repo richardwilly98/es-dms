@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.rest;
  * #L%
  */
 
-
 import javax.inject.Inject;
 import javax.ws.rs.Path;
 
@@ -37,12 +36,11 @@ import com.github.richardwilly98.esdms.services.RoleService;
 @Path(RestRoleService.ROLES_PATH)
 public class RestRoleService extends RestItemBaseService<Role> {
 
-	public static final String ROLES_PATH = "roles";
+    public static final String ROLES_PATH = "roles";
 
-	@Inject
-	public RestRoleService(AuthenticationService authenticationService,
-			final RoleService roleService) {
-		super(authenticationService, roleService);
-	}
+    @Inject
+    public RestRoleService(AuthenticationService authenticationService, final RoleService roleService) {
+	super(authenticationService, roleService);
+    }
 
 }

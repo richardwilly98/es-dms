@@ -26,27 +26,26 @@ package com.github.richardwilly98.esdms.rest.entity;
  * #L%
  */
 
-
 import java.util.Map;
 
 public class FacetedQuery {
 
-	String facet;
-	Map<String, Object> filters;
+    String facet;
+    Map<String, Object> filters;
 
-	public String getFacet() {
-		return facet;
-	}
+    public String getFacet() {
+	return facet;
+    }
 
-	public void setFacet(String facet) {
-		this.facet = facet;
-	}
+    public void setFacet(String facet) {
+	this.facet = facet;
+    }
 
-	public Map<String, Object> getFilters() {
-		return filters;
-	}
+    public Map<String, Object> getFilters() {
+	return filters;
+    }
 
-	public void setFilters(Map<String, Object> filters) {
-		this.filters = filters;
-	}
+    public void setFilters(Map<String, Object> filters) {
+	this.filters = filters;
+    }
 }

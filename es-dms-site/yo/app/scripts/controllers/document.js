@@ -46,8 +46,13 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 		if ($scope.criteria === '' || $scope.criteria === '*') {
 			$scope.alerts.push({ msg: 'Empty or wildcard not allowed' });
 			$scope.documents = [];
+      $scope.terms = [];
+      $scope.facets = [];
       searchService.criteria(null);
 		} else {
+      $scope.documents = [];
+      $scope.terms = [];
+      $scope.facets = [];
       searchService.criteria($scope.criteria);
 			$scope.facet = 'tags';
 			find(0, $scope.criteria, /*term,*/ true);
@@ -65,6 +70,11 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 			$scope.totalHits = result.totalHits;
 			$scope.elapsedTime = result.elapsedTime;
 			$scope.facets = result.facets[$scope.facet];
+      if ($scope.totalHits == 0) {
+        $scope.alerts.push({ msg: 'No document found.' });
+      } else {
+        $scope.alerts = [];
+      }
 		});
   }
 

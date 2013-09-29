@@ -1,70 +1,70 @@
 <div modal="shouldBeOpen" close="close()" options="opts">
 	<div class="modal-header">
-		<button type="button" class="close" data-ng-click="close()" aria-hidden="true">&times;</button>
+		<button type="button" class="close" data-ng-click="close()"
+			aria-hidden="true">&times;</button>
 		<h3>Details - {{document.id}}</h3>
 	</div>
-		<div class="modal-body">
-		  <tabset>
-		    <tab heading="Details">
-					<div class="control-group">
-						<label class="control-label">Name:</label>
-		    		<div class="controls">
-		      			<input type="text" ng-model="document.name" />
-		    		</div>
-					</div>
-					<div class="control-group">
-						<label class="control-label">Attributes:</label>
-						<ul>
-							<li data-ng-repeat="(name, value) in document.attributes">{{name}} - {{value}}</li>
-						</ul>
-					</div>
-					<div class="control-group" data-ng-show="document.tags">
-						<label class="control-label">Tags:</label>
-						<ul>
-							<li data-ng-repeat="tag in document.tags">{{tag}}</li>
-						</ul>
-					</div>
-		    </tab>
-		    <tab heading="Version" disabled="true">Version</tab>
-		    <tab heading="Audit" select="loadAudit()">
-		    	<table class="table table-condensed">
-						<thead>
-							<tr>
-								<th>Event</th>
-								<th>Date</th>
-								<th>Author</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr data-ng-repeat="auditEntry in auditEntries">
-								<td>{{ auditEntry.event }}</td>
-								<td>{{ auditEntry.date | date:'yyyy-MM-dd HH:mm:ss Z' }}</td>
-								<td>{{ auditEntry.user }}</td>
-							</tr>
-						</tbody>
-					</table>
-		    </tab>
-		    <tab heading="More Like This" select="moreLikeThis()">
-		    	<table class="table table-condensed">
-						<thead>
-							<tr>
-								<th>Name</th>
-								<th>Author</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr data-ng-repeat="document in moreLikeThis">
-								<td>{{ document.name }}</td>
-								<td>{{ document.attributes.author }}</td>
-							</tr>
-						</tbody>
-					</table>
-		    </tab>
-		  </tabset>
-  	</div>
-		<div class="modal-footer">
-			<button type="button" class="btn" data-ng-click="close()">Close</button>
-		</div>
+	<div class="modal-body">
+		<tabset> <tab heading="Details">
+		<form class="form-horizontal">
+			<div class="control-group">
+				<label class="control-label">Name</label>
+				<div class="controls">
+					<input class="input-xlarge" type="text" ng-model="document.name" />
+				</div>
+			</div>
+			<div class="control-group"
+				data-ng-repeat="(name, value) in document.attributes">
+				<label class="control-label">{{ name }}</label>
+				<div class="controls">
+					<input class="uneditable-input" type="text" ng-model="value" />
+				</div>
+			</div>
+			<div class="control-group" data-ng-show="tags">
+				<label class="control-label">Tags</label>
+				<div class="controls">
+					<input class="uneditable-input" type="text" ng-model="tags" />
+				</div>
+			</div>
+		</form>
+		</tab> <tab heading="Version" disabled="true">Version</tab> <tab
+			heading="Audit" select="loadAudit()">
+		<table class="table table-condensed">
+			<thead>
+				<tr>
+					<th>Event</th>
+					<th>Date</th>
+					<th>Author</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr data-ng-repeat="auditEntry in auditEntries">
+					<td>{{ auditEntry.event }}</td>
+					<td>{{ auditEntry.date | date:'yyyy-MM-dd HH:mm:ss Z' }}</td>
+					<td>{{ auditEntry.user }}</td>
+				</tr>
+			</tbody>
+		</table>
+		</tab> <tab heading="More Like This" select="moreLikeThis()">
+		<table class="table table-condensed">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Author</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr data-ng-repeat="document in moreLikeThis">
+					<td>{{ document.name }}</td>
+					<td>{{ document.attributes.author }}</td>
+				</tr>
+			</tbody>
+		</table>
+		</tab> </tabset>
+	</div>
+	<div class="modal-footer">
+		<button type="button" class="btn" data-ng-click="close()">Close</button>
+	</div>
 </div>
 
 
