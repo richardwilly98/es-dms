@@ -27,7 +27,7 @@ esDmsSiteApp.controller('UserCtrl', ['$scope', 'userService', function ($scope, 
   $scope.edit = function(id) {
     userService.edit(id);
   };
-  $scope.remove = function(id) {
+  $scope.delete = function(id) {
 		userService.remove(id);
 		var index = getIndexOf(id);
 		if (index) {
