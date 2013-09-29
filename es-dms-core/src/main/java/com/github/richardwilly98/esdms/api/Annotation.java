@@ -26,10 +26,9 @@ package com.github.richardwilly98.esdms.api;
  * #L%
  */
 
-
 public interface Annotation extends SecuredItem {
 
-//	SecuredItem parent;
-//	Object Content;
+    // SecuredItem parent;
+    // Object Content;
 
 }

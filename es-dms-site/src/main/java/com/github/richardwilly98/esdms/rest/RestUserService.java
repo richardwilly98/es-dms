@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.rest;
  * #L%
  */
 
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.inject.Inject;
@@ -47,48 +46,45 @@ import com.github.richardwilly98.esdms.services.UserService;
 @Path(RestUserService.USERS_PATH)
 public class RestUserService extends RestItemBaseService<User> {
 
-	public static final String USERS_PATH = "users";
-	private final HashService hashService;
+    public static final String USERS_PATH = "users";
+    private final HashService hashService;
 
-	@Inject
-	public RestUserService(final AuthenticationService authenticationService,
-			final HashService hashService, final UserService userService) {
-		super(authenticationService, userService);
-		this.hashService = hashService;
-	}
+    @Inject
+    public RestUserService(final AuthenticationService authenticationService, final HashService hashService, final UserService userService) {
+	super(authenticationService, userService);
+	this.hashService = hashService;
+    }
 
-	@Override
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response create(User item) {
-		checkNotNull(item);
-		checkNotNull(item.getEmail());
-		item.setId(item.getEmail());
-		if (item.getPassword() != null) {
-			String encodedHash = hashService.toBase64(item.getPassword()
-					.getBytes());
-			log.trace("From service - hash: " + encodedHash);
-			item.setHash(encodedHash);
-			item.setPassword(null);
-		} else {
-			log.warn("Missing password");
-		}
-		return super.create(item);
+    @Override
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response create(User item) {
+	checkNotNull(item);
+	checkNotNull(item.getEmail());
+	item.setId(item.getEmail());
+	if (item.getPassword() != null) {
+	    String encodedHash = hashService.toBase64(item.getPassword().getBytes());
+	    log.trace("From service - hash: " + encodedHash);
+	    item.setHash(encodedHash);
+	    item.setPassword(null);
+	} else {
+	    log.warn("Missing password");
 	}
+	return super.create(item);
+    }
 
-	@Override
-	@PUT
-	@Path("{id}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response update(@PathParam("id") String id, User item) {
-		if (item.getPassword() != null) {
-			String encodedHash = hashService.toBase64(item.getPassword()
-					.getBytes());
-			log.trace("From service - hash: " + encodedHash);
-			item.setHash(encodedHash);
-			item.setPassword(null);
-		}
-		return super.update(id, item);
+    @Override
+    @PUT
+    @Path("{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response update(@PathParam("id") String id, User item) {
+	if (item.getPassword() != null) {
+	    String encodedHash = hashService.toBase64(item.getPassword().getBytes());
+	    log.trace("From service - hash: " + encodedHash);
+	    item.setHash(encodedHash);
+	    item.setPassword(null);
 	}
+	return super.update(id, item);
+    }
 }

@@ -35,12 +35,11 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 
 public interface AuditService extends BaseService<AuditEntry> {
 
-	public abstract EnumSet<AuditEntry.Event> getEvents();
+    public abstract EnumSet<AuditEntry.Event> getEvents();
 
-	public abstract void clear(List<String> ids) throws ServiceException;
+    public abstract void clear(List<String> ids) throws ServiceException;
 
-	public abstract void clear(Date from, Date to) throws ServiceException;
+    public abstract void clear(Date from, Date to) throws ServiceException;
 
-	public abstract AuditEntry create(AuditEntry.Event event, String itemId,
-			String user) throws ServiceException;
+    public abstract AuditEntry create(AuditEntry.Event event, String itemId, String user) throws ServiceException;
 }

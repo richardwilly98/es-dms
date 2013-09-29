@@ -30,7 +30,6 @@ import com.github.richardwilly98.esdms.api.AuditEntry;
 
 public interface AuditStrategy {
 
-	public abstract AuditEntry convert(AuditEntry.Event event,
-			String itemId, String user);
+    public abstract AuditEntry convert(AuditEntry.Event event, String itemId, String user);
 
 }

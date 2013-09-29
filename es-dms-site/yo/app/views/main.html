@@ -1,4 +1,4 @@
-<esdms-authentication-directive view="'views/authentication/login.html'"/>
+<esdms-authentication-directive view="'views/authentication/login.html'" />
 
 <div data-ng-controller="mainController">
 
@@ -7,27 +7,29 @@
 		<div class="navbar-inner">
 			<a class="brand" href="#">ElasticSearch Dms Client</a>
 			<ul class="nav">
-	      <li data-ng-repeat="tab in tabs" data-match-route="{{tab.view}}">
-	      	<a href="#{{tab.view}}">{{tab.title}}</a>
-	      </li>
-	      <li data-ng-show="showLogout" class="divider-vertical"></li>
-				<li data-ng-show="hasRole('administrator')" class="dropdown">
-	      	<a href="#" class="dropdown-toggle" data-toggle="dropdown">Administration <b class="caret"></b></a>
-	      	<ul class="dropdown-menu">
-	          <li data-ng-repeat="tab in adminTabs" data-match-route="{{tab.view}}">
-	          	<a href="#{{tab.view}}">{{tab.title}}</a>
-	          </li>
-	      	</ul>
-	    	</li>
-				<li data-ng-show="showLogout"><a href="#" data-ng-click="logout()">Logout</a></li>
-	    </ul>
-	    <p data-ng-show="user.name" class="navbar-text pull-right">
-	    		Logged in as <a href="#" class="navbar-link">{{ user.name }}</a>
-	  	</p>
-	  </div>
+				<li data-ng-repeat="tab in tabs" data-match-route="{{tab.view}}">
+					<a href="#{{tab.view}}">{{tab.title}}</a>
+				</li>
+				<li data-ng-show="showLogout" class="divider-vertical"></li>
+				<li data-ng-show="hasRole('administrator')" class="dropdown"><a
+					href="#" class="dropdown-toggle" data-toggle="dropdown">Administration
+						<b class="caret"></b>
+				</a>
+					<ul class="dropdown-menu">
+						<li data-ng-repeat="tab in adminTabs"
+							data-match-route="{{tab.view}}"><a href="#{{tab.view}}">{{tab.title}}</a>
+						</li>
+					</ul></li>
+				<li data-ng-show="showLogout"><a href="#"
+					data-ng-click="logout()">Logout</a></li>
+			</ul>
+			<p data-ng-show="user.name" class="navbar-text pull-right">
+				Logged in as <a href="#" class="navbar-link">{{ user.name }}</a>
+			</p>
+		</div>
 	</div>
 
-  <!-- Placeholder for views -->
-  <div id="content" ui-view></div>
+	<!-- Placeholder for views -->
+	<div id="content" ui-view></div>
 
 </div>

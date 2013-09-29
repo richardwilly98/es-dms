@@ -69,545 +69,485 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 @Singleton
-public class DocumentProvider extends ProviderBase<Document> implements
-		DocumentService {
+public class DocumentProvider extends ProviderBase<Document> implements DocumentService {
 
-	private static final String DOCUMENT_MAPPING_JSON = "/com/github/richardwilly98/esdms/services/document-mapping.json";
-	private final static String type = "document";
-	private final VersionService versionService;
+    private static final String DOCUMENT_MAPPING_JSON = "/com/github/richardwilly98/esdms/services/document-mapping.json";
+    private final static String type = "document";
+    private final VersionService versionService;
 
-	@Inject
-	DocumentProvider(Client client, BootstrapService bootstrapService,
-			VersionService versionService) throws ServiceException {
-		super(client, bootstrapService, null, DocumentProvider.type,
-				Document.class);
-		this.versionService = versionService;
+    @Inject
+    DocumentProvider(Client client, BootstrapService bootstrapService, VersionService versionService) throws ServiceException {
+	super(client, bootstrapService, null, DocumentProvider.type, Document.class);
+	this.versionService = versionService;
+    }
+
+    private SimpleDocument getSimpleDocument(Document document) {
+	checkNotNull(document);
+	return new SimpleDocument.Builder().document(document).build();
+    }
+
+    private SimpleVersion getSimpleVersion(Version version) {
+	checkNotNull(version);
+	return new SimpleVersion.Builder().version(version).build();
+    }
+
+    @Override
+    protected void loadInitialData() throws ServiceException {
+    }
+
+    @Override
+    protected String getMapping() {
+	try {
+	    return copyToStringFromClasspath(DOCUMENT_MAPPING_JSON);
+	} catch (IOException ioEx) {
+	    log.error("getMapping failed", ioEx);
+	    return null;
 	}
+    }
 
-	private SimpleDocument getSimpleDocument(Document document) {
-		checkNotNull(document);
-		return new SimpleDocument.Builder().document(document).build();
-	}
+    private SimpleDocument updateModifiedDate(SimpleDocument document) {
+	DateTime now = new DateTime();
+	document.setReadOnlyAttribute(Document.MODIFIED_DATE, now.toString());
+	return document;
+    }
 
-	private SimpleVersion getSimpleVersion(Version version) {
-		checkNotNull(version);
-		return new SimpleVersion.Builder().version(version).build();
-	}
+    // @RequiresPermissions(PROFILE_READ_PERMISSION)
+    @SuppressWarnings("unchecked")
+    @Override
+    public Document getMetadata(String id) throws ServiceException {
+	try {
+	    if (log.isTraceEnabled()) {
+		log.trace(String.format("getMetadata - %s", id));
+	    }
+	    GetResponse response = client.prepareGet(index, type, id).setFields("id", "name", "attributes", "tags").execute().actionGet();
+	    if (!response.isExists()) {
+		log.info(String.format("Cannot find item %s", id));
+		return null;
+	    }
+	    // else {
+	    // for(String key :response.getFields().keySet() ){
+	    // log.info(String.format("1. Field %s - %s - %s", key,
+	    // response.getField(key).getValue().getClass(),
+	    // response.getField(key).getValue()));
+	    // log.info(String.format("2. Field %s - %s - %s", key,
+	    // response.getField(key).getValues().getClass(),
+	    // response.getField(key).getValues()));
+	    // if (response.getField(key).getValues() != null &&
+	    // response.getField(key).getValues().size() > 0) {
+	    // log.info(String.format("3. Field %s - %s", key,
+	    // response.getField(key).getValues().get(0)));
+	    // }
+	    // }
+	    // }
+	    // XContentBuilder builder = JsonXContent.contentBuilder();
+	    // response.toXContent(builder, null);
+	    // log.info(String.format("get- response: %s",
+	    // builder.prettyPrint().string()));
 
-	@Override
-	protected void loadInitialData() throws ServiceException {
-	}
+	    checkNotNull(response.getField("name"));
+	    String name = response.getField("name").getValue().toString();
+	    Map<String, Object> attributes = newHashMap();
+	    if (response.getField("attributes") != null && response.getField("attributes").getValue() instanceof Map<?, ?>) {
+		attributes.putAll((Map<String, Object>) response.getField("attributes").getValue());
 
-	@Override
-	protected String getMapping() {
-		try {
-			return copyToStringFromClasspath(DOCUMENT_MAPPING_JSON);
-		} catch (IOException ioEx) {
-			log.error("getMapping failed", ioEx);
-			return null;
+	    }
+	    Set<String> tags = newHashSet();
+	    if (response.getField("tags") != null && response.getField("tags").getValues().size() > 0) {
+		for (Object tag : response.getField("tags")) {
+		    tags.add(String.valueOf(tag));
 		}
+		// tags.addAll((List<String>)
+		// response.getField("tags").getValue());
+
+	    }
+	    // else if (response.getField("tags") != null &&
+	    // response.getField("tags").getValue() instanceof String) {
+	    // tags.add(String.valueOf(response.getField("tags").getValue()));
+	    // }
+	    Document document = new DocumentImpl.Builder().tags(tags).id(id).name(name).attributes(attributes).roles(null).build();
+	    return document;
+	} catch (Throwable t) {
+	    log.error("getMetadata failed", t);
+	    throw new ServiceException(t.getLocalizedMessage());
+	}
+    }
+
+    @RequiresPermissions(CREATE_PERMISSION)
+    @Override
+    public Document create(Document item) throws ServiceException {
+	SimpleDocument sd = getSimpleDocument(item);
+	DateTime now = new DateTime();
+	sd.setReadOnlyAttribute(Document.CREATION_DATE, now.toString());
+	sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
+	return super.create(sd);
+    }
+
+    @RequiresPermissions(DELETE_PERMISSION)
+    @Override
+    public void delete(Document item) throws ServiceException {
+
+	if (!item.hasStatus(DocumentStatus.DELETED)) {
+	    throw new ServiceException(String.format("Precondition failure: document %s not marked for deletion!", item.getId()));
 	}
 
-	private SimpleDocument updateModifiedDate(SimpleDocument document) {
-		DateTime now = new DateTime();
-		document.setReadOnlyAttribute(Document.MODIFIED_DATE, now.toString());
-		return document;
-	}
+	super.delete(item);
+    }
 
-	// @RequiresPermissions(PROFILE_READ_PERMISSION)
-	@SuppressWarnings("unchecked")
-	@Override
-	public Document getMetadata(String id) throws ServiceException {
-		try {
-			if (log.isTraceEnabled()) {
-				log.trace(String.format("getMetadata - %s", id));
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.github.richardwilly98.services.BaseService#search(java.lang.String)
+     */
+    @Override
+    public SearchResult<Document> search(String criteria, int first, int pageSize) throws ServiceException {
+	try {
+	    // Set<Document> documents = newHashSet();
+
+	    // QueryBuilder query = new MultiMatchQueryBuilder(criteria, "file",
+	    // "name");
+	    // QueryBuilder query = fieldQuery("file", criteria);
+	    QueryBuilder query = new QueryStringQueryBuilder(criteria);
+	    SearchResponse searchResponse = client.prepareSearch(index).setTypes(type).addPartialField("document", null, "versions")
+		    .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(first).setSize(pageSize).setQuery(query).execute().actionGet();
+	    // long totalHits = searchResponse.getHits().totalHits();
+	    // long elapsedTime = searchResponse.getTookInMillis();
+	    // log.debug("totalHits: " + totalHits);
+	    // log.debug("totalHits: " + searchResponse.getHits().totalHits());
+	    // log.debug(String.format("TotalHits: %s - TookInMillis: %s",
+	    // totalHits,
+	    // elapsedTime));
+	    // Stopwatch watch = new Stopwatch();
+	    // watch.start();
+	    // for (SearchHit hit : searchResponse.getHits().hits()) {
+	    // String json = hit.getSourceAsString();
+	    // Document document = mapper.readValue(json, Document.class);
+	    // Version currentVersion = document.getCurrentVersion();
+	    // if (currentVersion != null) {
+	    // currentVersion.getFile().setContent(null);
+	    // }
+	    // // document.getFile().setContent(null);
+	    // documents.add(document);
+	    // }
+	    // watch.stop();
+	    // log.debug("Elapsed time to build document list "
+	    // + watch.elapsed(TimeUnit.MILLISECONDS));
+	    //
+	    // SearchResult<Document> searchResult = new
+	    // SearchResultImpl.Builder<Document>()
+	    // .totalHits(totalHits).elapsedTime(elapsedTime).items(documents)
+	    // .firstIndex(first).pageSize(pageSize).build();
+	    // return searchResult;
+	    return getSearchResult(searchResponse, first, pageSize);
+	} catch (Throwable t) {
+	    log.error("search failed", t);
+	    throw new ServiceException(t.getLocalizedMessage());
+	}
+    }
+
+    @Override
+    protected SearchResult<Document> getSearchResult(SearchResponse searchResponse, int first, int pageSize) throws ServiceException {
+	log.trace("*** getSearchResult ***");
+	try {
+	    // log.debug("searchResponse: " + searchResponse.toString());
+	    Stopwatch watch = new Stopwatch();
+	    watch.start();
+	    Set<Document> items = newHashSet();
+	    long totalHits = searchResponse.getHits().totalHits();
+	    long elapsedTime = searchResponse.getTookInMillis();
+	    for (SearchHit hit : searchResponse.getHits().hits()) {
+		String json = convertFieldAsString(hit, "document");
+		Document item = mapper.readValue(json, Document.class);
+		// Version currentVersion = item.getCurrentVersion();
+		// if (currentVersion != null) {
+		// currentVersion.getFile().setContent(null);
+		// }
+		items.add(item);
+	    }
+	    SearchResult<Document> searchResult = new SearchResultImpl.Builder<Document>().totalHits(totalHits).elapsedTime(elapsedTime)
+		    .items(items).firstIndex(first).pageSize(pageSize).build();
+	    watch.stop();
+	    log.debug("Elapsed time to build document list " + watch.elapsed(TimeUnit.MILLISECONDS));
+	    return searchResult;
+	} catch (Throwable t) {
+	    log.error("getSearchResult failed", t);
+	    throw new ServiceException(t.getLocalizedMessage());
+	}
+    }
+
+    private String convertFieldAsString(SearchHit hit, String name) throws IOException {
+	XContentBuilder builder = jsonBuilder();
+	if (hit.getFields().containsKey(name)) {
+	    builder.value(hit.getFields().get(name).getValue());
+	}
+	return builder.string();
+    }
+
+    @Override
+    public void checkin(Document document) throws ServiceException {
+	if (document.hasStatus(DocumentStatus.LOCKED)) {
+	    SimpleDocument sd = getSimpleDocument(document);
+	    sd.removeReadOnlyAttribute(Document.STATUS);
+	    sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
+	    sd.removeReadOnlyAttribute(Document.LOCKED_BY);
+	    document = update(sd);
+	} else {
+	    throw new ServiceException(String.format("Document %s is not locked.", document.getId()));
+	}
+    }
+
+    public void markDeleted(Document document) throws ServiceException {
+	if (document.hasStatus(DocumentStatus.AVAILABLE)) {
+	    SimpleDocument sd = getSimpleDocument(document);
+	    sd.setStatus(DocumentStatus.DELETED);
+	    document = update(sd);
+	} else {
+	    throw new ServiceException(String.format("Document %s is not marked as available.", document.getId()));
+	}
+    }
+
+    public void undelete(Document document) throws ServiceException {
+	if (document.hasStatus(DocumentStatus.DELETED)) {
+	    SimpleDocument sd = getSimpleDocument(document);
+	    sd.setStatus(DocumentStatus.AVAILABLE);
+
+	    document = update(sd);
+	} else {
+	    throw new ServiceException(String.format("Document %s is not marked for deletion.", document.getId()));
+	}
+    }
+
+    @Override
+    public Document update(Document item) throws ServiceException {
+	SimpleDocument document = updateModifiedDate(getSimpleDocument(item));
+	return super.update(document);
+    }
+
+    @Override
+    public void checkout(Document document) throws ServiceException {
+	SimpleDocument sd = getSimpleDocument(document);
+	if (document.hasStatus(DocumentStatus.LOCKED)) {
+	    throw new ServiceException(String.format("Document %s already locked.", document.getId()));
+	}
+	sd.setStatus(DocumentStatus.LOCKED);
+	sd.setReadOnlyAttribute(Document.LOCKED_BY, getCurrentUser());
+	update(sd);
+    }
+
+    @Override
+    public String preview(Document document, /* int versionId, */
+	    String criteria, int size) throws ServiceException {
+	try {
+	    log.trace("*** preview ***");
+	    String query = jsonBuilder().startObject().startObject("bool").startArray("must").startObject().startObject("queryString")
+		    .field("query", criteria).array("fields", "_all", "file").endObject().endObject().startObject()
+		    .startObject("queryString").field("query", document.getId()).field("default_field", "id").endObject().endObject()
+		    .endArray().endObject().endObject().string();
+
+	    log.debug("query: " + query);
+
+	    // FieldQueryBuilder x = QueryBuilders.fieldQuery("id",
+	    // document.getId());
+	    SearchRequestBuilder srb = client.prepareSearch(index).setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH).setQuery(query)
+	    // .setQuery(fieldQuery("file", criteria))
+		    .setHighlighterOrder("score").addHighlightedField("file", size, 1);
+	    log.trace("Search request: " + srb);
+	    SearchResponse searchResponse = srb.execute().actionGet();
+	    log.debug("totalHits: " + searchResponse.getHits().totalHits());
+	    String preview = null;
+	    for (SearchHit hit : searchResponse.getHits().hits()) {
+		log.debug(String.format("HighlightFields: %s", hit.getHighlightFields().size()));
+		for (String key : hit.getHighlightFields().keySet()) {
+		    HighlightField field = hit.getHighlightFields().get(key);
+		    log.debug(String.format("Highlight key: %s", key));
+		    log.debug(String.format("Highlight: %s", hit.getHighlightFields().get(key)));
+		    for (Text text : field.fragments()) {
+			if (preview == null) {
+			    preview = text.string();
 			}
-			GetResponse response = client.prepareGet(index, type, id)
-					.setFields("id", "name", "attributes", "tags").execute()
-					.actionGet();
-			if (!response.isExists()) {
-				log.info(String.format("Cannot find item %s", id));
-				return null;
-			}
-			// else {
-			// for(String key :response.getFields().keySet() ){
-			// log.info(String.format("1. Field %s - %s - %s", key,
-			// response.getField(key).getValue().getClass(),
-			// response.getField(key).getValue()));
-			// log.info(String.format("2. Field %s - %s - %s", key,
-			// response.getField(key).getValues().getClass(),
-			// response.getField(key).getValues()));
-			// if (response.getField(key).getValues() != null &&
-			// response.getField(key).getValues().size() > 0) {
-			// log.info(String.format("3. Field %s - %s", key,
-			// response.getField(key).getValues().get(0)));
-			// }
-			// }
-			// }
-			// XContentBuilder builder = JsonXContent.contentBuilder();
-			// response.toXContent(builder, null);
-			// log.info(String.format("get- response: %s",
-			// builder.prettyPrint().string()));
-
-			checkNotNull(response.getField("name"));
-			String name = response.getField("name").getValue().toString();
-			Map<String, Object> attributes = newHashMap();
-			if (response.getField("attributes") != null
-					&& response.getField("attributes").getValue() instanceof Map<?, ?>) {
-				attributes.putAll((Map<String, Object>) response.getField(
-						"attributes").getValue());
-
-			}
-			Set<String> tags = newHashSet();
-			if (response.getField("tags") != null
-					&& response.getField("tags").getValues().size() > 0) {
-				for (Object tag : response.getField("tags")) {
-					tags.add(String.valueOf(tag));
-				}
-				// tags.addAll((List<String>)
-				// response.getField("tags").getValue());
-
-			}
-			// else if (response.getField("tags") != null &&
-			// response.getField("tags").getValue() instanceof String) {
-			// tags.add(String.valueOf(response.getField("tags").getValue()));
-			// }
-			Document document = new DocumentImpl.Builder().tags(tags).id(id)
-					.name(name).attributes(attributes).roles(null).build();
-			return document;
-		} catch (Throwable t) {
-			log.error("getMetadata failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
+		    }
 		}
+	    }
+	    return preview;
+	} catch (Throwable t) {
+	    log.error("getItems failed", t);
+	    throw new ServiceException(t.getLocalizedMessage());
 	}
+    }
 
-	@RequiresPermissions(CREATE_PERMISSION)
-	@Override
-	public Document create(Document item) throws ServiceException {
-		SimpleDocument sd = getSimpleDocument(item);
-		DateTime now = new DateTime();
-		sd.setReadOnlyAttribute(Document.CREATION_DATE, now.toString());
-		sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
-		return super.create(sd);
-	}
-
-	@RequiresPermissions(DELETE_PERMISSION)
-	@Override
-	public void delete(Document item) throws ServiceException {
-
-		if (!item.hasStatus(DocumentStatus.DELETED)) {
-			throw new ServiceException(
-					String.format(
-							"Precondition failure: document %s not marked for deletion!",
-							item.getId()));
-		}
-
-		super.delete(item);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.github.richardwilly98.services.BaseService#search(java.lang.String)
-	 */
-	@Override
-	public SearchResult<Document> search(String criteria, int first,
-			int pageSize) throws ServiceException {
-		try {
-			// Set<Document> documents = newHashSet();
-
-			// QueryBuilder query = new MultiMatchQueryBuilder(criteria, "file",
-			// "name");
-			// QueryBuilder query = fieldQuery("file", criteria);
-			QueryBuilder query = new QueryStringQueryBuilder(criteria);
-			SearchResponse searchResponse = client.prepareSearch(index)
-					.setTypes(type)
-					.addPartialField("document", null, "versions")
-					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-					.setFrom(first).setSize(pageSize).setQuery(query).execute()
-					.actionGet();
-			// long totalHits = searchResponse.getHits().totalHits();
-			// long elapsedTime = searchResponse.getTookInMillis();
-			// log.debug("totalHits: " + totalHits);
-			// log.debug("totalHits: " + searchResponse.getHits().totalHits());
-			// log.debug(String.format("TotalHits: %s - TookInMillis: %s",
-			// totalHits,
-			// elapsedTime));
-			// Stopwatch watch = new Stopwatch();
-			// watch.start();
-			// for (SearchHit hit : searchResponse.getHits().hits()) {
-			// String json = hit.getSourceAsString();
-			// Document document = mapper.readValue(json, Document.class);
-			// Version currentVersion = document.getCurrentVersion();
-			// if (currentVersion != null) {
-			// currentVersion.getFile().setContent(null);
-			// }
-			// // document.getFile().setContent(null);
-			// documents.add(document);
-			// }
-			// watch.stop();
-			// log.debug("Elapsed time to build document list "
-			// + watch.elapsed(TimeUnit.MILLISECONDS));
-			//
-			// SearchResult<Document> searchResult = new
-			// SearchResultImpl.Builder<Document>()
-			// .totalHits(totalHits).elapsedTime(elapsedTime).items(documents)
-			// .firstIndex(first).pageSize(pageSize).build();
-			// return searchResult;
-			return getSearchResult(searchResponse, first, pageSize);
-		} catch (Throwable t) {
-			log.error("search failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
-	}
-
-	@Override
-	protected SearchResult<Document> getSearchResult(
-			SearchResponse searchResponse, int first, int pageSize)
-			throws ServiceException {
-		log.trace("*** getSearchResult ***");
-		try {
-			// log.debug("searchResponse: " + searchResponse.toString());
-			Stopwatch watch = new Stopwatch();
-			watch.start();
-			Set<Document> items = newHashSet();
-			long totalHits = searchResponse.getHits().totalHits();
-			long elapsedTime = searchResponse.getTookInMillis();
-			for (SearchHit hit : searchResponse.getHits().hits()) {
-				String json = convertFieldAsString(hit, "document");
-				Document item = mapper.readValue(json, Document.class);
-				// Version currentVersion = item.getCurrentVersion();
-				// if (currentVersion != null) {
-				// currentVersion.getFile().setContent(null);
-				// }
-				items.add(item);
-			}
-			SearchResult<Document> searchResult = new SearchResultImpl.Builder<Document>()
-					.totalHits(totalHits).elapsedTime(elapsedTime).items(items)
-					.firstIndex(first).pageSize(pageSize).build();
-			watch.stop();
-			log.debug("Elapsed time to build document list "
-					+ watch.elapsed(TimeUnit.MILLISECONDS));
-			return searchResult;
-		} catch (Throwable t) {
-			log.error("getSearchResult failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
-	}
-
-	private String convertFieldAsString(SearchHit hit, String name)
-			throws IOException {
-		XContentBuilder builder = jsonBuilder();
-		if (hit.getFields().containsKey(name)) {
-			builder.value(hit.getFields().get(name).getValue());
-		}
-		return builder.string();
-	}
-
-	@Override
-	public void checkin(Document document) throws ServiceException {
-		if (document.hasStatus(DocumentStatus.LOCKED)) {
-			SimpleDocument sd = getSimpleDocument(document);
-			sd.removeReadOnlyAttribute(Document.STATUS);
-			sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
-			sd.removeReadOnlyAttribute(Document.LOCKED_BY);
-			document = update(sd);
+    private void updateVersions(SimpleDocument document) throws ServiceException {
+	for (Version version : document.getVersions().toArray(new Version[0])) {
+	    SimpleVersion sv = getSimpleVersion(version);
+	    if (!sv.isCurrent()) {
+		if (Strings.isNullOrEmpty(sv.getId())) {
+		    /* Version newVersion = */versionService.create(sv);
+		    // sv.setId(newVersion.getId());
 		} else {
-			throw new ServiceException(String.format(
-					"Document %s is not locked.", document.getId()));
+		    versionService.update(sv);
 		}
+		sv.setFile(null);
+		document.updateVersion(sv);
+	    }
+	}
+    }
+
+    @Override
+    public void addVersion(Document document, Version version) throws ServiceException {
+	if (log.isTraceEnabled()) {
+	    log.trace(String.format("*** addVersion document: %s - version: %s ***", document, version));
+	}
+	checkNotNull(document);
+	checkNotNull(version);
+	SimpleDocument sd = getSimpleDocument(document);
+	SimpleVersion sv = getSimpleVersion(version);
+	if (document.getCurrentVersion() != null) {
+	    // Move current version to archived index
+	    SimpleVersion currentVersion = getSimpleVersion(document.getCurrentVersion());
+	    currentVersion.setCurrent(false);
+	    if (sv.getParentId() == 0) {
+		sv.setParentId(currentVersion.getVersionId());
+	    }
+	    sd.updateVersion(currentVersion);
+	}
+	sd.addVersion(sv);
+	updateVersions(sd);
+	update(sd);
+    }
+
+    public void deleteVersion(Document document, Version version) throws ServiceException {
+	if (log.isTraceEnabled()) {
+	    log.trace(String.format("*** deleteVersion document: %s - version: %s ***", document, version));
+	}
+	checkNotNull(document);
+	checkNotNull(version);
+	if (document.getVersions().size() == 1) {
+	    throw new ServiceException("Cannot delete the last version of a document. Use DocumentService.delete");
+	}
+	SimpleDocument sd = getSimpleDocument(document);
+	SimpleVersion sv;
+	if (!version.isCurrent()) {
+	    versionService.delete(version);
+	} else {
+	    if (version.getParentId() > 0) {
+		String id = document.getVersion(version.getParentId()).getId();
+		if (id != null) {
+		    Version lastVersion = versionService.get(id);
+		    sv = getSimpleVersion(lastVersion);
+		    sv.setCurrent(true);
+		    sv.setId(null);
+		    sd.updateVersion(sv);
+		    versionService.delete(lastVersion);
+		}
+	    } else {
+		throw new ServiceException(String.format("Version %s is current but does not have parent!", version));
+	    }
 	}
 
-	public void markDeleted(Document document) throws ServiceException {
-		if (document.hasStatus(DocumentStatus.AVAILABLE)) {
-			SimpleDocument sd = getSimpleDocument(document);
-			sd.setStatus(DocumentStatus.DELETED);
-			document = update(sd);
-		} else {
-			throw new ServiceException(
-					String.format("Document %s is not marked as available.",
-							document.getId()));
-		}
+	// Change parent of version where parent is the deleted version
+	int parentId = version.getParentId();
+	final int versionId = version.getVersionId();
+	Set<Version> filteredVersions = Sets.filter(document.getVersions(), new Predicate<Version>() {
+	    @Override
+	    public boolean apply(Version version) {
+		return (version.getParentId() == versionId);
+	    }
+	});
+
+	for (Version v : filteredVersions.toArray(new Version[0])) {
+	    sv = getSimpleVersion(v);
+	    sv.setParentId(parentId);
+	    sd.updateVersion(sv);
 	}
 
-	public void undelete(Document document) throws ServiceException {
-		if (document.hasStatus(DocumentStatus.DELETED)) {
-			SimpleDocument sd = getSimpleDocument(document);
-			sd.setStatus(DocumentStatus.AVAILABLE);
+	sd.deleteVersion(version);
+	updateVersions(sd);
+	update(sd);
+    }
 
-			document = update(sd);
-		} else {
-			throw new ServiceException(
-					String.format("Document %s is not marked for deletion.",
-							document.getId()));
-		}
+    public Version getVersion(Document document, int versionId) throws ServiceException {
+	if (log.isTraceEnabled()) {
+	    log.trace(String.format("*** getVersion document: %s - versionId: %s ***", document, versionId));
 	}
-
-	@Override
-	public Document update(Document item) throws ServiceException {
-		SimpleDocument document = updateModifiedDate(getSimpleDocument(item));
-		return super.update(document);
+	checkNotNull(document);
+	checkNotNull(versionId);
+	Version version = document.getVersion(versionId);
+	checkNotNull(version);
+	if (!version.isCurrent()) {
+	    return versionService.get(version.getId());
+	} else {
+	    return version;
 	}
+    }
 
-	@Override
-	public void checkout(Document document) throws ServiceException {
-		SimpleDocument sd = getSimpleDocument(document);
-		if (document.hasStatus(DocumentStatus.LOCKED)) {
-			throw new ServiceException(String.format(
-					"Document %s already locked.", document.getId()));
-		}
-		sd.setStatus(DocumentStatus.LOCKED);
-		sd.setReadOnlyAttribute(Document.LOCKED_BY, getCurrentUser());
-		update(sd);
+    @Override
+    public Set<Version> getVersions(Document document) throws ServiceException {
+	if (log.isTraceEnabled()) {
+	    log.trace(String.format("*** getVersions document: %s ***", document));
 	}
-
-	@Override
-	public String preview(Document document, /* int versionId, */
-			String criteria, int size) throws ServiceException {
-		try {
-			log.trace("*** preview ***");
-			String query = jsonBuilder().startObject().startObject("bool")
-					.startArray("must").startObject()
-					.startObject("queryString").field("query", criteria)
-					.array("fields", "_all", "file").endObject().endObject()
-					.startObject().startObject("queryString")
-					.field("query", document.getId())
-					.field("default_field", "id").endObject().endObject()
-					.endArray().endObject().endObject().string();
-
-			log.debug("query: " + query);
-
-			// FieldQueryBuilder x = QueryBuilders.fieldQuery("id",
-			// document.getId());
-			SearchRequestBuilder srb = client.prepareSearch(index)
-					.setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH)
-					.setQuery(query)
-					// .setQuery(fieldQuery("file", criteria))
-					.setHighlighterOrder("score")
-					.addHighlightedField("file", size, 1);
-			log.trace("Search request: " + srb);
-			SearchResponse searchResponse = srb.execute().actionGet();
-			log.debug("totalHits: " + searchResponse.getHits().totalHits());
-			String preview = null;
-			for (SearchHit hit : searchResponse.getHits().hits()) {
-				log.debug(String.format("HighlightFields: %s", hit
-						.getHighlightFields().size()));
-				for (String key : hit.getHighlightFields().keySet()) {
-					HighlightField field = hit.getHighlightFields().get(key);
-					log.debug(String.format("Highlight key: %s", key));
-					log.debug(String.format("Highlight: %s", hit
-							.getHighlightFields().get(key)));
-					for (Text text : field.fragments()) {
-						if (preview == null) {
-							preview = text.string();
-						}
-					}
-				}
-			}
-			return preview;
-		} catch (Throwable t) {
-			log.error("getItems failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
+	Set<Version> versions = newHashSet();
+	for (Version version : document.getVersions()) {
+	    if (version.isCurrent()) {
+		versions.add(version);
+	    } else {
+		versions.add(versionService.get(version.getId()));
+	    }
 	}
+	return versions;
+    }
 
-	private void updateVersions(SimpleDocument document)
-			throws ServiceException {
-		for (Version version : document.getVersions().toArray(new Version[0])) {
-			SimpleVersion sv = getSimpleVersion(version);
-			if (!sv.isCurrent()) {
-				if (Strings.isNullOrEmpty(sv.getId())) {
-					/* Version newVersion = */versionService.create(sv);
-					// sv.setId(newVersion.getId());
-				} else {
-					versionService.update(sv);
-				}
-				sv.setFile(null);
-				document.updateVersion(sv);
-			}
-		}
+    @Override
+    public File getVersionContent(Document document, int versionId) throws ServiceException {
+	checkNotNull(document);
+	checkArgument(versionId > 0);
+	Version version = document.getVersion(versionId);
+	if (version == null) {
+	    throw new ServiceException(String.format("Version %s not found.", versionId));
 	}
-
-	@Override
-	public void addVersion(Document document, Version version)
-			throws ServiceException {
-		if (log.isTraceEnabled()) {
-			log.trace(String.format(
-					"*** addVersion document: %s - version: %s ***", document,
-					version));
-		}
-		checkNotNull(document);
-		checkNotNull(version);
-		SimpleDocument sd = getSimpleDocument(document);
-		SimpleVersion sv = getSimpleVersion(version);
-		if (document.getCurrentVersion() != null) {
-			// Move current version to archived index
-			SimpleVersion currentVersion = getSimpleVersion(document
-					.getCurrentVersion());
-			currentVersion.setCurrent(false);
-			if (sv.getParentId() == 0) {
-				sv.setParentId(currentVersion.getVersionId());
-			}
-			sd.updateVersion(currentVersion);
-		}
-		sd.addVersion(sv);
-		updateVersions(sd);
-		update(sd);
+	if (version.isCurrent()) {
+	    return version.getFile();
+	} else {
+	    version = versionService.get(version.getId());
+	    if (version == null || version.getFile() == null) {
+		throw new ServiceException(String.format("Version %s or its contents not found.", versionId));
+	    }
+	    return version.getFile();
 	}
+    }
 
-	public void deleteVersion(Document document, Version version)
-			throws ServiceException {
-		if (log.isTraceEnabled()) {
-			log.trace(String.format(
-					"*** deleteVersion document: %s - version: %s ***",
-					document, version));
-		}
-		checkNotNull(document);
-		checkNotNull(version);
-		if (document.getVersions().size() == 1) {
-			throw new ServiceException(
-					"Cannot delete the last version of a document. Use DocumentService.delete");
-		}
-		SimpleDocument sd = getSimpleDocument(document);
-		SimpleVersion sv;
-		if (!version.isCurrent()) {
-			versionService.delete(version);
-		} else {
-			if (version.getParentId() > 0) {
-				String id = document.getVersion(version.getParentId()).getId();
-				if (id != null) {
-					Version lastVersion = versionService.get(id);
-					sv = getSimpleVersion(lastVersion);
-					sv.setCurrent(true);
-					sv.setId(null);
-					sd.updateVersion(sv);
-					versionService.delete(lastVersion);
-				}
-			} else {
-				throw new ServiceException(String.format(
-						"Version %s is current but does not have parent!",
-						version));
-			}
-		}
-
-		// Change parent of version where parent is the deleted version
-		int parentId = version.getParentId();
-		final int versionId = version.getVersionId();
-		Set<Version> filteredVersions = Sets.filter(document.getVersions(),
-				new Predicate<Version>() {
-					@Override
-					public boolean apply(Version version) {
-						return (version.getParentId() == versionId);
-					}
-				});
-
-		for (Version v : filteredVersions.toArray(new Version[0])) {
-			sv = getSimpleVersion(v);
-			sv.setParentId(parentId);
-			sd.updateVersion(sv);
-		}
-
-		sd.deleteVersion(version);
-		updateVersions(sd);
-		update(sd);
+    @Override
+    public void setCurrentVersion(Document document, int versionId) throws ServiceException {
+	checkNotNull(document);
+	checkArgument(versionId > 0);
+	Version version = document.getVersion(versionId);
+	if (version == null) {
+	    throw new ServiceException(String.format("Version %s not found.", versionId));
 	}
+	SimpleDocument sd = getSimpleDocument(document);
+	SimpleVersion sv = getSimpleVersion(document.getCurrentVersion());
+	sv.setCurrent(false);
+	sd.updateVersion(sv);
 
-	public Version getVersion(Document document, int versionId)
-			throws ServiceException {
-		if (log.isTraceEnabled()) {
-			log.trace(String.format(
-					"*** getVersion document: %s - versionId: %s ***",
-					document, versionId));
-		}
-		checkNotNull(document);
-		checkNotNull(versionId);
-		Version version = document.getVersion(versionId);
-		checkNotNull(version);
-		if (!version.isCurrent()) {
-			return versionService.get(version.getId());
-		} else {
-			return version;
-		}
+	sv = getSimpleVersion(version);
+	sv.setCurrent(true);
+	sd.updateVersion(sv);
+	updateVersions(sd);
+	update(sd);
+    }
+
+    @Override
+    public void setVersionContent(Document document, int versionId, File file) throws ServiceException {
+	checkNotNull(document);
+	checkArgument(versionId > 0);
+	Version version = document.getVersion(versionId);
+	if (version == null) {
+	    throw new ServiceException(String.format("Version %s not found.", versionId));
 	}
+	SimpleDocument sd = getSimpleDocument(document);
+	SimpleVersion sv = getSimpleVersion(version);
+	sv.setFile(file);
+	sd.updateVersion(sv);
 
-	@Override
-	public Set<Version> getVersions(Document document) throws ServiceException {
-		if (log.isTraceEnabled()) {
-			log.trace(String.format("*** getVersions document: %s ***",
-					document));
-		}
-		Set<Version> versions = newHashSet();
-		for (Version version : document.getVersions()) {
-			if (version.isCurrent()) {
-				versions.add(version);
-			} else {
-				versions.add(versionService.get(version.getId()));
-			}
-		}
-		return versions;
-	}
-
-	@Override
-	public File getVersionContent(Document document, int versionId)
-			throws ServiceException {
-		checkNotNull(document);
-		checkArgument(versionId > 0);
-		Version version = document.getVersion(versionId);
-		if (version == null) {
-			throw new ServiceException(String.format("Version %s not found.",
-					versionId));
-		}
-		if (version.isCurrent()) {
-			return version.getFile();
-		} else {
-			version = versionService.get(version.getId());
-			if (version == null || version.getFile() == null) {
-				throw new ServiceException(String.format(
-						"Version %s or its contents not found.", versionId));
-			}
-			return version.getFile();
-		}
-	}
-
-	@Override
-	public void setCurrentVersion(Document document, int versionId)
-			throws ServiceException {
-		checkNotNull(document);
-		checkArgument(versionId > 0);
-		Version version = document.getVersion(versionId);
-		if (version == null) {
-			throw new ServiceException(String.format("Version %s not found.",
-					versionId));
-		}
-		SimpleDocument sd = getSimpleDocument(document);
-		SimpleVersion sv = getSimpleVersion(document.getCurrentVersion());
-		sv.setCurrent(false);
-		sd.updateVersion(sv);
-
-		sv = getSimpleVersion(version);
-		sv.setCurrent(true);
-		sd.updateVersion(sv);
-		updateVersions(sd);
-		update(sd);
-	}
-
-	@Override
-	public void setVersionContent(Document document, int versionId, File file)
-			throws ServiceException {
-		checkNotNull(document);
-		checkArgument(versionId > 0);
-		Version version = document.getVersion(versionId);
-		if (version == null) {
-			throw new ServiceException(String.format("Version %s not found.",
-					versionId));
-		}
-		SimpleDocument sd = getSimpleDocument(document);
-		SimpleVersion sv = getSimpleVersion(version);
-		sv.setFile(file);
-		sd.updateVersion(sv);
-
-		updateVersions(sd);
-		update(sd);
-	}
+	updateVersions(sd);
+	update(sd);
+    }
 }

@@ -26,7 +26,6 @@ package test.github.richardwilly98.esdms.inject;
  * #L%
  */
 
-
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.guice.aop.ShiroAopModule;
 
@@ -40,18 +39,18 @@ import com.mycila.inject.jsr250.Jsr250;
 
 public class ProviderModule2 extends AbstractModule {
 
-	@Override
-	protected void configure() {
+    @Override
+    protected void configure() {
 
-		install(new BootstrapModule());
-		install(new EsClientModule());
-		install(new ServicesModule());
-		install(new ShiroAopModule());
-		install(new EsShiroModule());
+	install(new BootstrapModule());
+	install(new EsClientModule());
+	install(new ServicesModule());
+	install(new ShiroAopModule());
+	install(new EsShiroModule());
 
-		Injector injector = Jsr250.createInjector(new BootstrapModule(), new EsClientModule(), new ServicesModule(), new EsShiroModule());
-	    org.apache.shiro.mgt.SecurityManager securityManager = injector.getInstance(org.apache.shiro.mgt.SecurityManager.class);
-	    SecurityUtils.setSecurityManager(securityManager);
-	}
+	Injector injector = Jsr250.createInjector(new BootstrapModule(), new EsClientModule(), new ServicesModule(), new EsShiroModule());
+	org.apache.shiro.mgt.SecurityManager securityManager = injector.getInstance(org.apache.shiro.mgt.SecurityManager.class);
+	SecurityUtils.setSecurityManager(securityManager);
+    }
 
 }

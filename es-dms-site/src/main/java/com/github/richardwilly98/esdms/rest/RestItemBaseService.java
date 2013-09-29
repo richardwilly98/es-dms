@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.rest;
  * #L%
  */
 
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.net.URI;
@@ -62,154 +61,150 @@ import com.github.richardwilly98.esdms.services.BaseService;
  */
 public abstract class RestItemBaseService<T extends ItemBase> extends RestServiceBase {
 
-	public static final String ITEM_ID_HEADER = "esdms-id";
-	public static final String SEARCH_PATH = "search";
-	public static final String SEARCH_FIRST_PARAMETER = "fi";
-	public static final String SEARCH_PAGE_SIZE_PARAMETER = "ps";
+    public static final String ITEM_ID_HEADER = "esdms-id";
+    public static final String SEARCH_PATH = "search";
+    public static final String SEARCH_FIRST_PARAMETER = "fi";
+    public static final String SEARCH_PAGE_SIZE_PARAMETER = "ps";
 
-	protected final Logger log = Logger.getLogger(getClass());
-//	protected final AuthenticationService authenticationService;
-	protected final BaseService<T> service;
+    protected final Logger log = Logger.getLogger(getClass());
+    // protected final AuthenticationService authenticationService;
+    protected final BaseService<T> service;
 
-	@Context
-	UriInfo url;
+    @Context
+    UriInfo url;
 
-	@Inject
-	public RestItemBaseService(final AuthenticationService authenticationService,
-			final BaseService<T> service) {
-		super(authenticationService);
-//		this.authenticationService = authenticationService;
-		this.service = service;
+    @Inject
+    public RestItemBaseService(final AuthenticationService authenticationService, final BaseService<T> service) {
+	super(authenticationService);
+	// this.authenticationService = authenticationService;
+	this.service = service;
+    }
+
+    // private String currentUser;
+
+    // protected String isAuthenticated() {
+    // try {
+    // log.debug("*** isAuthenticated ***");
+    // Subject currentSubject = SecurityUtils.getSubject();
+    // log.debug("currentSubject.isAuthenticated(): "
+    // + currentSubject.isAuthenticated());
+    // log.debug("Principal: " + currentSubject.getPrincipal());
+    // if (currentSubject.getPrincipal() == null) {
+    // throw new UnauthorizedException("Unauthorize request",
+    // url.getPath());
+    // } else {
+    // // if (currentUser == null) {
+    // // currentUser = currentSubject.getPrincipal().toString();
+    // return currentSubject.getPrincipal().toString();
+    // // }
+    // }
+    // } catch (Throwable t) {
+    // throw new UnauthorizedException();
+    // }
+    // }
+
+    // protected String getCurrentUser() {
+    // return isAuthenticated();
+    // // if (currentUser == null) {
+    // // isAuthenticated();
+    // // }
+    // // return currentUser;
+    // }
+
+    protected URI getItemUri(T item) {
+	checkNotNull(item);
+	return url.getBaseUriBuilder().path(getClass()).path(item.getId()).build();
+    }
+
+    protected Response.ResponseBuilder includeItemIdInHeaders(Response.ResponseBuilder builder, T item) {
+	checkNotNull(builder);
+	checkNotNull(item);
+	return builder.header(ITEM_ID_HEADER, item.getId());
+    }
+
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("{id}")
+    public Response get(@PathParam("id") String id) {
+	if (log.isTraceEnabled()) {
+	    log.trace(String.format("get - %s", id));
 	}
-
-//	private String currentUser;
-
-//	protected String isAuthenticated() {
-//		try {
-//			log.debug("*** isAuthenticated ***");
-//			Subject currentSubject = SecurityUtils.getSubject();
-//			log.debug("currentSubject.isAuthenticated(): "
-//					+ currentSubject.isAuthenticated());
-//			log.debug("Principal: " + currentSubject.getPrincipal());
-//			if (currentSubject.getPrincipal() == null) {
-//				throw new UnauthorizedException("Unauthorize request",
-//						url.getPath());
-//			} else {
-////				if (currentUser == null) {
-////					currentUser = currentSubject.getPrincipal().toString();
-//				return currentSubject.getPrincipal().toString();
-////				}
-//			}
-//		} catch (Throwable t) {
-//			throw new UnauthorizedException();
-//		}
-//	}
-
-//	protected String getCurrentUser() {
-//		return isAuthenticated();
-////		if (currentUser == null) {
-////			isAuthenticated();
-////		}
-////		return currentUser;
-//	}
-
-	protected URI getItemUri(T item) {
-		checkNotNull(item);
-		return url.getBaseUriBuilder().path(getClass()).path(item.getId())
-				.build();
+	try {
+	    T item = service.get(id);
+	    if (item == null) {
+		return Response.status(Status.NOT_FOUND).build();
+	    }
+	    return Response.ok(item).build();
+	} catch (ServiceException e) {
+	    throw new RestServiceException(e.getLocalizedMessage());
 	}
-	
-	protected Response.ResponseBuilder includeItemIdInHeaders(Response.ResponseBuilder builder, T item) {
-		checkNotNull(builder);
-		checkNotNull(item);
-		return builder.header(ITEM_ID_HEADER, item.getId());
-	}
+    }
 
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	@Path("{id}")
-	public Response get(@PathParam("id") String id) {
-		if (log.isTraceEnabled()) {
-			log.trace(String.format("get - %s", id));
-		}
-		try {
-			T item = service.get(id);
-			if (item == null) {
-				return Response.status(Status.NOT_FOUND).build();
-			}
-			return Response.ok(item).build();
-		} catch (ServiceException e) {
-			throw new RestServiceException(e.getLocalizedMessage());
-		}
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response create(T item) {
+	checkNotNull(item);
+	if (log.isTraceEnabled()) {
+	    log.trace(String.format("create - %s", item));
 	}
+	try {
+	    item = service.create(item);
+	    return Response.created(getItemUri(item)).build();
+	} catch (ServiceException e) {
+	    throw new RestServiceException(e.getLocalizedMessage());
+	}
+    }
 
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response create(T item) {
-		checkNotNull(item);
-		if (log.isTraceEnabled()) {
-			log.trace(String.format("create - %s", item));
-		}
-		try {
-			item = service.create(item);
-			return Response.created(getItemUri(item)).build();
-		} catch (ServiceException e) {
-			throw new RestServiceException(e.getLocalizedMessage());
-		}
+    @DELETE
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("{id}")
+    public Response delete(@PathParam("id") String id) {
+	if (log.isTraceEnabled()) {
+	    log.trace(String.format("get - %s", id));
 	}
+	try {
+	    T item = service.get(id);
+	    if (item != null) {
+		service.delete(item);
+	    } else {
+		return Response.status(Status.NOT_FOUND).build();
+	    }
+	    return Response.ok().build();
+	} catch (ServiceException e) {
+	    throw new RestServiceException(e.getLocalizedMessage());
+	}
+    }
 
-	@DELETE
-	@Produces({ MediaType.APPLICATION_JSON })
-	@Path("{id}")
-	public Response delete(@PathParam("id") String id) {
-		if (log.isTraceEnabled()) {
-			log.trace(String.format("get - %s", id));
-		}
-		try {
-			T item = service.get(id);
-			if (item != null) {
-				service.delete(item);
-			} else {
-				return Response.status(Status.NOT_FOUND).build();
-			}
-			return Response.ok().build();
-		} catch (ServiceException e) {
-			throw new RestServiceException(e.getLocalizedMessage());
-		}
+    @PUT
+    @Path("{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response update(@PathParam("id") String id, T item) {
+	checkNotNull(item);
+	if (log.isTraceEnabled()) {
+	    log.trace(String.format("update - %s", item));
 	}
+	try {
+	    item = service.update(item);
+	    return Response.ok(item).build();
+	} catch (ServiceException e) {
+	    throw new RestServiceException(e.getLocalizedMessage());
+	}
+    }
 
-	@PUT
-	@Path("{id}")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces({ MediaType.APPLICATION_JSON })
-	public Response update(@PathParam("id") String id, T item) {
-		checkNotNull(item);
-		if (log.isTraceEnabled()) {
-			log.trace(String.format("update - %s", item));
-		}
-		try {
-			item = service.update(item);
-			return Response.ok(item).build();
-		} catch (ServiceException e) {
-			throw new RestServiceException(e.getLocalizedMessage());
-		}
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path(SEARCH_PATH + "/{criteria}")
+    public Response search(@PathParam("criteria") String criteria, @QueryParam(SEARCH_FIRST_PARAMETER) @DefaultValue("0") int first,
+	    @QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("20") int pageSize) {
+	if (log.isTraceEnabled()) {
+	    log.trace(String.format("search - %s", criteria));
 	}
-
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	@Path(SEARCH_PATH + "/{criteria}")
-	public Response search(
-			@PathParam("criteria") String criteria,
-			@QueryParam(SEARCH_FIRST_PARAMETER) @DefaultValue("0") int first,
-			@QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("20") int pageSize) {
-		if (log.isTraceEnabled()) {
-			log.trace(String.format("search - %s", criteria));
-		}
-		try {
-			SearchResult<T> items = service.search(criteria, first, pageSize);
-			return Response.ok(items).build();
-		} catch (ServiceException e) {
-			throw new RestServiceException(e.getLocalizedMessage());
-		}
+	try {
+	    SearchResult<T> items = service.search(criteria, first, pageSize);
+	    return Response.ok(items).build();
+	} catch (ServiceException e) {
+	    throw new RestServiceException(e.getLocalizedMessage());
 	}
+    }
 }

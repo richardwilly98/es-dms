@@ -50,85 +50,75 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.services.audit.AuditStrategy;
 
 @Singleton
-public class AuditProvider extends ProviderBase<AuditEntry> implements
-		AuditService {
+public class AuditProvider extends ProviderBase<AuditEntry> implements AuditService {
 
-	private static Logger log = Logger.getLogger(AuditProvider.class);
+    private static Logger log = Logger.getLogger(AuditProvider.class);
 
-	private static final String AUDIT_MAPPING_JSON = "/com/github/richardwilly98/esdms/services/audit-mapping.json";
-	private final static String type = "audit";
-	private static final EnumSet<AuditEntry.Event> events = EnumSet
-			.allOf(AuditEntry.Event.class);
-	private final AuditStrategy strategy;
+    private static final String AUDIT_MAPPING_JSON = "/com/github/richardwilly98/esdms/services/audit-mapping.json";
+    private final static String type = "audit";
+    private static final EnumSet<AuditEntry.Event> events = EnumSet.allOf(AuditEntry.Event.class);
+    private final AuditStrategy strategy;
 
-	@Inject
-	AuditProvider(Client client, BootstrapService bootstrapService,
-			final UserService userService, final AuditStrategy strategy)
-			throws ServiceException {
-		super(client, bootstrapService, bootstrapService.loadSettings()
-				.getLibrary() + "-archive", AuditProvider.type,
-				AuditEntry.class);
-		this.strategy = strategy;
+    @Inject
+    AuditProvider(Client client, BootstrapService bootstrapService, final UserService userService, final AuditStrategy strategy)
+	    throws ServiceException {
+	super(client, bootstrapService, bootstrapService.loadSettings().getLibrary() + "-archive", AuditProvider.type, AuditEntry.class);
+	this.strategy = strategy;
+    }
+
+    @Override
+    public void clear(List<String> ids) throws ServiceException {
+	for (String id : ids) {
+	    AuditEntry audit = super.get(id);
+	    if (audit != null) {
+		super.delete(audit);
+	    }
 	}
+    }
 
-	@Override
-	public void clear(List<String> ids) throws ServiceException {
-		for (String id : ids) {
-			AuditEntry audit = super.get(id);
-			if (audit != null) {
-				super.delete(audit);
-			}
-		}
+    @Override
+    public void clear(Date from, Date to) throws ServiceException {
+	try {
+	    QueryBuilder query = QueryBuilders.rangeQuery("date").from(from).to(to).includeLower(true).includeUpper(true);
+	    SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(type)
+		    .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setQuery(query);
+	    log.debug("Search request builder: " + searchRequestBuilder);
+	    SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
+	    for (SearchHit hit : searchResponse.getHits().hits()) {
+		String json = hit.getSourceAsString();
+		AuditEntry audit;
+		audit = mapper.readValue(json, AuditEntry.class);
+		super.delete(audit);
+	    }
+	} catch (Throwable t) {
+	    log.error("clear failed", t);
+	    throw new ServiceException(t.getLocalizedMessage());
 	}
+    }
 
-	@Override
-	public void clear(Date from, Date to) throws ServiceException {
-		try {
-			QueryBuilder query = QueryBuilders.rangeQuery("date").from(from)
-					.to(to).includeLower(true).includeUpper(true);
-			SearchRequestBuilder searchRequestBuilder = client
-					.prepareSearch(index).setTypes(type)
-					.setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-					.setQuery(query);
-			log.debug("Search request builder: " + searchRequestBuilder);
-			SearchResponse searchResponse = searchRequestBuilder.execute()
-					.actionGet();
-			for (SearchHit hit : searchResponse.getHits().hits()) {
-				String json = hit.getSourceAsString();
-				AuditEntry audit;
-				audit = mapper.readValue(json, AuditEntry.class);
-				super.delete(audit);
-			}
-		} catch (Throwable t) {
-			log.error("clear failed", t);
-			throw new ServiceException(t.getLocalizedMessage());
-		}
-	}
+    @Override
+    public AuditEntry create(AuditEntry.Event event, String itemId, String user) throws ServiceException {
+	AuditEntry audit = strategy.convert(event, itemId, user);
+	return super.create(audit);
+    }
 
-	@Override
-	public AuditEntry create(AuditEntry.Event event, String itemId, String user)
-			throws ServiceException {
-		AuditEntry audit = strategy.convert(event, itemId, user);
-		return super.create(audit);
-	}
+    @Override
+    protected void loadInitialData() throws ServiceException {
+    }
 
-	@Override
-	protected void loadInitialData() throws ServiceException {
+    @Override
+    protected String getMapping() {
+	try {
+	    return copyToStringFromClasspath(AUDIT_MAPPING_JSON);
+	} catch (IOException ioEx) {
+	    log.error("getMapping failed", ioEx);
+	    return null;
 	}
+    }
 
-	@Override
-	protected String getMapping() {
-		try {
-			return copyToStringFromClasspath(AUDIT_MAPPING_JSON);
-		} catch (IOException ioEx) {
-			log.error("getMapping failed", ioEx);
-			return null;
-		}
-	}
-
-	@Override
-	public EnumSet<AuditEntry.Event> getEvents() {
-		return events;
-	}
+    @Override
+    public EnumSet<AuditEntry.Event> getEvents() {
+	return events;
+    }
 
 }

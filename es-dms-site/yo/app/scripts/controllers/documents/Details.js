@@ -8,6 +8,7 @@ angular.module('esDmsSiteApp')
   $scope.auditEntries = {};
   $scope.moreLikeThis = {};
   $scope.isAvailable = false;
+  $scope.tags = null;
 
   $rootScope.$on('document:showDetails', function() {
     var current = documentService.current();
@@ -15,6 +16,10 @@ angular.module('esDmsSiteApp')
       $scope.document.id = current;
       documentService.metadata(current, function(doc) {
         $scope.document = doc;
+        if (doc.tags) {
+          $scope.tags = _(doc.tags).toString();
+        }
+        $log.log('$scope.tags: ' + $scope.tags);
       });
     } else {
       $scope.document = {};
@@ -26,7 +31,6 @@ angular.module('esDmsSiteApp')
     $log.log('loadAudit: ' + $scope.document.id);
     $log.log('$state.params: ' + JSON.stringify($state.params));
     documentService.audit($scope.document.id, function(auditEntries) {
-      //$scope.auditEntries = auditEntries.items;
       $scope.auditEntries = _.map(auditEntries.items, function(auditEntry) {
         auditEntry.date = new Date(auditEntry.date);
         return auditEntry;

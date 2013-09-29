@@ -1,38 +1,43 @@
 <div class="container" data-ng-controller="RoleCtrl">
-    <h2>Roles</h2>
+	<h2>Roles</h2>
 	<form data-ng-submit="search()" class="form-search">
 		<input type="text" data-ng-model="criteria" />
 		<button type="button" class="btn btn-primary" data-ng-click="search()">Search</button>
 	</form>
 
-    <table class="table table-condensed">
-    	<thead>
-    		<tr>
-    			<th>Id</th>
-    			<th>Name</th>
-                <th style="width: 10%">Status</th>
-    			<th>Actions</th>
-    		</tr>
-    	</thead>
-    	<tbody>
-    		<tr data-ng-repeat="role in roles | filter: filter.name | orderBy: 'name'">
-    			<td>{{ role.id }}</td>
-    			<td>{{ role.name }}</td>
-                <td><span data-ng-show="role.disabled" class="label label-important">Disabled</span></td>
-    			<td>
-    				<button class="btn btn-primary" data-ng-click="edit(role.id)" data-toggle="modal" href="#editModal">
-    					<i class="icon-pencil icon-white"></i> Edit
-    				</button>
-    			</td>
-    		</tr>
-    	</tbody>
-    </table>
-    <br />
+	<table class="table table-condensed">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Name</th>
+				<th style="width: 10%">Status</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr
+				data-ng-repeat="role in roles | filter: filter.name | orderBy: 'name'">
+				<td>{{ role.id }}</td>
+				<td>{{ role.name }}</td>
+				<td><span data-ng-show="role.disabled"
+					class="label label-important">Disabled</span></td>
+				<td>
+					<button class="btn btn-primary" data-ng-click="edit(role.id)"
+						data-toggle="modal" href="#editModal">
+						<i class="icon-pencil icon-white"></i> Edit
+					</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<br />
 
-	<button class="btn btn-success" ng-click="edit('new')" data-toggle="modal" href="#editModal">
-        <i class="icon-user icon-white"></i>&nbsp;New Role
+	<button class="btn btn-success" ng-click="edit('new')"
+		data-toggle="modal" href="#editModal">
+		<i class="icon-user icon-white"></i>&nbsp;New Role
 	</button>
-	
-	<div class="modal hide fade" ng-include="'views/roles/edit-role.html'" id="editModal"></div>
+
+	<div class="modal hide fade" ng-include="'views/roles/edit-role.html'"
+		id="editModal"></div>
 
 </div>

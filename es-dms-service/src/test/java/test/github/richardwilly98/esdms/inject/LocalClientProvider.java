@@ -26,7 +26,6 @@ package test.github.richardwilly98.esdms.inject;
  * #L%
  */
 
-
 import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilder;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
@@ -45,49 +44,41 @@ import com.google.inject.Provider;
 
 public class LocalClientProvider implements Provider<Client> {
 
-	/*
-	 * Provides embedded ES instance for unit testing
-	 * (non-Javadoc)
-	 * @see com.google.inject.Provider#get()
-	 */
-	@Override
-	public Client get() {
-		Settings settings = getSettings();
-		Tuple<Settings, Environment> initialSettings = InternalSettingsPerparer
-				.prepareSettings(settings, true);
-		PluginManager pluginManager = new PluginManager(
-				initialSettings.v2(), null);
+    /*
+     * Provides embedded ES instance for unit testing (non-Javadoc)
+     * 
+     * @see com.google.inject.Provider#get()
+     */
+    @Override
+    public Client get() {
+	Settings settings = getSettings();
+	Tuple<Settings, Environment> initialSettings = InternalSettingsPerparer.prepareSettings(settings, true);
+	PluginManager pluginManager = new PluginManager(initialSettings.v2(), null);
 
-		if (!initialSettings.v2().configFile().exists()) {
-			FileSystemUtils.mkdirs(initialSettings.v2().configFile());
-		}
-
-		if (!initialSettings.v2().logsFile().exists()) {
-			FileSystemUtils.mkdirs(initialSettings.v2().logsFile());
-		}
-
-		if (!initialSettings.v2().pluginsFile().exists()) {
-			FileSystemUtils.mkdirs(initialSettings.v2().pluginsFile());
-			try {
-				pluginManager.downloadAndExtract(
-						settings.get("plugins.mapper-attachments"), false);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		Node node = nodeBuilder().local(true).settings(settings).node();
-		Client client = node.client();
-		return client;
+	if (!initialSettings.v2().configFile().exists()) {
+	    FileSystemUtils.mkdirs(initialSettings.v2().configFile());
 	}
-	
-	private Settings getSettings() {
-		Settings settings = settingsBuilder()
-				.loadFromStream(
-						"settings.yml",
-						ClassLoader
-								.getSystemResourceAsStream("settings.yml"))
-				.build();
-		return settings;
+
+	if (!initialSettings.v2().logsFile().exists()) {
+	    FileSystemUtils.mkdirs(initialSettings.v2().logsFile());
 	}
+
+	if (!initialSettings.v2().pluginsFile().exists()) {
+	    FileSystemUtils.mkdirs(initialSettings.v2().pluginsFile());
+	    try {
+		pluginManager.downloadAndExtract(settings.get("plugins.mapper-attachments"), false);
+	    } catch (IOException e) {
+		e.printStackTrace();
+	    }
+	}
+	Node node = nodeBuilder().local(true).settings(settings).node();
+	Client client = node.client();
+	return client;
+    }
+
+    private Settings getSettings() {
+	Settings settings = settingsBuilder().loadFromStream("settings.yml", ClassLoader.getSystemResourceAsStream("settings.yml")).build();
+	return settings;
+    }
 
 }

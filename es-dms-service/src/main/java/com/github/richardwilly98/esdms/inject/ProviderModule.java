@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.inject;
  * #L%
  */
 
-
 import org.apache.log4j.Logger;
 import org.apache.shiro.guice.aop.ShiroAopModule;
 
@@ -34,15 +33,15 @@ import com.google.inject.AbstractModule;
 
 public class ProviderModule extends AbstractModule {
 
-	private final Logger log = Logger.getLogger(this.getClass());
-	
-	@Override
-	protected void configure() {
-		log.info("*** configure ***");
-		install(new BootstrapModule());
-		install(new EsClientModule());
-		install(new ServicesModule());
-		install(new ShiroAopModule());
-	}
+    private final Logger log = Logger.getLogger(this.getClass());
+
+    @Override
+    protected void configure() {
+	log.info("*** configure ***");
+	install(new BootstrapModule());
+	install(new EsClientModule());
+	install(new ServicesModule());
+	install(new ShiroAopModule());
+    }
 
 }

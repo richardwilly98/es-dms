@@ -29,10 +29,9 @@ import com.github.richardwilly98.esdms.TermImpl;
  * #L%
  */
 
-
 @JsonDeserialize(as = TermImpl.class)
 public interface Term {
-	public abstract String getTerm();
+    public abstract String getTerm();
 
-	public abstract int getCount();
+    public abstract int getCount();
 }

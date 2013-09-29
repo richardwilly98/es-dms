@@ -1,4 +1,5 @@
-<div data-ng-controller="RoleEditCtrl" modal="shouldBeOpen" options="opts" close="close()">
+<div data-ng-controller="RoleEditCtrl" modal="shouldBeOpen"
+	options="opts" close="close()">
 	<div class="modal-header">
 		<button type="button" class="close" data-ng-click="close()"
 			aria-hidden="true">&times;</button>
@@ -8,30 +9,31 @@
 	<div class="modal-body">
 		<form class="form-horizontal">
 			<div class="control-group">
-        		<label class="control-label">Id:</label>
-        		<div class="controls">
-          			<input type="text" ng-model="role.id" ng-disabled="!newRole" placeholder="Id" autofocus="autofocus" />
-        		</div>
-      		</div>				
+				<label class="control-label">Id:</label>
+				<div class="controls">
+					<input type="text" ng-model="role.id" ng-disabled="!newRole"
+						placeholder="Id" autofocus="autofocus" />
+				</div>
+			</div>
 			<div class="control-group">
-        		<label class="control-label">Name:</label>
-        		<div class="controls">
-          			<input type="text" ng-model="role.name" placeholder="Name" />
-        		</div>
-      		</div>				
+				<label class="control-label">Name:</label>
+				<div class="controls">
+					<input type="text" ng-model="role.name" placeholder="Name" />
+				</div>
+			</div>
 			<div class="control-group">
-        		<label class="control-label">Permissions:</label>
-        		<div class="controls">
-        			<select multiple="multiple">
-        				<option data-ng-repeat="permission in role.permissions">{{
-            				permission.id }}</option>
-        			</select>
-        		</div>
-      		</div>
+				<label class="control-label">Permissions:</label>
+				<div class="controls">
+					<select multiple="multiple">
+						<option data-ng-repeat="permission in role.permissions">{{
+							permission.id }}</option>
+					</select>
+				</div>
+			</div>
 			<div class="control-group">
 				<div class="controls">
-      				<label class="checkbox">
-						<input type="checkbox" value="disabled" data-ng-model="role.disabled"/> Disabled
+					<label class="checkbox"> <input type="checkbox"
+						value="disabled" data-ng-model="role.disabled" /> Disabled
 					</label>
 				</div>
 			</div>

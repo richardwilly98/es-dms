@@ -34,17 +34,13 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 
 public interface SearchService<T extends ItemBase> {
 
-	public abstract SearchResult<T> search(String criteria, int first,
-			int pageSize) throws ServiceException;
+    public abstract SearchResult<T> search(String criteria, int first, int pageSize) throws ServiceException;
 
-	public abstract SearchResult<T> search(String criteria, int first,
-			int pageSize, String facet) throws ServiceException;
+    public abstract SearchResult<T> search(String criteria, int first, int pageSize, String facet) throws ServiceException;
 
-	public abstract SearchResult<T> search(String criteria, int first,
-			int pageSize, String facet, Map<String, Object> filters)
-			throws ServiceException;
+    public abstract SearchResult<T> search(String criteria, int first, int pageSize, String facet, Map<String, Object> filters)
+	    throws ServiceException;
 
-	public abstract SearchResult<T> moreLikeThis(String criteria, int first,
-			int pageSize, int minTermFrequency, int maxItems)
-			throws ServiceException;
+    public abstract SearchResult<T> moreLikeThis(String criteria, int first, int pageSize, int minTermFrequency, int maxItems)
+	    throws ServiceException;
 }

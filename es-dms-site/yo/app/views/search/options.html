@@ -9,11 +9,12 @@
 		<div class="modal-body">
 			<form class="form-horizontal">
 				<div class="control-group">
-	        		<label class="control-label">Page size: {{ pageSize }}</label>
-	        		<div class="controls">
-	          			<select ng-model="options.pageSize" ng-options="ps for ps in pageSizeList"></select>
-	        		</div>
-	      		</div>				
+					<label class="control-label">Page size: {{ pageSize }}</label>
+					<div class="controls">
+						<select ng-model="options.pageSize"
+							ng-options="ps for ps in pageSizeList"></select>
+					</div>
+				</div>
 			</form>
 		</div>
 		<div class="modal-footer">

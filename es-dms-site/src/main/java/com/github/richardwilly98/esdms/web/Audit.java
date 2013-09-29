@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.web;
  * #L%
  */
 
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -40,5 +39,5 @@ import com.github.richardwilly98.esdms.api.AuditEntry;
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @NameBinding
 public @interface Audit {
-	AuditEntry.Event value() default AuditEntry.Event.UNDEFINED;
+    AuditEntry.Event value() default AuditEntry.Event.UNDEFINED;
 }

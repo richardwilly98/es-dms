@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.shiro;
  * #L%
  */
 
-
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.SimpleCookie;
@@ -37,17 +36,18 @@ import com.google.inject.Inject;
 
 public class EsWebSessionManager extends DefaultWebSessionManager {
 
-	@Inject
-	public EsWebSessionManager(SessionDAO sessionDAO) {
-		super();
-		// this.setDeleteInvalidSessions(true);
-		// this.setSessionFactory(new SimpleSessionFactory());
-		this.setSessionDAO(sessionDAO);
-		Cookie cookie = new SimpleCookie(RestAuthencationService.ES_DMS_TICKET);
-		cookie.setHttpOnly(true);
-		setSessionIdCookie(cookie);
-		// Cookie session is enabled. Cookie is managed in AuthenticationService login / logout
-		setSessionIdCookieEnabled(true);
-	}
+    @Inject
+    public EsWebSessionManager(SessionDAO sessionDAO) {
+	super();
+	// this.setDeleteInvalidSessions(true);
+	// this.setSessionFactory(new SimpleSessionFactory());
+	this.setSessionDAO(sessionDAO);
+	Cookie cookie = new SimpleCookie(RestAuthencationService.ES_DMS_TICKET);
+	cookie.setHttpOnly(true);
+	setSessionIdCookie(cookie);
+	// Cookie session is enabled. Cookie is managed in AuthenticationService
+	// login / logout
+	setSessionIdCookieEnabled(true);
+    }
 
 }

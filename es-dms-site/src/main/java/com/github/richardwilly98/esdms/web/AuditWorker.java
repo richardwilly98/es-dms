@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.web;
  * #L%
  */
 
-
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -42,31 +41,31 @@ import com.github.richardwilly98.esdms.services.AuditService;
 @Singleton
 public class AuditWorker implements Runnable {
 
-	private static Logger log = Logger.getLogger(AuditWorker.class);
-	private final AuditService service;
-	
-	@Inject
-	public AuditWorker(final AuditService service) {
-		this.service = service;
-	}
-	
-	@Override
-	public void run() {
-		while(true) {
-			try {
-				Thread.sleep(5000);
-				log.debug("Run at " + new Date());
-				try {
-					String criteria = "event:" + AuditEntry.Event.UPLOAD;
-					SearchResult<AuditEntry> result = service.search(criteria, 0, 20);
-					log.debug(String.format("TotalHits for %s: %s", criteria, result.getTotalHits()));
-				} catch (ServiceException sEx) {
-					log.error("AuditService.search failed.", sEx);
-				}
-			} catch (InterruptedException iEx) {
-				
-			}
+    private static Logger log = Logger.getLogger(AuditWorker.class);
+    private final AuditService service;
+
+    @Inject
+    public AuditWorker(final AuditService service) {
+	this.service = service;
+    }
+
+    @Override
+    public void run() {
+	while (true) {
+	    try {
+		Thread.sleep(5000);
+		log.debug("Run at " + new Date());
+		try {
+		    String criteria = "event:" + AuditEntry.Event.UPLOAD;
+		    SearchResult<AuditEntry> result = service.search(criteria, 0, 20);
+		    log.debug(String.format("TotalHits for %s: %s", criteria, result.getTotalHits()));
+		} catch (ServiceException sEx) {
+		    log.error("AuditService.search failed.", sEx);
 		}
+	    } catch (InterruptedException iEx) {
+
+	    }
 	}
+    }
 
 }

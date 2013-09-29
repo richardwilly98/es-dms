@@ -36,137 +36,129 @@ import com.google.common.base.Strings;
 
 public class AuditEntryImpl extends ItemBaseImpl implements AuditEntry {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+    private String user;
+    private AuditEntry.Event event;
+    @JsonProperty("item_id")
+    private String itemId;
+    private Date date;
+
+    public static class Builder extends BuilderBase<Builder> {
+
 	private String user;
 	private AuditEntry.Event event;
-	@JsonProperty("item_id")
 	private String itemId;
 	private Date date;
 
-	public static class Builder extends BuilderBase<Builder> {
-
-		private String user;
-		private AuditEntry.Event event;
-		private String itemId;
-		private Date date;
-
-		public Builder user(String user) {
-			this.user = user;
-			return getThis();
-		}
-
-		public Builder date(Date date) {
-			this.date = date;
-			return getThis();
-		}
-
-		public Builder event(AuditEntry.Event event) {
-			this.event = event;
-			return getThis();
-		}
-
-		public Builder itemId(String itemId) {
-			this.itemId = itemId;
-			return getThis();
-		}
-
-		@Override
-		protected Builder getThis() {
-			return this;
-		}
-
-		public AuditEntryImpl build() {
-			if (Strings.isNullOrEmpty(name)) {
-				name = new StringBuilder().append(event).append("-")
-						.append(user).append("-").append(itemId).toString();
-			}
-			return new AuditEntryImpl(this);
-		}
+	public Builder user(String user) {
+	    this.user = user;
+	    return getThis();
 	}
 
-	AuditEntryImpl() {
-		this(null);
+	public Builder date(Date date) {
+	    this.date = date;
+	    return getThis();
 	}
 
-	protected AuditEntryImpl(Builder builder) {
-		super(builder);
-		if (builder != null) {
-			user = builder.user;
-			date = builder.date;
-			event = builder.event;
-			itemId = builder.itemId;
-		}
+	public Builder event(AuditEntry.Event event) {
+	    this.event = event;
+	    return getThis();
 	}
 
-	/*
-	 * Method used to deserialize attributes Map
-	 */
-	@JsonProperty("attributes")
-	private void deserialize(Map<String, Object> attributes) {
-		// if (!attributes.containsKey(AuditEntryImpl.STATUS)) {
-		// attributes.put(AuditEntryImpl.STATUS,
-		// DocumentImpl.DocumentStatus.AVAILABLE.getStatusCode());
-		// }
-		getAttributes().putAll(attributes);
+	public Builder itemId(String itemId) {
+	    this.itemId = itemId;
+	    return getThis();
 	}
 
 	@Override
-	public String getUser() {
-		return user;
+	protected Builder getThis() {
+	    return this;
 	}
 
-	@Override
-	public Date getDate() {
-		return date;
+	public AuditEntryImpl build() {
+	    if (Strings.isNullOrEmpty(name)) {
+		name = new StringBuilder().append(event).append("-").append(user).append("-").append(itemId).toString();
+	    }
+	    return new AuditEntryImpl(this);
+	}
+    }
+
+    AuditEntryImpl() {
+	this(null);
+    }
+
+    protected AuditEntryImpl(Builder builder) {
+	super(builder);
+	if (builder != null) {
+	    user = builder.user;
+	    date = builder.date;
+	    event = builder.event;
+	    itemId = builder.itemId;
+	}
+    }
+
+    /*
+     * Method used to deserialize attributes Map
+     */
+    @JsonProperty("attributes")
+    private void deserialize(Map<String, Object> attributes) {
+	// if (!attributes.containsKey(AuditEntryImpl.STATUS)) {
+	// attributes.put(AuditEntryImpl.STATUS,
+	// DocumentImpl.DocumentStatus.AVAILABLE.getStatusCode());
+	// }
+	getAttributes().putAll(attributes);
+    }
+
+    @Override
+    public String getUser() {
+	return user;
+    }
+
+    @Override
+    public Date getDate() {
+	return date;
+    }
+
+    @Override
+    public AuditEntry.Event getEvent() {
+	return event;
+    }
+
+    @Override
+    public String getItemId() {
+	return itemId;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (obj == this) {
+	    return true;
+	}
+	if (obj == null || obj.getClass() != this.getClass()) {
+	    return false;
 	}
 
-	@Override
-	public AuditEntry.Event getEvent() {
-		return event;
-	}
+	AuditEntryImpl obj2 = (AuditEntryImpl) obj;
+	return (super.equals(obj) && (user == obj2.getUser() || (user != null && user.equals(obj2.getUser())))
+	        && (date == obj2.getDate() || (date != null && date.equals(obj2.getDate())))
+	        && (event == obj2.getEvent() || (event != null && event.equals(obj2.getEvent()))) && (itemId == obj2.getItemId() || (itemId != null && itemId
+	        .equals(obj2.getItemId()))));
+    }
 
-	@Override
-	public String getItemId() {
-		return itemId;
-	}
+    @Override
+    public int hashCode() {
+	final int prime = 31;
+	int result = super.hashCode();
+	result = prime * result + ((user == null) ? 0 : user.hashCode());
+	result = prime * result + ((date == null) ? 0 : date.hashCode());
+	result = prime * result + ((event == null) ? 0 : event.hashCode());
+	result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
+	return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == this) {
-			return true;
-		}
-		if (obj == null || obj.getClass() != this.getClass()) {
-			return false;
-		}
-
-		AuditEntryImpl obj2 = (AuditEntryImpl) obj;
-		return (super.equals(obj)
-				&& (user == obj2.getUser() || (user != null && user.equals(obj2
-						.getUser())))
-				&& (date == obj2.getDate() || (date != null && date.equals(obj2
-						.getDate())))
-				&& (event == obj2.getEvent() || (event != null && event
-						.equals(obj2.getEvent()))) && (itemId == obj2
-				.getItemId() || (itemId != null && itemId.equals(obj2
-				.getItemId()))));
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((user == null) ? 0 : user.hashCode());
-		result = prime * result + ((date == null) ? 0 : date.hashCode());
-		result = prime * result + ((event == null) ? 0 : event.hashCode());
-		result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
-		return result;
-	}
-
-	@Override
-	public String toString() {
-		return Objects.toStringHelper(this).add("id", id).add("name", name)
-				.add("user", user).add("date", date).add("type", event)
-				.add("itemId", itemId).add("description", description)
-				.add("attributes", getAttributes()).toString();
-	}
+    @Override
+    public String toString() {
+	return Objects.toStringHelper(this).add("id", id).add("name", name).add("user", user).add("date", date).add("type", event)
+	        .add("itemId", itemId).add("description", description).add("attributes", getAttributes()).toString();
+    }
 }

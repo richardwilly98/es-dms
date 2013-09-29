@@ -40,40 +40,37 @@ import com.google.inject.name.Names;
 
 public class EsShiroWebModule extends ShiroWebModule {
 
-	private final String securityFilterPath;
-	private final Logger log = Logger.getLogger(this.getClass());
+    private final String securityFilterPath;
+    private final Logger log = Logger.getLogger(this.getClass());
 
-	public EsShiroWebModule(ServletContext servletContext,
-			String securityFilterPath) {
-		super(servletContext);
-		log.debug("*** constructor ***");
-		this.securityFilterPath = securityFilterPath;
-	}
+    public EsShiroWebModule(ServletContext servletContext, String securityFilterPath) {
+	super(servletContext);
+	log.debug("*** constructor ***");
+	this.securityFilterPath = securityFilterPath;
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected void configureShiroWeb() {
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void configureShiroWeb() {
 
-		log.debug("*** configureShiroWeb ***");
-		bindRealm().to(EsRealm.class).asEagerSingleton();
-		bind(SessionDAO.class).to(EsSessionDAO.class);
-		bind(EsSessionDAO.class);
+	log.debug("*** configureShiroWeb ***");
+	bindRealm().to(EsRealm.class).asEagerSingleton();
+	bind(SessionDAO.class).to(EsSessionDAO.class);
+	bind(EsSessionDAO.class);
 
-		// TODO: SSL currently does not work with grunt-connect-proxy
-		// addFilterChain("/api/auth/**", config(SSL, "8443"));
-		addFilterChain("/api/auth/**", ANON);
-		addFilterChain("/api/**", Key.get(EsAuthenticationFilter.class));
-	}
+	// TODO: SSL currently does not work with grunt-connect-proxy
+	// addFilterChain("/api/auth/**", config(SSL, "8443"));
+	addFilterChain("/api/auth/**", ANON);
+	addFilterChain("/api/**", Key.get(EsAuthenticationFilter.class));
+    }
 
-	@Override
-	protected void bindSessionManager(
-			AnnotatedBindingBuilder<SessionManager> bind) {
-		log.debug("*** bindSessionManager ***");
-		bind.to(EsWebSessionManager.class).in(Scopes.SINGLETON);
-		bindConstant().annotatedWith(Names.named("shiro.globalSessionTimeout"))
-				.to(30000L);
-		bind(EsWebSessionManager.class);
+    @Override
+    protected void bindSessionManager(AnnotatedBindingBuilder<SessionManager> bind) {
+	log.debug("*** bindSessionManager ***");
+	bind.to(EsWebSessionManager.class).in(Scopes.SINGLETON);
+	bindConstant().annotatedWith(Names.named("shiro.globalSessionTimeout")).to(30000L);
+	bind(EsWebSessionManager.class);
 
-	}
+    }
 
 }
