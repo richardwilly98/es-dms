@@ -113,6 +113,26 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 		}
 	}
 
+  // Update facets
+  function updateFacets(operation, tag) {
+    var term = _.find($scope.facets.terms, {'term': tag});
+    if ('add' === operation) {
+      if (term !== undefined) {
+        term.count++;
+      } else {
+        $scope.facets.terms.push({'term': tag, 'count': 1});
+      }
+    } else if ('remove' === operation) {
+      if (term !== undefined) {
+        if (term.count > 1) {
+          term.count--;
+        } else {
+          $scope.facets.terms.splice(_.indexOf($scope.facets.terms, term), 1);
+        }
+      }
+    }
+  }
+  
   $scope.setPage = function () {
 		$log.log('setPage');
 		if ($scope.criteria === undefined ) {
@@ -133,12 +153,7 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 		documentService.addTag(id, tag, function(doc) {
 			var index = getIndexOf(id);
       // Update facets
-      var term = _.find($scope.facets.terms, {'term': tag});
-      if (term !== undefined) {
-        term.count++;
-      } else {
-        $scope.facets.terms.push({'term': tag, 'count': 1});
-      }
+      updateFacets('add', tag);
 			$scope.documents[index] = doc;
 		});
   });
@@ -152,15 +167,7 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 		var tag = args.tag;
 		documentService.removeTag(id, tag, function(doc) {
 			var index = getIndexOf(id);
-      // Update facets
-      var term = _.find($scope.facets.terms, {'term': tag});
-      if (term !== undefined) {
-        if (term.count > 1) {
-          term.count--;
-        } else {
-          $scope.facets.terms.splice(_.indexOf($scope.facets.terms, term), 1);
-        }
-      }
+      updateFacets('remove', tag);
 			$scope.documents[index] = doc;
 		});
   });
@@ -208,11 +215,17 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
   };
 
   $scope.remove = function(id) {
-		documentService.remove(id);
-		var index = getIndexOf(id);
-		if (index) {
-			$scope.documents.splice(index, 1);
-		}
+		documentService.remove(id, function(data, status) {
+      $log.log('remove -> ' + data + ' - ' + status);
+      var document = getDocument(id);
+      _.each(document.tags, function (tag) {
+        updateFacets('remove', tag);
+      });
+      var index = getIndexOf(id);
+      if (index) {
+        $scope.documents.splice(index, 1);
+      }
+    });
   };
 
   $scope.preview = function(id) {
