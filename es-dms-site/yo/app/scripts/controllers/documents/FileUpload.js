@@ -1,6 +1,7 @@
 'use strict';
 
-esDmsSiteApp.controller('DocumentsFileUploadCtrl', ['$scope', '$rootScope', 'uploadService', function ($scope, $rootScope, uploadService) {
+esDmsSiteApp.controller('DocumentsFileUploadCtrl', 
+  ['$scope', '$rootScope', 'uploadService', 'userService', function ($scope, $rootScope, uploadService, userService) {
 
   $scope.shouldBeOpen = false;
   $scope.files = [];
@@ -24,8 +25,12 @@ esDmsSiteApp.controller('DocumentsFileUploadCtrl', ['$scope', '$rootScope', 'upl
   $scope.close = function() {
     $scope.shouldBeOpen = false;
   };
+  
   $scope.open = function() {
-    $scope.shouldBeOpen = true;
+    // TODO: Hack to check if user if authenticated before to display the form
+    // userService.get('admin', function (data) {
+      $scope.shouldBeOpen = true;
+    // });
   };
 
   $scope.opts = {
