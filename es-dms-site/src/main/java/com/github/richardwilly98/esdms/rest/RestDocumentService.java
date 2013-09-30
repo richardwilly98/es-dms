@@ -58,6 +58,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.glassfish.jersey.media.multipart.ContentDisposition;
+import org.glassfish.jersey.media.multipart.ContentDisposition.ContentDispositionBuilder;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.joda.time.DateTime;
 
 import com.github.richardwilly98.esdms.DocumentImpl;
@@ -76,12 +81,6 @@ import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.DocumentService;
 import com.github.richardwilly98.esdms.web.Audit;
 import com.google.common.base.Strings;
-
-import org.glassfish.jersey.media.multipart.ContentDisposition;
-import org.glassfish.jersey.media.multipart.ContentDisposition.ContentDispositionBuilder;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataParam;
 
 @Path(RestDocumentService.DOCUMENTS_PATH)
 public class RestDocumentService extends RestItemBaseService<Document> {
@@ -715,24 +714,23 @@ public class RestDocumentService extends RestItemBaseService<Document> {
     }
 
     @DELETE
-    // @Path("{id}/" + DELETE_PATH)
-    @Path("{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
+    @Path("{id}")
     public Response delete(@PathParam("id") String id) {
 	try {
 	    Document document = service.get(id);
 	    checkNotNull(document);
 
 	    if (!document.hasStatus(Document.DocumentStatus.DELETED))
-		throw new ServiceException(String.format("Document %s is not marked as deleted", id));
+		throw new PreconditionException(String.format("Document %s is not marked as deleted", id));
 
 	    return super.delete(id);
 	} catch (ServiceException t) {
-	    log.error(String.format("Document %s is not marked as deleted", id), t);
-	    return Response.status(Status.PRECONDITION_FAILED).build();
-	} catch (Throwable t) {
-	    log.error(String.format("Check if document %s exists", id), t);
+	    String message = String.format("Document %s is not marked as deleted", id);
+	    log.error(message, t);
+	    return Response.status(Status.PRECONDITION_FAILED).entity(message).build();
+	} catch (NullPointerException npEx) {
+	    log.error(String.format("Check if document %s exists", id), npEx);
 	    return Response.status(Status.NOT_FOUND).build();
 	}
     }
@@ -768,7 +766,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 	    checkNotNull(document);
 
 	    if (!document.hasStatus(Document.DocumentStatus.DELETED))
-		throw new ServiceException(String.format("Document %s is not marked as deleted", id));
+		throw new PreconditionException(String.format("Document %s is not marked as deleted", id));
 
 	    Version version = document.getVersion(Integer.parseInt(vid));
 	    checkNotNull(version);
