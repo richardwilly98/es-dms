@@ -53,7 +53,7 @@ esDmsSiteApp.directive('esdmsTagging', ['$log', '$compile', function ($log, $com
           });
         },
         post : function(scope, element) {
-          var template = '<input ui-select2="getTags()" ng-change="change()" ng-model="select2tags" style="width: 200px;" />';
+          var template = '<input ui-select2="getTags()" ng-change="change()" ng-model="select2tags" />';
           element.replaceWith($compile(template)(scope));
         }
       };
