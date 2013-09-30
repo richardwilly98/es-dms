@@ -124,46 +124,20 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 		log.info(String.format("Cannot find item %s", id));
 		return null;
 	    }
-	    // else {
-	    // for(String key :response.getFields().keySet() ){
-	    // log.info(String.format("1. Field %s - %s - %s", key,
-	    // response.getField(key).getValue().getClass(),
-	    // response.getField(key).getValue()));
-	    // log.info(String.format("2. Field %s - %s - %s", key,
-	    // response.getField(key).getValues().getClass(),
-	    // response.getField(key).getValues()));
-	    // if (response.getField(key).getValues() != null &&
-	    // response.getField(key).getValues().size() > 0) {
-	    // log.info(String.format("3. Field %s - %s", key,
-	    // response.getField(key).getValues().get(0)));
-	    // }
-	    // }
-	    // }
-	    // XContentBuilder builder = JsonXContent.contentBuilder();
-	    // response.toXContent(builder, null);
-	    // log.info(String.format("get- response: %s",
-	    // builder.prettyPrint().string()));
 
 	    checkNotNull(response.getField("name"));
 	    String name = response.getField("name").getValue().toString();
 	    Map<String, Object> attributes = newHashMap();
 	    if (response.getField("attributes") != null && response.getField("attributes").getValue() instanceof Map<?, ?>) {
 		attributes.putAll((Map<String, Object>) response.getField("attributes").getValue());
-
 	    }
 	    Set<String> tags = newHashSet();
 	    if (response.getField("tags") != null && response.getField("tags").getValues().size() > 0) {
 		for (Object tag : response.getField("tags")) {
 		    tags.add(String.valueOf(tag));
 		}
-		// tags.addAll((List<String>)
-		// response.getField("tags").getValue());
-
 	    }
-	    // else if (response.getField("tags") != null &&
-	    // response.getField("tags").getValue() instanceof String) {
-	    // tags.add(String.valueOf(response.getField("tags").getValue()));
-	    // }
+
 	    Document document = new DocumentImpl.Builder().tags(tags).id(id).name(name).attributes(attributes).roles(null).build();
 	    return document;
 	} catch (Throwable t) {
@@ -202,42 +176,9 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
     @Override
     public SearchResult<Document> search(String criteria, int first, int pageSize) throws ServiceException {
 	try {
-	    // Set<Document> documents = newHashSet();
-
-	    // QueryBuilder query = new MultiMatchQueryBuilder(criteria, "file",
-	    // "name");
-	    // QueryBuilder query = fieldQuery("file", criteria);
 	    QueryBuilder query = new QueryStringQueryBuilder(criteria);
 	    SearchResponse searchResponse = client.prepareSearch(index).setTypes(type).addPartialField("document", null, "versions")
 		    .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(first).setSize(pageSize).setQuery(query).execute().actionGet();
-	    // long totalHits = searchResponse.getHits().totalHits();
-	    // long elapsedTime = searchResponse.getTookInMillis();
-	    // log.debug("totalHits: " + totalHits);
-	    // log.debug("totalHits: " + searchResponse.getHits().totalHits());
-	    // log.debug(String.format("TotalHits: %s - TookInMillis: %s",
-	    // totalHits,
-	    // elapsedTime));
-	    // Stopwatch watch = new Stopwatch();
-	    // watch.start();
-	    // for (SearchHit hit : searchResponse.getHits().hits()) {
-	    // String json = hit.getSourceAsString();
-	    // Document document = mapper.readValue(json, Document.class);
-	    // Version currentVersion = document.getCurrentVersion();
-	    // if (currentVersion != null) {
-	    // currentVersion.getFile().setContent(null);
-	    // }
-	    // // document.getFile().setContent(null);
-	    // documents.add(document);
-	    // }
-	    // watch.stop();
-	    // log.debug("Elapsed time to build document list "
-	    // + watch.elapsed(TimeUnit.MILLISECONDS));
-	    //
-	    // SearchResult<Document> searchResult = new
-	    // SearchResultImpl.Builder<Document>()
-	    // .totalHits(totalHits).elapsedTime(elapsedTime).items(documents)
-	    // .firstIndex(first).pageSize(pageSize).build();
-	    // return searchResult;
 	    return getSearchResult(searchResponse, first, pageSize);
 	} catch (Throwable t) {
 	    log.error("search failed", t);
