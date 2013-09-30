@@ -7,6 +7,8 @@ esDmsSiteApp.service('documentService', ['$log', '$rootScope', '$resource', '$ht
       preview: {method:'GET', params: {action: 'preview'}},
       metadata: {method:'GET', params: {action: 'metadata'}},
       audit: {method:'GET', params: {action: 'audit'}},
+      markDeleted: {method:'POST', params: {action: 'deleted'}},
+      undelete: {method:'POST', params: {action: 'undelete'}},
       update: {method:'PUT', params: {}}
     });
 
@@ -81,10 +83,23 @@ esDmsSiteApp.service('documentService', ['$log', '$rootScope', '$resource', '$ht
         callback(document);
       });
     },
-    remove: function(id) {
+    remove: function(id, callback) {
       $log.log('delete document: ' + id);
       var doc = new documentResource.get({'id': id});
-      doc.$delete({'id': id});
+      doc.$markDeleted({'id': id}, function() {
+        doc.$delete({'id': id}, function (response) {
+          callback(response);
+        });
+      });
+      // doc.$delete({'id': id}, callback);
+      // doc.$delete({'id': id}, 
+      //   function(response) {
+      //     $log.log('success: ' + JSON.stringify(response));
+      //   },
+      //   function(response) {
+      //     $log.log('error: ' + JSON.stringify(response));
+      //   }
+      // );
     },
     preview: function(id, criteria, callback) {
       $log.log('preview document: ' + id + ' - criteria: ' + criteria);
