@@ -51,6 +51,21 @@ esDmsSiteApp.service('sharedService', function ($log, $rootScope) {
       } else {
         return false;
       }
+    },
+    hasPermission: function(id) {
+      if (currentUser !== null) {
+        $log.log('hasPermission: ' + id + ' in ' + currentUser.id);
+        var permission;
+        _.each(currentUser.roles, function(role) {
+          permission = _.find(role.permissions, {'id' : id});
+          if (permission !== undefined) {
+            return false;
+          }
+        });
+        return (permission !== undefined);
+      } else {
+        return false;
+      }
     }
   };
 });

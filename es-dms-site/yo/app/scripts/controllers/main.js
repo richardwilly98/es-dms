@@ -33,6 +33,10 @@ esDmsSiteApp.controller('mainController', function ($log, $scope, $location, sha
     return sharedService.hasRole(id);
   };
 
+  $scope.hasPermission = function(id) {
+    return sharedService.hasPermission(id);
+  };
+
   $scope.logout = function() {
     authenticationService.logout();
   };
