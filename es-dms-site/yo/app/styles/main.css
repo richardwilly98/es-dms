@@ -1,7 +1,5 @@
 /* Main Stylesheet */
-@import
-	url('../bower_components/blueimp-file-upload/css/jquery.fileupload-ui.css')
-	;
+@import url('../bower_components/blueimp-file-upload/css/jquery.fileupload-ui.css');
 
 /* Add top padding for navbar-top-fixed */
 /*body {
@@ -18,4 +16,10 @@
 
 .sidebar-nav {
 	padding: 9px 0;
+}
+
+/* Used in document preview to highlight terms */
+.highlight-tag {
+  font-style: italic;
+  font-weight: bolder;
 }

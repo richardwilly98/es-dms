@@ -8,7 +8,7 @@ esDmsSiteApp.directive('esdmsFacet', ['$log', function ($log) {
     template:
       '<div>' +
       '<a data-ng-click="toggle()" class="label">{{ term.term }}</a>' +
-      ' ' + 
+      ' ' +
       '<span class="badge badge-info">{{ term.count }}</span>' +
       '</div>',
     link: function ( scope, element ) {

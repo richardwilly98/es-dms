@@ -39,11 +39,8 @@
 							<td><esdms-tagging id="document.id" tags="document.tags"
 									newtag="newtag"></esdms-tagging></td>
 							<td>
-								<div popover="{{ document.preview }}" popover-placement="bottom"
-									popover-title="Preview" popover-trigger="mouseenter"
-									popover-popup-delay="1000"
-									data-ng-mouseover="preview(document.id)">{{ document.name
-									}}</div>
+								<div data-ng-bind="document.name"></div>
+								<esdms-preview id="document.id"></esdms-preview>
 							</td>
 							<td>{{ document.attributes.author }}</td>
 							<td>{{ document.attributes.status }}</td>
