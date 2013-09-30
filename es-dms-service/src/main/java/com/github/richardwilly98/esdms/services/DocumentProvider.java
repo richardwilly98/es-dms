@@ -350,10 +350,12 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 	    // document.getId());
 	    SearchRequestBuilder srb = client.prepareSearch(index).setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH).setQuery(query)
 	    // .setQuery(fieldQuery("file", criteria))
-		    .setHighlighterOrder("score").addHighlightedField("file", size, 1);
-	    log.trace("Search request: " + srb);
+		    .setHighlighterPreTags("<span class='highlight-tag'>").setHighlighterPostTags("</span>").setHighlighterOrder("score").addHighlightedField("file", size, 1);
+	    log.trace("++ Search request: " + srb);
 	    SearchResponse searchResponse = srb.execute().actionGet();
-	    log.debug("totalHits: " + searchResponse.getHits().totalHits());
+	    if (log.isTraceEnabled()) {
+		log.trace("totalHits: " + searchResponse.getHits().totalHits());
+	    }
 	    String preview = null;
 	    for (SearchHit hit : searchResponse.getHits().hits()) {
 		log.debug(String.format("HighlightFields: %s", hit.getHighlightFields().size()));

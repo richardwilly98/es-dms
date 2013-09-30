@@ -46,9 +46,8 @@ module.exports = function (grunt) {
       coffeeTest: {
         files: ['test/spec/{,*/}*.coffee'],
         tasks: ['coffee:test']
-      }
+      },
       // es-dms: Start - disabled livereload for IE - comment out this section
-      ,
       livereload: {
         options: {
           livereload: LIVERELOAD_PORT

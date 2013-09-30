@@ -35,10 +35,10 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$rootScope', '$http'
 				// TODO: Check the reason orderBy filter does not work. Items not selected.
 				_.each($scope.roles, function(role) {
 					_.find($scope.user.roles, function(item) {
-						if (item != null && role.id == item.id) {
+						if (item !== null && role.id === item.id) {
 							$scope.selectedRoles.push(role);
 						}
-					})
+					});
 				});
 				$log.log('$scope.selectedRoles: ' + JSON.stringify($scope.selectedRoles));
 			}
