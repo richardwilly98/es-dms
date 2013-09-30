@@ -40,11 +40,16 @@
 									newtag="newtag"></esdms-tagging></td>
 							<td>
 								<div data-ng-bind="document.name"></div>
-								<esdms-preview id="document.id"></esdms-preview>
+								<esdms-preview preview="preview(document.id)" id="document.id"></esdms-preview>
 							</td>
 							<td>{{ document.attributes.author }}</td>
 							<td>{{ document.attributes.status }}</td>
 							<td>
+								<!-- div>
+									<div ng-init="x = 3">
+										<rating value="x" max="5"></rating> 
+									</div>
+								</div -->
 								<div data-ng-switch="document.attributes.status"
 									class="btn-group">
 									<a class="btn btn-success dropdown-toggle"
