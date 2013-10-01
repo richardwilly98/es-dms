@@ -37,8 +37,9 @@ import org.elasticsearch.common.io.FileSystemUtils;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.node.Node;
-import org.elasticsearch.node.internal.InternalSettingsPerparer;
+import org.elasticsearch.node.internal.InternalSettingsPreparer;
 import org.elasticsearch.plugins.PluginManager;
+import org.elasticsearch.plugins.PluginManager.OutputMode;
 
 import com.google.inject.Provider;
 
@@ -52,8 +53,8 @@ public class LocalClientProvider implements Provider<Client> {
     @Override
     public Client get() {
 	Settings settings = getSettings();
-	Tuple<Settings, Environment> initialSettings = InternalSettingsPerparer.prepareSettings(settings, true);
-	PluginManager pluginManager = new PluginManager(initialSettings.v2(), null);
+	Tuple<Settings, Environment> initialSettings = InternalSettingsPreparer.prepareSettings(settings, true);
+	PluginManager pluginManager = new PluginManager(initialSettings.v2(), null, OutputMode.DEFAULT);
 
 	if (!initialSettings.v2().configFile().exists()) {
 	    FileSystemUtils.mkdirs(initialSettings.v2().configFile());
@@ -66,7 +67,7 @@ public class LocalClientProvider implements Provider<Client> {
 	if (!initialSettings.v2().pluginsFile().exists()) {
 	    FileSystemUtils.mkdirs(initialSettings.v2().pluginsFile());
 	    try {
-		pluginManager.downloadAndExtract(settings.get("plugins.mapper-attachments"), false);
+		pluginManager.downloadAndExtract(settings.get("plugins.mapper-attachments"));
 	    } catch (IOException e) {
 		e.printStackTrace();
 	    }
