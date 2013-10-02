@@ -34,6 +34,7 @@ import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,7 +53,6 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightField;
-import org.joda.time.DateTime;
 
 import com.github.richardwilly98.esdms.DocumentImpl;
 import com.github.richardwilly98.esdms.SearchResultImpl;
@@ -104,8 +104,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
     }
 
     private SimpleDocument updateModifiedDate(SimpleDocument document) {
-	DateTime now = new DateTime();
-	document.setReadOnlyAttribute(Document.MODIFIED_DATE, now.toString());
+	document.setReadOnlyAttribute(Document.MODIFIED_DATE, new Date());
 	return document;
     }
 
@@ -148,8 +147,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
     @Override
     public Document create(Document item) throws ServiceException {
 	SimpleDocument sd = getSimpleDocument(item);
-	DateTime now = new DateTime();
-	sd.setReadOnlyAttribute(Document.CREATION_DATE, now.toString());
+	sd.setReadOnlyAttribute(Document.CREATION_DATE, new Date());
 	sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
 	return super.create(sd);
     }

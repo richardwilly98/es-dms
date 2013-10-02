@@ -30,14 +30,12 @@ import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.shiro.authz.UnauthorizedException;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -228,7 +226,6 @@ public class DocumentProviderTest extends ProviderTestBase {
 	String id = String.valueOf(System.currentTimeMillis());
 	String name = "document-" + id;
 	Map<String, Object> attributes = newHashMap();
-	// Document document = new DocumentImpl(id, name, null, attributes);
 	Document document = new DocumentImpl.Builder().attributes(attributes).id(id).name(name).roles(null).build();
 	document.setId(id);
 	Document newDocument = documentService.create(document);
@@ -252,7 +249,6 @@ public class DocumentProviderTest extends ProviderTestBase {
 	String id = String.valueOf(System.currentTimeMillis());
 	String name = "document-" + id;
 	Map<String, Object> attributes = newHashMap();
-	// Document document = new DocumentImpl(id, name, null, attributes);
 	Document document = new DocumentImpl.Builder().attributes(attributes).id(id).name(name).roles(null).build();
 	document.setId(id);
 	Document newDocument = documentService.create(document);
@@ -263,8 +259,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 	Assert.assertTrue(attributes != null && attributes.size() > 1);
 	Assert.assertTrue(attributes.containsKey(DocumentImpl.CREATION_DATE));
 	log.info(attributes.get(DocumentImpl.CREATION_DATE));
-	DateTimeFormatter formatter = ISODateTimeFormat.dateOptionalTimeParser();
-	DateTime newDate = formatter.parseDateTime(attributes.get(DocumentImpl.CREATION_DATE).toString());
+	Date newDate = new Date(Long.valueOf(attributes.get(DocumentImpl.CREATION_DATE).toString()));
 	log.info(String.format("Attribute %s - %s", DocumentImpl.CREATION_DATE, newDate));
     }
 
@@ -275,7 +270,6 @@ public class DocumentProviderTest extends ProviderTestBase {
 	String id = String.valueOf(System.currentTimeMillis());
 	String name = "document-" + id;
 	Map<String, Object> attributes = newHashMap();
-	// Document document = new DocumentImpl(id, name, null, attributes);
 	Document document = new DocumentImpl.Builder().attributes(attributes).id(id).name(name).roles(null).build();
 	document.setId(id);
 	Document newDocument = documentService.create(document);
