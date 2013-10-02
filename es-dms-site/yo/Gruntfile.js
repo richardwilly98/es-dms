@@ -129,7 +129,8 @@ module.exports = function (grunt) {
           ]
         }]
       },
-      server: '.tmp'
+      server: '.tmp',
+      distBowerComponents: ['<%= yeoman.dist %>/bower_components']
     },
     jshint: {
       options: {
@@ -337,7 +338,9 @@ module.exports = function (grunt) {
     'cssmin',
     //'uglify',
     'rev',
-    'usemin'
+    'usemin',
+    // Delete unnecessary bower components
+    'clean:distBowerComponents'
   ]);
 
   grunt.registerTask('default', [
