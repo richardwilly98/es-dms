@@ -110,18 +110,18 @@ public class TestRestUserService extends GuiceAndJettyTestBase<UserImpl> {
 	}
     }
 
-    protected UserImpl createUser(String login, String password) throws Throwable {
-	log.debug(String.format("*** createUser - %s - %s ***", login, password));
-	User user = new UserImpl.Builder().id(login).name(login).email(login).password(password).build();
-	String json = mapper.writeValueAsString(user);
-	log.trace(json);
-	Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
-	        .post(Entity.json(user));
-	log.debug(String.format("status: %s", response.getStatus()));
-	Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
-	URI uri = response.getLocation();
-	Assert.assertNotNull(uri);
-	return get(uri, UserImpl.class);
-    }
+//    protected UserImpl createUser(String login, String password) throws Throwable {
+//	log.debug(String.format("*** createUser - %s - %s ***", login, password));
+//	User user = new UserImpl.Builder().id(login).name(login).email(login).password(password).build();
+//	String json = mapper.writeValueAsString(user);
+//	log.trace(json);
+//	Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+//	        .post(Entity.json(user));
+//	log.debug(String.format("status: %s", response.getStatus()));
+//	Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
+//	URI uri = response.getLocation();
+//	Assert.assertNotNull(uri);
+//	return get(uri, UserImpl.class);
+//    }
 
 }

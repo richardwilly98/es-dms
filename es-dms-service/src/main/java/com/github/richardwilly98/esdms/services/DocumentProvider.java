@@ -36,7 +36,6 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -47,7 +46,6 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.common.base.Stopwatch;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -191,8 +189,8 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 	log.trace("*** getSearchResult ***");
 	try {
 	    // log.debug("searchResponse: " + searchResponse.toString());
-	    Stopwatch watch = new Stopwatch();
-	    watch.start();
+//	    Stopwatch watch = new Stopwatch();
+//	    watch.start();
 	    Set<Document> items = newHashSet();
 	    long totalHits = searchResponse.getHits().totalHits();
 	    long elapsedTime = searchResponse.getTookInMillis();
@@ -207,8 +205,8 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 	    }
 	    SearchResult<Document> searchResult = new SearchResultImpl.Builder<Document>().totalHits(totalHits).elapsedTime(elapsedTime)
 		    .items(items).firstIndex(first).pageSize(pageSize).build();
-	    watch.stop();
-	    log.debug("Elapsed time to build document list " + watch.elapsed(TimeUnit.MILLISECONDS));
+//	    watch.stop();
+//	    log.debug("Elapsed time to build document list " + watch.elapsed(TimeUnit.MILLISECONDS));
 	    return searchResult;
 	} catch (Throwable t) {
 	    log.error("getSearchResult failed", t);
@@ -299,11 +297,10 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 	    }
 	    String preview = null;
 	    for (SearchHit hit : searchResponse.getHits().hits()) {
-		log.debug(String.format("HighlightFields: %s", hit.getHighlightFields().size()));
 		for (String key : hit.getHighlightFields().keySet()) {
 		    HighlightField field = hit.getHighlightFields().get(key);
-		    log.debug(String.format("Highlight key: %s", key));
-		    log.debug(String.format("Highlight: %s", hit.getHighlightFields().get(key)));
+//		    log.debug(String.format("Highlight key: %s", key));
+//		    log.debug(String.format("Highlight: %s", hit.getHighlightFields().get(key)));
 		    for (Text text : field.fragments()) {
 			if (preview == null) {
 			    preview = text.string();
@@ -313,7 +310,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 	    }
 	    return preview;
 	} catch (Throwable t) {
-	    log.error("getItems failed", t);
+	    log.error("preview failed", t);
 	    throw new ServiceException(t.getLocalizedMessage());
 	}
     }

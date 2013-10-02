@@ -45,11 +45,11 @@
 							<td>{{ document.attributes.author }}</td>
 							<td>{{ document.attributes.status }}</td>
 							<td>
-								<!-- div>
-									<div ng-init="x = 3">
-										<rating value="x" max="5"></rating> 
+								<div>
+									<div data-ng-controller="DocumentsRatingCtrl" data-ng-init="getRating(document)">
+										<rating value="rating.score" max="5" on-hover="hoveringRating(value)" on-leave="addRating(document.id)"></rating> 
 									</div>
-								</div -->
+								</div>
 								<div data-ng-switch="document.attributes.status"
 									class="btn-group">
 									<a class="btn btn-success dropdown-toggle"

@@ -41,11 +41,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
 
 import org.apache.log4j.Logger;
 
@@ -127,7 +125,7 @@ public abstract class RestItemBaseService<T extends ItemBase> extends RestServic
     @Path("{id}")
     public Response delete(@PathParam("id") String id) {
 	if (log.isTraceEnabled()) {
-	    log.trace(String.format("get - %s", id));
+	    log.trace(String.format("delete - %s", id));
 	}
 	try {
 	    T item = service.get(id);

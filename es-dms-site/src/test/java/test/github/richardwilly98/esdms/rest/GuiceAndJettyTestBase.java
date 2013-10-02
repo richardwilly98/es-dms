@@ -59,9 +59,12 @@ import test.github.richardwilly98.esdms.web.TestRestGuiceServletConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.cfg.Annotations;
 import com.github.richardwilly98.esdms.CredentialImpl;
+import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.api.ItemBase;
+import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.rest.RestAuthencationService;
+import com.github.richardwilly98.esdms.rest.RestUserService;
 import com.github.richardwilly98.esdms.services.UserService;
 import com.google.inject.Inject;
 import com.google.inject.servlet.GuiceFilter;
@@ -304,6 +307,30 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
 	} catch (Throwable t) {
 	    Assert.fail("logoutAdminUser failed", t);
 	}
+    }
+
+    protected UserImpl createUser(String login, String password) throws Throwable {
+        log.debug(String.format("*** createUser - %s - %s ***", login, password));
+        User user = new UserImpl.Builder().id(login).name(login).email(login).password(password).build();
+        String json = mapper.writeValueAsString(user);
+        log.trace(json);
+        Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+                .post(Entity.json(user));
+        log.debug(String.format("status: %s", response.getStatus()));
+        Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
+        URI uri = response.getLocation();
+        Assert.assertNotNull(uri);
+//        return get(uri, UserImpl.class);
+        log.debug(String.format("getItem - %s", uri));
+        response = client().target(uri).request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+        log.debug(String.format("status: %s", response.getStatus()));
+        // log.debug(String.format("get - body: %s",
+        // response.getEntity(String.class)));
+        if (response.getStatus() == Status.OK.getStatusCode()) {
+            // return deserialize(response.getEntity(String.class), type);
+            return response.readEntity(UserImpl.class);
+        }
+        return null;
     }
 
     @AfterSuite

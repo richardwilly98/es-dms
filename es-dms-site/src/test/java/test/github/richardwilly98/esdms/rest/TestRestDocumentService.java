@@ -33,8 +33,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -45,12 +47,18 @@ import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.api.AuditEntry;
 import com.github.richardwilly98.esdms.api.Document;
+import com.github.richardwilly98.esdms.api.Rating;
 import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.rest.RestDocumentService;
 import com.github.richardwilly98.esdms.rest.RestItemBaseService;
+import com.github.richardwilly98.esdms.rest.RestRatingService;
+import com.github.richardwilly98.esdms.rest.RestRatingService.RatingRequest;
+import com.github.richardwilly98.esdms.services.UserService;
 import com.google.common.collect.ImmutableSet;
 
 public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
@@ -376,6 +384,150 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 	    Assert.fail();
 	}
 	log.debug("*** testCreateUpdateDocumentVersions end ***");
+    }
+
+    @Test
+    public void testCRUDRatingDocuments() throws Throwable {
+        log.debug("*** testCRUDRatingDocuments ***");
+        try {
+            Document document = createDocument("test-attachment.html", "text/html",
+                    "/test/github/richardwilly98/services/test-attachment.html");
+            Assert.assertNotNull(document);
+            Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(document.getId())
+                    .path(RestDocumentService.AUDIT_PATH).request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+            log.debug(String.format("status: %s", response.getStatus()));
+            Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+//            SearchResult<AuditEntry> auditEntries = response.readEntity(new GenericType<SearchResult<AuditEntry>>() {
+//            });
+//            Assert.assertNotNull(auditEntries);
+//            Assert.assertTrue(auditEntries.getTotalHits() >= 1);
+            RestRatingService.RatingRequest ratingRequest = new RatingRequest();
+            ratingRequest.setItemId(document.getId());
+            ratingRequest.setScore(3);
+            
+            // Create
+            response = target().path(RestRatingService.RATINGS_PATH).request().cookie(adminCookie).post(Entity.entity(ratingRequest, MediaType.APPLICATION_JSON));
+            Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
+            
+            // Retrieve
+            response = target().path(RestRatingService.RATINGS_PATH).path(document.getId())/*.path(adminCredential.getUsername())*/
+                    .request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+            Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+            Rating rating = response.readEntity(Rating.class);
+            Assert.assertNotNull(rating);
+            Assert.assertEquals(rating.getScore(), ratingRequest.getScore());
+            Assert.assertEquals(rating.getUser(), adminCredential.getUsername());
+
+            // Update
+            ratingRequest.setScore(1);
+            response = target().path(RestRatingService.RATINGS_PATH).path(document.getId()).request().cookie(adminCookie).put(Entity.entity(ratingRequest, MediaType.APPLICATION_JSON));
+            Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+            rating = response.readEntity(Rating.class);
+            Assert.assertEquals(rating.getScore(), ratingRequest.getScore());
+            Assert.assertEquals(rating.getUser(), adminCredential.getUsername());
+
+            // Delete
+            response = target().path(RestRatingService.RATINGS_PATH).path(document.getId())
+                    .request().cookie(adminCookie).delete();
+            Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+            response = target().path(RestRatingService.RATINGS_PATH).path(document.getId())
+                    .request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+            Assert.assertTrue(response.getStatus() == Status.NOT_FOUND.getStatusCode());
+
+        } catch (Throwable t) {
+            log.error("testCRUDRatingDocuments fail", t);
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void testTotalAverageRatingDocuments() throws Throwable {
+        log.debug("*** testTotalAverageRatingDocuments ***");
+        try {
+            Document document = createDocument("test-attachment.html", "text/html",
+                    "/test/github/richardwilly98/services/test-attachment.html");
+            Assert.assertNotNull(document);
+            Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(document.getId())
+                    .path(RestDocumentService.AUDIT_PATH).request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+            log.debug(String.format("status: %s", response.getStatus()));
+            Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+
+            // Create
+            RestRatingService.RatingRequest ratingRequest = new RatingRequest();
+            ratingRequest.setItemId(document.getId());
+            ratingRequest.setScore(3);
+            response = target().path(RestRatingService.RATINGS_PATH).request().cookie(adminCookie).post(Entity.entity(ratingRequest, MediaType.APPLICATION_JSON));
+            Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
+            
+            // Retrieve
+            response = target().path(RestRatingService.RATINGS_PATH).path(document.getId())/*.path(adminCredential.getUsername())*/
+                    .request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+            Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+            Rating rating = response.readEntity(Rating.class);
+            Assert.assertNotNull(rating);
+            Assert.assertEquals(rating.getScore(), ratingRequest.getScore());
+            Assert.assertEquals(rating.getUser(), adminCredential.getUsername());
+
+            response = target().path(RestRatingService.RATINGS_PATH).path(document.getId()).path(RestRatingService.ALL_PATH)
+                    .request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+            Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+            Set<Rating> ratings = response.readEntity(new GenericType<Set<Rating>>() {
+              });
+            Assert.assertNotNull(ratings);
+            Assert.assertTrue(ratings.size() == 1);
+            Assert.assertTrue(ratings.contains(rating));
+
+            User testRatingUser = createUser("test-rating-user", "secret");
+            Assert.assertNotNull(testRatingUser);
+            log.debug(String.format("New test rating user created: %s", testRatingUser));
+            Cookie cookie = login(new CredentialImpl.Builder().username(testRatingUser.getLogin())
+                    .password("secret").build());
+
+            // Create
+            RestRatingService.RatingRequest ratingRequest2 = new RatingRequest();
+            ratingRequest2.setItemId(document.getId());
+            ratingRequest2.setScore(5);
+            response = target().path(RestRatingService.RATINGS_PATH).request().cookie(cookie).post(Entity.entity(ratingRequest2, MediaType.APPLICATION_JSON));
+            Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
+            
+            // Retrieve
+            response = target().path(RestRatingService.RATINGS_PATH).path(document.getId())/*.path(adminCredential.getUsername())*/
+                    .request().cookie(cookie).accept(MediaType.APPLICATION_JSON).get();
+            Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+            Rating rating2 = response.readEntity(Rating.class);
+            Assert.assertNotNull(rating);
+            Assert.assertEquals(rating2.getScore(), ratingRequest2.getScore());
+            Assert.assertEquals(rating2.getUser(), testRatingUser.getLogin());
+
+            response = target().path(RestRatingService.RATINGS_PATH).path(document.getId()).path(RestRatingService.ALL_PATH)
+                    .request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+            Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+            ratings = response.readEntity(new GenericType<Set<Rating>>() {
+              });
+            Assert.assertNotNull(ratings);
+            Assert.assertTrue(ratings.size() == 2);
+            Assert.assertTrue(ratings.contains(rating2));
+
+            // Total ratings
+            response = target().path(RestRatingService.RATINGS_PATH).path(document.getId()).path(RestRatingService.TOTAL_PATH)
+                    .request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+            Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+            float total = response.readEntity(float.class);
+            Assert.assertTrue(total == ratingRequest.getScore() + ratingRequest2.getScore());
+            
+            // Average ratings
+            response = target().path(RestRatingService.RATINGS_PATH).path(document.getId()).path(RestRatingService.AVERAGE_PATH)
+                    .request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+            Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+            float average = response.readEntity(float.class);
+            Assert.assertTrue(average == (ratingRequest.getScore() + ratingRequest2.getScore()) / ratings.size());
+
+            logout(cookie);
+            
+        } catch (Throwable t) {
+            log.error("testTotalAverageRatingDocuments fail", t);
+            Assert.fail();
+        }
     }
 
     private boolean setCurrentVersion(String documentId, String versionId) throws Throwable {
