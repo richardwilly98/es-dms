@@ -47,6 +47,21 @@
 			"tags" : {
 				"type" : "string", 
 				"index_name" : "tag"
+			},
+			"ratings" : {
+				"type" : "object",
+				"properties": {
+					"date": {
+						"type": "date"
+					},
+					"user": {
+						"type": "string"
+					},
+					"score": {
+						"type": "integer"
+					}
+				}, 
+				"index_name" : "rating"
 			}
 		}
 	}
