@@ -60,7 +60,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
     @JsonIgnore
     protected Set<String> readOnlyAttributeKeys;
 
-    static abstract class BuilderBase<T extends BuilderBase<T>> {
+    public static abstract class BuilderBase<T extends BuilderBase<T>> {
 
 	String id;
 	String name;
