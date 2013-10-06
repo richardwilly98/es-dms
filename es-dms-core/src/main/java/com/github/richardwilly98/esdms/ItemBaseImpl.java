@@ -100,8 +100,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
 
     protected ItemBaseImpl(BuilderBase<?> builder) {
         if (builder != null) {
-            // checkNotNull(builder.id);
-            checkNotNull(builder.name);
+            checkNotNull(builder.name, "name is required");
             this.id = builder.id;
             this.name = builder.name;
             this.disabled = builder.disabled;
@@ -114,7 +113,6 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
 
     @JsonProperty("attributes")
     private void deserialize(Map<String, Object> attributes) {
-        // this.attributes = attributes;
         for (String key : attributes.keySet()) {
             this.attributes.put(key, attributes.get(key));
         }
