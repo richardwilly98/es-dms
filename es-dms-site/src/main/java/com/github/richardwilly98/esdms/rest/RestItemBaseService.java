@@ -53,6 +53,7 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.BaseService;
+import com.google.common.base.Strings;
 
 /*
  * CRUD methods MUST follow http response status code from http://www.restapitutorial.com/lessons/httpmethods.html
@@ -67,77 +68,81 @@ public abstract class RestItemBaseService<T extends ItemBase> extends RestServic
     protected final Logger log = Logger.getLogger(getClass());
     protected final BaseService<T> service;
 
-//    @Context
-//    UriInfo url;
-//
+    // @Context
+    // UriInfo url;
+    //
     @Inject
     public RestItemBaseService(final AuthenticationService authenticationService, final BaseService<T> service) {
-	super(authenticationService);
-	this.service = service;
+        super(authenticationService);
+        this.service = service;
     }
 
     protected URI getItemUri(T item) {
-	checkNotNull(item);
-	return url.getBaseUriBuilder().path(getClass()).path(item.getId()).build();
+        checkNotNull(item);
+        return url.getBaseUriBuilder().path(getClass()).path(item.getId()).build();
     }
 
     protected Response.ResponseBuilder includeItemIdInHeaders(Response.ResponseBuilder builder, T item) {
-	checkNotNull(builder);
-	checkNotNull(item);
-	return builder.header(ITEM_ID_HEADER, item.getId());
+        checkNotNull(builder);
+        checkNotNull(item);
+        return builder.header(ITEM_ID_HEADER, item.getId());
     }
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
     @Path("{id}")
     public Response get(@PathParam("id") String id) {
-	if (log.isTraceEnabled()) {
-	    log.trace(String.format("get - %s", id));
-	}
-	try {
-	    T item = service.get(id);
-	    if (item == null) {
-		return Response.status(Status.NOT_FOUND).build();
-	    }
-	    return Response.ok(item).build();
-	} catch (ServiceException e) {
-	    throw new RestServiceException(e.getLocalizedMessage());
-	}
+        if (log.isTraceEnabled()) {
+            log.trace(String.format("get - %s", id));
+        }
+        try {
+            T item = service.get(id);
+            if (item == null) {
+                return Response.status(Status.NOT_FOUND).build();
+            }
+            return Response.ok(item).build();
+        } catch (ServiceException e) {
+            throw new RestServiceException(e.getLocalizedMessage());
+        }
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(T item) {
-	checkNotNull(item);
-	if (log.isTraceEnabled()) {
-	    log.trace(String.format("create - %s", item));
-	}
-	try {
-	    item = service.create(item);
-	    return Response.created(getItemUri(item)).build();
-	} catch (ServiceException e) {
-	    throw new RestServiceException(e.getLocalizedMessage());
-	}
+        checkNotNull(item);
+        if (log.isTraceEnabled()) {
+            log.trace(String.format("create - %s", item));
+        }
+        try {
+            if (!Strings.isNullOrEmpty(item.getId()) && service.exists(item.getId())) {
+                log.warn(String.format("Cannot create item. One item with the same id %s already exists.", item.getId()));
+                return Response.status(Status.CONFLICT).build();
+            }
+            item = service.create(item);
+            return Response.created(getItemUri(item)).build();
+        } catch (ServiceException e) {
+            throw new RestServiceException(e.getLocalizedMessage());
+        }
     }
 
     @DELETE
     @Produces({ MediaType.APPLICATION_JSON })
     @Path("{id}")
     public Response delete(@PathParam("id") String id) {
-	if (log.isTraceEnabled()) {
-	    log.trace(String.format("delete - %s", id));
-	}
-	try {
-	    T item = service.get(id);
-	    if (item != null) {
-		service.delete(item);
-	    } else {
-		return Response.status(Status.NOT_FOUND).build();
-	    }
-	    return Response.ok().build();
-	} catch (ServiceException e) {
-	    throw new RestServiceException(e.getLocalizedMessage());
-	}
+        if (log.isTraceEnabled()) {
+            log.trace(String.format("delete - %s", id));
+        }
+        try {
+            T item = service.get(id);
+            if (item != null) {
+                service.delete(item);
+            } else {
+                return Response.status(Status.NOT_FOUND).build();
+            }
+            return Response.ok().build();
+        } catch (ServiceException e) {
+            throw new RestServiceException(e.getLocalizedMessage());
+        }
     }
 
     @PUT
@@ -145,31 +150,31 @@ public abstract class RestItemBaseService<T extends ItemBase> extends RestServic
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
     public Response update(@PathParam("id") String id, T item) {
-	checkNotNull(item);
-	if (log.isTraceEnabled()) {
-	    log.trace(String.format("update - %s", item));
-	}
-	try {
-	    item = service.update(item);
-	    return Response.ok(item).build();
-	} catch (ServiceException e) {
-	    throw new RestServiceException(e.getLocalizedMessage());
-	}
+        checkNotNull(item);
+        if (log.isTraceEnabled()) {
+            log.trace(String.format("update - %s", item));
+        }
+        try {
+            item = service.update(item);
+            return Response.ok(item).build();
+        } catch (ServiceException e) {
+            throw new RestServiceException(e.getLocalizedMessage());
+        }
     }
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
     @Path(SEARCH_PATH + "/{criteria}")
     public Response search(@PathParam("criteria") String criteria, @QueryParam(SEARCH_FIRST_PARAMETER) @DefaultValue("0") int first,
-	    @QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("20") int pageSize) {
-	if (log.isTraceEnabled()) {
-	    log.trace(String.format("search - %s", criteria));
-	}
-	try {
-	    SearchResult<T> items = service.search(criteria, first, pageSize);
-	    return Response.ok(items).build();
-	} catch (ServiceException e) {
-	    throw new RestServiceException(e.getLocalizedMessage());
-	}
+            @QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("20") int pageSize) {
+        if (log.isTraceEnabled()) {
+            log.trace(String.format("search - %s", criteria));
+        }
+        try {
+            SearchResult<T> items = service.search(criteria, first, pageSize);
+            return Response.ok(items).build();
+        } catch (ServiceException e) {
+            throw new RestServiceException(e.getLocalizedMessage());
+        }
     }
 }

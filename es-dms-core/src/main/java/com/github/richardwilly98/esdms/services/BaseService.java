@@ -45,5 +45,7 @@ public interface BaseService<T extends ItemBase> {
     public abstract boolean disabled(T item) throws ServiceException;
 
     public abstract void disable(T item, boolean b) throws ServiceException;
+    
+    public abstract boolean exists(String id) throws ServiceException;
 
 }

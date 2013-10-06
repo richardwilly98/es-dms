@@ -108,6 +108,19 @@ public class AuthenticationProvider implements AuthenticationService {
     }
 
     @Override
+    public boolean exists(String id) throws ServiceException {
+        try {
+            if (log.isTraceEnabled()) {
+                log.trace(String.format("exists - %s", id));
+            }
+            return client.prepareGet(index, type, id).setFields(new String[0]).execute().actionGet().isExists();
+        } catch (Throwable t) {
+            log.error("exists failed", t);
+            throw new ServiceException(t.getLocalizedMessage());
+        }
+    }
+
+    @Override
     public String login(Credential credential) throws ServiceException {
         String login = credential.getUsername();
         char[] password = credential.getPassword();

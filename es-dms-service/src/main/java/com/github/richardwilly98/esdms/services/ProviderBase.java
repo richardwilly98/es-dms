@@ -136,6 +136,19 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
     }
 
     @Override
+    public boolean exists(String id) throws ServiceException {
+        try {
+            if (log.isTraceEnabled()) {
+                log.trace(String.format("exists - %s", id));
+            }
+            return client.prepareGet(index, type, id).setFields(new String[0]).execute().actionGet().isExists();
+        } catch (Throwable t) {
+            log.error("exists failed", t);
+            throw new ServiceException(t.getLocalizedMessage());
+        }
+    }
+
+    @Override
     public SearchResult<T> search(String criteria, int first, int pageSize) throws ServiceException {
 	try {
 	    SearchResponse searchResponse = client.prepareSearch(index).setTypes(type).setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
