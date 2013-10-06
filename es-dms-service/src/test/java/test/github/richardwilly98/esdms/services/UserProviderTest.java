@@ -36,6 +36,7 @@ import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.services.RoleService;
 import com.github.richardwilly98.esdms.services.UserService;
+import com.google.common.collect.ImmutableSet;
 
 public class UserProviderTest extends ProviderTestBase {
 
@@ -127,6 +128,24 @@ public class UserProviderTest extends ProviderTestBase {
 	//
 	// //Assert.assertNotNull(user);
 	// if (!(user == null))log.info("User found: " + user.getName());
+    }
+
+    @Test
+    public void testCreateUpdateDeleteUser() throws Throwable {
+        log.info("Start testCreateUpdateDeleteUser");
+        String id = "tst-createupdatedelete-user-" + System.currentTimeMillis() + "@pippo.pippo";
+        id = testCreateUser(id, "", false, id, "123456".toCharArray(), ImmutableSet.of(RoleService.DefaultRoles.WRITER.getRole(), RoleService.DefaultRoles.READER.getRole()));
+        User user = userService.get(id);
+        Assert.assertTrue(user.getRoles().contains(RoleService.DefaultRoles.WRITER.getRole()));
+        Assert.assertTrue(user.getRoles().contains(RoleService.DefaultRoles.READER.getRole()));
+        user.removeRole(RoleService.DefaultRoles.READER.getRole());
+        userService.update(user);
+        user = userService.get(id);
+        Assert.assertTrue(user.getRoles().contains(RoleService.DefaultRoles.WRITER.getRole()));
+        Assert.assertFalse(user.getRoles().contains(RoleService.DefaultRoles.READER.getRole()));
+        userService.delete(user);
+        user = userService.get(id);
+        Assert.assertNull(user);
     }
 
     @Test

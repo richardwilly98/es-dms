@@ -110,7 +110,7 @@ public class UserProvider extends ProviderBase<User> implements UserService {
     @RequiresPermissions(UserPermissions.Constants.USER_EDIT)
     @Override
     public User update(User item) throws ServiceException {
-        checkArgument(isAdminUserAndContainSystemRoles(item), String.format(
+        checkArgument(canUserBeUpdated(item), String.format(
                 "Cannot update user %s. Missing required system roles", item.getId()));
         if (item.getPassword() != null) {
             String encodedHash = computeBase64Hash(item.getPassword());
@@ -130,17 +130,16 @@ public class UserProvider extends ProviderBase<User> implements UserService {
         super.delete(item);
     }
 
-    private boolean isAdminUserAndContainSystemRoles(User user) {
+    private boolean canUserBeUpdated(User user) {
         if (user.getId().equals(UserService.DEFAULT_ADMIN_LOGIN)) {
-            for ( Role role : RoleService.SystemRoles) {
+            for (Role role : RoleService.SystemRoles) {
                 if (!user.getRoles().contains(role)) {
                     return false;
                 }
             }
             return true;
-//            return !user.getRoles().contains(role);
         } else {
-            return false;
+            return true;
         }
     }
 }
