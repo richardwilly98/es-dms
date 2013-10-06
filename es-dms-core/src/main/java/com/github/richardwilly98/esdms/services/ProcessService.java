@@ -1,8 +1,8 @@
-package com.github.richardwilly98.esdms.rest.exception;
+package com.github.richardwilly98.esdms.services;
 
 /*
  * #%L
- * es-dms-site
+ * es-dms-core
  * %%
  * Copyright (C) 2013 es-dms
  * %%
@@ -26,18 +26,15 @@ package com.github.richardwilly98.esdms.rest.exception;
  * #L%
  */
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
-@SuppressWarnings("serial")
-public class RestServiceException extends WebApplicationException {
+import java.util.Set;
 
-    public RestServiceException(String message) {
-	super(Response.status(Response.Status.BAD_REQUEST).entity(message).type(MediaType.TEXT_PLAIN).build());
-    }
+import com.github.richardwilly98.esdms.bpm.api.ProcessDefinition;
+import com.github.richardwilly98.esdms.exception.ServiceException;
 
-    public RestServiceException(Response.Status status, String message) {
-        super(Response.status(status).entity(message).type(MediaType.TEXT_PLAIN).build());
-    }
+public interface ProcessService {
+
+    public abstract String startProcessInstance(String processDefinitionId) throws ServiceException;
+    
+    public abstract Set<ProcessDefinition> getProcessDefinitions() throws ServiceException;
 }

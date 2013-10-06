@@ -61,8 +61,10 @@ public abstract class RestServiceBase {
 	try {
 	    log.trace("*** getCurrentUser ***");
 	    Subject currentSubject = SecurityUtils.getSubject();
-	    log.trace(String.format("currentSubject.isAuthenticated(): %s", currentSubject.isAuthenticated()));
-	    log.trace(String.format("Principal: %s", currentSubject.getPrincipal()));
+	    if (log.isTraceEnabled()) {
+	            log.trace(String.format("currentSubject.isAuthenticated(): %s", currentSubject.isAuthenticated()));
+	            log.trace(String.format("Principal: %s", currentSubject.getPrincipal()));
+	    }
 	    if (currentSubject.getPrincipal() == null) {
 		throw new UnauthorizedException("Unauthorize request", url.getPath());
 	    } else {
