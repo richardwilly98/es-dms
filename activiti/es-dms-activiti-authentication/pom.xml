@@ -5,6 +5,7 @@
 		<groupId>com.github.richardwilly98</groupId>
 		<artifactId>es-dms</artifactId>
 		<version>1.0-SNAPSHOT</version>
+		<relativePath>../..</relativePath>
 	</parent>
 	<artifactId>es-dms-activiti-authentication</artifactId>
 	<name>es-dms-activiti-authentication</name>
