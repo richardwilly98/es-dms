@@ -45,9 +45,9 @@ public interface User extends Person, Principal {
 
     public abstract void setHash(String hash);
 
-    public abstract String getPassword();
+    public abstract char[] getPassword();
 
-    public abstract void setPassword(String password);
+    public abstract void setPassword(char[] password);
 
     public abstract void addRole(Role role);
 

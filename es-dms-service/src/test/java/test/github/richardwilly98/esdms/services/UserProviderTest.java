@@ -38,7 +38,7 @@ import com.github.richardwilly98.esdms.services.RoleService;
 
 public class UserProviderTest extends ProviderTestBase {
 
-    private String testCreateUser(String name, String description, boolean disabled, String email, String password, Set<Role> roles)
+    private String testCreateUser(String name, String description, boolean disabled, String email, char[] password, Set<Role> roles)
 	    throws Throwable {
 	User user = createUser(name, description, disabled, email, password, roles);
 	Assert.assertNotNull(user);
@@ -49,8 +49,7 @@ public class UserProviderTest extends ProviderTestBase {
 	if (roles != null) {
 	    Assert.assertTrue(user.getRoles().equals(roles));
 	} else {
-	    Role defaultRole = roleService.get(RoleService.WRITER_ROLE_ID);
-	    Assert.assertTrue(user.getRoles().contains(defaultRole));
+	    Assert.assertTrue(user.getRoles().contains(RoleService.DefaultRoles.DEFAULT.getRole()));
 	}
 	return user.getId();
     }
@@ -61,8 +60,8 @@ public class UserProviderTest extends ProviderTestBase {
 
 	// Make sure to be login with user having sufficient permission
 	loginAdminUser();
-	testCreateUser("Richard", "Lead developer", false, "richard@pippo.pippo", "qwerty", null);
-	testCreateUser("Danilo", "Mezza calzetta", true, "danilo@pippo.pippo", "123456", null);
+	testCreateUser("Richard", "Lead developer", false, "richard@pippo.pippo", "qwerty".toCharArray(), null);
+	testCreateUser("Danilo", "Mezza calzetta", true, "danilo@pippo.pippo", "123456".toCharArray(), null);
     }
 
     @Test
@@ -70,7 +69,7 @@ public class UserProviderTest extends ProviderTestBase {
 	log.info("Start testFindUser");
 
 	String username = "richard" + System.currentTimeMillis();
-	String id = testCreateUser(username, "", false, "", username, null);
+	String id = testCreateUser(username, "", false, "", username.toCharArray(), null);
 	Assert.assertNotNull(id);
 	SearchResult<User> searchResult = userService.search(username, 0, -1);
 	// List should not be null
@@ -90,7 +89,7 @@ public class UserProviderTest extends ProviderTestBase {
     @Test
     public void testDeleteUser() throws Throwable {
 	log.info("Start testDeleteUser");
-	String id = testCreateUser("Richard", "Lead developer", false, "richard@pippo.pippo", "123456", null);
+	String id = testCreateUser("Richard", "Lead developer", false, "richard@pippo.pippo", "123456".toCharArray(), null);
 	User user = userService.get(id);
 	userService.delete(user);
 	user = userService.get(id);
@@ -99,8 +98,8 @@ public class UserProviderTest extends ProviderTestBase {
 
     @Test
     public void testListUser() throws Throwable {
-	String id1 = testCreateUser("Danilo1", "Lead developer", false, "richard@pippo.pippo", "123456", null);
-	String id2 = testCreateUser("Danilo2", "Mezza calzetta", true, "danilo@pippo.pippo", "123456", null);
+	String id1 = testCreateUser("Danilo1", "Lead developer", false, "richard@pippo.pippo", "123456".toCharArray(), null);
+	String id2 = testCreateUser("Danilo2", "Mezza calzetta", true, "danilo@pippo.pippo", "123456".toCharArray(), null);
 	SearchResult<User> searchResult = userService.search("*", 0, -1);
 	Assert.assertNotNull(searchResult);
 	Set<User> users = searchResult.getItems();
@@ -116,4 +115,5 @@ public class UserProviderTest extends ProviderTestBase {
 	}
 	Assert.assertEquals(found, 2);
     }
+    
 }

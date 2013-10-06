@@ -36,9 +36,9 @@ public interface Credential {
 
     public abstract void setUsername(String username);
 
-    public abstract String getPassword();
+    public abstract char[] getPassword();
 
-    public abstract void setPassword(String password);
+    public abstract void setPassword(char[] password);
 
     public abstract boolean isRememberMe();
 

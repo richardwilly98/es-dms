@@ -82,13 +82,16 @@ public class EsRealm extends AuthorizingRealm {
 	}
 
 	User principal = principalList.iterator().next();
+        log.trace(String.format("getAuthorization for %s", principal.getId()));
 	Set<String> roles = new HashSet<String>();
 	Set<String> permissions = new HashSet<String>();
 	for (Role role : principal.getRoles()) {
+	    log.trace(String.format("add role %s to %s", role.getId(), principal.getId()));
 	    roles.add(role.getId());
 	    try {
 		role = roleService.get(role.getId());
 		for (Permission permission : role.getPermissions()) {
+		    log.trace(String.format("add permission %s to %s", permission.getId(), principal.getId()));
 		    permissions.add(permission.getId());
 		}
 	    } catch (ServiceException ex) {
@@ -127,7 +130,11 @@ public class EsRealm extends AuthorizingRealm {
     }
 
     private String computeBase64Hash(char[] password) {
-	return hashService.toBase64(ByteSource.Util.bytes(password).getBytes());
+        String hash = hashService.toBase64(ByteSource.Util.bytes(password).getBytes());
+        if (log.isDebugEnabled()) {
+            log.debug(String.format("computeBase64Hash - %s", hash));
+        }
+        return hash;
     }
 
     private User getPrincipal(String login) {
