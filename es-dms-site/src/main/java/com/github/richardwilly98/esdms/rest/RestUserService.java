@@ -63,7 +63,7 @@ public class RestUserService extends RestItemBaseService<User> {
 	checkNotNull(item.getEmail());
 	item.setId(item.getEmail());
 	if (item.getPassword() != null) {
-	    String encodedHash = hashService.toBase64(item.getPassword().getBytes());
+	    String encodedHash = hashService.toBase64(String.valueOf(item.getPassword()).getBytes());
 	    log.trace("From service - hash: " + encodedHash);
 	    item.setHash(encodedHash);
 	    item.setPassword(null);
@@ -80,7 +80,7 @@ public class RestUserService extends RestItemBaseService<User> {
     @Produces(MediaType.APPLICATION_JSON)
     public Response update(@PathParam("id") String id, User item) {
 	if (item.getPassword() != null) {
-	    String encodedHash = hashService.toBase64(item.getPassword().getBytes());
+	    String encodedHash = hashService.toBase64(String.valueOf(item.getPassword()).getBytes());
 	    log.trace("From service - hash: " + encodedHash);
 	    item.setHash(encodedHash);
 	    item.setPassword(null);
