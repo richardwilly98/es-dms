@@ -26,51 +26,53 @@ package com.github.richardwilly98.esdms;
  * #L%
  */
 
+import java.util.Arrays;
+
 import com.github.richardwilly98.esdms.api.Credential;
 import com.google.common.base.Objects;
 
 public class CredentialImpl implements Credential {
 
     private String username;
-    private String password;
+    private char[] password;
     private boolean rememberMe;
 
     public static class Builder {
 
-	private String username;
-	private String password;
-	private boolean rememberMe;
+        private String username;
+        private char[] password;
+        private boolean rememberMe;
 
-	public Builder username(String username) {
-	    this.username = username;
-	    return this;
-	}
+        public Builder username(String username) {
+            this.username = username;
+            return this;
+        }
 
-	public Builder password(String password) {
-	    this.password = password;
-	    return this;
-	}
+        public Builder password(char[] password) {
+            this.password = password;
+            return this;
+        }
 
-	public Builder rememberMe(boolean rememberMe) {
-	    this.rememberMe = rememberMe;
-	    return this;
-	}
+        public Builder rememberMe(boolean rememberMe) {
+            this.rememberMe = rememberMe;
+            return this;
+        }
 
-	public Credential build() {
-	    return new CredentialImpl(this);
-	}
+        public Credential build() {
+            return new CredentialImpl(this);
+        }
     }
 
     CredentialImpl() {
-	this(null);
+        this(null);
     }
 
     protected CredentialImpl(Builder builder) {
-	if (builder != null) {
-	    this.username = builder.username;
-	    this.password = builder.password;
-	    this.rememberMe = builder.rememberMe;
-	}
+        if (builder != null) {
+            this.username = builder.username;
+            this.password = builder.password;
+            this.rememberMe = builder.rememberMe;
+        }
     }
 
     /*
@@ -80,7 +82,7 @@ public class CredentialImpl implements Credential {
      */
     @Override
     public String getUsername() {
-	return username;
+        return username;
     }
 
     /*
@@ -91,7 +93,7 @@ public class CredentialImpl implements Credential {
      */
     @Override
     public void setUsername(String username) {
-	this.username = username;
+        this.username = username;
     }
 
     /*
@@ -100,8 +102,8 @@ public class CredentialImpl implements Credential {
      * @see com.github.richardwilly98.esdms.Credential#getPassword()
      */
     @Override
-    public String getPassword() {
-	return password;
+    public char[] getPassword() {
+        return password;
     }
 
     /*
@@ -111,8 +113,8 @@ public class CredentialImpl implements Credential {
      * com.github.richardwilly98.esdms.Credential#setPassword(java.lang.String)
      */
     @Override
-    public void setPassword(String password) {
-	this.password = password;
+    public void setPassword(char[] password) {
+        this.password = password;
     }
 
     /*
@@ -122,7 +124,7 @@ public class CredentialImpl implements Credential {
      */
     @Override
     public boolean isRememberMe() {
-	return rememberMe;
+        return rememberMe;
     }
 
     /*
@@ -132,11 +134,42 @@ public class CredentialImpl implements Credential {
      */
     @Override
     public void setRememberMe(boolean rememberMe) {
-	this.rememberMe = rememberMe;
+        this.rememberMe = rememberMe;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(password);
+        result = prime * result + (rememberMe ? 1231 : 1237);
+        result = prime * result + ((username == null) ? 0 : username.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        CredentialImpl other = (CredentialImpl) obj;
+        if (!Arrays.equals(password, other.password))
+            return false;
+        if (rememberMe != other.rememberMe)
+            return false;
+        if (username == null) {
+            if (other.username != null)
+                return false;
+        } else if (!username.equals(other.username))
+            return false;
+        return true;
     }
 
     @Override
     public String toString() {
-	return Objects.toStringHelper(this).add("username", username).add("rememberMe", rememberMe).toString();
+        return Objects.toStringHelper(this).add("username", username).add("rememberMe", rememberMe).toString();
     }
 }
