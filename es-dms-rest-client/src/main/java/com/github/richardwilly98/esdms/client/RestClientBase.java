@@ -1,0 +1,52 @@
+package com.github.richardwilly98.esdms.client;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Cookie;
+
+import org.apache.log4j.Logger;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+
+import com.github.richardwilly98.esdms.CredentialImpl;
+import com.github.richardwilly98.esdms.exception.ServiceException;
+
+public abstract class RestClientBase {
+
+	public static final String ES_DMS_TICKET = "ES_DMS_TICKET";
+	public static final String API_PATH = "api";
+	
+	protected final Logger log = Logger.getLogger(getClass());
+	private final String url;
+	protected final Client restClient;
+
+	protected RestClientBase(final String url) {
+		checkNotNull(url);
+		this.url = url;
+		ClientConfig configuration = new ClientConfig();
+		configuration.register(MultiPartFeature.class);
+//		configuration.register(JacksonFeature.class);
+		restClient = ClientBuilder.newClient(configuration);
+	}
+
+	protected WebTarget getWebTarget() {
+		return restClient.target(url)
+				.path("api");
+	}
+
+	protected Cookie getUserCookie(String userId, char[] password) throws ServiceException {
+		RestAuthenticationServiceClient authenticationClient = new RestAuthenticationServiceClient(
+				url);
+		return authenticationClient.getEsDmsCookie(new CredentialImpl.Builder()
+				.username(userId).password(password).build());
+	}
+
+	protected Cookie newUserCookie(String token) {
+		checkNotNull(token);
+		return new Cookie(ES_DMS_TICKET, token);
+	}
+	
+}
