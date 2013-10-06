@@ -38,7 +38,6 @@ import com.github.richardwilly98.esdms.api.Facet;
 import com.github.richardwilly98.esdms.api.ItemBase;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.google.common.base.Objects;
-import com.google.common.primitives.Longs;
 
 public class SearchResultImpl<T extends ItemBase> implements SearchResult<T> {
 
@@ -141,45 +140,59 @@ public class SearchResultImpl<T extends ItemBase> implements SearchResult<T> {
 	throw new UnsupportedOperationException();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public boolean equals(Object obj) {
-	if (obj == this) {
-	    return true;
-	}
-	if (obj == null || obj.getClass() != this.getClass()) {
-	    return false;
-	}
-
-	SearchResultImpl<T> obj2 = (SearchResultImpl<T>) obj;
-	return ((firstIndex == obj2.getFirstIndex()) && (pageSize == obj2.getPageSize()) && (elapsedTime == obj2.getElapsedTime())
-	        && (totalHits == obj2.getTotalHits())
-	        && (facets == obj2.getFacets() || (facets != null && facets.equals(obj2.getFacets()))) && (items == obj2.getItems() || (items != null && items
-	        .equals(obj2.getItems()))));
+    public Map<String, Facet> getFacets() {
+        return facets;
     }
 
     @Override
     public int hashCode() {
-	final int prime = 31;
-	int result = 1;
-	result = prime * result + firstIndex;
-	result = prime * result + pageSize;
-	result = prime * result + Longs.hashCode(elapsedTime);
-	result = prime * result + Longs.hashCode(totalHits);
-	result = prime * result + ((items == null) ? 0 : items.hashCode());
-	result = prime * result + ((facets == null) ? 0 : facets.hashCode());
-	return result;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (elapsedTime ^ (elapsedTime >>> 32));
+        result = prime * result + ((facets == null) ? 0 : facets.hashCode());
+        result = prime * result + firstIndex;
+        result = prime * result + ((items == null) ? 0 : items.hashCode());
+        result = prime * result + pageSize;
+        result = prime * result + (int) (totalHits ^ (totalHits >>> 32));
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SearchResultImpl<T> other = (SearchResultImpl<T>) obj;
+        if (elapsedTime != other.elapsedTime)
+            return false;
+        if (facets == null) {
+            if (other.facets != null)
+                return false;
+        } else if (!facets.equals(other.facets))
+            return false;
+        if (firstIndex != other.firstIndex)
+            return false;
+        if (items == null) {
+            if (other.items != null)
+                return false;
+        } else if (!items.equals(other.items))
+            return false;
+        if (pageSize != other.pageSize)
+            return false;
+        if (totalHits != other.totalHits)
+            return false;
+        return true;
     }
 
     @Override
     public String toString() {
 	return Objects.toStringHelper(this).add("firstIndex", firstIndex).add("pageSize", pageSize).add("elapsedTime", elapsedTime)
 	        .add("totalHits", totalHits).toString();
-    }
-
-    @Override
-    public Map<String, Facet> getFacets() {
-	return facets;
     }
 
 }

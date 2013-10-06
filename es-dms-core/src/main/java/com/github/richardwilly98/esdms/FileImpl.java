@@ -27,6 +27,7 @@ package com.github.richardwilly98.esdms;
  */
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import org.joda.time.DateTime;
 
@@ -183,26 +184,6 @@ public class FileImpl implements Serializable, File {
 	this.contentType = contentType;
     }
 
-    // /*
-    // * (non-Javadoc)
-    // *
-    // * @see com.github.richardwilly98.api.File#getHighlight()
-    // */
-    // @Override
-    // public String getHighlight() {
-    // return highlight;
-    // }
-    //
-    // /*
-    // * (non-Javadoc)
-    // *
-    // * @see com.github.richardwilly98.api.File#setHighlight(java.lang.String)
-    // */
-    // @Override
-    // public void setHighlight(String highlight) {
-    // this.highlight = highlight;
-    // }
-
     /*
      * (non-Javadoc)
      * 
@@ -261,6 +242,64 @@ public class FileImpl implements Serializable, File {
     @Override
     public void setAuthor(String author) {
 	this.author = author;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((author == null) ? 0 : author.hashCode());
+        result = prime * result + Arrays.hashCode(content);
+        result = prime * result + ((contentType == null) ? 0 : contentType.hashCode());
+        result = prime * result + ((date == null) ? 0 : date.hashCode());
+        result = prime * result + ((highlight == null) ? 0 : highlight.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((title == null) ? 0 : title.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        FileImpl other = (FileImpl) obj;
+        if (author == null) {
+            if (other.author != null)
+                return false;
+        } else if (!author.equals(other.author))
+            return false;
+        if (!Arrays.equals(content, other.content))
+            return false;
+        if (contentType == null) {
+            if (other.contentType != null)
+                return false;
+        } else if (!contentType.equals(other.contentType))
+            return false;
+        if (date == null) {
+            if (other.date != null)
+                return false;
+        } else if (!date.equals(other.date))
+            return false;
+        if (highlight == null) {
+            if (other.highlight != null)
+                return false;
+        } else if (!highlight.equals(other.highlight))
+            return false;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        if (title == null) {
+            if (other.title != null)
+                return false;
+        } else if (!title.equals(other.title))
+            return false;
+        return true;
     }
 
 }

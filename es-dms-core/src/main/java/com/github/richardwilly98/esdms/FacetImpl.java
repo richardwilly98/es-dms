@@ -33,7 +33,6 @@ import java.util.Set;
 import com.github.richardwilly98.esdms.api.Facet;
 import com.github.richardwilly98.esdms.api.Term;
 import com.google.common.base.Objects;
-import com.google.common.primitives.Longs;
 
 public class FacetImpl implements Facet {
 
@@ -122,30 +121,37 @@ public class FacetImpl implements Facet {
     }
 
     @Override
-    public boolean equals(Object obj) {
-	if (obj == this) {
-	    return true;
-	}
-	if (obj == null || obj.getClass() != this.getClass()) {
-	    return false;
-	}
-
-	FacetImpl obj2 = (FacetImpl) obj;
-	return ((missingCount == obj2.getMissingCount()) && (otherCount == obj2.getOtherCount()) && (totalCount == obj2.getTotalCount()) && (terms == obj2
-	        .getTerms() || (terms != null && terms.equals(obj2.getTerms()))));
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (missingCount ^ (missingCount >>> 32));
+        result = prime * result + (int) (otherCount ^ (otherCount >>> 32));
+        result = prime * result + ((terms == null) ? 0 : terms.hashCode());
+        result = prime * result + (int) (totalCount ^ (totalCount >>> 32));
+        return result;
     }
 
     @Override
-    public int hashCode() {
-	final int prime = 31;
-	int result = 1;
-	// INFO:
-	// http://stackoverflow.com/questions/4045063/how-should-i-map-long-to-int-in-hashcode
-	result = prime * result + Longs.hashCode(missingCount);
-	result = prime * result + Longs.hashCode(otherCount);
-	result = prime * result + Longs.hashCode(totalCount);
-	result = prime * result + ((terms == null) ? 0 : terms.hashCode());
-	return result;
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        FacetImpl other = (FacetImpl) obj;
+        if (missingCount != other.missingCount)
+            return false;
+        if (otherCount != other.otherCount)
+            return false;
+        if (terms == null) {
+            if (other.terms != null)
+                return false;
+        } else if (!terms.equals(other.terms))
+            return false;
+        if (totalCount != other.totalCount)
+            return false;
+        return true;
     }
 
     @Override

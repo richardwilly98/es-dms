@@ -27,6 +27,7 @@ package com.github.richardwilly98.esdms;
  */
 
 import com.github.richardwilly98.esdms.api.Permission;
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
 public class PermissionImpl extends ItemBaseImpl implements Permission {
@@ -36,37 +37,37 @@ public class PermissionImpl extends ItemBaseImpl implements Permission {
 
     public static class Builder extends BuilderBase<Builder> {
 
-	String access;
+        String access;
 
-	public Builder access(String access) {
-	    this.access = access;
-	    return getThis();
-	}
+        public Builder access(String access) {
+            this.access = access;
+            return getThis();
+        }
 
-	@Override
-	protected Builder getThis() {
-	    return this;
-	}
+        @Override
+        protected Builder getThis() {
+            return this;
+        }
 
-	public Permission build() {
-	    if (Strings.isNullOrEmpty(this.name)) {
-		this.name = this.id;
-	    } else if (Strings.isNullOrEmpty(this.id)) {
-		this.id = this.name;
-	    }
-	    return new PermissionImpl(this);
-	}
+        public Permission build() {
+            if (Strings.isNullOrEmpty(this.name)) {
+                this.name = this.id;
+            } else if (Strings.isNullOrEmpty(this.id)) {
+                this.id = this.name;
+            }
+            return new PermissionImpl(this);
+        }
     }
 
     PermissionImpl() {
-	super(null);
+        super(null);
     }
 
     protected PermissionImpl(Builder builder) {
-	super(builder);
-	if (builder != null) {
-	    this.access = builder.access;
-	}
+        super(builder);
+        if (builder != null) {
+            this.access = builder.access;
+        }
     }
 
     /*
@@ -76,7 +77,7 @@ public class PermissionImpl extends ItemBaseImpl implements Permission {
      */
     @Override
     public void setAccess(String access) {
-	this.access = access;
+        this.access = access;
     }
 
     /*
@@ -86,27 +87,37 @@ public class PermissionImpl extends ItemBaseImpl implements Permission {
      */
     @Override
     public String getAccess() {
-	return access;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-	if (obj == this) {
-	    return true;
-	}
-	if (obj == null || obj.getClass() != this.getClass()) {
-	    return false;
-	}
-
-	PermissionImpl obj2 = (PermissionImpl) obj;
-	return (super.equals(obj) && (access == obj2.getAccess() || (access != null && access.equals(obj2.getAccess()))));
+        return access;
     }
 
     @Override
     public int hashCode() {
-	final int prime = 31;
-	int result = super.hashCode();
-	result = prime * result + ((access == null) ? 0 : access.hashCode());
-	return result;
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((access == null) ? 0 : access.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        PermissionImpl other = (PermissionImpl) obj;
+        if (access == null) {
+            if (other.access != null)
+                return false;
+        } else if (!access.equals(other.access))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this).add("id", id).add("name", name).add("description", description)
+                .add("attributes", getAttributes()).add("access", access).toString();
     }
 }

@@ -98,12 +98,6 @@ public class SettingsImpl implements Settings {
     }
 
     @Override
-    public String toString() {
-	return Objects.toStringHelper(this).add("library", library).add("esPort", esPort).add("esHost", esHost)
-	        .add("indexRefresh", indexRefresh).toString();
-    }
-
-    @Override
     public boolean isIndexRefresh() {
 	return indexRefresh;
     }
@@ -113,4 +107,48 @@ public class SettingsImpl implements Settings {
 	this.indexRefresh = indexRefresh;
 
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((esHost == null) ? 0 : esHost.hashCode());
+        result = prime * result + esPort;
+        result = prime * result + (indexRefresh ? 1231 : 1237);
+        result = prime * result + ((library == null) ? 0 : library.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SettingsImpl other = (SettingsImpl) obj;
+        if (esHost == null) {
+            if (other.esHost != null)
+                return false;
+        } else if (!esHost.equals(other.esHost))
+            return false;
+        if (esPort != other.esPort)
+            return false;
+        if (indexRefresh != other.indexRefresh)
+            return false;
+        if (library == null) {
+            if (other.library != null)
+                return false;
+        } else if (!library.equals(other.library))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this).add("library", library).add("esPort", esPort).add("esHost", esHost)
+                .add("indexRefresh", indexRefresh).toString();
+    }
+
 }

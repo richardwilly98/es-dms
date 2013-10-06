@@ -169,4 +169,47 @@ public class SecuredItemImpl extends ItemBaseImpl implements SecuredItem {
 	// attachments = new HashMap<String, SecuredItem>();
 	this.attachments.put(name, attachment);
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((annotations == null) ? 0 : annotations.hashCode());
+        result = prime * result + ((attachments == null) ? 0 : attachments.hashCode());
+        result = prime * result + ((comments == null) ? 0 : comments.hashCode());
+        result = prime * result + ((roles == null) ? 0 : roles.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SecuredItemImpl other = (SecuredItemImpl) obj;
+        if (annotations == null) {
+            if (other.annotations != null)
+                return false;
+        } else if (!annotations.equals(other.annotations))
+            return false;
+        if (attachments == null) {
+            if (other.attachments != null)
+                return false;
+        } else if (!attachments.equals(other.attachments))
+            return false;
+        if (comments == null) {
+            if (other.comments != null)
+                return false;
+        } else if (!comments.equals(other.comments))
+            return false;
+        if (roles == null) {
+            if (other.roles != null)
+                return false;
+        } else if (!roles.equals(other.roles))
+            return false;
+        return true;
+    }
 }

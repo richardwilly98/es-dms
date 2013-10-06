@@ -62,61 +62,61 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
 
     public static abstract class BuilderBase<T extends BuilderBase<T>> {
 
-	String id;
-	String name;
-	boolean disabled;
-	String description;
-	Map<String, Object> attributes;
+        String id;
+        String name;
+        boolean disabled;
+        String description;
+        Map<String, Object> attributes;
 
-	public T id(String id) {
-	    this.id = id;
-	    return getThis();
-	}
+        public T id(String id) {
+            this.id = id;
+            return getThis();
+        }
 
-	public T name(String name) {
-	    this.name = name;
-	    return getThis();
-	}
+        public T name(String name) {
+            this.name = name;
+            return getThis();
+        }
 
-	public T description(String description) {
-	    this.description = description;
-	    return getThis();
-	}
+        public T description(String description) {
+            this.description = description;
+            return getThis();
+        }
 
-	public T disabled(boolean disabled) {
-	    this.disabled = disabled;
-	    return getThis();
-	}
+        public T disabled(boolean disabled) {
+            this.disabled = disabled;
+            return getThis();
+        }
 
-	public T attributes(Map<String, Object> attributes) {
-	    this.attributes = attributes;
-	    return getThis();
-	}
+        public T attributes(Map<String, Object> attributes) {
+            this.attributes = attributes;
+            return getThis();
+        }
 
-	protected abstract T getThis();
+        protected abstract T getThis();
 
     }
 
     protected ItemBaseImpl(BuilderBase<?> builder) {
-	if (builder != null) {
-	    // checkNotNull(builder.id);
-	    checkNotNull(builder.name);
-	    this.id = builder.id;
-	    this.name = builder.name;
-	    this.disabled = builder.disabled;
-	    this.description = builder.description;
-	    if (builder.attributes != null) {
-		this.attributes.putAll(builder.attributes);
-	    }
-	}
+        if (builder != null) {
+            // checkNotNull(builder.id);
+            checkNotNull(builder.name);
+            this.id = builder.id;
+            this.name = builder.name;
+            this.disabled = builder.disabled;
+            this.description = builder.description;
+            if (builder.attributes != null) {
+                this.attributes.putAll(builder.attributes);
+            }
+        }
     }
 
     @JsonProperty("attributes")
     private void deserialize(Map<String, Object> attributes) {
-	// this.attributes = attributes;
-	for (String key : attributes.keySet()) {
-	    this.attributes.put(key, attributes.get(key));
-	}
+        // this.attributes = attributes;
+        for (String key : attributes.keySet()) {
+            this.attributes.put(key, attributes.get(key));
+        }
     }
 
     /*
@@ -126,7 +126,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
      */
     @Override
     public String getId() {
-	return id;
+        return id;
     }
 
     /*
@@ -136,7 +136,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
      */
     @Override
     public void setId(String id) {
-	this.id = id;
+        this.id = id;
     }
 
     /*
@@ -146,7 +146,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
      */
     @Override
     public boolean isDisabled() {
-	return this.disabled;
+        return this.disabled;
     }
 
     /*
@@ -156,7 +156,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
      */
     @Override
     public void setDisabled(boolean value) {
-	this.disabled = value;
+        this.disabled = value;
     }
 
     /*
@@ -166,7 +166,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
      */
     @Override
     public String getName() {
-	return this.name;
+        return this.name;
     }
 
     /*
@@ -176,7 +176,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
      */
     @Override
     public void setName(String name) {
-	this.name = name;
+        this.name = name;
     }
 
     /*
@@ -186,7 +186,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
      */
     @Override
     public String getDescription() {
-	return this.description;
+        return this.description;
     }
 
     /*
@@ -197,7 +197,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
      */
     @Override
     public void setDescription(String description) {
-	this.description = description;
+        this.description = description;
     }
 
     /*
@@ -207,7 +207,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
      */
     @Override
     public Map<String, Object> getAttributes() {
-	return attributes;
+        return attributes;
     }
 
     /*
@@ -217,15 +217,15 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
      */
     @Override
     public Map<String, Object> getAttributes(Set<String> keys) {
-	Map<String, Object> attributes = getAttributes();
-	if (keys != null) {
-	    for (String key : attributes.keySet()) {
-		if (!keys.contains(key)) {
-		    attributes.remove(key);
-		}
-	    }
-	}
-	return attributes;
+        Map<String, Object> attributes = getAttributes();
+        if (keys != null) {
+            for (String key : attributes.keySet()) {
+                if (!keys.contains(key)) {
+                    attributes.remove(key);
+                }
+            }
+        }
+        return attributes;
     }
 
     /*
@@ -237,7 +237,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
      */
     @Override
     public void setAttribute(String name, Object value) {
-	updateAttribute(name, value, false);
+        updateAttribute(name, value, false);
     }
 
     /*
@@ -247,11 +247,11 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
      */
     @Override
     public void setAttributes(Map<String, Object> attributes) {
-	if (attributes != null) {
-	    for (String key : attributes.keySet()) {
-		setAttribute(key, attributes.get(key));
-	    }
-	}
+        if (attributes != null) {
+            for (String key : attributes.keySet()) {
+                setAttribute(key, attributes.get(key));
+            }
+        }
     }
 
     /*
@@ -262,7 +262,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
      */
     @Override
     public void removeAttribute(String name) {
-	updateAttribute(name, null, false);
+        updateAttribute(name, null, false);
     }
 
     /*
@@ -272,62 +272,88 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
      */
     @Override
     public Set<String> getReadOnlyAttributeKeys() {
-	return readOnlyAttributeKeys;
+        return readOnlyAttributeKeys;
     }
 
     protected void setReadOnlyAttribute(String name, Object value) {
-	updateAttribute(name, value, true);
+        updateAttribute(name, value, true);
     }
 
     private void updateAttribute(String name, Object value, boolean readOnly) {
-	checkNotNull(name);
-	if (!readOnly && (readOnlyAttributeKeys != null && readOnlyAttributeKeys.contains(name))) {
-	    log.warn(String.format("Cannot update read-only attribute %s", name));
-	    return;
-	}
-	if (readOnly && (readOnlyAttributeKeys != null && readOnlyAttributeKeys.contains(name)) || !readOnly) {
-	    if (name != null && !name.isEmpty()) {
-		// if (this.attributes == null) {
-		// this.attributes = newHashMap();
-		// }
-		if (value != null) {
-		    this.attributes.put(name, value);
-		} else {
-		    this.attributes.remove(name);
-		}
-	    }
-	}
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-	if (obj == this) {
-	    return true;
-	}
-	if (obj == null || obj.getClass() != this.getClass()) {
-	    return false;
-	}
-
-	ItemBaseImpl obj2 = (ItemBaseImpl) obj;
-	return (disabled == obj2.isDisabled()) && (id == obj2.getId() || (id != null && id.equals(obj2.getId())))
-	        && (name == obj2.getName() || (name != null && name.equals(obj2.getName())))
-	        && (description == obj2.getDescription() || (description != null && description.equals(obj2.getDescription())));
+        checkNotNull(name);
+        if (!readOnly && (readOnlyAttributeKeys != null && readOnlyAttributeKeys.contains(name))) {
+            log.warn(String.format("Cannot update read-only attribute %s", name));
+            return;
+        }
+        if (readOnly && (readOnlyAttributeKeys != null && readOnlyAttributeKeys.contains(name)) || !readOnly) {
+            if (name != null && !name.isEmpty()) {
+                // if (this.attributes == null) {
+                // this.attributes = newHashMap();
+                // }
+                if (value != null) {
+                    this.attributes.put(name, value);
+                } else {
+                    this.attributes.remove(name);
+                }
+            }
+        }
     }
 
     @Override
     public int hashCode() {
-	final int prime = 31;
-	int result = 1;
-	result = prime * result + ((id == null) ? 0 : id.hashCode());
-	result = prime * result + ((name == null) ? 0 : name.hashCode());
-	result = prime * result + ((description == null) ? 0 : description.hashCode());
-	result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
-	return result;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((attributes == null) ? 0 : attributes.hashCode());
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + (disabled ? 1231 : 1237);
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((readOnlyAttributeKeys == null) ? 0 : readOnlyAttributeKeys.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ItemBaseImpl other = (ItemBaseImpl) obj;
+        if (attributes == null) {
+            if (other.attributes != null)
+                return false;
+        } else if (!attributes.equals(other.attributes))
+            return false;
+        if (description == null) {
+            if (other.description != null)
+                return false;
+        } else if (!description.equals(other.description))
+            return false;
+        if (disabled != other.disabled)
+            return false;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        if (readOnlyAttributeKeys == null) {
+            if (other.readOnlyAttributeKeys != null)
+                return false;
+        } else if (!readOnlyAttributeKeys.equals(other.readOnlyAttributeKeys))
+            return false;
+        return true;
     }
 
     @Override
     public String toString() {
-	return Objects.toStringHelper(this).add("id", id).add("name", name).add("description", description).add("attributes", attributes)
-	        .toString();
+        return Objects.toStringHelper(this).add("id", id).add("name", name).add("description", description).add("disabled", disabled)
+                .add("attributes", attributes).toString();
     }
 }

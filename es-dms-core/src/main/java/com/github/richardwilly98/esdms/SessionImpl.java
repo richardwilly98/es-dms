@@ -28,8 +28,8 @@ package com.github.richardwilly98.esdms;
 
 import java.util.Date;
 
-import com.github.richardwilly98.esdms.api.Session;
 import com.github.richardwilly98.esdms.api.ItemBase;
+import com.github.richardwilly98.esdms.api.Session;
 import com.google.common.base.Objects;
 
 public class SessionImpl extends ItemBaseImpl implements ItemBase, Session {
@@ -46,148 +46,201 @@ public class SessionImpl extends ItemBaseImpl implements ItemBase, Session {
 
     public static class Builder extends BuilderBase<Builder> {
 
-	private String userId;
-	private boolean active;
-	private boolean secure;
-	private Date createTime;
-	private Date lastAccessTime;
-	private long timeout;
+        private String userId;
+        private boolean active;
+        private boolean secure;
+        private Date createTime;
+        private Date lastAccessTime;
+        private long timeout;
 
-	public Builder userId(String userId) {
-	    this.userId = userId;
-	    return getThis();
-	}
+        public Builder userId(String userId) {
+            this.userId = userId;
+            return getThis();
+        }
 
-	public Builder active(boolean active) {
-	    this.active = active;
-	    return getThis();
-	}
+        public Builder active(boolean active) {
+            this.active = active;
+            return getThis();
+        }
 
-	public Builder secure(boolean secure) {
-	    this.secure = secure;
-	    return getThis();
-	}
+        public Builder secure(boolean secure) {
+            this.secure = secure;
+            return getThis();
+        }
 
-	public Builder createTime(Date createTime) {
-	    this.createTime = createTime;
-	    return getThis();
-	}
+        public Builder createTime(Date createTime) {
+            this.createTime = createTime;
+            return getThis();
+        }
 
-	public Builder lastAccessTime(Date lastAccessTime) {
-	    this.lastAccessTime = lastAccessTime;
-	    return getThis();
-	}
+        public Builder lastAccessTime(Date lastAccessTime) {
+            this.lastAccessTime = lastAccessTime;
+            return getThis();
+        }
 
-	public Builder timeout(long timeout) {
-	    this.timeout = timeout;
-	    return getThis();
-	}
+        public Builder timeout(long timeout) {
+            this.timeout = timeout;
+            return getThis();
+        }
 
-	@Override
-	protected Builder getThis() {
-	    return this;
-	}
+        @Override
+        protected Builder getThis() {
+            return this;
+        }
 
-	public SessionImpl build() {
-	    this.name = "session-" + this.id;
-	    return new SessionImpl(this);
-	}
+        public SessionImpl build() {
+            this.name = "session-" + this.id;
+            return new SessionImpl(this);
+        }
     }
 
     SessionImpl() {
-	super(null);
+        super(null);
     }
 
     protected SessionImpl(Builder builder) {
-	super(builder);
-	if (builder != null) {
-	    this.id = builder.id;
-	    this.active = builder.active;
-	    this.createTime = builder.createTime;
-	    this.lastAccessTime = builder.lastAccessTime;
-	    this.secure = builder.secure;
-	    this.timeout = builder.timeout;
-	    this.userId = builder.userId;
-	}
+        super(builder);
+        if (builder != null) {
+            this.id = builder.id;
+            this.active = builder.active;
+            this.createTime = builder.createTime;
+            this.lastAccessTime = builder.lastAccessTime;
+            this.secure = builder.secure;
+            this.timeout = builder.timeout;
+            this.userId = builder.userId;
+        }
     }
 
     public static long getSerialversionuid() {
-	return serialVersionUID;
+        return serialVersionUID;
     }
 
     @Override
     public String getId() {
-	return id;
+        return id;
     }
 
     @Override
     public void setId(String id) {
-	this.id = id;
+        this.id = id;
     }
 
     @Override
     public String getUserId() {
-	return userId;
+        return userId;
     }
 
     @Override
     public void setUserId(String userId) {
-	this.userId = userId;
+        this.userId = userId;
     }
 
     @Override
     public boolean isActive() {
-	return active;
+        return active;
     }
 
     @Override
     public void setActive(boolean active) {
-	this.active = active;
+        this.active = active;
     }
 
     @Override
     public boolean isSecure() {
-	return secure;
+        return secure;
     }
 
     @Override
     public void setSecure(boolean secure) {
-	this.secure = secure;
+        this.secure = secure;
     }
 
     @Override
     public Date getCreateTime() {
-	return createTime;
+        return createTime;
     }
 
     @Override
     public void setCreateTime(Date createTime) {
-	this.createTime = createTime;
+        this.createTime = createTime;
     }
 
     @Override
     public Date getLastAccessTime() {
-	return lastAccessTime;
+        return lastAccessTime;
     }
 
     @Override
     public void setLastAccessTime(Date lastAccessTime) {
-	this.lastAccessTime = lastAccessTime;
+        this.lastAccessTime = lastAccessTime;
     }
 
     @Override
     public long getTimeout() {
-	return timeout;
+        return timeout;
     }
 
     @Override
     public void setTimeout(long timeout) {
-	this.timeout = timeout;
+        this.timeout = timeout;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + (active ? 1231 : 1237);
+        result = prime * result + ((createTime == null) ? 0 : createTime.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((lastAccessTime == null) ? 0 : lastAccessTime.hashCode());
+        result = prime * result + (secure ? 1231 : 1237);
+        result = prime * result + (int) (timeout ^ (timeout >>> 32));
+        result = prime * result + ((userId == null) ? 0 : userId.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SessionImpl other = (SessionImpl) obj;
+        if (active != other.active)
+            return false;
+        if (createTime == null) {
+            if (other.createTime != null)
+                return false;
+        } else if (!createTime.equals(other.createTime))
+            return false;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        if (lastAccessTime == null) {
+            if (other.lastAccessTime != null)
+                return false;
+        } else if (!lastAccessTime.equals(other.lastAccessTime))
+            return false;
+        if (secure != other.secure)
+            return false;
+        if (timeout != other.timeout)
+            return false;
+        if (userId == null) {
+            if (other.userId != null)
+                return false;
+        } else if (!userId.equals(other.userId))
+            return false;
+        return true;
     }
 
     @Override
     public String toString() {
-	return Objects.toStringHelper(this).add("id", id).add("userId", userId).add("createTime", createTime).toString();
+        return Objects.toStringHelper(this).add("id", id).add("userId", userId).add("createTime", createTime).add("active", active)
+                .add("lastAccessTime", lastAccessTime).add("secure", secure).add("timeout", timeout).toString();
     }
 
 }

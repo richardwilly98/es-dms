@@ -27,6 +27,7 @@ package com.github.richardwilly98.esdms;
  */
 
 import com.github.richardwilly98.esdms.api.Person;
+import com.google.common.base.Objects;
 
 public class PersonImpl extends ItemBaseImpl implements Person {
 
@@ -103,6 +104,43 @@ public class PersonImpl extends ItemBaseImpl implements Person {
     @Override
     public void setEmail(String email) {
 	this.email = email;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((city == null) ? 0 : city.hashCode());
+        result = prime * result + ((email == null) ? 0 : email.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        PersonImpl other = (PersonImpl) obj;
+        if (city == null) {
+            if (other.city != null)
+                return false;
+        } else if (!city.equals(other.city))
+            return false;
+        if (email == null) {
+            if (other.email != null)
+                return false;
+        } else if (!email.equals(other.email))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this).add("id", id).add("name", name).add("description", description).add("disabled", disabled)
+                .add("attributes", getAttributes()).add("city", city).add("email", email).toString();
     }
 
 }

@@ -105,34 +105,43 @@ public class RatingImpl implements Rating {
     }
 
     @Override
-    public String toString() {
-	return Objects.toStringHelper(this)
-	// .add("item", itemId)
-	        .add("user", user).add("date", date).add("score", score).toString();
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((date == null) ? 0 : date.hashCode());
+        result = prime * result + score;
+        result = prime * result + ((user == null) ? 0 : user.hashCode());
+        return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj == this) {
-	    return true;
-	}
-	if (obj == null || obj.getClass() != this.getClass()) {
-	    return false;
-	}
-
-	RatingImpl obj2 = (RatingImpl) obj;
-	return (/* (itemId.equals(obj2.getItemId())) && */(user.equals(obj2.getUser())) && (date.equals(obj2.getDate()) || (score == obj2
-	        .getScore())));
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        RatingImpl other = (RatingImpl) obj;
+        if (date == null) {
+            if (other.date != null)
+                return false;
+        } else if (!date.equals(other.date))
+            return false;
+        if (score != other.score)
+            return false;
+        if (user == null) {
+            if (other.user != null)
+                return false;
+        } else if (!user.equals(other.user))
+            return false;
+        return true;
     }
 
     @Override
-    public int hashCode() {
-	final int prime = 31;
-	int result = 1;
-	result = prime * result + score;
-	// result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
-	result = prime * result + ((user == null) ? 0 : user.hashCode());
-	result = prime * result + ((date == null) ? 0 : date.hashCode());
-	return result;
+    public String toString() {
+	return Objects.toStringHelper(this)
+	        .add("user", user).add("date", date).add("score", score).toString();
     }
+
 }

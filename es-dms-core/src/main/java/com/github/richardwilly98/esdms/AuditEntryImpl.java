@@ -130,30 +130,43 @@ public class AuditEntryImpl extends ItemBaseImpl implements AuditEntry {
     }
 
     @Override
-    public boolean equals(Object obj) {
-	if (obj == this) {
-	    return true;
-	}
-	if (obj == null || obj.getClass() != this.getClass()) {
-	    return false;
-	}
-
-	AuditEntryImpl obj2 = (AuditEntryImpl) obj;
-	return (super.equals(obj) && (user == obj2.getUser() || (user != null && user.equals(obj2.getUser())))
-	        && (date == obj2.getDate() || (date != null && date.equals(obj2.getDate())))
-	        && (event == obj2.getEvent() || (event != null && event.equals(obj2.getEvent()))) && (itemId == obj2.getItemId() || (itemId != null && itemId
-	        .equals(obj2.getItemId()))));
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((date == null) ? 0 : date.hashCode());
+        result = prime * result + ((event == null) ? 0 : event.hashCode());
+        result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
+        result = prime * result + ((user == null) ? 0 : user.hashCode());
+        return result;
     }
 
     @Override
-    public int hashCode() {
-	final int prime = 31;
-	int result = super.hashCode();
-	result = prime * result + ((user == null) ? 0 : user.hashCode());
-	result = prime * result + ((date == null) ? 0 : date.hashCode());
-	result = prime * result + ((event == null) ? 0 : event.hashCode());
-	result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
-	return result;
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        AuditEntryImpl other = (AuditEntryImpl) obj;
+        if (date == null) {
+            if (other.date != null)
+                return false;
+        } else if (!date.equals(other.date))
+            return false;
+        if (event != other.event)
+            return false;
+        if (itemId == null) {
+            if (other.itemId != null)
+                return false;
+        } else if (!itemId.equals(other.itemId))
+            return false;
+        if (user == null) {
+            if (other.user != null)
+                return false;
+        } else if (!user.equals(other.user))
+            return false;
+        return true;
     }
 
     @Override
