@@ -59,6 +59,7 @@ import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
+import com.github.richardwilly98.esdms.api.Role.RoleType;
 import com.github.richardwilly98.esdms.api.Session;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.api.Version;
@@ -86,36 +87,39 @@ public class ProviderTestBase {
     final static Role readerRole = RoleService.DefaultRoles.READER.getRole();
     final static Role writerRole = RoleService.DefaultRoles.WRITER.getRole();
     final static Role collaboratorRole;
-//    final static Permission createDocumentPermission;
-//    final static Permission deleteDocumentPermission;
-//    final static Permission readDocumentPermission;
+    // final static Permission createDocumentPermission;
+    // final static Permission deleteDocumentPermission;
+    // final static Permission readDocumentPermission;
     static String adminToken;
 
     static {
-//        createDocumentPermission = new PermissionImpl.Builder().name("document:create").description("Create document").build();
+        // createDocumentPermission = new
+        // PermissionImpl.Builder().name("document:create").description("Create document").build();
         permissions.add(DocumentService.DocumentPermissions.CREATE_PERMISSION.getPermission());
 
-//        deleteDocumentPermission = new PermissionImpl.Builder().name("document:delete").description("Delete document").build();
+        // deleteDocumentPermission = new
+        // PermissionImpl.Builder().name("document:delete").description("Delete document").build();
         permissions.add(DocumentService.DocumentPermissions.DELETE_PERMISSION.getPermission());
 
-//        readDocumentPermission = new PermissionImpl.Builder().name("document:read").description("Read document").build();
+        // readDocumentPermission = new
+        // PermissionImpl.Builder().name("document:read").description("Read document").build();
         permissions.add(DocumentService.DocumentPermissions.READ_PERMISSION.getPermission());
 
-        collaboratorRole = new RoleImpl.Builder().id("collaborator").name("Collaborator")
-                .description("Collaborator").disabled(false).permissions(permissions).build();
+        collaboratorRole = new RoleImpl.Builder().id("collaborator").name("Collaborator").description("Collaborator").disabled(false)
+                .permissions(permissions).build();
         roles.add(collaboratorRole);
 
-//        readerRole = RoleService.DefaultRoles.READER.getRole();
+        // readerRole = RoleService.DefaultRoles.READER.getRole();
         roles.add(readerRole);
 
         final User user = new UserImpl.Builder().id("richard.louapre@gmail.com").name("Richard").disabled(false).city("Jersey City")
                 .password("secret".toCharArray()).email("richard.louapre@gmail.com").roles(ImmutableSet.of(readerRole)).build();
-//        user.addRole(readerRole);
+        // user.addRole(readerRole);
         users.put(user.getLogin(), user);
 
         final User user2 = new UserImpl.Builder().id("danilo.sandron@gmail.com").name("Danilo").disabled(false).city("Bankok")
                 .password("segreto".toCharArray()).email("danilo.sandron@gmail.com").roles(ImmutableSet.of(collaboratorRole)).build();
-//        user.addRole(collaboratorRole);
+        // user.addRole(collaboratorRole);
         users.put(user2.getLogin(), user2);
     }
 
@@ -328,9 +332,15 @@ public class ProviderTestBase {
     }
 
     protected Role createRole(String name, String description, boolean disabled, Set<Permission> permissions) throws ServiceException {
+        return createRole(name, description, disabled, null, permissions);
+    }
+
+    protected Role createRole(String name, String description, boolean disabled, RoleType type, Set<Permission> permissions)
+            throws ServiceException {
         log.trace("Preparing to create permission: " + name);
         Assert.assertTrue(!(name == null || name.isEmpty()));
-        Role role = new RoleImpl.Builder().id(name).name(name).description(description).disabled(disabled).permissions(permissions).build();
+        Role role = new RoleImpl.Builder().id(name).name(name).description(description).disabled(disabled).type(type)
+                .permissions(permissions).build();
         return createRole(role);
     }
 

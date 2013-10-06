@@ -49,8 +49,11 @@ public interface Role extends ItemBase {
         }
 
         public static class Constants {
+            // system role type cannot be updated or deleted
             public static final String SYSTEM = "system";
+            // user-defined role type can be used in es-dms for permissions
             public static final String USER_DEFINED = "user-defined";
+            // process role type are only used for process integration
             public static final String PROCESS = "process";
         }
 

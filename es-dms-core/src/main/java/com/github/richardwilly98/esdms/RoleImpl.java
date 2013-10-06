@@ -45,48 +45,50 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 
         private RoleType type = RoleType.USER_DEFINED;
         private Set<String> scopes;
-	private Set<Permission> permissions;
+        private Set<Permission> permissions;
 
         public Builder type(RoleType type) {
-            this.type = type;
+            if (type != null) {
+                this.type = type;
+            }
             return getThis();
         }
 
         public Builder scopes(Set<String> scopes) {
-	    this.scopes = scopes;
-	    return getThis();
-	}
+            this.scopes = scopes;
+            return getThis();
+        }
 
-	public Builder permissions(Set<Permission> permissions) {
-	    this.permissions = permissions;
-	    return getThis();
-	}
+        public Builder permissions(Set<Permission> permissions) {
+            this.permissions = permissions;
+            return getThis();
+        }
 
-	@Override
-	protected Builder getThis() {
-	    return this;
-	}
+        @Override
+        protected Builder getThis() {
+            return this;
+        }
 
-	public RoleImpl build() {
-	    return new RoleImpl(this);
-	}
+        public RoleImpl build() {
+            return new RoleImpl(this);
+        }
     }
 
     RoleImpl() {
-	super(null);
+        super(null);
     }
 
     protected RoleImpl(Builder builder) {
-	super(builder);
-	if (builder != null) {
-	    this.type = builder.type;
-	    if (builder.scopes != null) {
-	        this.scopes.addAll(builder.scopes);
-	    }
-	    if (builder.permissions != null) {
-	        this.permissions.addAll(builder.permissions);
-	    }
-	}
+        super(builder);
+        if (builder != null) {
+            this.type = builder.type;
+            if (builder.scopes != null) {
+                this.scopes.addAll(builder.scopes);
+            }
+            if (builder.permissions != null) {
+                this.permissions.addAll(builder.permissions);
+            }
+        }
     }
 
     @Override
@@ -107,7 +109,7 @@ public class RoleImpl extends ItemBaseImpl implements Role {
      */
     @Override
     public Set<String> getScopes() {
-	return scopes;
+        return scopes;
     }
 
     /*
@@ -117,9 +119,9 @@ public class RoleImpl extends ItemBaseImpl implements Role {
      */
     @Override
     public void setScopes(Set<String> scopes) {
-	if (scopes != null) {
-	    this.scopes.addAll(scopes);
-	}
+        if (scopes != null) {
+            this.scopes.addAll(scopes);
+        }
     }
 
     /*
@@ -129,9 +131,9 @@ public class RoleImpl extends ItemBaseImpl implements Role {
      */
     @Override
     public void addScope(String scope) {
-	if (!scopes.contains(scope)) {
-	    scopes.add(scope);
-	}
+        if (!scopes.contains(scope)) {
+            scopes.add(scope);
+        }
     }
 
     /*
@@ -141,9 +143,9 @@ public class RoleImpl extends ItemBaseImpl implements Role {
      */
     @Override
     public void removeScope(String scope) {
-	if (scopes.contains(scope)) {
-	    this.scopes.remove(scope);
-	}
+        if (scopes.contains(scope)) {
+            this.scopes.remove(scope);
+        }
     }
 
     // end of methods on scopes
@@ -156,7 +158,7 @@ public class RoleImpl extends ItemBaseImpl implements Role {
      */
     @Override
     public Set<Permission> getPermissions() {
-	return permissions;
+        return permissions;
     }
 
     /*
@@ -166,9 +168,9 @@ public class RoleImpl extends ItemBaseImpl implements Role {
      */
     @Override
     public void setPermissions(Set<Permission> permissions) {
-	if (permissions != null) {
-	    this.permissions.addAll(permissions);
-	}
+        if (permissions != null) {
+            this.permissions.addAll(permissions);
+        }
     }
 
     /*
@@ -180,12 +182,12 @@ public class RoleImpl extends ItemBaseImpl implements Role {
      */
     @Override
     public void addPermission(Permission permission) {
-	if (permission == null) {
-	    return;
-	}
-	if (!this.permissions.contains(permission)) {
-	    permissions.add(permission);
-	}
+        if (permission == null) {
+            return;
+        }
+        if (!this.permissions.contains(permission)) {
+            permissions.add(permission);
+        }
     }
 
     /*

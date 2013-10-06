@@ -26,6 +26,9 @@ package com.github.richardwilly98.esdms.services;
  * #L%
  */
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -33,6 +36,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.client.Client;
 
 import com.github.richardwilly98.esdms.api.Role;
+import com.github.richardwilly98.esdms.api.Role.RoleType;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
 @Singleton
@@ -61,9 +65,19 @@ public class RoleProvider extends ProviderBase<Role> implements RoleService {
 	return super.create(item);
     }
 
+    @RequiresPermissions(RolePermissions.Constants.ROLE_EDIT)
+    @Override
+    public Role update(Role item) throws ServiceException {
+        checkNotNull(item, "item is null");
+        checkArgument(item.getType() != RoleType.SYSTEM, String.format("Cannot update role %s with type %s", item.getId(), RoleType.SYSTEM));
+        return super.update(item);
+    }
+    
     @RequiresPermissions(RolePermissions.Constants.ROLE_DELETE)
     @Override
     public void delete(Role item) throws ServiceException {
+        checkNotNull(item, "item is null");
+        checkArgument(item.getType() != RoleType.SYSTEM, String.format("Cannot delete role %s with type %s", item.getId(), RoleType.SYSTEM));
 	super.delete(item);
     }
 
