@@ -211,7 +211,7 @@ public class RoleProviderTest extends ProviderTestBase {
         permissions.add(createPermission("content:add", "content:add", true));
         permissions.add(createPermission("content:remove", "content:remove", true));
         permissions.add(createPermission("profile:todelete", "profile:todelete", true));
-        testCreateRole("Writer", "writer", permissions, false);
+        testCreateRole("dummy-writer", "Dummy-Writer", permissions, false);
 
         permissions.add(createPermission("user:add", "user:add", true));
         permissions.add(createPermission("user:remove", "user:remove", true));
@@ -248,8 +248,8 @@ public class RoleProviderTest extends ProviderTestBase {
         for (Role r : roles)
             log.info(r.getId());
 
-        log.info("Obtaining role: writer");
-        role = roleService.get("writer");
+        log.info("Obtaining role: dummy-writer");
+        role = roleService.get("dummy-writer");
         Assert.assertNotNull(role);
 
         log.info("Deleting role: " + role.getId());
