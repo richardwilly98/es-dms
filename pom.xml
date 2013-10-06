@@ -28,6 +28,9 @@
 		<slf4j.version>1.7.5</slf4j.version>
 		<mycila.version>2.9.ga</mycila.version>
 		<jackson.version>2.2.2</jackson.version>
+		
+		<!-- Maven plugins versions -->
+		<maven.surefire.version>2.12.3</maven.surefire.version>
 	</properties>
 
 	<profiles>
@@ -115,6 +118,9 @@
 		<module>es-dms-site</module>
 		<module>es-dms-service</module>
 		<module>es-dms-core</module>
+		<module>es-dms-rest-client</module>
+		<module>activiti/es-dms-activiti-authentication</module>
+		<module>activiti/es-dms-activiti-rest-client</module>
 	</modules>
 	<build>
 		<plugins>
