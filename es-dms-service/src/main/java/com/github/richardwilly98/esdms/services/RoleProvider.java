@@ -32,8 +32,6 @@ import javax.inject.Singleton;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.client.Client;
 
-import com.github.richardwilly98.esdms.PermissionImpl;
-import com.github.richardwilly98.esdms.RoleImpl;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
@@ -50,42 +48,44 @@ public class RoleProvider extends ProviderBase<Role> implements RoleService {
     @Override
     protected void loadInitialData() throws ServiceException {
 
-	Role role = new RoleImpl.Builder().id(READER_ROLE_ID).name(READER_ROLE_NAME).build();
-	role.addPermission(new PermissionImpl.Builder().id(DocumentService.READ_PERMISSION).name(DocumentService.READ_PERMISSION).build());
-	super.create(role);
+//	Role role = new RoleImpl.Builder().id(READER_ROLE_ID).name(READER_ROLE_NAME).build();
+//	role.addPermission(new PermissionImpl.Builder().id(DocumentService.READ_PERMISSION).name(DocumentService.READ_PERMISSION).build());
+	create(RoleService.DefaultRoles.READER.getRole());
+	
+//	role = new RoleImpl.Builder().id(WRITER_ROLE_ID).name(WRITER_ROLE_NAME).build();
+//	role.addPermission(new PermissionImpl.Builder().id(DocumentService.READ_PERMISSION).name(DocumentService.READ_PERMISSION).build());
+//	role.addPermission(new PermissionImpl.Builder().id(DocumentService.EDIT_PERMISSION).name(DocumentService.EDIT_PERMISSION).build());
+//	role.addPermission(new PermissionImpl.Builder().id(DocumentService.CREATE_PERMISSION).name(DocumentService.CREATE_PERMISSION)
+//	        .build());
+//	role.addPermission(new PermissionImpl.Builder().id(DocumentService.DELETE_PERMISSION).name(DocumentService.DELETE_PERMISSION)
+//	        .build());
+	create(RoleService.DefaultRoles.WRITER.getRole());
 
-	role = new RoleImpl.Builder().id(WRITER_ROLE_ID).name(WRITER_ROLE_NAME).build();
-	role.addPermission(new PermissionImpl.Builder().id(DocumentService.READ_PERMISSION).name(DocumentService.READ_PERMISSION).build());
-	role.addPermission(new PermissionImpl.Builder().id(DocumentService.EDIT_PERMISSION).name(DocumentService.EDIT_PERMISSION).build());
-	role.addPermission(new PermissionImpl.Builder().id(DocumentService.CREATE_PERMISSION).name(DocumentService.CREATE_PERMISSION)
-	        .build());
-	role.addPermission(new PermissionImpl.Builder().id(DocumentService.DELETE_PERMISSION).name(DocumentService.DELETE_PERMISSION)
-	        .build());
-	super.create(role);
-
-	role = new RoleImpl.Builder().id(ADMINISTRATOR_ROLE_ID).name(ADMINISTRATOR_ROLE_NAME).build();
-	role.addPermission(new PermissionImpl.Builder().id(DocumentService.READ_PERMISSION).name(DocumentService.READ_PERMISSION).build());
-	role.addPermission(new PermissionImpl.Builder().id(DocumentService.EDIT_PERMISSION).name(DocumentService.EDIT_PERMISSION).build());
-	role.addPermission(new PermissionImpl.Builder().id(DocumentService.CREATE_PERMISSION).name(DocumentService.CREATE_PERMISSION)
-	        .build());
-	role.addPermission(new PermissionImpl.Builder().id(DocumentService.DELETE_PERMISSION).name(DocumentService.DELETE_PERMISSION)
-	        .build());
-	role.addPermission(new PermissionImpl.Builder().id(UserService.EDIT_PERMISSION).name(UserService.EDIT_PERMISSION).build());
-	role.addPermission(new PermissionImpl.Builder().id(UserService.CREATE_PERMISSION).name(UserService.CREATE_PERMISSION).build());
-	role.addPermission(new PermissionImpl.Builder().id(UserService.DELETE_PERMISSION).name(UserService.DELETE_PERMISSION).build());
-	role.addPermission(new PermissionImpl.Builder().id(RoleService.EDIT_PERMISSION).name(RoleService.EDIT_PERMISSION).build());
-	role.addPermission(new PermissionImpl.Builder().id(RoleService.CREATE_PERMISSION).name(RoleService.CREATE_PERMISSION).build());
-	role.addPermission(new PermissionImpl.Builder().id(RoleService.DELETE_PERMISSION).name(RoleService.DELETE_PERMISSION).build());
-	super.create(role);
+//	role = new RoleImpl.Builder().id(ADMINISTRATOR_ROLE_ID).name(ADMINISTRATOR_ROLE_NAME).build();
+//	role.addPermission(new PermissionImpl.Builder().id(DocumentService.READ_PERMISSION).name(DocumentService.READ_PERMISSION).build());
+//	role.addPermission(new PermissionImpl.Builder().id(DocumentService.EDIT_PERMISSION).name(DocumentService.EDIT_PERMISSION).build());
+//	role.addPermission(new PermissionImpl.Builder().id(DocumentService.CREATE_PERMISSION).name(DocumentService.CREATE_PERMISSION)
+//	        .build());
+//	role.addPermission(new PermissionImpl.Builder().id(DocumentService.DELETE_PERMISSION).name(DocumentService.DELETE_PERMISSION)
+//	        .build());
+//	role.addPermission(new PermissionImpl.Builder().id(UserService.EDIT_PERMISSION).name(UserService.EDIT_PERMISSION).build());
+//	role.addPermission(new PermissionImpl.Builder().id(UserService.CREATE_PERMISSION).name(UserService.CREATE_PERMISSION).build());
+//	role.addPermission(new PermissionImpl.Builder().id(UserService.DELETE_PERMISSION).name(UserService.DELETE_PERMISSION).build());
+//	role.addPermission(new PermissionImpl.Builder().id(RoleService.EDIT_PERMISSION).name(RoleService.EDIT_PERMISSION).build());
+//	role.addPermission(new PermissionImpl.Builder().id(RoleService.CREATE_PERMISSION).name(RoleService.CREATE_PERMISSION).build());
+//	role.addPermission(new PermissionImpl.Builder().id(RoleService.DELETE_PERMISSION).name(RoleService.DELETE_PERMISSION).build());
+	create(RoleService.DefaultRoles.ADMINISTRATOR.getRole());
+        create(RoleService.DefaultRoles.PROCESS_ADMIN.getRole());
+        create(RoleService.DefaultRoles.PROCESS_USER.getRole());
     }
 
-    @RequiresPermissions(CREATE_PERMISSION)
+    @RequiresPermissions(RolePermissions.Constants.ROLE_CREATE)
     @Override
     public Role create(Role item) throws ServiceException {
 	return super.create(item);
     }
 
-    @RequiresPermissions(DELETE_PERMISSION)
+    @RequiresPermissions(RolePermissions.Constants.ROLE_DELETE)
     @Override
     public void delete(Role item) throws ServiceException {
 	super.delete(item);

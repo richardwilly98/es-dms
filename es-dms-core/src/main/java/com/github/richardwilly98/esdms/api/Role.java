@@ -28,11 +28,49 @@ package com.github.richardwilly98.esdms.api;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.richardwilly98.esdms.RoleImpl;
 
 @JsonDeserialize(as = RoleImpl.class)
 public interface Role extends ItemBase {
+
+    public enum RoleType {
+        SYSTEM(Constants.SYSTEM), USER_DEFINED(Constants.USER_DEFINED), PROCESS(Constants.PROCESS);
+
+        private String type;
+
+        RoleType(String type) {
+            this.type = type;
+        }
+
+        public String getType() {
+            return this.type;
+        }
+
+        public static class Constants {
+            public static final String SYSTEM = "system";
+            public static final String USER_DEFINED = "user-defined";
+            public static final String PROCESS = "process";
+        }
+
+        @JsonValue
+        public static RoleType fromValue(String value) {
+            switch (value) {
+            case Constants.SYSTEM:
+                return RoleType.SYSTEM;
+            case Constants.USER_DEFINED:
+                return RoleType.USER_DEFINED;
+            case Constants.PROCESS:
+                return RoleType.PROCESS;
+            }
+            throw new IllegalArgumentException("Invalid role type: " + value);
+        }
+    }
+
+    public abstract RoleType getType();
+
+    public abstract void setType(RoleType type);
 
     // methods on scope
     public abstract Set<String> getScopes();

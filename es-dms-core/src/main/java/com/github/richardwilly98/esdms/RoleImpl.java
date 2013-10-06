@@ -32,19 +32,27 @@ import java.util.Set;
 
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
+import com.google.common.base.Objects;
 
 public class RoleImpl extends ItemBaseImpl implements Role {
 
     private static final long serialVersionUID = 1L;
+    private RoleType type;
     private final Set<String> scopes = newHashSet();
     private final Set<Permission> permissions = newHashSet();
 
     public static class Builder extends BuilderBase<Builder> {
 
-	private Set<String> scopes;
+        private RoleType type = RoleType.USER_DEFINED;
+        private Set<String> scopes;
 	private Set<Permission> permissions;
 
-	public Builder scopes(Set<String> scopes) {
+        public Builder type(RoleType type) {
+            this.type = type;
+            return getThis();
+        }
+
+        public Builder scopes(Set<String> scopes) {
 	    this.scopes = scopes;
 	    return getThis();
 	}
@@ -71,17 +79,24 @@ public class RoleImpl extends ItemBaseImpl implements Role {
     protected RoleImpl(Builder builder) {
 	super(builder);
 	if (builder != null) {
+	    this.type = builder.type;
 	    if (builder.scopes != null) {
-		for (String scope : builder.scopes) {
-		    this.scopes.add(scope);
-		}
+	        this.scopes.addAll(builder.scopes);
 	    }
 	    if (builder.permissions != null) {
-		for (Permission permission : builder.permissions) {
-		    this.permissions.add(permission);
-		}
+	        this.permissions.addAll(builder.permissions);
 	    }
 	}
+    }
+
+    @Override
+    public RoleType getType() {
+        return type;
+    }
+
+    @Override
+    public void setType(RoleType type) {
+        this.type = type;
     }
 
     // methods on scope
@@ -173,25 +188,6 @@ public class RoleImpl extends ItemBaseImpl implements Role {
 	}
     }
 
-    @Override
-    public boolean equals(Object role) {
-	if (role != null && role instanceof Role) {
-	    if (((Role) role).getId().equals(id)) {
-		return true;
-	    }
-	}
-	return super.equals(role);
-    }
-
-    @Override
-    public int hashCode() {
-	final int prime = 31;
-	int result = super.hashCode();
-	result = prime * result + ((scopes == null) ? 0 : scopes.hashCode());
-	result = prime * result + ((permissions == null) ? 0 : permissions.hashCode());
-	return result;
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -200,12 +196,51 @@ public class RoleImpl extends ItemBaseImpl implements Role {
      */
     @Override
     public void removePermission(Permission permission) {
-	if (permission == null) {
-	    return;
-	}
-	if (permissions.contains(permission)) {
-	    permissions.remove(permission);
-	}
+        if (permission == null) {
+            return;
+        }
+        if (permissions.contains(permission)) {
+            permissions.remove(permission);
+        }
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        RoleImpl other = (RoleImpl) obj;
+        if (permissions == null) {
+            if (other.permissions != null)
+                return false;
+        } else if (!permissions.equals(other.permissions))
+            return false;
+        if (scopes == null) {
+            if (other.scopes != null)
+                return false;
+        } else if (!scopes.equals(other.scopes))
+            return false;
+        if (type != other.type)
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((permissions == null) ? 0 : permissions.hashCode());
+        result = prime * result + ((scopes == null) ? 0 : scopes.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this).add("id", id).add("name", name).add("description", description)
+                .add("attributes", getAttributes()).add("type", type).add("scopes", scopes).add("permissions", permissions).toString();
+    }
 }
