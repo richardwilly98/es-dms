@@ -114,8 +114,8 @@ public class RatingProvider implements RatingService {
 	}
     }
 
+    @RequiresPermissions(DocumentService.DocumentPermissions.Constants.DOCUMENT_EDIT)
     @Override
-    @RequiresPermissions(DocumentService.CREATE_PERMISSION)
     public Rating create(String itemId, int score) throws ServiceException {
 	try {
 	    if (log.isTraceEnabled()) {
@@ -150,6 +150,7 @@ public class RatingProvider implements RatingService {
 	}
     }
 
+    @RequiresPermissions(DocumentService.DocumentPermissions.Constants.DOCUMENT_EDIT)
     @Override
     public Rating update(String itemId, int score) throws ServiceException {
 	if (log.isTraceEnabled()) {
@@ -158,6 +159,7 @@ public class RatingProvider implements RatingService {
 	return create(itemId, score);
     }
 
+    @RequiresPermissions(DocumentService.DocumentPermissions.Constants.DOCUMENT_EDIT)
     @Override
     public void delete(String itemId, Rating rating) throws ServiceException {
 	try {

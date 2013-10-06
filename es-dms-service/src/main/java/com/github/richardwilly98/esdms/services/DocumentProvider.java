@@ -143,7 +143,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 	}
     }
 
-    @RequiresPermissions(CREATE_PERMISSION)
+    @RequiresPermissions(DocumentService.DocumentPermissions.Constants.DOCUMENT_CREATE)
     @Override
     public Document create(Document item) throws ServiceException {
 	SimpleDocument sd = getSimpleDocument(item);
@@ -152,7 +152,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 	return super.create(sd);
     }
 
-    @RequiresPermissions(DELETE_PERMISSION)
+    @RequiresPermissions(DocumentService.DocumentPermissions.Constants.DOCUMENT_DELETE)
     @Override
     public void delete(Document item) throws ServiceException {
 
@@ -186,19 +186,13 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
     protected SearchResult<Document> getSearchResult(SearchResponse searchResponse, int first, int pageSize) throws ServiceException {
 	log.trace("*** getSearchResult ***");
 	try {
-	    // log.debug("searchResponse: " + searchResponse.toString());
-//	    Stopwatch watch = new Stopwatch();
-//	    watch.start();
+//	    Stopwatch watch = Stopwatch.createStarted();
 	    Set<Document> items = newHashSet();
 	    long totalHits = searchResponse.getHits().totalHits();
 	    long elapsedTime = searchResponse.getTookInMillis();
 	    for (SearchHit hit : searchResponse.getHits().hits()) {
 		String json = convertFieldAsString(hit, "document");
 		Document item = mapper.readValue(json, Document.class);
-		// Version currentVersion = item.getCurrentVersion();
-		// if (currentVersion != null) {
-		// currentVersion.getFile().setContent(null);
-		// }
 		items.add(item);
 	    }
 	    SearchResult<Document> searchResult = new SearchResultImpl.Builder<Document>().totalHits(totalHits).elapsedTime(elapsedTime)

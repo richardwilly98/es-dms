@@ -37,10 +37,14 @@ import com.google.common.collect.ImmutableSet;
 public interface UserService extends BaseService<User> {
 
     public enum DefaultUsers {
-        ADMINISTRATOR(new UserImpl.Builder().id(DEFAULT_ADMIN_LOGIN)
-                .name(DEFAULT_ADMIN_LOGIN).description(DEFAULT_ADMIN_DESCRIPTION).email(DEFAULT_ADMIN_LOGIN)
+        ADMINISTRATOR(new UserImpl.Builder()
+                .id(DEFAULT_ADMIN_LOGIN)
+                .name(DEFAULT_ADMIN_LOGIN)
+                .description(DEFAULT_ADMIN_DESCRIPTION)
+                .email(DEFAULT_ADMIN_LOGIN)
                 .password(DEFAULT_ADMIN_PASSWORD.toCharArray())
-                .roles(newHashSet(ImmutableSet.of(RoleService.DefaultRoles.ADMINISTRATOR.getRole()))).build());
+                .roles(newHashSet(ImmutableSet.of(RoleService.DefaultRoles.ADMINISTRATOR.getRole(),
+                        RoleService.DefaultRoles.PROCESS_ADMIN.getRole()))).build());
 
         private final User user;
 

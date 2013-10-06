@@ -54,8 +54,7 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 
     @Override
     protected void loadInitialData() throws ServiceException {
-        User adminUser = UserService.DefaultUsers.ADMINISTRATOR.getUser();
-        create(adminUser);
+        create(UserService.DefaultUsers.ADMINISTRATOR.getUser());
     }
 
     @Override

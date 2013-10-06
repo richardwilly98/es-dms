@@ -31,7 +31,6 @@ import javax.inject.Singleton;
 
 import org.elasticsearch.client.Client;
 
-import com.github.richardwilly98.esdms.PermissionImpl;
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
@@ -47,16 +46,16 @@ public class PermissionProvider extends ProviderBase<Permission> implements Perm
 
     @Override
     protected void loadInitialData() throws ServiceException {
-	create(new PermissionImpl.Builder().name(DocumentService.CREATE_PERMISSION).build());
-	create(new PermissionImpl.Builder().name(DocumentService.DELETE_PERMISSION).build());
-	create(new PermissionImpl.Builder().name(DocumentService.EDIT_PERMISSION).build());
-	create(new PermissionImpl.Builder().name(DocumentService.READ_PERMISSION).build());
-	create(new PermissionImpl.Builder().name(UserService.CREATE_PERMISSION).build());
-	create(new PermissionImpl.Builder().name(UserService.EDIT_PERMISSION).build());
-	create(new PermissionImpl.Builder().name(UserService.DELETE_PERMISSION).build());
-	create(new PermissionImpl.Builder().name(RoleService.CREATE_PERMISSION).build());
-	create(new PermissionImpl.Builder().name(RoleService.EDIT_PERMISSION).build());
-	create(new PermissionImpl.Builder().name(RoleService.DELETE_PERMISSION).build());
+        create(DocumentService.DocumentPermissions.CREATE_PERMISSION.getPermission());
+        create(DocumentService.DocumentPermissions.DELETE_PERMISSION.getPermission());
+        create(DocumentService.DocumentPermissions.EDIT_PERMISSION.getPermission());
+        create(DocumentService.DocumentPermissions.READ_PERMISSION.getPermission());
+        create(UserService.UserPermissions.CREATE_PERMISSION.getPermission());
+        create(UserService.UserPermissions.EDIT_PERMISSION.getPermission());
+        create(UserService.UserPermissions.DELETE_PERMISSION.getPermission());
+        create(RoleService.RolePermissions.CREATE_PERMISSION.getPermission());
+        create(RoleService.RolePermissions.EDIT_PERMISSION.getPermission());
+        create(RoleService.RolePermissions.DELETE_PERMISSION.getPermission());
     }
 
     @Override
