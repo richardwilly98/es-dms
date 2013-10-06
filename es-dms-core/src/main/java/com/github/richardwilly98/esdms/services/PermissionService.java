@@ -31,8 +31,8 @@ import com.github.richardwilly98.esdms.api.Permission;
 public interface PermissionService extends BaseService<Permission> {
 
     public enum PermissionPermissions {
-        CREATE_PERMISSION("permission:create"), EDIT_PERMISSION("permission:edit"), DELETE_PERMISSION("permission:delete"), ADD_PERMISSION(
-                "permission:add"), REMOVE_PERMISSION("permission:remove");
+        CREATE_PERMISSION(Constants.PERMISSION_CREATE), EDIT_PERMISSION(Constants.PERMISSION_EDIT), DELETE_PERMISSION(
+                Constants.PERMISSION_DELETE), ADD_PERMISSION(Constants.PERMISSION_ADD), REMOVE_PERMISSION(Constants.PERMISSION_REMOVE);
         private String id;
 
         PermissionPermissions(String id) {
@@ -41,6 +41,14 @@ public interface PermissionService extends BaseService<Permission> {
 
         public String getId() {
             return id;
+        }
+
+        public static class Constants {
+            public static final String PERMISSION_CREATE = "permission:create";
+            public static final String PERMISSION_EDIT = "permission:edit";
+            public static final String PERMISSION_DELETE = "permission:delete";
+            public static final String PERMISSION_ADD = "permission:add";
+            public static final String PERMISSION_REMOVE = "permission:remove";
         }
     }
 

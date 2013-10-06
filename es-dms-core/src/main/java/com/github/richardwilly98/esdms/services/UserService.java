@@ -44,7 +44,7 @@ public interface UserService extends BaseService<User> {
                 .email(DEFAULT_ADMIN_LOGIN)
                 .password(DEFAULT_ADMIN_PASSWORD.toCharArray())
                 .roles(newHashSet(ImmutableSet.of(RoleService.DefaultRoles.ADMINISTRATOR.getRole(),
-                        RoleService.DefaultRoles.PROCESS_ADMIN.getRole()))).build());
+                        RoleService.DefaultRoles.PROCESS_ADMINISTRATOR.getRole()))).build());
 
         private final User user;
 

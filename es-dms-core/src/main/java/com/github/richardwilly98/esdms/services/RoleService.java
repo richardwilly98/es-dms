@@ -26,6 +26,8 @@ package com.github.richardwilly98.esdms.services;
  * #L%
  */
 
+import java.util.Set;
+
 import com.github.richardwilly98.esdms.PermissionImpl;
 import com.github.richardwilly98.esdms.RoleImpl;
 import com.github.richardwilly98.esdms.api.Permission;
@@ -39,7 +41,7 @@ public interface RoleService extends BaseService<Role> {
 
     public enum DefaultRoles {
         ADMINISTRATOR(new RoleImpl.Builder()
-                .id("administrator")
+                .id(Constants.ADMINISTRATOR_ROLE_ID)
                 .name("Administrator")
                 .type(RoleType.SYSTEM)
                 .permissions(
@@ -49,19 +51,19 @@ public interface RoleService extends BaseService<Role> {
                                 UserPermissions.CREATE_PERMISSION.getPermission(), UserPermissions.DELETE_PERMISSION.getPermission(),
                                 RolePermissions.EDIT_PERMISSION.getPermission(), RolePermissions.CREATE_PERMISSION.getPermission(),
                                 RolePermissions.DELETE_PERMISSION.getPermission())).build()), WRITER(new RoleImpl.Builder()
-                .id("writer")
+                .id(Constants.WRITER_ROLE_ID)
                 .name("Writer")
                 .type(RoleType.SYSTEM)
                 .permissions(
                         ImmutableSet.of(DocumentPermissions.READ_PERMISSION.getPermission(),
                                 DocumentPermissions.EDIT_PERMISSION.getPermission(), DocumentPermissions.CREATE_PERMISSION.getPermission(),
                                 DocumentPermissions.DELETE_PERMISSION.getPermission())).build()), READER(new RoleImpl.Builder()
-                .id("reader").name("Reader").type(RoleType.SYSTEM)
+                .id(Constants.READER_ROLE_ID).name("Reader").type(RoleType.SYSTEM)
                 .permissions(ImmutableSet.of(DocumentPermissions.READ_PERMISSION.getPermission())).build()), PROCESS_USER(
-                new RoleImpl.Builder().id("process-user").name("Process User").type(RoleType.SYSTEM).build()), PROCESS_ADMIN(
-                new RoleImpl.Builder().id("process-admin").name("Process Administrator").type(RoleType.SYSTEM).build()),
+                new RoleImpl.Builder().id(Constants.PROCESS_USER_ROLE_ID).name("Process User").type(RoleType.SYSTEM).build()), PROCESS_ADMINISTRATOR(
+                new RoleImpl.Builder().id(Constants.PROCESS_ADMINISTRATOR_ROLE_ID).name("Process Administrator").type(RoleType.SYSTEM).build()),
                 DEFAULT(new RoleImpl.Builder()
-                .id("reader").name("Reader").type(RoleType.SYSTEM)
+                .id(Constants.READER_ROLE_ID).name("Reader").type(RoleType.SYSTEM)
                 .permissions(ImmutableSet.of(DocumentPermissions.READ_PERMISSION.getPermission())).build());
 
         private Role role;
@@ -73,7 +75,18 @@ public interface RoleService extends BaseService<Role> {
         public Role getRole() {
             return role;
         }
+        
+        public static class Constants {
+            public static final String ADMINISTRATOR_ROLE_ID = "administrator";
+            public static final String WRITER_ROLE_ID = "writer";
+            public static final String READER_ROLE_ID = "reader";
+            public static final String PROCESS_USER_ROLE_ID = "process-user";
+            public static final String PROCESS_ADMINISTRATOR_ROLE_ID = "process-admin";
+        }
     }
+    
+    // List of system roles
+    public static final Set<Role> SystemRoles = ImmutableSet.of(DefaultRoles.ADMINISTRATOR.getRole(), DefaultRoles.PROCESS_ADMINISTRATOR.getRole());
 
     public enum RolePermissions {
         CREATE_PERMISSION(new PermissionImpl.Builder().id(Constants.ROLE_CREATE).build()), EDIT_PERMISSION(new PermissionImpl.Builder().id(

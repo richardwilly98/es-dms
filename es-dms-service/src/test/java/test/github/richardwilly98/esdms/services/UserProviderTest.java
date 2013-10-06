@@ -35,6 +35,7 @@ import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.services.RoleService;
+import com.github.richardwilly98.esdms.services.UserService;
 
 public class UserProviderTest extends ProviderTestBase {
 
@@ -62,6 +63,48 @@ public class UserProviderTest extends ProviderTestBase {
 	loginAdminUser();
 	testCreateUser("Richard", "Lead developer", false, "richard@pippo.pippo", "qwerty".toCharArray(), null);
 	testCreateUser("Danilo", "Mezza calzetta", true, "danilo@pippo.pippo", "123456".toCharArray(), null);
+    }
+
+    @Test
+    public void testCannotDeleteAdmin() throws Throwable {
+        log.info("Start testCannotDeleteAdmin");
+
+        // Make sure to be login with user having sufficient permission
+        loginAdminUser();
+        try {
+            User adminUser = userService.get(UserService.DEFAULT_ADMIN_LOGIN);
+            Assert.assertNotNull(adminUser);
+            userService.delete(adminUser);
+            Assert.fail("Must not be able to delete admin user");
+        } catch(IllegalArgumentException ex) {
+            
+        }
+    }
+
+    @Test
+    public void testCannotRemoveSystemRolesFromAdmin() throws Throwable {
+        log.info("Start testCannotRemoveSystemRolesFromAdmin");
+
+        // Make sure to be login with user having sufficient permission
+        loginAdminUser();
+        User adminUser = userService.get(UserService.DEFAULT_ADMIN_LOGIN);
+        Assert.assertNotNull(adminUser);
+        try {
+            Assert.assertTrue(adminUser.getRoles().contains(RoleService.DefaultRoles.ADMINISTRATOR.getRole()));
+            adminUser.removeRole(RoleService.DefaultRoles.ADMINISTRATOR.getRole());
+            userService.update(adminUser);
+            Assert.fail("Must not be able to remove " + RoleService.DefaultRoles.Constants.ADMINISTRATOR_ROLE_ID + " from admin user");
+        } catch(IllegalArgumentException ex) {
+            
+        }
+        try {
+            Assert.assertTrue(adminUser.getRoles().contains(RoleService.DefaultRoles.PROCESS_ADMINISTRATOR.getRole()));
+            adminUser.removeRole(RoleService.DefaultRoles.PROCESS_ADMINISTRATOR.getRole());
+            userService.update(adminUser);
+            Assert.fail("Must not be able to remove " + RoleService.DefaultRoles.Constants.PROCESS_ADMINISTRATOR_ROLE_ID + " from admin user");
+        } catch(IllegalArgumentException ex) {
+            
+        }
     }
 
     @Test

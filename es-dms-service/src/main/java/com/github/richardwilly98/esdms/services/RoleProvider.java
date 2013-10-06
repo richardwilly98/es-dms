@@ -55,7 +55,7 @@ public class RoleProvider extends ProviderBase<Role> implements RoleService {
 	create(RoleService.DefaultRoles.READER.getRole());
 	create(RoleService.DefaultRoles.WRITER.getRole());
 	create(RoleService.DefaultRoles.ADMINISTRATOR.getRole());
-        create(RoleService.DefaultRoles.PROCESS_ADMIN.getRole());
+        create(RoleService.DefaultRoles.PROCESS_ADMINISTRATOR.getRole());
         create(RoleService.DefaultRoles.PROCESS_USER.getRole());
     }
 

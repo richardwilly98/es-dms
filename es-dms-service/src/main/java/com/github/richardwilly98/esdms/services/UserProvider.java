@@ -26,6 +26,8 @@ package com.github.richardwilly98.esdms.services;
  * #L%
  */
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -108,6 +110,8 @@ public class UserProvider extends ProviderBase<User> implements UserService {
     @RequiresPermissions(UserPermissions.Constants.USER_EDIT)
     @Override
     public User update(User item) throws ServiceException {
+        checkArgument(isAdminUserAndContainSystemRoles(item), String.format(
+                "Cannot update user %s. Missing required system roles", item.getId()));
         if (item.getPassword() != null) {
             String encodedHash = computeBase64Hash(item.getPassword());
             if (log.isTraceEnabled()) {
@@ -119,4 +123,24 @@ public class UserProvider extends ProviderBase<User> implements UserService {
         return super.update(item);
     }
 
+    @RequiresPermissions(UserPermissions.Constants.USER_DELETE)
+    @Override
+    public void delete(User item) throws ServiceException {
+        checkArgument(!item.getId().equals(UserService.DEFAULT_ADMIN_LOGIN), String.format("Cannot delete %s user", item.getId()));
+        super.delete(item);
+    }
+
+    private boolean isAdminUserAndContainSystemRoles(User user) {
+        if (user.getId().equals(UserService.DEFAULT_ADMIN_LOGIN)) {
+            for ( Role role : RoleService.SystemRoles) {
+                if (!user.getRoles().contains(role)) {
+                    return false;
+                }
+            }
+            return true;
+//            return !user.getRoles().contains(role);
+        } else {
+            return false;
+        }
+    }
 }
