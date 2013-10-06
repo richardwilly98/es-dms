@@ -59,4 +59,7 @@ public interface ItemBase {
 
     public abstract Set<String> getReadOnlyAttributeKeys();
 
+    public abstract byte[] getHashCode();
+
+    public abstract void setHashCode(byte[] id);
 }

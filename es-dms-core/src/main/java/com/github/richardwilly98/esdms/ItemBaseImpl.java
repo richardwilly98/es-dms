@@ -54,6 +54,7 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
     String name;
     boolean disabled;
     String description;
+    byte[] hashCode;
 
     private final Map<String, Object> attributes = newHashMap();
 
@@ -117,6 +118,16 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
         for (String key : attributes.keySet()) {
             this.attributes.put(key, attributes.get(key));
         }
+    }
+
+    @Override
+    public byte[] getHashCode() {
+        return hashCode;
+    }
+
+    @Override
+    public void setHashCode(byte[] hashCode) {
+        this.hashCode = hashCode;
     }
 
     /*
