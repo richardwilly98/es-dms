@@ -123,9 +123,7 @@ public class SearchProvider implements SearchService<Document> {
 	    throws ServiceException {
 	log.trace("*** parseSearchResult ***");
 	try {
-	    // log.debug("searchResponse: " + searchResponse.toString());
-	    Stopwatch watch = new Stopwatch();
-	    watch.start();
+	    Stopwatch watch = Stopwatch.createStarted();
 	    Set<Document> items = newHashSet();
 	    long totalHits = searchResponse.getHits().totalHits();
 	    long elapsedTime = searchResponse.getTookInMillis();
