@@ -42,6 +42,14 @@ This project contains 3 modules:
 
   This module contains the web application. It is using AngularJS as Javascript MVVM framework. REST services are provided using Jersey.
 
+4. es-dms-rest-client
+
+  This module contains a client for es-dms REST api using Jersey.
+
+5. activiti
+
+  This directory contains integration with Activiti
+
 # License #
 ```
 Copyright 2012-2013 Richard Louapre
