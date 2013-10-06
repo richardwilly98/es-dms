@@ -58,12 +58,10 @@ import com.github.richardwilly98.esdms.rest.RestDocumentService;
 import com.github.richardwilly98.esdms.rest.RestItemBaseService;
 import com.github.richardwilly98.esdms.rest.RestRatingService;
 import com.github.richardwilly98.esdms.rest.RestRatingService.RatingRequest;
-import com.github.richardwilly98.esdms.services.UserService;
+import com.github.richardwilly98.esdms.services.RoleService;
 import com.google.common.collect.ImmutableSet;
 
 public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
-    // public class TestRestDocumentService extends
-    // GuiceAndJerseyTestBase<Document> {
 
     public TestRestDocumentService() throws Exception {
 	super();
@@ -477,11 +475,11 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
             Assert.assertTrue(ratings.size() == 1);
             Assert.assertTrue(ratings.contains(rating));
 
-            User testRatingUser = createUser("test-rating-user", "secret");
+            User testRatingUser = createUser("test-rating-user-" + System.currentTimeMillis(), "secret", ImmutableSet.of(RoleService.DefaultRoles.WRITER.getRole()));
             Assert.assertNotNull(testRatingUser);
             log.debug(String.format("New test rating user created: %s", testRatingUser));
             Cookie cookie = login(new CredentialImpl.Builder().username(testRatingUser.getLogin())
-                    .password("secret").build());
+                    .password("secret".toCharArray()).build());
 
             // Create
             RestRatingService.RatingRequest ratingRequest2 = new RatingRequest();

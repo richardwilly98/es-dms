@@ -69,7 +69,7 @@ public class GuiceAndJerseyTestBase<T extends ItemBase> extends JerseyTest {
 
     final protected Logger log = Logger.getLogger(this.getClass());
     protected final static Credential adminCredential = new CredentialImpl.Builder().username(UserService.DEFAULT_ADMIN_LOGIN)
-	    .password(UserService.DEFAULT_ADMIN_PASSWORD).build();
+	    .password(UserService.DEFAULT_ADMIN_PASSWORD.toCharArray()).build();
     final static ObjectMapper mapper = new ObjectMapper();
     protected String adminToken;
     protected Cookie adminCookie;

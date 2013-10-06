@@ -29,12 +29,12 @@ package test.github.richardwilly98.esdms.rest;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.net.URI;
+import java.util.Set;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
@@ -62,6 +62,7 @@ import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.api.ItemBase;
+import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.rest.RestAuthencationService;
 import com.github.richardwilly98.esdms.rest.RestUserService;
@@ -77,7 +78,7 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
 
     protected final Logger log = Logger.getLogger(getClass());
     protected final static Credential adminCredential = new CredentialImpl.Builder().username(UserService.DEFAULT_ADMIN_LOGIN)
-	    .password(UserService.DEFAULT_ADMIN_PASSWORD).build();
+	    .password(UserService.DEFAULT_ADMIN_PASSWORD.toCharArray()).build();
     private final Server server;
     final static ObjectMapper mapper = new ObjectMapper();
     protected static String adminToken;
@@ -132,16 +133,6 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
 	if (response.getStatus() == Status.OK.getStatusCode()) {
 	    // return deserialize(response.getEntity(String.class), type);
 	    return response.readEntity(type);
-	}
-	return null;
-    }
-
-    private T deserialize(String json, Class<T> type) {
-	try {
-	    log.debug(String.format("deserialize in %s -> %s", type.getName(), json));
-	    return mapper.readValue(json, type);
-	} catch (Throwable t) {
-	    log.error("deserialize failed", t);
 	}
 	return null;
     }
@@ -309,9 +300,13 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
 	}
     }
 
-    protected UserImpl createUser(String login, String password) throws Throwable {
+    protected User createUser(String login, String password) throws Throwable {
+        return createUser(login, password, null);
+    }
+    
+    protected User createUser(String login, String password, Set<Role> roles) throws Throwable {
         log.debug(String.format("*** createUser - %s - %s ***", login, password));
-        User user = new UserImpl.Builder().id(login).name(login).email(login).password(password).build();
+        User user = new UserImpl.Builder().id(login).name(login).email(login).password(password.toCharArray()).roles(roles).build();
         String json = mapper.writeValueAsString(user);
         log.trace(json);
         Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
@@ -328,7 +323,7 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
         // response.getEntity(String.class)));
         if (response.getStatus() == Status.OK.getStatusCode()) {
             // return deserialize(response.getEntity(String.class), type);
-            return response.readEntity(UserImpl.class);
+            return response.readEntity(User.class);
         }
         return null;
     }

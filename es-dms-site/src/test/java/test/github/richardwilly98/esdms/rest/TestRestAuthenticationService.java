@@ -48,7 +48,7 @@ public class TestRestAuthenticationService extends TestRestUserService {
 	    String login = "user-" + System.currentTimeMillis();
 	    createUser(login, password);
 	    boolean rememberMe = true;
-	    Credential credential = new CredentialImpl.Builder().username(login).password(password).rememberMe(rememberMe).build();
+	    Credential credential = new CredentialImpl.Builder().username(login).password(password.toCharArray()).rememberMe(rememberMe).build();
 	    Cookie cookie = login(credential);
 	    Assert.assertNotNull(cookie);
 	    logout(cookie);
