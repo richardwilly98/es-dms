@@ -202,12 +202,6 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
     }
 
     @Override
-    public String toString() {
-	return Objects.toStringHelper(this).add("id", id).add("name", name).add("versions", versions).add("tags", tags)
-	        .add("ratings", ratings).add("description", description).add("attributes", getAttributes()).toString();
-    }
-
-    @Override
     public Set<Rating> getRatings() {
 	return ratings;
     }
@@ -223,6 +217,12 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 	if (ratings.contains(rating)) {
 	    ratings.remove(rating);
 	}
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this).add("id", id).add("name", name).add("versions", versions).add("tags", tags)
+                .add("ratings", ratings).add("description", description).add("attributes", getAttributes()).toString();
     }
 
 }
