@@ -41,6 +41,7 @@ import org.testng.annotations.Test;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.esdms.AuditEntryImpl;
+import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.FacetImpl;
 import com.github.richardwilly98.esdms.PermissionImpl;
 import com.github.richardwilly98.esdms.RoleImpl;
@@ -48,12 +49,14 @@ import com.github.richardwilly98.esdms.SearchResultImpl;
 import com.github.richardwilly98.esdms.TermImpl;
 import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.AuditEntry;
+import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.api.Facet;
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Term;
 import com.github.richardwilly98.esdms.api.User;
+import com.github.richardwilly98.esdms.services.RoleService;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -69,12 +72,28 @@ public class UserSerializationTest {
     }
 
     @Test
+    public void testSerializeDeserializeCredential() throws Throwable {
+        log.debug("*** testSerializeDeserializeCredential ***");
+        String id = "user-" + System.currentTimeMillis();
+        String name = id;
+        char[] password = "secret".toCharArray();
+        Credential credential = new CredentialImpl.Builder().password(password).username(name).rememberMe(true).build();
+        log.debug(credential);
+        String json = mapper.writeValueAsString(credential);
+        log.debug(json);
+        Assert.assertNotNull(json);
+        Credential credential2 = mapper.readValue(json, Credential.class);
+        log.debug(credential2);
+        Assert.assertEquals(credential, credential2);
+    }
+
+    @Test
     public void testSerializeDeserializeUser() throws Throwable {
 	log.debug("*** testSerializeDeserializeUser ***");
 	String id = "user-" + System.currentTimeMillis();
 	String name = id;
 	String email = id + "@gmail.com";
-	String password = "secret";
+	char[] password = "secret".toCharArray();
 	User user = new UserImpl.Builder().password(password).id(id).name(name).email(email).build();
 	log.debug(user);
 	String json = mapper.writeValueAsString(user);
@@ -144,7 +163,7 @@ public class UserSerializationTest {
     public void testSerializeDeserializeSearchResult() throws Throwable {
 	log.debug("*** testSerializeDeserializeSearchResult ***");
 	Set<User> users = newHashSet();
-	users.add(new UserImpl.Builder().password("test").id("test").name("test").email("test@test").build());
+	users.add(new UserImpl.Builder().password("test".toCharArray()).id("test").name("test").email("test@test").build());
 	long elapsedTime = 1;
 	String term = "term";
 	Set<Term> terms = newHashSet();
@@ -187,7 +206,7 @@ public class UserSerializationTest {
 	String id = "user-" + System.currentTimeMillis();
 	String name = id;
 	String email = id + "@gmail.com";
-	String password = "secret";
+	char[] password = "secret".toCharArray();
 	Role role = new RoleImpl.Builder().id("my-role").name("My role").build();
 	Set<Role> roles = newHashSet(ImmutableSet.of(role));
 	User user = new UserImpl.Builder().password(password).id(id).name(name).email(email).roles(roles).build();
@@ -201,6 +220,19 @@ public class UserSerializationTest {
 	Assert.assertEquals(user, user2);
 	Assert.assertTrue(user2.hasRole(role));
     }
+    
+    @Test
+    public void testUserBuiderWithRole() {
+        String id = "user-"+System.currentTimeMillis();
+        User user = new UserImpl.Builder().password("123456".toCharArray()).id(id)
+                .name(id).description(id).email(id)
+                .roles(ImmutableSet.of(RoleService.DefaultRoles.ADMINISTRATOR.getRole())).build();
+        Assert.assertNotNull(user);
+        Assert.assertTrue(user.hasRole(RoleService.DefaultRoles.ADMINISTRATOR.getRole()));
+        Assert.assertTrue(user.getRoles().contains(RoleService.DefaultRoles.ADMINISTRATOR.getRole()));
+        log.debug(user);
+    }
+
 
     @Test
     public void testSerializeDeserializePermission() throws Throwable {

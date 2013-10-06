@@ -26,10 +26,12 @@ package test.github.richardwilly98.esdms.services;
  * #L%
  */
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.elasticsearch.common.io.Streams.copyToBytesFromClasspath;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,12 +55,13 @@ import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.VersionImpl;
 import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.api.Document;
+import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
+import com.github.richardwilly98.esdms.api.Session;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.api.Version;
-import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.services.AuditService;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
@@ -67,6 +70,7 @@ import com.github.richardwilly98.esdms.services.PermissionService;
 import com.github.richardwilly98.esdms.services.RoleService;
 import com.github.richardwilly98.esdms.services.SearchService;
 import com.github.richardwilly98.esdms.services.UserService;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
 /*
@@ -76,47 +80,50 @@ import com.google.inject.Inject;
 public class ProviderTestBase {
 
     final protected Logger log = Logger.getLogger(this.getClass());
-    final static Credential adminCredential = new CredentialImpl.Builder().username(UserService.DEFAULT_ADMIN_LOGIN)
-	    .password(UserService.DEFAULT_ADMIN_PASSWORD).build();
     final static Map<String, User> users = newHashMap();
     final static Set<Permission> permissions = newHashSet();
     final static Set<Role> roles = newHashSet();
+    final static Role readerRole = RoleService.DefaultRoles.READER.getRole();
+    final static Role writerRole = RoleService.DefaultRoles.WRITER.getRole();
+    final static Role collaboratorRole;
+//    final static Permission createDocumentPermission;
+//    final static Permission deleteDocumentPermission;
+//    final static Permission readDocumentPermission;
     static String adminToken;
 
     static {
-	Permission permissionCreateDocument = new PermissionImpl.Builder().name("document:create").description("Create document").build();
-	permissions.add(permissionCreateDocument);
+//        createDocumentPermission = new PermissionImpl.Builder().name("document:create").description("Create document").build();
+        permissions.add(DocumentService.DocumentPermissions.CREATE_PERMISSION.getPermission());
 
-	Permission permissionDeleteDocument = new PermissionImpl.Builder().name("document:delete").description("Delete document").build();
-	permissions.add(permissionDeleteDocument);
+//        deleteDocumentPermission = new PermissionImpl.Builder().name("document:delete").description("Delete document").build();
+        permissions.add(DocumentService.DocumentPermissions.DELETE_PERMISSION.getPermission());
 
-	Permission permissionReadDocument = new PermissionImpl.Builder().name("document:read").description("Read document").build();
-	permissions.add(permissionReadDocument);
+//        readDocumentPermission = new PermissionImpl.Builder().name("document:read").description("Read document").build();
+        permissions.add(DocumentService.DocumentPermissions.READ_PERMISSION.getPermission());
 
-	Role collaboratorRole = new RoleImpl.Builder().permissions(permissions).id("collaborator").name("Collaborator")
-	        .description("Collaborator").disabled(false).build();
-	roles.add(collaboratorRole);
+        collaboratorRole = new RoleImpl.Builder().id("collaborator").name("Collaborator")
+                .description("Collaborator").disabled(false).permissions(permissions).build();
+        roles.add(collaboratorRole);
 
-	Set<Permission> ps = newHashSet(permissionReadDocument);
-	Role readerRole = new RoleImpl.Builder().permissions(ps).id("reader").name("Reader").description("Reader").disabled(false).build();
-	roles.add(readerRole);
+//        readerRole = RoleService.DefaultRoles.READER.getRole();
+        roles.add(readerRole);
 
-	User user = new UserImpl.Builder().id("richard.louapre@gmail.com").name("Richard").disabled(false).city("Jersey City")
-	        .password("secret").email("richard.louapre@gmail.com").build();
-	user.addRole(readerRole);
-	users.put(user.getLogin(), user);
+        final User user = new UserImpl.Builder().id("richard.louapre@gmail.com").name("Richard").disabled(false).city("Jersey City")
+                .password("secret".toCharArray()).email("richard.louapre@gmail.com").roles(ImmutableSet.of(readerRole)).build();
+//        user.addRole(readerRole);
+        users.put(user.getLogin(), user);
 
-	user = new UserImpl.Builder().id("danilo.sandron@gmail.com").name("Danilo").disabled(false).city("Bankok").password("segreto")
-	        .email("danilo.sandron@gmail.com").build();
-	user.addRole(collaboratorRole);
-	users.put(user.getLogin(), user);
+        final User user2 = new UserImpl.Builder().id("danilo.sandron@gmail.com").name("Danilo").disabled(false).city("Bankok")
+                .password("segreto".toCharArray()).email("danilo.sandron@gmail.com").roles(ImmutableSet.of(collaboratorRole)).build();
+//        user.addRole(collaboratorRole);
+        users.put(user2.getLogin(), user2);
     }
 
     @Inject
     Client client;
 
     @Inject
-    AuthenticationService authenticationService;
+    private AuthenticationService authenticationService;
 
     @Inject
     AuditService auditService;
@@ -138,150 +145,209 @@ public class ProviderTestBase {
 
     @BeforeSuite
     public void beforeSuite() {
-	log.info("** beforeSuite **");
-	loginAdminUser();
-	createPermissions();
-	createRoles();
-	createUsers();
+        log.info("** beforeSuite **");
+        loginAdminUser();
+        createPermissions();
+        createRoles();
+        createUsers();
     }
 
     @AfterSuite
     public void tearDownSuite() throws Exception {
-	log.info("*** tearDownSuite ***");
-	tearDownElasticsearch();
+        log.info("*** tearDownSuite ***");
+        tearDownElasticsearch();
     }
 
     private void tearDownElasticsearch() throws Exception {
-	log.info("*** tearDownElasticsearch ***");
-	client.admin().indices().prepareDelete().execute().actionGet();
-	client.close();
+        log.info("*** tearDownElasticsearch ***");
+        client.admin().indices().prepareDelete().execute().actionGet();
+        client.close();
     }
 
     protected void loginAdminUser() {
-	try {
-	    adminToken = authenticationService.login(adminCredential);
-	} catch (ServiceException ex) {
-	    log.error("loginAdminUser failed", ex);
-	    Assert.fail("loginAdminUser failed", ex);
-	}
+        try {
+            adminToken = authenticationService.login(new CredentialImpl.Builder().username(UserService.DEFAULT_ADMIN_LOGIN)
+                    .password(UserService.DEFAULT_ADMIN_PASSWORD.toCharArray()).build());
+        } catch (ServiceException ex) {
+            log.error("loginAdminUser failed", ex);
+            Assert.fail("loginAdminUser failed", ex);
+        }
+    }
+
+    protected String login(User user) {
+        try {
+            checkNotNull(user);
+            // Must generate a copy of password char[]. It will be reset to null
+            // by Shiro
+            Credential credential = new CredentialImpl.Builder().password(Arrays.copyOf(user.getPassword(), user.getPassword().length))
+                    .username(user.getLogin()).build();
+            return authenticationService.login(credential);
+        } catch (ServiceException ex) {
+            log.error("login failed", ex);
+            Assert.fail("login failed", ex);
+        }
+        return null;
+    }
+
+    protected Session getSession(String token) {
+        checkNotNull(token);
+        try {
+            return authenticationService.get(token);
+        } catch (ServiceException ex) {
+            log.error("getSession failed", ex);
+            Assert.fail("getSession failed", ex);
+        }
+        return null;
+    }
+
+    protected boolean hasRole(String token, Role role) {
+        checkNotNull(token);
+        checkNotNull(role);
+        try {
+            return authenticationService.hasRole(token, role.getId());
+        } catch (ServiceException ex) {
+            log.error("hasRole failed", ex);
+            Assert.fail("hasRole failed", ex);
+        }
+        return false;
+    }
+
+    protected boolean hasPermission(String token, Permission permission) {
+        checkNotNull(token);
+        checkNotNull(permission);
+        try {
+            return authenticationService.hasPermission(token, permission.getId());
+        } catch (ServiceException ex) {
+            log.error("hasPermission failed", ex);
+            Assert.fail("hasPermission failed", ex);
+        }
+        return false;
+    }
+
+    protected void logout(String token) {
+        checkNotNull(token);
+        try {
+            authenticationService.logout(token);
+        } catch (ServiceException ex) {
+            log.error("logout failed", ex);
+            Assert.fail("logout failed", ex);
+        }
     }
 
     private void createUsers() {
-	try {
-	    for (User user : users.values()) {
-		String password = user.getPassword();
-		createUser(user);
-		user.setPassword(password);
-	    }
-	} catch (ServiceException ex) {
-	    log.error("createUsers failed", ex);
-	    Assert.fail("createUsers failed", ex);
-	}
+        try {
+            for (User user : users.values()) {
+                createUser(user);
+            }
+        } catch (ServiceException ex) {
+            log.error("createUsers failed", ex);
+            Assert.fail("createUsers failed", ex);
+        }
     }
 
     private void createRoles() {
-	try {
-	    for (Role role : roles) {
-		createRole(role);
-	    }
-	} catch (ServiceException ex) {
-	    log.error("createRoles failed", ex);
-	    Assert.fail("createRoles failed", ex);
-	}
+        try {
+            for (Role role : roles) {
+                createRole(role);
+            }
+        } catch (ServiceException ex) {
+            log.error("createRoles failed", ex);
+            Assert.fail("createRoles failed", ex);
+        }
     }
 
     private void createPermissions() {
-	try {
-	    for (Permission permission : permissions) {
-		createPermission(permission);
-	    }
-	} catch (ServiceException ex) {
-	    log.error("createPermissions failed", ex);
-	    Assert.fail("createPermissions failed", ex);
-	}
+        try {
+            for (Permission permission : permissions) {
+                createPermission(permission);
+            }
+        } catch (ServiceException ex) {
+            log.error("createPermissions failed", ex);
+            Assert.fail("createPermissions failed", ex);
+        }
     }
 
     @BeforeClass
     public void setupServer() {
-	log.info("** setupServer **");
+        log.info("** setupServer **");
     }
 
     @AfterClass
     public void closeServer() {
-	log.info("** closeServer **");
+        log.info("** closeServer **");
     }
 
     protected Permission createPermission(Permission permission) throws ServiceException {
-	try {
-	    Permission newPermission = permissionService.create(permission);
-	    Assert.assertNotNull(newPermission);
-	    Assert.assertEquals(permission.getId(), newPermission.getId());
-	    return newPermission;
-	} catch (ServiceException e) {
-	    log.error("createPermission failed", e);
-	    throw e;
-	}
+        try {
+            Permission newPermission = permissionService.create(permission);
+            Assert.assertNotNull(newPermission);
+            Assert.assertEquals(permission.getId(), newPermission.getId());
+            return newPermission;
+        } catch (ServiceException e) {
+            log.error("createPermission failed", e);
+            throw e;
+        }
     }
 
     protected Permission createPermission(String name, String description, boolean disabled) throws ServiceException {
-	Assert.assertTrue(!(name == null || name.isEmpty()));
+        Assert.assertTrue(!(name == null || name.isEmpty()));
 
-	Permission permission = new PermissionImpl.Builder().id(name).name(name).description(description).disabled(disabled).build();
-	return createPermission(permission);
+        Permission permission = new PermissionImpl.Builder().id(name).name(name).description(description).disabled(disabled).build();
+        return createPermission(permission);
     }
 
     protected User createUser(User user) throws ServiceException {
-	try {
-	    User newUser = userService.create(user);
-	    Assert.assertNotNull(newUser);
-	    Assert.assertEquals(user.getId(), newUser.getId());
-	    return newUser;
-	} catch (ServiceException e) {
-	    log.error("createUser failed", e);
-	    throw e;
-	}
+        try {
+            User newUser = userService.create(user);
+            Assert.assertNotNull(newUser);
+            Assert.assertEquals(user.getId(), newUser.getId());
+            return newUser;
+        } catch (ServiceException e) {
+            log.error("createUser failed", e);
+            throw e;
+        }
     }
 
-    protected User createUser(String name, String description, boolean disabled, String email, String password, Set<Role> roles)
-	    throws ServiceException {
-	User user = new UserImpl.Builder().id(email).name(name).description(description).disabled(disabled).email(email).password(password)
-	        .roles(roles).build();
-	return createUser(user);
+    protected User createUser(String name, String description, boolean disabled, String email, char[] password, Set<Role> roles)
+            throws ServiceException {
+        User user = new UserImpl.Builder().id(email).name(name).description(description).disabled(disabled).email(email).password(password)
+                .roles(roles).build();
+        return createUser(user);
     }
 
     protected Role createRole(Role role) throws ServiceException {
-	try {
-	    Role newRole = roleService.create(role);
-	    Assert.assertNotNull(newRole);
-	    Assert.assertEquals(role.getId(), newRole.getId());
-	    return newRole;
-	} catch (ServiceException e) {
-	    log.error("createRole failed", e);
-	    throw e;
-	}
+        try {
+            Role newRole = roleService.create(role);
+            Assert.assertNotNull(newRole);
+            Assert.assertEquals(role.getId(), newRole.getId());
+            return newRole;
+        } catch (ServiceException e) {
+            log.error("createRole failed", e);
+            throw e;
+        }
     }
 
     protected Role createRole(String name, String description, boolean disabled, Set<Permission> permissions) throws ServiceException {
-	log.trace("Preparing to create permission: " + name);
-	Assert.assertTrue(!(name == null || name.isEmpty()));
-	Role role = new RoleImpl.Builder().id(name).name(name).description(description).disabled(disabled).permissions(permissions).build();
-	return createRole(role);
+        log.trace("Preparing to create permission: " + name);
+        Assert.assertTrue(!(name == null || name.isEmpty()));
+        Role role = new RoleImpl.Builder().id(name).name(name).description(description).disabled(disabled).permissions(permissions).build();
+        return createRole(role);
     }
-    
-    protected String createDocument(String name, String contentType, String path) throws Throwable {
-	String id = String.valueOf(System.currentTimeMillis());
-	byte[] content = copyToBytesFromClasspath(path);
-	File file = new FileImpl.Builder().content(content).name(name).contentType(contentType).build();
-	Set<Version> versions = newHashSet();
-	versions.add(new VersionImpl.Builder().documentId(id).file(file).current(true).versionId(1).build());
 
-	Document document = new DocumentImpl.Builder().versions(versions).id(id).name(name).roles(null).build();
-	Document newDocument = documentService.create(document);
-	Assert.assertNotNull(newDocument);
-	Assert.assertEquals(id, newDocument.getId());
-	Assert.assertTrue(newDocument.hasStatus(DocumentStatus.AVAILABLE));
-	log.info(String.format("New document created #%s", newDocument.getId()));
-	return id;
+    protected String createDocument(String name, String contentType, String path) throws Throwable {
+        String id = String.valueOf(System.currentTimeMillis());
+        byte[] content = copyToBytesFromClasspath(path);
+        File file = new FileImpl.Builder().content(content).name(name).contentType(contentType).build();
+        Set<Version> versions = newHashSet();
+        versions.add(new VersionImpl.Builder().documentId(id).file(file).current(true).versionId(1).build());
+
+        Document document = new DocumentImpl.Builder().versions(versions).id(id).name(name).roles(null).build();
+        Document newDocument = documentService.create(document);
+        Assert.assertNotNull(newDocument);
+        Assert.assertEquals(id, newDocument.getId());
+        Assert.assertTrue(newDocument.hasStatus(DocumentStatus.AVAILABLE));
+        log.info(String.format("New document created #%s", newDocument.getId()));
+        return id;
     }
 
 }

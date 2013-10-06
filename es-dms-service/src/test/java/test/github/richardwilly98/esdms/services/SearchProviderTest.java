@@ -28,44 +28,22 @@ package test.github.richardwilly98.esdms.services;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Sets.newHashSet;
-import static org.elasticsearch.common.io.Streams.copyToBytesFromClasspath;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.github.richardwilly98.esdms.DocumentImpl;
-import com.github.richardwilly98.esdms.FileImpl;
-import com.github.richardwilly98.esdms.VersionImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Facet;
-import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Term;
-import com.github.richardwilly98.esdms.api.Version;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 public class SearchProviderTest extends ProviderTestBase {
 
     int tagsCount = 0;
-
-//    private String createDocument(String name, String contentType, String path) throws Throwable {
-//	String id = String.valueOf(System.currentTimeMillis());
-//	byte[] content = copyToBytesFromClasspath(path);
-//	File file = new FileImpl.Builder().content(content).name(name).contentType(contentType).build();
-//	Set<Version> versions = newHashSet();
-//	versions.add(new VersionImpl.Builder().documentId(id).file(file).current(true).versionId(1).build());
-//
-//	Document document = new DocumentImpl.Builder().versions(versions).id(id).name(name).roles(null).build();
-//	Document newDocument = documentService.create(document);
-//	Assert.assertNotNull(newDocument);
-//	log.info(String.format("New document created #%s", newDocument.getId()));
-//	return id;
-//    }
 
     private SearchResult<Document> searchDocument(String criteria, int first, int pageSize) throws Throwable {
 	return searchDocument(criteria, first, pageSize, null);
