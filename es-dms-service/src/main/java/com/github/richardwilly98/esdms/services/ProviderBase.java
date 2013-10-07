@@ -34,6 +34,10 @@ import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
@@ -46,6 +50,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 
@@ -62,6 +67,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
     final protected Logger log = Logger.getLogger(getClass());
 
     final static ObjectMapper mapper = new ObjectMapper();
+    private static Validator validator;
     final Client client;
     final Settings settings;
     final String index;
@@ -86,6 +92,8 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	}
 	this.type = type;
 	this.clazz = clazz;
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
     }
 
     protected void isAuthenticated() throws ServiceException {
@@ -115,6 +123,17 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	return currentUser;
     }
 
+    protected void validate(T item) throws ServiceException  {
+        Set<ConstraintViolation<T>> constraintViolations = validator.validate(item);
+        if (constraintViolations.size() != 0) {
+            StringBuffer message = new StringBuffer();
+            for (ConstraintViolation<T> constraintVioldation : constraintViolations) {
+                message.append(constraintVioldation.getMessage()).append(" ");
+            }
+            throw new ServiceException(message.toString());
+        }
+    }
+    
     @Override
     public T get(String id) throws ServiceException {
 	try {
@@ -128,6 +147,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	    }
 	    String json = response.getSourceAsString();
 	    T item = mapper.readValue(json, clazz);
+	    validate(item);
 	    return item;
 	} catch (Throwable t) {
 	    log.error("get failed", t);
@@ -158,6 +178,17 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	    log.error("search failed", t);
 	    throw new ServiceException(t.getLocalizedMessage());
 	}
+    }
+
+    protected SearchResult<T> search(QueryBuilder query, int first, int pageSize) throws ServiceException {
+        try {
+            SearchResponse searchResponse = client.prepareSearch(index).setTypes(type).setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+                    .setFrom(first).setSize(pageSize).setQuery(query).execute().actionGet();
+            return getSearchResult(searchResponse, first, pageSize);
+        } catch (Throwable t) {
+            log.error("search failed", t);
+            throw new ServiceException(t.getLocalizedMessage());
+        }
     }
 
     protected SearchResult<T> getSearchResult(SearchResponse searchResponse, int first, int pageSize) throws ServiceException {

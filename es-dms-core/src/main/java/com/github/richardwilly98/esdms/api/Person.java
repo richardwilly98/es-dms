@@ -26,6 +26,8 @@ package com.github.richardwilly98.esdms.api;
  * #L%
  */
 
+import org.hibernate.validator.constraints.Email;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.richardwilly98.esdms.PersonImpl;
 
@@ -36,6 +38,7 @@ public interface Person extends ItemBase {
 
     public abstract void setCity(String city);
 
+    @Email(message = "email is not well-formed")
     public abstract String getEmail();
 
     public abstract void setEmail(String email);

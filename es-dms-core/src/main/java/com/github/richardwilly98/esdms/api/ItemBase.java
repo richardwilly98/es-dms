@@ -29,8 +29,11 @@ package com.github.richardwilly98.esdms.api;
 import java.util.Map;
 import java.util.Set;
 
+import javax.validation.constraints.NotNull;
+
 public interface ItemBase {
 
+    @NotNull(message = "id is required")
     public abstract String getId();
 
     public abstract void setId(String id);
@@ -39,6 +42,7 @@ public interface ItemBase {
 
     public abstract void setDisabled(boolean value);
 
+    @NotNull(message = "name is required")
     public abstract String getName();
 
     public abstract void setName(String name);

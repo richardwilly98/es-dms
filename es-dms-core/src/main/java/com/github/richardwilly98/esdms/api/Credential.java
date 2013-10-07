@@ -26,16 +26,20 @@ package com.github.richardwilly98.esdms.api;
  * #L%
  */
 
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.richardwilly98.esdms.CredentialImpl;
 
 @JsonDeserialize(as = CredentialImpl.class)
 public interface Credential {
 
+    @NotNull(message = "username is required")
     public abstract String getUsername();
 
     public abstract void setUsername(String username);
 
+    @NotNull(message = "password is required")
     public abstract char[] getPassword();
 
     public abstract void setPassword(char[] password);

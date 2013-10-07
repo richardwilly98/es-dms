@@ -28,16 +28,20 @@ package com.github.richardwilly98.esdms.api;
 
 import java.util.Date;
 
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.richardwilly98.esdms.SessionImpl;
 
 @JsonDeserialize(as = SessionImpl.class)
 public interface Session {
 
+    @NotNull
     public abstract String getId();
 
     public abstract void setId(String id);
 
+    @NotNull
     public abstract String getUserId();
 
     public abstract void setUserId(String userId);
@@ -50,10 +54,12 @@ public interface Session {
 
     public abstract void setSecure(boolean secure);
 
+    @NotNull
     public abstract Date getCreateTime();
 
     public abstract void setCreateTime(Date createTime);
 
+    @NotNull
     public abstract Date getLastAccessTime();
 
     public abstract void setLastAccessTime(Date lastAccessTime);

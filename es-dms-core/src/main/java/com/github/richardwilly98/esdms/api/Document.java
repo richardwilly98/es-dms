@@ -26,7 +26,10 @@ package com.github.richardwilly98.esdms.api;
  * #L%
  */
 
+import java.util.EnumSet;
 import java.util.Set;
+
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.richardwilly98.esdms.DocumentImpl;
@@ -34,14 +37,19 @@ import com.github.richardwilly98.esdms.DocumentImpl;
 @JsonDeserialize(as = DocumentImpl.class)
 public interface Document extends ItemBase {
 
-    public final static String CREATION_DATE = "creation";
-    public final static String MODIFIED_DATE = "modified";
-    public final static String AUTHOR = "author";
-    public final static String STATUS = "status";
-    public final static String LOCKED_BY = "lockedBy";
-
+    public enum DocumentSystemAttributes {
+        CREATION_DATE("creation"), MODIFIED_DATE("modified"), AUTHOR("author"), STATUS("status"), LOCKED_BY("lockedBy");
+        private String key;
+        private DocumentSystemAttributes(String key) {
+            this.key = key;
+        }
+        
+        public String getKey() {
+            return key;
+        }
+    }
     public enum DocumentStatus {
-	AVAILABLE("A"), LOCKED("L"), DELETED("D");
+	AVAILABLE(Constants.AVAILABLE), LOCKED(Constants.LOCKED), DELETED(Constants.DELETED);
 
 	private String statusCode;
 
@@ -53,6 +61,19 @@ public interface Document extends ItemBase {
 	    return statusCode;
 	}
 
+	public static DocumentStatus getDocumentStatus(String status) {
+	    for (DocumentStatus documentStatus : EnumSet.allOf(DocumentStatus.class)) {
+	        if (status.equals(documentStatus.getStatusCode())) {
+	            return documentStatus;
+	        }
+	    }
+	    return null;
+	}
+	public static class Constants {
+	    public static final String AVAILABLE = "A";
+            public static final String LOCKED = "L";
+            public static final String DELETED = "D";
+	}
     }
 
     public abstract Version getCurrentVersion();
@@ -73,5 +94,8 @@ public interface Document extends ItemBase {
 
     public abstract void removeRating(Rating rating);
 
+    @NotNull(message= "status is required")
+    public abstract DocumentStatus getStatus();
+    
     public abstract boolean hasStatus(DocumentStatus status);
 }

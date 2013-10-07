@@ -26,7 +26,11 @@ package com.github.richardwilly98.esdms.api;
  * #L%
  */
 
-import org.joda.time.DateTime;
+import java.util.Date;
+
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.richardwilly98.esdms.FileImpl;
@@ -34,21 +38,24 @@ import com.github.richardwilly98.esdms.FileImpl;
 @JsonDeserialize(as = FileImpl.class)
 public interface File {
 
+    @NotEmpty(message = "content is required")
     public abstract byte[] getContent();
 
     public abstract void setContent(byte[] content);
 
+    @NotNull(message = "name is required")
     public abstract String getName();
 
     public abstract void setName(String name);
 
+    @NotNull(message = "content-type is required")
     public abstract String getContentType();
 
     public abstract void setContentType(String contentType);
 
-    public abstract DateTime getDate();
+    public abstract Date getDate();
 
-    public abstract void setDate(DateTime date);
+    public abstract void setDate(Date date);
 
     public abstract String getTitle();
 

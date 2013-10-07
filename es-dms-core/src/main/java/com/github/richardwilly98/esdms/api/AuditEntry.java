@@ -28,6 +28,8 @@ package com.github.richardwilly98.esdms.api;
 
 import java.util.Date;
 
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.richardwilly98.esdms.AuditEntryImpl;
 
@@ -35,26 +37,38 @@ import com.github.richardwilly98.esdms.AuditEntryImpl;
 public interface AuditEntry extends ItemBase {
 
     public enum Event {
-	UNDEFINED("undefined"), CUSTOM("custom"), UPLOAD("upload"), CHECKOUT("checkout"), CHECKIN("checkin");
+        UNDEFINED(Constants.UNDEFINED_EVENT_ID), CUSTOM(Constants.CUSTOM_EVENT_ID), UPLOAD(Constants.UPLOAD_EVENT_ID), CHECKOUT(
+                Constants.CHECKOUT_EVENT_ID), CHECKIN(Constants.CHECKIN_EVENT_ID);
 
-	private String eventName;
+        private String eventName;
 
-	private Event(String eventName) {
-	    this.eventName = eventName;
-	}
+        private Event(String eventName) {
+            this.eventName = eventName;
+        }
 
-	public String getEventName() {
-	    return eventName;
-	}
+        public String getEventName() {
+            return eventName;
+        }
 
+        public static class Constants {
+            public static final String UNDEFINED_EVENT_ID = "undefined";
+            public static final String CUSTOM_EVENT_ID = "custom";
+            public static final String UPLOAD_EVENT_ID = "upload";
+            public static final String CHECKOUT_EVENT_ID = "checkout";
+            public static final String CHECKIN_EVENT_ID = "checkin";
+        }
     }
 
+    @NotNull(message = "user is required")
     public abstract String getUser();
 
+    @NotNull(message = "date is required")
     public abstract Date getDate();
 
+    @NotNull(message = "event is required")
     public abstract Event getEvent();
 
+    @NotNull(message = "itemId is required")
     public abstract String getItemId();
 
 }

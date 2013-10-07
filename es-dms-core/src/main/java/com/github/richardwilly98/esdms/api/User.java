@@ -29,14 +29,19 @@ package com.github.richardwilly98.esdms.api;
 import java.security.Principal;
 import java.util.Set;
 
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.richardwilly98.esdms.UserImpl;
 
 @JsonDeserialize(as = UserImpl.class)
 public interface User extends Person, Principal {
 
+    @NotNull(message = "login is required")
     public abstract String getLogin();
 
+    public abstract void setLogin(String login);
+    
     public abstract Set<Role> getRoles();
 
     public abstract void setRoles(Set<Role> roles);

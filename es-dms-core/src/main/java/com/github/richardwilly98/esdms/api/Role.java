@@ -28,6 +28,8 @@ package com.github.richardwilly98.esdms.api;
 
 import java.util.Set;
 
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.richardwilly98.esdms.RoleImpl;
@@ -71,6 +73,7 @@ public interface Role extends ItemBase {
         }
     }
 
+    @NotNull(message = "type is required")
     public abstract RoleType getType();
 
     public abstract void setType(RoleType type);
