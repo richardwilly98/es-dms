@@ -27,12 +27,10 @@ package test.github.richardwilly98.esdms.services;
  */
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.elasticsearch.common.io.Streams.copyToBytesFromClasspath;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -81,46 +79,32 @@ import com.google.inject.Inject;
 public class ProviderTestBase {
 
     final protected Logger log = Logger.getLogger(this.getClass());
-    final static Map<String, User> users = newHashMap();
+    final static Set<User> users = newHashSet();
     final static Set<Permission> permissions = newHashSet();
     final static Set<Role> roles = newHashSet();
     final static Role readerRole = RoleService.DefaultRoles.READER.getRole();
     final static Role writerRole = RoleService.DefaultRoles.WRITER.getRole();
     final static Role collaboratorRole;
-    // final static Permission createDocumentPermission;
-    // final static Permission deleteDocumentPermission;
-    // final static Permission readDocumentPermission;
     static String adminToken;
 
     static {
-        // createDocumentPermission = new
-        // PermissionImpl.Builder().name("document:create").description("Create document").build();
         permissions.add(DocumentService.DocumentPermissions.CREATE_PERMISSION.getPermission());
-
-        // deleteDocumentPermission = new
-        // PermissionImpl.Builder().name("document:delete").description("Delete document").build();
         permissions.add(DocumentService.DocumentPermissions.DELETE_PERMISSION.getPermission());
-
-        // readDocumentPermission = new
-        // PermissionImpl.Builder().name("document:read").description("Read document").build();
         permissions.add(DocumentService.DocumentPermissions.READ_PERMISSION.getPermission());
 
         collaboratorRole = new RoleImpl.Builder().id("collaborator").name("Collaborator").description("Collaborator").disabled(false)
                 .permissions(permissions).build();
         roles.add(collaboratorRole);
 
-        // readerRole = RoleService.DefaultRoles.READER.getRole();
         roles.add(readerRole);
 
         final User user = new UserImpl.Builder().id("richard.louapre@gmail.com").name("Richard").disabled(false).city("Jersey City")
-                .password("secret".toCharArray()).email("richard.louapre@gmail.com").roles(ImmutableSet.of(readerRole)).build();
-        // user.addRole(readerRole);
-        users.put(user.getLogin(), user);
+                .password("secret".toCharArray()).login("richard.louapre@gmail.com").email("richard.louapre@gmail.com").roles(ImmutableSet.of(readerRole)).build();
+        users.add(user);
 
         final User user2 = new UserImpl.Builder().id("danilo.sandron@gmail.com").name("Danilo").disabled(false).city("Bankok")
-                .password("segreto".toCharArray()).email("danilo.sandron@gmail.com").roles(ImmutableSet.of(collaboratorRole)).build();
-        // user.addRole(collaboratorRole);
-        users.put(user2.getLogin(), user2);
+                .password("segreto".toCharArray()).login("danilo.sandron@gmail.com").email("danilo.sandron@gmail.com").roles(ImmutableSet.of(collaboratorRole)).build();
+        users.add(user2);
     }
 
     @Inject
@@ -240,7 +224,7 @@ public class ProviderTestBase {
 
     private void createUsers() {
         try {
-            for (User user : users.values()) {
+            for (User user : users) {
                 createUser(user);
             }
         } catch (ServiceException ex) {
@@ -312,11 +296,15 @@ public class ProviderTestBase {
         }
     }
 
-    protected User createUser(String name, String description, boolean disabled, String email, char[] password, Set<Role> roles)
+    protected User createUser(String name, String description, boolean disabled, String email, String login, char[] password, Set<Role> roles)
             throws ServiceException {
-        User user = new UserImpl.Builder().id(email).name(name).description(description).disabled(disabled).email(email).password(password)
+        User user = new UserImpl.Builder().id(email).name(name).description(description).disabled(disabled).email(email).login(login).password(password)
                 .roles(roles).build();
         return createUser(user);
+    }
+    protected User createUser(String name, String description, boolean disabled, String email, char[] password, Set<Role> roles)
+            throws ServiceException {
+        return createUser(name, description, disabled, email, email, password, roles);
     }
 
     protected Role createRole(Role role) throws ServiceException {

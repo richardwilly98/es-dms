@@ -27,6 +27,9 @@ package com.github.richardwilly98.esdms.services;
  */
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
+
+import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,14 +37,19 @@ import javax.inject.Singleton;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.util.ByteSource;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 
 import com.github.richardwilly98.esdms.api.Role;
+import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.google.common.collect.Iterables;
 
 @Singleton
 public class UserProvider extends ProviderBase<User> implements UserService {
 
+    private static final String USER_MAPPING_JSON = "/com/github/richardwilly98/esdms/services/user-mapping.json";
     private final static String type = "user";
     private final HashService hashService;
     private final RoleService roleService;
@@ -61,7 +69,12 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 
     @Override
     protected String getMapping() {
-        return null;
+        try {
+            return copyToStringFromClasspath(USER_MAPPING_JSON);
+        } catch (IOException ioEx) {
+            log.error("getMapping failed", ioEx);
+            return null;
+        }
     }
 
     private String computeBase64Hash(char[] password) {
@@ -130,6 +143,25 @@ public class UserProvider extends ProviderBase<User> implements UserService {
         super.delete(item);
     }
 
+    @Override
+    public User findByLogin(String login) throws ServiceException {
+        QueryBuilder query = QueryBuilders.matchQuery("login", login);
+        SearchResult<User> searchResult = search(query, 0, 1);
+        if (searchResult.getTotalHits() == 1) {
+            return Iterables.get( searchResult.getItems(), 0);
+        }
+        
+        if (searchResult.getTotalHits() > 1) {
+            if (log.isTraceEnabled()) {
+                for (User user : searchResult.getItems()) {
+                    log.warn("USER WITH SAME LOGIN: " + user);
+                }
+            }
+            throw new ServiceException(String.format("Found more than one user with the same login %s. Possible data integrity issue", login));
+        }
+        throw new ServiceException(String.format("Cannot find user with login %s", login));
+    }
+    
     private boolean canUserBeUpdated(User user) {
         if (user.getId().equals(UserService.DEFAULT_ADMIN_LOGIN)) {
             for (Role role : RoleService.SystemRoles) {

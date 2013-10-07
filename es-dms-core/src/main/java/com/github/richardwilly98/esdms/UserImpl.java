@@ -46,7 +46,6 @@ public class UserImpl extends PersonImpl implements User {
     private final Set<Role> roles = newHashSet();
     private String hash;
     private char[] password;
-    @JsonIgnore
     private String login;
 
     public static class Builder extends PersonImpl.Builder<Builder> {
@@ -54,6 +53,7 @@ public class UserImpl extends PersonImpl implements User {
         private Set<Role> roles = newHashSet();
         private String hash;
         private char[] password;
+        private String login;
 
         public Builder password(char[] password) {
             this.password = password;
@@ -70,13 +70,20 @@ public class UserImpl extends PersonImpl implements User {
             return getThis();
         }
 
+        public Builder login(String login) {
+            this.login = login;
+            return getThis();
+        }
+
         @Override
         protected Builder getThis() {
             return this;
         }
 
         public UserImpl build() {
-            return new UserImpl(this);
+            UserImpl user = new UserImpl(this);
+//            checkArgument(!Strings.isNullOrEmpty(user.getLogin()), "login is required");
+            return user;
         }
     }
 
@@ -92,7 +99,7 @@ public class UserImpl extends PersonImpl implements User {
                 this.roles.addAll(builder.roles);
             }
             this.hash = builder.hash;
-            this.login = builder.email;
+            this.login = builder.login;
         }
     }
 
@@ -107,8 +114,12 @@ public class UserImpl extends PersonImpl implements User {
     }
 
     @Override
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    @Override
     public void setEmail(String email) {
-        login = email;
         super.setEmail(email);
     }
 

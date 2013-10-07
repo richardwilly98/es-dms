@@ -306,7 +306,7 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
     
     protected User createUser(String login, String password, Set<Role> roles) throws Throwable {
         log.debug(String.format("*** createUser - %s - %s ***", login, password));
-        User user = new UserImpl.Builder().id(login).name(login).email(login).password(password.toCharArray()).roles(roles).build();
+        User user = new UserImpl.Builder().id(login).name(login).email(login).login(login).password(password.toCharArray()).roles(roles).build();
         String json = mapper.writeValueAsString(user);
         log.trace(json);
         Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
@@ -315,16 +315,12 @@ public class GuiceAndJettyTestBase<T extends ItemBase> {
         Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
         URI uri = response.getLocation();
         Assert.assertNotNull(uri);
-//        return get(uri, UserImpl.class);
         log.debug(String.format("getItem - %s", uri));
         response = client().target(uri).request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
-        log.debug(String.format("status: %s", response.getStatus()));
-        // log.debug(String.format("get - body: %s",
-        // response.getEntity(String.class)));
         if (response.getStatus() == Status.OK.getStatusCode()) {
-            // return deserialize(response.getEntity(String.class), type);
             return response.readEntity(User.class);
         }
+        log.warn(String.format("status: %s", response.getStatus()));
         return null;
     }
 

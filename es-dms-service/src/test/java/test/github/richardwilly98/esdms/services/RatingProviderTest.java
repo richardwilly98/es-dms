@@ -29,7 +29,6 @@ package test.github.richardwilly98.esdms.services;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Rating;
 import com.github.richardwilly98.esdms.api.User;
@@ -131,9 +130,7 @@ public class RatingProviderTest extends ProviderTestBase {
     private User createUserWithWriterRole() throws ServiceException {
         if (ratingUser == null) {
             String id = "rating-ruser-" + System.currentTimeMillis() + "@gmail.com";
-            ratingUser = new UserImpl.Builder().id(id).name(id).disabled(false).city("New York").password("secret".toCharArray()).email(id)
-                    .roles(ImmutableSet.of(writerRole)).build();
-            ratingUser = createUser(ratingUser);
+            ratingUser = createUser(id, "", false, id, id, "secret".toCharArray(), ImmutableSet.of(writerRole));
             Assert.assertNotNull(ratingUser);
         }
         return ratingUser;

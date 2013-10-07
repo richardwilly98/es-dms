@@ -32,6 +32,7 @@ import com.github.richardwilly98.esdms.PermissionImpl;
 import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.User;
+import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.google.common.collect.ImmutableSet;
 
 public interface UserService extends BaseService<User> {
@@ -41,7 +42,8 @@ public interface UserService extends BaseService<User> {
                 .id(DEFAULT_ADMIN_LOGIN)
                 .name(DEFAULT_ADMIN_LOGIN)
                 .description(DEFAULT_ADMIN_DESCRIPTION)
-                .email(DEFAULT_ADMIN_LOGIN)
+                .email(DEFAULT_ADMIN_EMAIL)
+                .login(DEFAULT_ADMIN_LOGIN)
                 .password(DEFAULT_ADMIN_PASSWORD.toCharArray())
                 .roles(newHashSet(ImmutableSet.of(RoleService.DefaultRoles.ADMINISTRATOR.getRole(),
                         RoleService.DefaultRoles.PROCESS_ADMINISTRATOR.getRole()))).build());
@@ -84,4 +86,7 @@ public interface UserService extends BaseService<User> {
     public static final String DEFAULT_ADMIN_DESCRIPTION = "System administrator";
     public static final String DEFAULT_ADMIN_LOGIN = "admin";
     public static final String DEFAULT_ADMIN_PASSWORD = "secret";
+    public static final String DEFAULT_ADMIN_EMAIL = "admin@admin";
+    
+    public abstract User findByLogin(String login) throws ServiceException;
 }

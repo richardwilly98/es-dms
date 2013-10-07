@@ -14,7 +14,7 @@ public class AuthenticationProviderTest extends ProviderTestBase {
     @Test
     public void testLogin() throws Throwable {
         log.info("Start testLogin");
-        for (User user : users.values()) {
+        for (User user : users) {
             String token = login(user);
             Assert.assertNotNull(token);
             log.trace(String.format("Login %s - token: %s", user.getLogin(), token));
@@ -27,7 +27,7 @@ public class AuthenticationProviderTest extends ProviderTestBase {
     @Test
     public void testRolePermission() throws Throwable {
         log.info("Start testRolePermission");
-        for (User user : users.values()) {
+        for (User user : users) {
             String token = login(user);
             Assert.assertNotNull(token);
             for (Role role : roles) {
@@ -67,7 +67,7 @@ public class AuthenticationProviderTest extends ProviderTestBase {
     @Test
     public void testGetSession() throws Throwable {
         log.info("Start testGetSession");
-        for (User user : users.values()) {
+        for (User user : users) {
             String token = login(user);
             Assert.assertNotNull(token);
             Session session = getSession(token);
@@ -82,7 +82,7 @@ public class AuthenticationProviderTest extends ProviderTestBase {
     @Test
     public void testLogout() throws Throwable {
         log.info("Start testLogout");
-        for (User user : users.values()) {
+        for (User user : users) {
             String token = login(user);
             Assert.assertNotNull(token);
             log.trace(String.format("Login %s - token: %s", user.getLogin(), token));

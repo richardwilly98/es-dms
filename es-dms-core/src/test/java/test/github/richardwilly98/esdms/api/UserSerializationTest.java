@@ -57,6 +57,7 @@ import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Term;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.services.RoleService;
+import com.github.richardwilly98.esdms.services.UserService;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -65,7 +66,7 @@ public class UserSerializationTest {
     private static Logger log = Logger.getLogger(UserSerializationTest.class);
 
     private static final ObjectMapper mapper = new ObjectMapper();
-
+    
     @BeforeClass
     public void initialize() {
 	log.info("*** initialize ***");
@@ -88,13 +89,29 @@ public class UserSerializationTest {
     }
 
     @Test
+    public void testSerializeDeserializeAdminUser() throws Throwable {
+        log.debug("*** testSerializeDeserializeAdminUser ***");
+        Role adminRole = RoleService.DefaultRoles.ADMINISTRATOR.getRole();
+        User user = UserService.DefaultUsers.ADMINISTRATOR.getUser();//new UserImpl.Builder().password(password).id(id).name(name).email(email).login(email).roles(roles).build();
+        log.debug("user: " + user);
+        Assert.assertTrue(user.hasRole(adminRole));
+        String json = mapper.writeValueAsString(user);
+        log.debug(json);
+        Assert.assertNotNull(json);
+        User user2 = mapper.readValue(json, User.class);
+        log.debug("user2: " + user2);
+        Assert.assertEquals(user, user2);
+        Assert.assertTrue(user2.hasRole(adminRole));
+    }
+
+    @Test
     public void testSerializeDeserializeUser() throws Throwable {
 	log.debug("*** testSerializeDeserializeUser ***");
 	String id = "user-" + System.currentTimeMillis();
 	String name = id;
 	String email = id + "@gmail.com";
 	char[] password = "secret".toCharArray();
-	User user = new UserImpl.Builder().password(password).id(id).name(name).email(email).build();
+	User user = new UserImpl.Builder().password(password).id(id).name(name).email(email).login(email).build();
 	log.debug(user);
 	String json = mapper.writeValueAsString(user);
 	log.debug(json);
@@ -163,7 +180,7 @@ public class UserSerializationTest {
     public void testSerializeDeserializeSearchResult() throws Throwable {
 	log.debug("*** testSerializeDeserializeSearchResult ***");
 	Set<User> users = newHashSet();
-	users.add(new UserImpl.Builder().password("test".toCharArray()).id("test").name("test").email("test@test").build());
+	users.add(new UserImpl.Builder().password("test".toCharArray()).id("test").name("test").email("test@test").login("test").build());
 	long elapsedTime = 1;
 	String term = "term";
 	Set<Term> terms = newHashSet();
@@ -209,7 +226,7 @@ public class UserSerializationTest {
 	char[] password = "secret".toCharArray();
 	Role role = new RoleImpl.Builder().id("my-role").name("My role").build();
 	Set<Role> roles = newHashSet(ImmutableSet.of(role));
-	User user = new UserImpl.Builder().password(password).id(id).name(name).email(email).roles(roles).build();
+	User user = new UserImpl.Builder().password(password).id(id).name(name).email(email)/*.login(email)*/.roles(roles).build();
 	log.debug("user: " + user);
 	Assert.assertTrue(user.hasRole(role));
 	String json = mapper.writeValueAsString(user);
@@ -222,10 +239,10 @@ public class UserSerializationTest {
     }
     
     @Test
-    public void testUserBuiderWithRole() {
+    public void testUserBuiderWithRole() throws Throwable {
         String id = "user-"+System.currentTimeMillis();
         User user = new UserImpl.Builder().password("123456".toCharArray()).id(id)
-                .name(id).description(id).email(id)
+                .name(id).description(id).email(id).login(id)
                 .roles(ImmutableSet.of(RoleService.DefaultRoles.ADMINISTRATOR.getRole())).build();
         Assert.assertNotNull(user);
         Assert.assertTrue(user.hasRole(RoleService.DefaultRoles.ADMINISTRATOR.getRole()));

@@ -26,8 +26,6 @@ package test.github.richardwilly98.esdms.rest;
  * #L%
  */
 
-import java.net.URI;
-
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
@@ -90,7 +88,7 @@ public class TestRestUserService extends GuiceAndJettyTestBase<UserImpl> {
         log.debug("*** testCreateRetrieveDeleteUpdate ***");
         try {
             String password = "secret1";
-            String login = "user-" + System.currentTimeMillis();
+            String login = "user-" + System.currentTimeMillis() + "@gmail.com";
             User user1 = createUser(login, password, ImmutableSet.of(RoleService.DefaultRoles.WRITER.getRole()));
             Assert.assertNotNull(user1);
             Assert.assertNotNull(user1.getRoles());
@@ -116,17 +114,10 @@ public class TestRestUserService extends GuiceAndJettyTestBase<UserImpl> {
         log.debug("*** testAvoidDuplicate ***");
         try {
             String password = "11111111";
-            String login = "user-" + System.currentTimeMillis();
-            User user = new UserImpl.Builder().id(login).name(login).email(login).password(password.toCharArray()).roles(ImmutableSet.of(RoleService.DefaultRoles.WRITER.getRole())).build();
+            String login = "user-" + System.currentTimeMillis() + "@gmail.com";
+            User user = createUser(login, password, ImmutableSet.of(RoleService.DefaultRoles.WRITER.getRole()));
 
             Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
-                    .post(Entity.json(user));
-            log.debug(String.format("status: %s", response.getStatus()));
-            Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
-            URI uri = response.getLocation();
-            Assert.assertNotNull(uri);
-            
-            response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
                     .post(Entity.json(user));
             log.debug(String.format("status: %s", response.getStatus()));
             Assert.assertTrue(response.getStatus() == Status.CONFLICT.getStatusCode());

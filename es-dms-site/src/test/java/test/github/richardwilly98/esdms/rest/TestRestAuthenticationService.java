@@ -45,7 +45,7 @@ public class TestRestAuthenticationService extends TestRestUserService {
 	log.debug("*** testLoginLogout ***");
 	try {
 	    String password = "secret1";
-	    String login = "user-" + System.currentTimeMillis();
+	    String login = "user-" + System.currentTimeMillis() + "@yahoo.com";
 	    createUser(login, password);
 	    boolean rememberMe = true;
 	    Credential credential = new CredentialImpl.Builder().username(login).password(password.toCharArray()).rememberMe(rememberMe).build();
