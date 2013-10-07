@@ -28,8 +28,7 @@ package com.github.richardwilly98.esdms;
 
 import java.io.Serializable;
 import java.util.Arrays;
-
-import org.joda.time.DateTime;
+import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -54,7 +53,7 @@ public class FileImpl implements Serializable, File {
     private String highlight;
 
     @JsonProperty("date")
-    private DateTime date;
+    private Date date;
 
     @JsonProperty("title")
     private String title;
@@ -67,7 +66,7 @@ public class FileImpl implements Serializable, File {
 	private String author;
 	private String contentType;
 	private byte[] content;
-	private DateTime date;
+	private Date date;
 	private String name;
 	private String title;
 
@@ -86,7 +85,7 @@ public class FileImpl implements Serializable, File {
 	    return this;
 	}
 
-	public Builder date(DateTime date) {
+	public Builder date(Date date) {
 	    this.date = date;
 	    return this;
 	}
@@ -190,7 +189,7 @@ public class FileImpl implements Serializable, File {
      * @see com.github.richardwilly98.api.File#getDate()
      */
     @Override
-    public DateTime getDate() {
+    public Date getDate() {
 	return date;
     }
 
@@ -200,7 +199,7 @@ public class FileImpl implements Serializable, File {
      * @see com.github.richardwilly98.api.File#setDate(org.joda.time.DateTime)
      */
     @Override
-    public void setDate(DateTime date) {
+    public void setDate(Date date) {
 	this.date = date;
     }
 
