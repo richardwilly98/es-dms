@@ -232,6 +232,20 @@
 					<!-- <httpsPort>8443</httpsPort> <keystoreFile>${basedir}/.keystore</keystoreFile> 
 						<keystorePass>secret</keystorePass> -->
 				</configuration>
+				<executions>
+					<execution>
+						<id>default-cli</id>
+						<goals>
+							<goal>run-war-only</goal>
+						</goals>
+							<configuration>
+								<httpsPort>8443</httpsPort>
+								<keystoreFile>${basedir}/.keystore</keystoreFile>
+								<keystorePass>secret</keystorePass>
+								<contextFile>${basedir}/src/test/resources/tomcat-context.xml</contextFile>
+							</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
