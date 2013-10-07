@@ -118,7 +118,7 @@ public class RoleSerializationTest {
 	String email = id + "@gmail.com";
 	char[] password = "secret".toCharArray();
 	Role role = createRole("my-role", "My Role", false, RoleType.USER_DEFINED, null);
-	User user = new UserImpl.Builder().id(id).name(name).email(email).password(password).roles(ImmutableSet.of(role)).build();
+	User user = new UserImpl.Builder().id(id).name(name).email(email).password(password).login(email).roles(ImmutableSet.of(role)).build();
 	log.debug("user: " + user);
 	Assert.assertTrue(user.hasRole(role));
 	String json = mapper.writeValueAsString(user);

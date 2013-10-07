@@ -54,7 +54,8 @@ public class PersonImpl extends ItemBaseImpl implements Person {
 	protected abstract T getThis();
 
 	public PersonImpl build() {
-	    return new PersonImpl(this);
+	    PersonImpl person = new PersonImpl(this);
+	    return person;
 	}
     }
 
