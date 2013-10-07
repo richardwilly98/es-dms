@@ -47,7 +47,9 @@ import com.google.common.collect.Iterables;
 public class DocumentImpl extends SecuredItemImpl implements Document {
 
     private static final long serialVersionUID = 1L;
-    private static final Set<String> readOnlyAttributes = ImmutableSet.of(AUTHOR, CREATION_DATE, MODIFIED_DATE, STATUS, LOCKED_BY);
+    private static final Set<String> readOnlyAttributes = ImmutableSet.of(DocumentSystemAttributes.AUTHOR.getKey(),
+            DocumentSystemAttributes.CREATION_DATE.getKey(), DocumentSystemAttributes.MODIFIED_DATE.getKey(),
+            DocumentSystemAttributes.STATUS.getKey(), DocumentSystemAttributes.LOCKED_BY.getKey());
 
     private final Set<String> tags = newHashSet();
     private final Set<Version> versions = newHashSet();
@@ -55,53 +57,53 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
 
     public static class Builder extends SecuredItemImpl.Builder<DocumentImpl.Builder> {
 
-	private Set<String> tags;
-	private Set<Version> versions;
-	private Set<Rating> ratings;
+        private Set<String> tags;
+        private Set<Version> versions;
+        private Set<Rating> ratings;
 
-	public Builder tags(Set<String> tags) {
-	    this.tags = tags;
-	    return getThis();
-	}
+        public Builder tags(Set<String> tags) {
+            this.tags = tags;
+            return getThis();
+        }
 
-	public Builder versions(Set<Version> versions) {
-	    this.versions = versions;
-	    return getThis();
-	}
+        public Builder versions(Set<Version> versions) {
+            this.versions = versions;
+            return getThis();
+        }
 
-	public Builder ratings(Set<Rating> ratings) {
-	    this.ratings = ratings;
-	    return getThis();
-	}
+        public Builder ratings(Set<Rating> ratings) {
+            this.ratings = ratings;
+            return getThis();
+        }
 
-	@Override
-	protected Builder getThis() {
-	    return this;
-	}
+        @Override
+        protected Builder getThis() {
+            return this;
+        }
 
-	public DocumentImpl build() {
-	    return new DocumentImpl(this);
-	}
+        public DocumentImpl build() {
+            return new DocumentImpl(this);
+        }
     }
 
     DocumentImpl() {
-	this(null);
+        this(null);
     }
 
     protected DocumentImpl(Builder builder) {
-	super(builder);
-	if (builder != null) {
-	    if (builder.tags != null) {
-		this.tags.addAll(builder.tags);
-	    }
-	    if (builder.versions != null) {
-		this.versions.addAll(builder.versions);
-	    }
-	    if (builder.ratings != null) {
-		this.ratings.addAll(builder.ratings);
-	    }
-	}
-	readOnlyAttributeKeys = readOnlyAttributes;
+        super(builder);
+        if (builder != null) {
+            if (builder.tags != null) {
+                this.tags.addAll(builder.tags);
+            }
+            if (builder.versions != null) {
+                this.versions.addAll(builder.versions);
+            }
+            if (builder.ratings != null) {
+                this.ratings.addAll(builder.ratings);
+            }
+        }
+        readOnlyAttributeKeys = readOnlyAttributes;
     }
 
     /*
@@ -109,10 +111,10 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
      */
     @JsonProperty("attributes")
     private void deserialize(Map<String, Object> attributes) {
-	if (!attributes.containsKey(DocumentImpl.STATUS)) {
-	    attributes.put(DocumentImpl.STATUS, DocumentImpl.DocumentStatus.AVAILABLE.getStatusCode());
-	}
-	getAttributes().putAll(attributes);
+        if (!attributes.containsKey(DocumentSystemAttributes.STATUS.getKey())) {
+            attributes.put(DocumentSystemAttributes.STATUS.getKey(), DocumentImpl.DocumentStatus.AVAILABLE.getStatusCode());
+        }
+        getAttributes().putAll(attributes);
     }
 
     /*
@@ -123,47 +125,57 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
     @Override
     @JsonIgnore
     public Version getCurrentVersion() {
-	if (versions == null || versions.size() == 0) {
-	    return null;
-	} else {
-	    try {
-		return Iterables.find(versions, new Predicate<Version>() {
-		    @Override
-		    public boolean apply(Version version) {
-			return version.isCurrent();
-		    }
-		});
-	    } catch (NoSuchElementException ex) {
-		return null;
-	    }
-	}
+        if (versions == null || versions.size() == 0) {
+            return null;
+        } else {
+            try {
+                return Iterables.find(versions, new Predicate<Version>() {
+                    @Override
+                    public boolean apply(Version version) {
+                        return version.isCurrent();
+                    }
+                });
+            } catch (NoSuchElementException ex) {
+                return null;
+            }
+        }
     }
 
     @Override
     @JsonIgnore
     public Version getVersion(final int versionId) {
-	checkArgument(versionId > 0);
-	try {
-	    return Iterables.find(versions, new Predicate<Version>() {
-		@Override
-		public boolean apply(Version version) {
-		    return (version.getVersionId() == versionId);
-		}
-	    });
-	} catch (NoSuchElementException ex) {
-	    return null;
-	}
+        checkArgument(versionId > 0);
+        try {
+            return Iterables.find(versions, new Predicate<Version>() {
+                @Override
+                public boolean apply(Version version) {
+                    return (version.getVersionId() == versionId);
+                }
+            });
+        } catch (NoSuchElementException ex) {
+            return null;
+        }
+    }
+
+    @Override
+    @JsonIgnore
+    public DocumentStatus getStatus() {
+        if (this.getAttributes().containsKey(DocumentSystemAttributes.STATUS.getKey())) {
+            String status = this.getAttributes().get(DocumentSystemAttributes.STATUS.getKey()).toString();
+            return DocumentStatus.getDocumentStatus(status);
+        }
+        return null;
     }
 
     @Override
     @JsonIgnore
     public boolean hasStatus(DocumentStatus status) {
 
-	if (!this.getAttributes().containsKey(Document.STATUS)) {
-	    return false;
-	}
+        if (!this.getAttributes().containsKey(DocumentSystemAttributes.STATUS.getKey())) {
+            return false;
+        }
 
-	return this.getAttributes().get(Document.STATUS).equals(status.getStatusCode());
+        return this.getAttributes().get(DocumentSystemAttributes.STATUS.getKey()).equals(status.getStatusCode());
     }
 
     /*
@@ -173,7 +185,7 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
      */
     @Override
     public Set<Version> getVersions() {
-	return versions;
+        return versions;
     }
 
     /*
@@ -183,40 +195,40 @@ public class DocumentImpl extends SecuredItemImpl implements Document {
      */
     @Override
     public Set<String> getTags() {
-	return tags;
+        return tags;
     }
 
     @Override
     public void addTag(String tag) {
-	tags.add(tag);
+        tags.add(tag);
     }
 
     @Override
     public void removeTag(String tag) {
-	checkNotNull(tag);
-	if (tags != null) {
-	    if (tags.contains(tag)) {
-		tags.remove(tag);
-	    }
-	}
+        checkNotNull(tag);
+        if (tags != null) {
+            if (tags.contains(tag)) {
+                tags.remove(tag);
+            }
+        }
     }
 
     @Override
     public Set<Rating> getRatings() {
-	return ratings;
+        return ratings;
     }
 
     @Override
     public void addRating(Rating rating) {
-	ratings.add(rating);
+        ratings.add(rating);
     }
 
     @Override
     public void removeRating(Rating rating) {
-	checkNotNull(rating);
-	if (ratings.contains(rating)) {
-	    ratings.remove(rating);
-	}
+        checkNotNull(rating);
+        if (ratings.contains(rating)) {
+            ratings.remove(rating);
+        }
     }
 
     @Override

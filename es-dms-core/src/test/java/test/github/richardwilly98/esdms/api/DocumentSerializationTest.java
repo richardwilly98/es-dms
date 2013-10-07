@@ -44,6 +44,7 @@ import com.github.richardwilly98.esdms.RatingImpl;
 import com.github.richardwilly98.esdms.VersionImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
+import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
 import com.github.richardwilly98.esdms.api.Rating;
 import com.github.richardwilly98.esdms.api.Version;
 
@@ -65,7 +66,7 @@ public class DocumentSerializationTest {
 	DocumentTest document = new DocumentTest(new DocumentImpl.Builder().id(id).name(name).attributes(attributes).roles(null));
 	log.debug(document);
 	Assert.assertTrue(document.getAttributes().get(attributeKey).equals(attributeValue));
-	document.setReadOnlyAttribute(DocumentImpl.AUTHOR, "richard");
+	document.setReadOnlyAttribute(DocumentSystemAttributes.AUTHOR.getKey(), "richard");
 	log.debug(document);
 	String json = mapper.writeValueAsString(document);
 	log.debug(json);
@@ -125,7 +126,7 @@ public class DocumentSerializationTest {
 	        .versionId(2).parentId(1).build());
 	DocumentTest document = new DocumentTest(new DocumentImpl.Builder().versions(versions).id(id).name(name).attributes(attributes)
 	        .roles(null));
-	document.setReadOnlyAttribute(DocumentImpl.AUTHOR, "richard");
+	document.setReadOnlyAttribute(DocumentSystemAttributes.AUTHOR.getKey(), "richard");
 	log.debug(document);
 	String json = mapper.writeValueAsString(document);
 	log.debug(json);

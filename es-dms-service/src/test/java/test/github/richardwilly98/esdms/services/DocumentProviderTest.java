@@ -44,6 +44,7 @@ import com.github.richardwilly98.esdms.FileImpl;
 import com.github.richardwilly98.esdms.VersionImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
+import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
@@ -92,7 +93,7 @@ public class DocumentProviderTest extends ProviderTestBase {
     public void testCreateDocument() throws Throwable {
         log.info("Start testCreateDocument");
         User user = null;
-        for (User u : users.values()) {
+        for (User u : users) {
             for (Role role : u.getRoles()) {
                 for (Permission permission : role.getPermissions()) {
                     if ("document:create".equals(permission.getId())) {
@@ -119,7 +120,7 @@ public class DocumentProviderTest extends ProviderTestBase {
     public void testCreateDeleteDocument() throws Throwable {
         log.info("Start testCreateDeleteDocument ************************************");
         User user = null;
-        for (User u : users.values()) {
+        for (User u : users) {
             for (Role role : u.getRoles()) {
                 for (Permission permission : role.getPermissions()) {
                     if ("document:create".equals(permission.getId())) {
@@ -219,13 +220,13 @@ public class DocumentProviderTest extends ProviderTestBase {
         log.info(String.format("New document created %s", newDocument));
         attributes = newDocument.getAttributes();
         Assert.assertTrue(attributes != null && attributes.size() > 1);
-        Assert.assertTrue(attributes.containsKey(DocumentImpl.AUTHOR));
-        String author = attributes.get(DocumentImpl.AUTHOR).toString();
+        Assert.assertTrue(attributes.containsKey(DocumentSystemAttributes.AUTHOR.getKey()));
+        String author = attributes.get(DocumentSystemAttributes.AUTHOR.getKey()).toString();
         Assert.assertTrue(!author.isEmpty());
         // Test ignore set read-only attribute
-        newDocument.setAttribute(DocumentImpl.AUTHOR, author + "-" + System.currentTimeMillis());
+        newDocument.setAttribute(DocumentSystemAttributes.AUTHOR.getKey(), author + "-" + System.currentTimeMillis());
         Document updatedDocument = documentService.update(newDocument);
-        Assert.assertTrue(updatedDocument.getAttributes().get(DocumentImpl.AUTHOR).toString().equals(author));
+        Assert.assertTrue(updatedDocument.getAttributes().get(DocumentSystemAttributes.AUTHOR.getKey()).toString().equals(author));
     }
 
     @Test
@@ -243,10 +244,10 @@ public class DocumentProviderTest extends ProviderTestBase {
         attributes = newDocument.getAttributes();
 
         Assert.assertTrue(attributes != null && attributes.size() > 1);
-        Assert.assertTrue(attributes.containsKey(DocumentImpl.CREATION_DATE));
-        log.info(attributes.get(DocumentImpl.CREATION_DATE));
-        Date newDate = new Date(Long.valueOf(attributes.get(DocumentImpl.CREATION_DATE).toString()));
-        log.info(String.format("Attribute %s - %s", DocumentImpl.CREATION_DATE, newDate));
+        Assert.assertTrue(attributes.containsKey(DocumentSystemAttributes.CREATION_DATE.getKey()));
+        log.info(attributes.get(DocumentSystemAttributes.CREATION_DATE.getKey()));
+        Date newDate = new Date(Long.valueOf(attributes.get(DocumentSystemAttributes.CREATION_DATE.getKey()).toString()));
+        log.info(String.format("Attribute %s - %s", DocumentSystemAttributes.CREATION_DATE.getKey(), newDate));
     }
 
     @Test
@@ -272,19 +273,20 @@ public class DocumentProviderTest extends ProviderTestBase {
         }
 
         attributes = newDocument.getAttributes();
-        Assert.assertNotNull(attributes.get(DocumentImpl.STATUS));
-        Assert.assertTrue(attributes.get(DocumentImpl.STATUS).equals(DocumentImpl.DocumentStatus.LOCKED.getStatusCode()));
-        Assert.assertNotNull(attributes.get(DocumentImpl.LOCKED_BY));
-        Assert.assertTrue(attributes.get(DocumentImpl.LOCKED_BY).equals(UserService.DEFAULT_ADMIN_LOGIN));
-        Assert.assertNotNull(attributes.get(DocumentImpl.MODIFIED_DATE));
+        Assert.assertNotNull(attributes.get(DocumentSystemAttributes.STATUS.getKey()));
+        Assert.assertTrue(attributes.get(DocumentSystemAttributes.STATUS.getKey()).equals(
+                DocumentImpl.DocumentStatus.LOCKED.getStatusCode()));
+        Assert.assertNotNull(attributes.get(DocumentSystemAttributes.LOCKED_BY.getKey()));
+        Assert.assertTrue(attributes.get(DocumentSystemAttributes.LOCKED_BY.getKey()).equals(UserService.DEFAULT_ADMIN_LOGIN));
+        Assert.assertNotNull(attributes.get(DocumentSystemAttributes.MODIFIED_DATE.getKey()));
 
         log.debug(String.format("Checkin document %s", newDocument.getId()));
         documentService.checkin(newDocument);
         newDocument = documentService.get(newDocument.getId());
         log.trace(String.format("Document checked-in %s", newDocument));
-        Assert.assertTrue(newDocument.getAttributes().get(DocumentImpl.STATUS)
+        Assert.assertTrue(newDocument.getAttributes().get(DocumentSystemAttributes.STATUS.getKey())
                 .equals(DocumentImpl.DocumentStatus.AVAILABLE.getStatusCode()));
-        Assert.assertFalse(newDocument.getAttributes().containsKey(DocumentImpl.LOCKED_BY));
+        Assert.assertFalse(newDocument.getAttributes().containsKey(DocumentSystemAttributes.LOCKED_BY.getKey()));
 
         try {
             documentService.checkin(newDocument);

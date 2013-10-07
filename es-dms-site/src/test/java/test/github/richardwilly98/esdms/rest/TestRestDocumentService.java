@@ -54,6 +54,7 @@ import com.github.richardwilly98.esdms.api.Rating;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.api.Version;
+import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
 import com.github.richardwilly98.esdms.rest.RestDocumentService;
 import com.github.richardwilly98.esdms.rest.RestItemBaseService;
 import com.github.richardwilly98.esdms.rest.RestRatingService;
@@ -110,11 +111,11 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 	    Document document2 = get(document.getId(), Document.class, RestDocumentService.DOCUMENTS_PATH);
 	    log.debug("Checked-out document: " + document);
 	    Map<String, Object> attributes = document2.getAttributes();
-	    Assert.assertNotNull(attributes.get(Document.STATUS));
-	    Assert.assertTrue(attributes.get(Document.STATUS).equals(Document.DocumentStatus.LOCKED.getStatusCode()));
-	    Assert.assertNotNull(attributes.get(Document.LOCKED_BY));
-	    Assert.assertTrue(attributes.get(Document.LOCKED_BY).equals(adminCredential.getUsername()));
-	    Assert.assertNotNull(attributes.get(Document.MODIFIED_DATE));
+	    Assert.assertNotNull(attributes.get(DocumentSystemAttributes.STATUS.getKey()));
+	    Assert.assertTrue(attributes.get(DocumentSystemAttributes.STATUS.getKey()).equals(Document.DocumentStatus.LOCKED.getStatusCode()));
+	    Assert.assertNotNull(attributes.get(DocumentSystemAttributes.LOCKED_BY.getKey()));
+	    Assert.assertTrue(attributes.get(DocumentSystemAttributes.LOCKED_BY.getKey()).equals(adminCredential.getUsername()));
+	    Assert.assertNotNull(attributes.get(DocumentSystemAttributes.MODIFIED_DATE.getKey()));
 
 	    response = target().path(RestDocumentService.DOCUMENTS_PATH).path(document.getId()).path("checkout")
 		    .request(MediaType.APPLICATION_JSON).cookie(adminCookie).post(null);
@@ -129,8 +130,8 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
 	    document2 = get(document.getId(), Document.class, RestDocumentService.DOCUMENTS_PATH);
 
 	    attributes = document2.getAttributes();
-	    Assert.assertTrue(document2.getAttributes().get(Document.STATUS).equals(Document.DocumentStatus.AVAILABLE.getStatusCode()));
-	    Assert.assertFalse(attributes.containsKey(Document.LOCKED_BY));
+	    Assert.assertTrue(document2.getAttributes().get(DocumentSystemAttributes.STATUS.getKey()).equals(Document.DocumentStatus.AVAILABLE.getStatusCode()));
+	    Assert.assertFalse(attributes.containsKey(DocumentSystemAttributes.LOCKED_BY.getKey()));
 
 	    response = target().path(RestDocumentService.DOCUMENTS_PATH).path(document.getId()).path("checkin")
 		    .request(MediaType.APPLICATION_JSON).cookie(adminCookie).post(null);
@@ -475,7 +476,7 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
             Assert.assertTrue(ratings.size() == 1);
             Assert.assertTrue(ratings.contains(rating));
 
-            User testRatingUser = createUser("test-rating-user-" + System.currentTimeMillis(), "secret", ImmutableSet.of(RoleService.DefaultRoles.WRITER.getRole()));
+            User testRatingUser = createUser("test-rating-user-" + System.currentTimeMillis() + "@gmail.com", "secret", ImmutableSet.of(RoleService.DefaultRoles.WRITER.getRole()));
             Assert.assertNotNull(testRatingUser);
             log.debug(String.format("New test rating user created: %s", testRatingUser));
             Cookie cookie = login(new CredentialImpl.Builder().username(testRatingUser.getLogin())

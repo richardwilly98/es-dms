@@ -58,6 +58,7 @@ import com.github.richardwilly98.esdms.DocumentImpl;
 import com.github.richardwilly98.esdms.SearchResultImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
+import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Version;
@@ -104,7 +105,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
     }
 
     private SimpleDocument updateModifiedDate(SimpleDocument document) {
-	document.setReadOnlyAttribute(Document.MODIFIED_DATE, new Date());
+	document.setReadOnlyAttribute(DocumentSystemAttributes.MODIFIED_DATE.getKey(), new Date());
 	return document;
     }
 
@@ -147,8 +148,8 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
     @Override
     public Document create(Document item) throws ServiceException {
 	SimpleDocument sd = getSimpleDocument(item);
-	sd.setReadOnlyAttribute(Document.CREATION_DATE, new Date());
-	sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
+	sd.setReadOnlyAttribute(DocumentSystemAttributes.CREATION_DATE.getKey(), new Date());
+	sd.setReadOnlyAttribute(DocumentSystemAttributes.AUTHOR.getKey(), getCurrentUser());
 	return super.create(sd);
     }
 
@@ -218,9 +219,9 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
     public void checkin(Document document) throws ServiceException {
 	if (document.hasStatus(DocumentStatus.LOCKED)) {
 	    SimpleDocument sd = getSimpleDocument(document);
-	    sd.removeReadOnlyAttribute(Document.STATUS);
-	    sd.setReadOnlyAttribute(Document.AUTHOR, getCurrentUser());
-	    sd.removeReadOnlyAttribute(Document.LOCKED_BY);
+	    sd.removeReadOnlyAttribute(DocumentSystemAttributes.STATUS.getKey());
+	    sd.setReadOnlyAttribute(DocumentSystemAttributes.AUTHOR.getKey(), getCurrentUser());
+	    sd.removeReadOnlyAttribute(DocumentSystemAttributes.LOCKED_BY.getKey());
 	    document = update(sd);
 	} else {
 	    throw new ServiceException(String.format("Document %s is not locked.", document.getId()));
@@ -261,7 +262,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 	    throw new ServiceException(String.format("Document %s already locked.", document.getId()));
 	}
 	sd.setStatus(DocumentStatus.LOCKED);
-	sd.setReadOnlyAttribute(Document.LOCKED_BY, getCurrentUser());
+	sd.setReadOnlyAttribute(DocumentSystemAttributes.LOCKED_BY.getKey(), getCurrentUser());
 	update(sd);
     }
 

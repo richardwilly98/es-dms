@@ -76,7 +76,7 @@ class SimpleDocument extends DocumentImpl {
 
     protected void setStatus(DocumentStatus status) {
 	checkNotNull(status);
-	setReadOnlyAttribute(Document.STATUS, status.getStatusCode());
+	setReadOnlyAttribute(DocumentSystemAttributes.STATUS.getKey(), status.getStatusCode());
     }
 
     /*

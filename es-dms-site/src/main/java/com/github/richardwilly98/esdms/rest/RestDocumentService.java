@@ -73,6 +73,7 @@ import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Version;
+import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.rest.exception.PreconditionException;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
@@ -246,7 +247,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 
 	    contentDisposition.fileName(version.getFile().getName());
 	    if (version.getFile().getDate() != null) {
-		contentDisposition.creationDate(version.getFile().getDate().toDate());
+		contentDisposition.creationDate(version.getFile().getDate());
 	    }
 	    ResponseBuilder rb = Response.ok();
 	    rb.type(version.getFile().getContentType());
@@ -507,8 +508,8 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 	    File file = new FileImpl.Builder().content(content).name(fileDetail.getFileName()).contentType(contentType).build();
 	    Map<String, Object> attributes = new HashMap<String, Object>();
 	    DateTime now = new DateTime();
-	    attributes.put(Document.CREATION_DATE, now.toString());
-	    attributes.put(Document.AUTHOR, getCurrentUser());
+	    attributes.put(DocumentSystemAttributes.CREATION_DATE.getKey(), now.toString());
+	    attributes.put(DocumentSystemAttributes.AUTHOR.getKey(), getCurrentUser());
 	    // Document document = new DocumentImpl(null, name, file,
 	    // attributes);
 	    Set<Version> versions = newHashSet();
@@ -603,7 +604,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 
 	    contentDisposition.fileName(version.getFile().getName());
 	    if (version.getFile().getDate() != null) {
-		contentDisposition.creationDate(version.getFile().getDate().toDate());
+		contentDisposition.creationDate(version.getFile().getDate());
 	    }
 	    ResponseBuilder rb = Response.ok();
 	    rb.type(version.getFile().getContentType());
@@ -638,7 +639,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 
 	    contentDisposition.fileName(version.getFile().getName());
 	    if (version.getFile().getDate() != null) {
-		contentDisposition.creationDate(version.getFile().getDate().toDate());
+		contentDisposition.creationDate(version.getFile().getDate());
 	    }
 	    ResponseBuilder rb = Response.ok();
 	    rb.type(version.getFile().getContentType());

@@ -93,9 +93,8 @@ public class DocumentTest extends DocumentImpl {
 	return docs;
     }
 
-    private void setStatus(DocumentStatus status) {
-	// RLO - Must be .getStatusCode()
-	super.setReadOnlyAttribute(STATUS, status.getStatusCode());
+    void setStatus(DocumentStatus status) {
+	super.setReadOnlyAttribute(DocumentSystemAttributes.STATUS.getKey(), status.getStatusCode());
     }
 
     @Test
