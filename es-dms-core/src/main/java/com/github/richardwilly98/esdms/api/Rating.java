@@ -33,10 +33,6 @@ import com.github.richardwilly98.esdms.RatingImpl;
 
 @JsonDeserialize(as = RatingImpl.class)
 public interface Rating {
-    // /*
-    // * Item id of the rating
-    // */
-    // public abstract String getItemId();
 
     /*
      * user login who has created the rating

@@ -14,6 +14,7 @@ import com.github.richardwilly98.esdms.bpm.api.ProcessInstance;
 import com.github.richardwilly98.esdms.bpm.api.Task;
 
 public class BpmObjectsTest {
+
     private static Logger log = Logger.getLogger(BpmObjectsTest.class);
 
     @Test
