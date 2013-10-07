@@ -100,7 +100,6 @@ public abstract class ItemBaseImpl implements Serializable, ItemBase {
 
     protected ItemBaseImpl(BuilderBase<?> builder) {
         if (builder != null) {
-            checkNotNull(builder.name, "name is required");
             this.id = builder.id;
             this.name = builder.name;
             this.disabled = builder.disabled;
