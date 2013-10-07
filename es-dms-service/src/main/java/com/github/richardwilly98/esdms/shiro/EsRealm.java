@@ -139,7 +139,7 @@ public class EsRealm extends AuthorizingRealm {
 
     private User getPrincipal(String login) {
 	try {
-	    return userService.get(login);
+	    return userService.findByLogin(login);
 	} catch (ServiceException ex) {
 	    log.error("getPrincipal failed", ex);
 	}
