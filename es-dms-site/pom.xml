@@ -214,12 +214,20 @@
 						<fileset>
 							<directory>yo/.tmp</directory>
 						</fileset>
+						<!--
 						<fileset>
-							<directory>yo/app/components</directory>
+							<directory>yo/app/bower_components</directory>
+							<excludes>
+								<exclude>**/*</exclude>
+							</excludes>
 						</fileset>
 						<fileset>
 							<directory>yo/node_modules</directory>
+							<excludes>
+								<exclude>**/*</exclude>
+							</excludes>
 						</fileset>
+					-->
 					</filesets>
 				</configuration>
 			</plugin>
