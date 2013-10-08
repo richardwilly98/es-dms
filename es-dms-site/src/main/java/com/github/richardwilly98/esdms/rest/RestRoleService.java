@@ -48,6 +48,7 @@ import com.github.richardwilly98.esdms.services.RoleService;
 @Path(RestRoleService.ROLES_PATH)
 public class RestRoleService extends RestItemBaseService<Role> {
 
+    public static final String TYPES_PATH = "_types";
     public static final String ROLES_PATH = "roles";
 
     @Inject
@@ -57,7 +58,7 @@ public class RestRoleService extends RestItemBaseService<Role> {
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
-    @Path("_types")
+    @Path(TYPES_PATH)
     public Response getRoleTypes() {
         if (log.isTraceEnabled()) {
             log.trace("getRoleTypes");
