@@ -50,6 +50,7 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.services.HashService;
 import com.github.richardwilly98.esdms.services.RoleService;
 import com.github.richardwilly98.esdms.services.UserService;
+import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 
 public class EsRealm extends AuthorizingRealm {
@@ -81,8 +82,8 @@ public class EsRealm extends AuthorizingRealm {
 	    throw new AuthorizationException("Empty principal list!");
 	}
 
-	User principal = principalList.iterator().next();
-        log.trace(String.format("getAuthorization for %s", principal.getId()));
+	User principal = Iterables.get(principalList, 0);//.iterator().next();
+        log.debug(String.format("getAuthorization for %s", principal.getId()));
 	Set<String> roles = new HashSet<String>();
 	Set<String> permissions = new HashSet<String>();
 	for (Role role : principal.getRoles()) {

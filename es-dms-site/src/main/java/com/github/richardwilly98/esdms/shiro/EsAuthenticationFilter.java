@@ -87,6 +87,7 @@ public class EsAuthenticationFilter extends UserFilter {
 	return new Subject.Builder().buildSubject();
     }
 
+    @SuppressWarnings("rawtypes")
     private Subject getSubjectFromUri(HttpServletRequest request) {
 	try {
 	    Enumeration enumeration = request.getHeaderNames();
@@ -156,7 +157,7 @@ public class EsAuthenticationFilter extends UserFilter {
 
     private Subject getSubjectByPrincipal(String token, PrincipalCollection principals) {
 	if (log.isTraceEnabled()) {
-	    log.trace(String.format("Start getSubjectByPrincipal - %s - %s", token, principals));
+	    log.trace(String.format("Start getSubjectByPrincipal - %s", token));
 	}
 	Subject currentUser = new Subject.Builder().principals(principals)/*
 					                                   * .
@@ -179,7 +180,7 @@ public class EsAuthenticationFilter extends UserFilter {
 	}
 	Subject subject = getSubjectByPrincipal(token, principals);
 	if (subject != null) {
-	    log.debug("Subject principal: " + subject.getPrincipal() + " - authenticated: " + subject.isAuthenticated());
+//	    log.debug("Subject principal: " + subject.getPrincipal() + " - authenticated: " + subject.isAuthenticated());
 	    ThreadContext.bind(subject);
 	}
 	return subject;
