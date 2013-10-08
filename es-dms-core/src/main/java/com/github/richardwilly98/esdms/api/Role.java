@@ -26,6 +26,7 @@ package com.github.richardwilly98.esdms.api;
  * #L%
  */
 
+import java.util.EnumSet;
 import java.util.Set;
 
 import javax.validation.constraints.NotNull;
@@ -38,36 +39,25 @@ import com.github.richardwilly98.esdms.RoleImpl;
 public interface Role extends ItemBase {
 
     public enum RoleType {
-        SYSTEM(Constants.SYSTEM), USER_DEFINED(Constants.USER_DEFINED), PROCESS(Constants.PROCESS);
+        SYSTEM(0), PROCESS(1), USER_DEFINED(2);
 
-        private String type;
+        private int type;
 
-        RoleType(String type) {
+        RoleType(int type) {
             this.type = type;
         }
 
-        public String getType() {
+        @JsonValue
+        public int getType() {
             return this.type;
         }
 
-        public static class Constants {
-            // system role type cannot be updated or deleted
-            public static final String SYSTEM = "system";
-            // user-defined role type can be used in es-dms for permissions
-            public static final String USER_DEFINED = "user-defined";
-            // process role type are only used for process integration
-            public static final String PROCESS = "process";
-        }
-
         @JsonValue
-        public static RoleType fromValue(String value) {
-            switch (value) {
-            case Constants.SYSTEM:
-                return RoleType.SYSTEM;
-            case Constants.USER_DEFINED:
-                return RoleType.USER_DEFINED;
-            case Constants.PROCESS:
-                return RoleType.PROCESS;
+        public static RoleType fromValue(int value) {
+            for (RoleType roleType : EnumSet.allOf(RoleType.class)) {
+                if (roleType.getType() == value) {
+                    return roleType;
+                }
             }
             throw new IllegalArgumentException("Invalid role type: " + value);
         }

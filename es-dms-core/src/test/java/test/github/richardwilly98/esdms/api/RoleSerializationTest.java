@@ -50,11 +50,6 @@ public class RoleSerializationTest {
 
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    @BeforeClass
-    public void initialize() {
-	log.info("*** initialize ***");
-    }
-
     protected Permission createPermission(String name, String description, boolean disabled) {
         Assert.assertTrue(!(name == null || name.isEmpty()));
         return new PermissionImpl.Builder().id(name).name(name).description(description).disabled(disabled).build();
