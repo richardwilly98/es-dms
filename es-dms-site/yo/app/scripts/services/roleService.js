@@ -1,10 +1,24 @@
 'use strict';
 
 esDmsSiteApp.service('roleService', ['$log', '$rootScope', '$resource', '$http', function roleService($log, $rootScope, $resource, $http) {
-	var resource = $resource('api/roles/:verb/:name', {}, {});
+	var resource = $resource('api/roles/:id/:action', { }, {
+		update: {method: 'PUT'},
+		create: {method: 'POST'},
+		types: {method: 'GET', params: {id: '_types'}, isArray: true}
+	});
 	var roles = [];
+	var roleTypes = [];
 	var editedRole = null;
 	return {
+		roleTypes: function(callback) {
+			if (roleTypes.length === 0) {
+				var types = new resource.types({}, function(){
+					$log.log('get roleTypes: ' + JSON.stringify(types));
+					roleTypes = types;
+	        callback(types);
+				});
+			}
+		},
 		search: function(criteria, callback) {
 			$http.get('api/roles/search/' + criteria).success(function (data) {
 				roles = data.items;
@@ -20,22 +34,25 @@ esDmsSiteApp.service('roleService', ['$log', '$rootScope', '$resource', '$http',
 			}
 			$rootScope.$broadcast('role:edit');
 		},
-		currentRole: function() {
+		currentRole: function(callback) {
 			if (editedRole) {
-				for (var i in roles) {
-					if (roles[i].id === editedRole) {
-						return roles[i];
-					}
-				}
+				var role = new resource.get({'id': editedRole}, function(){
+					callback(role);
+				});
 			} else {
-				return {};
+				return callback(new resource());
 			}
 		},
-		save: function(role) {
-			$log.log('save role: ' + role);
-			resource.save(role);
-			if (!editedRole) {
-				roles.push(role);
+		save: function(role, isNew) {
+			$log.log('save role: ' + JSON.stringify(role));
+			if (isNew) {
+				role.$create({}, function() {
+					$rootScope.$broadcast('role:updated', {id: role.id});
+				});
+			} else {
+			role.$update({id: role.id}, function() {
+				$rootScope.$broadcast('role:updated', {id: role.id});
+			});
 			}
 		}
 	};
