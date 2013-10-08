@@ -40,13 +40,13 @@ import com.google.inject.name.Names;
 
 public class EsShiroWebModule extends ShiroWebModule {
 
-    private final String securityFilterPath;
+//    private final String securityFilterPath;
     private final Logger log = Logger.getLogger(this.getClass());
 
     public EsShiroWebModule(ServletContext servletContext, String securityFilterPath) {
 	super(servletContext);
 	log.debug("*** constructor ***");
-	this.securityFilterPath = securityFilterPath;
+//	this.securityFilterPath = securityFilterPath;
     }
 
     @SuppressWarnings("unchecked")

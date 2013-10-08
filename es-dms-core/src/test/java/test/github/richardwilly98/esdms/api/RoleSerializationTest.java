@@ -30,7 +30,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

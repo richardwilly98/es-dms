@@ -29,7 +29,6 @@ package com.github.richardwilly98.esdms.shiro;
 import javax.servlet.ServletContext;
 
 import org.apache.log4j.Logger;
-import org.apache.shiro.guice.aop.ShiroAopModule;
 
 import com.google.inject.AbstractModule;
 

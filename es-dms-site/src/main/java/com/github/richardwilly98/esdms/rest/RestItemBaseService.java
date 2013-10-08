@@ -68,9 +68,6 @@ public abstract class RestItemBaseService<T extends ItemBase> extends RestServic
     protected final Logger log = Logger.getLogger(getClass());
     protected final BaseService<T> service;
 
-    // @Context
-    // UriInfo url;
-    //
     @Inject
     public RestItemBaseService(final AuthenticationService authenticationService, final BaseService<T> service) {
         super(authenticationService);
