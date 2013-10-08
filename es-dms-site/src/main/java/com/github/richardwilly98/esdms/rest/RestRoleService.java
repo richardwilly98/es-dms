@@ -26,8 +26,20 @@ package com.github.richardwilly98.esdms.rest;
  * #L%
  */
 
+import static com.google.common.collect.Sets.newHashSet;
+
+import java.util.AbstractMap;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
+
 import javax.inject.Inject;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
@@ -40,7 +52,21 @@ public class RestRoleService extends RestItemBaseService<Role> {
 
     @Inject
     public RestRoleService(AuthenticationService authenticationService, final RoleService roleService) {
-	super(authenticationService, roleService);
+        super(authenticationService, roleService);
+    }
+
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("_types")
+    public Response getRoleTypes() {
+        if (log.isTraceEnabled()) {
+            log.trace("getRoleTypes");
+        }
+        Set<Map.Entry<Integer, String>> types = newHashSet();
+        for (Role.RoleType type : EnumSet.allOf(Role.RoleType.class)) {
+            types.add(new AbstractMap.SimpleEntry<Integer, String>(type.getType(), type.getDescription()));
+        }
+        return Response.status(Status.OK).entity(types).build();
     }
 
 }

@@ -39,17 +39,23 @@ import com.github.richardwilly98.esdms.RoleImpl;
 public interface Role extends ItemBase {
 
     public enum RoleType {
-        SYSTEM(0), PROCESS(1), USER_DEFINED(2);
+        SYSTEM(0, "System"), PROCESS(1, "Process"), USER_DEFINED(2, "User defined");
 
         private int type;
+        private String description;
 
-        RoleType(int type) {
+        RoleType(int type, String description) {
             this.type = type;
+            this.description = description;
         }
 
         @JsonValue
         public int getType() {
             return this.type;
+        }
+        
+        public String getDescription() {
+            return this.description;
         }
 
         @JsonValue
