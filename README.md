@@ -1,6 +1,6 @@
 # es-dms #
 
-Test web app using AngujarJS, Jersey and ElasticSearch
+ES DMS is a collaborative content management framework based on AngularJS, Bootstrap, Jersey and ElasticSearch
 
 ## Build status##
 [![Build Status](https://drone.io/github.com/richardwilly98/es-dms/status.png)](https://drone.io/github.com/richardwilly98/es-dms/latest)
