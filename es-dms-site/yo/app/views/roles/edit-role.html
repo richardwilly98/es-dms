@@ -4,7 +4,7 @@
 		<button type="button" class="close" data-ng-click="close()"
 			aria-hidden="true">&times;</button>
 		<h3 data-ng-show="newRole">New role</h3>
-		<h3 data-ng-hide="newRole">Edit Role: {{ role.name }}</h3>
+		<h3 data-ng-hide="newRole">Edit: {{ role.name }}</h3>
 	</div>
 	<div class="modal-body">
 		<form class="form-horizontal">
@@ -19,6 +19,14 @@
 				<label class="control-label">Name:</label>
 				<div class="controls">
 					<input type="text" ng-model="role.name" placeholder="Name" />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">Type:</label>
+				<div class="controls">
+					<select required ng-model="role.type"
+						ng-options="type.key as type.value for type in roleTypes">
+					</select>
 				</div>
 			</div>
 			<div class="control-group">

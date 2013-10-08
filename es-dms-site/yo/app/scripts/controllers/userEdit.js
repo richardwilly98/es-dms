@@ -13,6 +13,7 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$rootScope', '$http'
 	$scope.selectedRoles = [];
 	$scope.roles = [];
 
+	/*
 	$rootScope.$on('user:edit', function() {
 		$log.log('on user:edit');
 		var editUser = userService.currentUser();
@@ -46,6 +47,43 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$rootScope', '$http'
 		});
     $scope.shouldBeOpen = true;
 	});
+	*/
+	
+	$rootScope.$on('user:edit', function() {
+		$log.log('on user:edit');
+		userService.currentUser(function(user){
+			if (user.id) {
+				$scope.user = user;
+				$log.log('user.roles: ' + JSON.stringify($scope.user.roles));
+				//$scope.selectedRoles = $scope.user.roles;
+				$scope.newUser = false;
+			} else {
+				$scope.newUser = true;
+				$scope.incomplete = true;
+				// $scope.user = {roles: []};
+				$scope.user = user;
+				$scope.pw1 = '';
+				$scope.pw2 = '';
+			}
+			roleService.search('*', function(result) {
+				$scope.roles = result.items;
+				if (!$scope.newUser) {
+					// TODO: Must be optimized.
+					// TODO: Check the reason orderBy filter does not work. Items not selected.
+					_.each($scope.roles, function(role) {
+						_.find($scope.user.roles, function(item) {
+							if (item !== null && role.id === item.id) {
+								$scope.selectedRoles.push(role);
+							}
+						});
+					});
+					$log.log('$scope.selectedRoles: ' + JSON.stringify($scope.selectedRoles));
+				}
+				$log.log('roles: ' + JSON.stringify($scope.roles));
+			});
+	    $scope.shouldBeOpen = true;
+		});
+	});
 	
   $scope.close = function() {
     $scope.shouldBeOpen = false;
@@ -62,7 +100,7 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$rootScope', '$http'
 		}
 		$log.log('About to save user: ' + JSON.stringify($scope.user));
 		$scope.user.roles = $scope.selectedRoles;
-		userService.save($scope.user);
+		userService.save($scope.user, $scope.newUser);
     $scope.shouldBeOpen = false;
 	};
 	

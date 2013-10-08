@@ -2,8 +2,9 @@
 
 esDmsSiteApp.service('userService', ['$log', '$rootScope', '$resource', '$http', function userService($log, $rootScope, $resource, $http) {
 	var resource = $resource('api/users/:verb/:name', {}, {});
-	var userResource = $resource('api/users/:id/:action/:parameter' , {id:'@id'}, {
+	var userResource = $resource('api/users/:id/:action/:parameter' , { /*id:'@id'*/ }, {
 		metadata: {method:'GET', params: {action: 'metadata'}},
+		create: {method: 'POST', params: {}},
 		update: {method:'PUT', params: {}}
 	});
 	
@@ -31,23 +32,39 @@ esDmsSiteApp.service('userService', ['$log', '$rootScope', '$resource', '$http',
 			var user = new userResource.get({'id': id});
 			user.$delete({'id': id});
 		},
-		currentUser: function() {
+		currentUser: function(callback) {
 			if (editedUser) {
-				for (var i in users) {
-					if (users[i].id === editedUser) {
-						return users[i];
-					}
-				}
+				var user = new userResource.get({'id': editedUser}, function(){
+					callback(user);
+				});
 			} else {
-				return {};
+				return callback(new userResource());
 			}
+			// if (editedUser) {
+			// 	for (var i in users) {
+			// 		if (users[i].id === editedUser) {
+			// 			return users[i];
+			// 		}
+			// 	}
+			// } else {
+			// 	return {};
+			// }
 		},
-		save: function(user) {
-			$log.log('save user: ' + user);
-			resource.save(user);
-			if (!editedUser) {
-				users.push(user);
+		save: function(user, isNew) {
+			$log.log('save user: ' + JSON.stringify(user));
+			if (isNew) {
+				user.$create({}, function() {
+					$rootScope.$broadcast('user:updated', {id: user.id});
+				});
+			} else {
+				user.$update({id: user.id}, function() {
+					$rootScope.$broadcast('user:updated', {id: user.id});
+				});
 			}
+			// userResource.$update(user);
+			// if (!editedUser) {
+			// 	users.push(user);
+			// }
 		},
 		get: function(id, callback) {
 			$log.log('get user: ' + id);
