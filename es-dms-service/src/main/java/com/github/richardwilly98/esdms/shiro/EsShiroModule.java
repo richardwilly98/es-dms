@@ -26,6 +26,8 @@ package com.github.richardwilly98.esdms.shiro;
  * #L%
  */
 
+import org.apache.shiro.cache.CacheManager;
+import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.guice.ShiroModule;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
@@ -37,6 +39,7 @@ public class EsShiroModule extends ShiroModule {
 
     @Override
     protected void configureShiro() {
+        bind(CacheManager.class).to(MemoryConstrainedCacheManager.class).asEagerSingleton();
 	bindRealm().to(EsRealm.class).asEagerSingleton();
 	bind(SessionDAO.class).to(EsSessionDAO.class);
 	bind(EsSessionDAO.class);
