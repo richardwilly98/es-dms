@@ -1,7 +1,7 @@
 'use strict';
 
 esDmsSiteApp.service('roleService', ['$log', '$rootScope', '$resource', '$http', function roleService($log, $rootScope, $resource, $http) {
-	var resource = $resource('api/roles/:id/:action', { }, {
+	var RoleResource = $resource('api/roles/:id/:action', { }, {
 		update: {method: 'PUT'},
 		create: {method: 'POST'},
 		types: {method: 'GET', params: {id: '_types'}, isArray: true}
@@ -12,7 +12,7 @@ esDmsSiteApp.service('roleService', ['$log', '$rootScope', '$resource', '$http',
 	return {
 		roleTypes: function(callback) {
 			if (roleTypes.length === 0) {
-				var types = new resource.types({}, function(){
+				var types = new RoleResource.types({}, function(){
 					$log.log('get roleTypes: ' + JSON.stringify(types));
 					roleTypes = types;
 	        callback(types);
@@ -36,11 +36,11 @@ esDmsSiteApp.service('roleService', ['$log', '$rootScope', '$resource', '$http',
 		},
 		currentRole: function(callback) {
 			if (editedRole) {
-				var role = new resource.get({'id': editedRole}, function(){
+				var role = new RoleResource.get({'id': editedRole}, function(){
 					callback(role);
 				});
 			} else {
-				return callback(new resource());
+				return callback(new RoleResource());
 			}
 		},
 		save: function(role, isNew) {
@@ -50,9 +50,9 @@ esDmsSiteApp.service('roleService', ['$log', '$rootScope', '$resource', '$http',
 					$rootScope.$broadcast('role:updated', {id: role.id});
 				});
 			} else {
-			role.$update({id: role.id}, function() {
-				$rootScope.$broadcast('role:updated', {id: role.id});
-			});
+				role.$update({id: role.id}, function() {
+					$rootScope.$broadcast('role:updated', {id: role.id});
+				});
 			}
 		}
 	};

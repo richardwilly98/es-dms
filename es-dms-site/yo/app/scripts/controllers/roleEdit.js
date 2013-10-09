@@ -5,7 +5,7 @@ esDmsSiteApp.controller('RoleEditCtrl', ['$scope', '$rootScope', 'roleService', 
   $scope.roleTypes = [];
 	$rootScope.$on('role:edit', function() {
     loadRoleTypes();
-		var editRole = roleService.currentRole(function(role){
+		roleService.currentRole(function(role) {
         if (role.id) {
           $scope.role = role;
           $scope.newRole = false;
@@ -17,7 +17,7 @@ esDmsSiteApp.controller('RoleEditCtrl', ['$scope', '$rootScope', 'roleService', 
         }
         $scope.shouldBeOpen = true;
       });
-    });
+  });
 
   function loadRoleTypes() {
     roleService.roleTypes(function(result) {

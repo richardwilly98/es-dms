@@ -1,8 +1,8 @@
 'use strict';
 
 esDmsSiteApp.service('userService', ['$log', '$rootScope', '$resource', '$http', function userService($log, $rootScope, $resource, $http) {
-	var resource = $resource('api/users/:verb/:name', {}, {});
-	var userResource = $resource('api/users/:id/:action/:parameter' , { /*id:'@id'*/ }, {
+	// var resource = $resource('api/users/:verb/:name', {}, {});
+	var UserResource = $resource('api/users/:id/:action/:parameter' , { /*id:'@id'*/ }, {
 		metadata: {method:'GET', params: {action: 'metadata'}},
 		create: {method: 'POST', params: {}},
 		update: {method:'PUT', params: {}}
@@ -29,16 +29,16 @@ esDmsSiteApp.service('userService', ['$log', '$rootScope', '$resource', '$http',
 		},
 		remove: function(id) {
 			$log.log('delete document: ' + id);
-			var user = new userResource.get({'id': id});
+			var user = new UserResource.get({'id': id});
 			user.$delete({'id': id});
 		},
 		currentUser: function(callback) {
 			if (editedUser) {
-				var user = new userResource.get({'id': editedUser}, function(){
+				var user = new UserResource.get({'id': editedUser}, function(){
 					callback(user);
 				});
 			} else {
-				return callback(new userResource());
+				return callback(new UserResource());
 			}
 			// if (editedUser) {
 			// 	for (var i in users) {
@@ -61,14 +61,14 @@ esDmsSiteApp.service('userService', ['$log', '$rootScope', '$resource', '$http',
 					$rootScope.$broadcast('user:updated', {id: user.id});
 				});
 			}
-			// userResource.$update(user);
+			// UserResource.$update(user);
 			// if (!editedUser) {
 			// 	users.push(user);
 			// }
 		},
 		get: function(id, callback) {
 			$log.log('get user: ' + id);
-      var user = new userResource.get({'id': id}, function() {
+      var user = new UserResource.get({'id': id}, function() {
         $log.log('get user: ' + JSON.stringify(user));
         callback(user);
       });
