@@ -38,18 +38,18 @@ public class TestJerseyApplication extends ResourceConfig {
 
     @Inject
     public TestJerseyApplication(ServiceLocator serviceLocator) {
-	super(MultiPartFeature.class);
-	packages("com.github.richardwilly98.esdms.rest", "com.github.richardwilly98.esdms.web", "com.fasterxml.jackson.jaxrs");
+        super(MultiPartFeature.class);
+        packages("com.github.richardwilly98.esdms.rest", "com.github.richardwilly98.esdms.web", "com.fasterxml.jackson.jaxrs");
 
-	System.out.println("Registering injectables...");
+        System.out.println("Registering injectables...");
 
-	GuiceBridge.getGuiceBridge().initializeGuiceBridge(serviceLocator);
+        GuiceBridge.getGuiceBridge().initializeGuiceBridge(serviceLocator);
 
-	GuiceIntoHK2Bridge guiceBridge = serviceLocator.getService(GuiceIntoHK2Bridge.class);
-	// guiceBridge
-	// .bridgeGuiceInjector(Guice.createInjector(new
-	// EsJerseyServletModule("/api/*")));
-	guiceBridge.bridgeGuiceInjector(TestRestGuiceServletConfig.injector);
+        GuiceIntoHK2Bridge guiceBridge = serviceLocator.getService(GuiceIntoHK2Bridge.class);
+        // guiceBridge
+        // .bridgeGuiceInjector(Guice.createInjector(new
+        // EsJerseyServletModule("/api/*")));
+        guiceBridge.bridgeGuiceInjector(TestRestGuiceServletConfig.injector);
     }
 
 }

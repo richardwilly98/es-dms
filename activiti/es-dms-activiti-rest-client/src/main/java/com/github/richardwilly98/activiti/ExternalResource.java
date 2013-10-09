@@ -2,51 +2,52 @@ package com.github.richardwilly98.activiti;
 
 public class ExternalResource extends ItemBase {
 
-	private String type;
-	private String externalUrl;
-	private String taskUrl;
-	private String processInstanceUrl;
-	private String contentUrl;
-	
-	public ExternalResource(){}
+    private String type;
+    private String externalUrl;
+    private String taskUrl;
+    private String processInstanceUrl;
+    private String contentUrl;
 
-	public String getType() {
-		return type;
-	}
+    public ExternalResource() {
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public String getExternalUrl() {
-		return externalUrl;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public void setExternalUrl(String externalUrl) {
-		this.externalUrl = externalUrl;
-	}
+    public String getExternalUrl() {
+        return externalUrl;
+    }
 
-	public String getTaskUrl() {
-		return taskUrl;
-	}
+    public void setExternalUrl(String externalUrl) {
+        this.externalUrl = externalUrl;
+    }
 
-	public void setTaskUrl(String taskUrl) {
-		this.taskUrl = taskUrl;
-	}
+    public String getTaskUrl() {
+        return taskUrl;
+    }
 
-	public String getProcessInstanceUrl() {
-		return processInstanceUrl;
-	}
+    public void setTaskUrl(String taskUrl) {
+        this.taskUrl = taskUrl;
+    }
 
-	public void setProcessInstanceUrl(String processInstanceUrl) {
-		this.processInstanceUrl = processInstanceUrl;
-	}
+    public String getProcessInstanceUrl() {
+        return processInstanceUrl;
+    }
 
-	public String getContentUrl() {
-		return contentUrl;
-	}
+    public void setProcessInstanceUrl(String processInstanceUrl) {
+        this.processInstanceUrl = processInstanceUrl;
+    }
 
-	public void setContentUrl(String contentUrl) {
-		this.contentUrl = contentUrl;
-	}
+    public String getContentUrl() {
+        return contentUrl;
+    }
+
+    public void setContentUrl(String contentUrl) {
+        this.contentUrl = contentUrl;
+    }
 }

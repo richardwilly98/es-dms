@@ -53,48 +53,48 @@ public class AuditFilter implements ContainerResponseFilter {
 
     @Inject
     public AuditFilter(final AuditService service) {
-	this.service = service;
+        this.service = service;
     }
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-	Annotation[] annotations = responseContext.getEntityAnnotations();
-	if (annotations == null) {
-	    log.info("No annotation found.");
-	} else {
-	    for (Annotation annotation : annotations) {
-		if (annotation.annotationType() == Audit.class) {
-		    String id = responseContext.getHeaderString(RestItemBaseService.ITEM_ID_HEADER);
-		    if (id != null) {
-			String currentUser = getCurrentUser();
-			if (currentUser != null) {
-			    try {
-				if (log.isDebugEnabled()) {
-				    log.debug("Audit value: " + ((Audit) annotation).value() + " - id: " + id + " - current user: "
-					    + currentUser);
-				}
-				service.create(((Audit) annotation).value(), id, currentUser);
-			    } catch (ServiceException sEx) {
-				log.error("Create audit failed.", sEx);
-			    }
-			}
-		    }
-		    break;
-		}
-	    }
-	}
+        Annotation[] annotations = responseContext.getEntityAnnotations();
+        if (annotations == null) {
+            log.info("No annotation found.");
+        } else {
+            for (Annotation annotation : annotations) {
+                if (annotation.annotationType() == Audit.class) {
+                    String id = responseContext.getHeaderString(RestItemBaseService.ITEM_ID_HEADER);
+                    if (id != null) {
+                        String currentUser = getCurrentUser();
+                        if (currentUser != null) {
+                            try {
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Audit value: " + ((Audit) annotation).value() + " - id: " + id + " - current user: "
+                                            + currentUser);
+                                }
+                                service.create(((Audit) annotation).value(), id, currentUser);
+                            } catch (ServiceException sEx) {
+                                log.error("Create audit failed.", sEx);
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     private String getCurrentUser() {
-	try {
-	    Subject currentSubject = SecurityUtils.getSubject();
-	    if (currentSubject.getPrincipal() == null) {
-		return null;
-	    } else {
-		return ((User) currentSubject.getPrincipal()).getId();
-	    }
-	} catch (Throwable t) {
-	    return null;
-	}
+        try {
+            Subject currentSubject = SecurityUtils.getSubject();
+            if (currentSubject.getPrincipal() == null) {
+                return null;
+            } else {
+                return ((User) currentSubject.getPrincipal()).getId();
+            }
+        } catch (Throwable t) {
+            return null;
+        }
     }
 }

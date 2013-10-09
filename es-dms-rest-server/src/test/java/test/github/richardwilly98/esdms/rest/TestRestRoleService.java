@@ -85,8 +85,8 @@ public class TestRestRoleService extends GuiceAndJettyTestBase<UserImpl> {
         log.debug("*** testFindRoleByTypes ***");
         try {
             Response response;
-            response = target().path(RestRoleService.ROLES_PATH).queryParam("type", RoleType.SYSTEM.getType()).request(MediaType.APPLICATION_JSON)
-                    .cookie(adminCookie).get();
+            response = target().path(RestRoleService.ROLES_PATH).queryParam("type", RoleType.SYSTEM.getType())
+                    .request(MediaType.APPLICATION_JSON).cookie(adminCookie).get();
             Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
             SearchResult<Role> roles = response.readEntity(new GenericType<SearchResult<Role>>() {
             });
@@ -102,12 +102,12 @@ public class TestRestRoleService extends GuiceAndJettyTestBase<UserImpl> {
             Assert.fail();
         }
     }
-    
+
     @Test
     public void testLoadDefaultRoles() throws Throwable {
         log.debug("*** testLoadDefaultRoles ***");
         try {
-            for(RoleService.DefaultRoles defaultRole : EnumSet.allOf(RoleService.DefaultRoles.class)) {
+            for (RoleService.DefaultRoles defaultRole : EnumSet.allOf(RoleService.DefaultRoles.class)) {
                 Assert.assertNotNull(getRole(defaultRole.getRole().getId()));
             }
         } catch (Throwable t) {
@@ -115,7 +115,7 @@ public class TestRestRoleService extends GuiceAndJettyTestBase<UserImpl> {
             Assert.fail();
         }
     }
-    
+
     // TODO: Validate system role cannot be updated or deleted.
 
 }

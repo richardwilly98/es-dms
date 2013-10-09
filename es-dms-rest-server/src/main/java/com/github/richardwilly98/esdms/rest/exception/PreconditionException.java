@@ -34,6 +34,6 @@ import javax.ws.rs.core.Response.Status;
 public class PreconditionException extends WebApplicationException {
 
     public PreconditionException(String message) {
-	super(Response.status(Status.PRECONDITION_FAILED).entity(message).build());
+        super(Response.status(Status.PRECONDITION_FAILED).entity(message).build());
     }
 }

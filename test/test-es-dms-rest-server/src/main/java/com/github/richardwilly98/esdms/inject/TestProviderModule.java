@@ -36,21 +36,19 @@ import com.mycila.inject.jsr250.Jsr250;
 
 public class TestProviderModule extends AbstractModule {
 
-	@Override
-	protected void configure() {
+    @Override
+    protected void configure() {
 
-		install(new BootstrapModule());
-		install(new TestEsClientModule());
-		install(new ServicesModule());
-		install(new ShiroAopModule());
-		// install(new EsShiroModule());
+        install(new BootstrapModule());
+        install(new TestEsClientModule());
+        install(new ServicesModule());
+        install(new ShiroAopModule());
+        // install(new EsShiroModule());
 
-		Injector injector = Jsr250.createInjector(new BootstrapModule(),
-				new TestEsClientModule(), new ServicesModule(),
-				new EsShiroModule());
-		org.apache.shiro.mgt.SecurityManager securityManager = injector
-				.getInstance(org.apache.shiro.mgt.SecurityManager.class);
-		SecurityUtils.setSecurityManager(securityManager);
-	}
+        Injector injector = Jsr250.createInjector(new BootstrapModule(), new TestEsClientModule(), new ServicesModule(),
+                new EsShiroModule());
+        org.apache.shiro.mgt.SecurityManager securityManager = injector.getInstance(org.apache.shiro.mgt.SecurityManager.class);
+        SecurityUtils.setSecurityManager(securityManager);
+    }
 
 }

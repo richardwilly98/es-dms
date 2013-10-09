@@ -34,18 +34,18 @@ public class FacetedQuery {
     Map<String, Object> filters;
 
     public String getFacet() {
-	return facet;
+        return facet;
     }
 
     public void setFacet(String facet) {
-	this.facet = facet;
+        this.facet = facet;
     }
 
     public Map<String, Object> getFilters() {
-	return filters;
+        return filters;
     }
 
     public void setFilters(Map<String, Object> filters) {
-	this.filters = filters;
+        this.filters = filters;
     }
 }

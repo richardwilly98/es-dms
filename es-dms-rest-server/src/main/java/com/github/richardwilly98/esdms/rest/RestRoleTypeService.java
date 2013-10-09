@@ -48,7 +48,7 @@ import com.github.richardwilly98.esdms.services.AuthenticationService;
 public class RestRoleTypeService extends RestServiceBase {
 
     public static final String ROLE_TYPES_PATH = "role-types";
-    
+
     @Inject
     public RestRoleTypeService(AuthenticationService authenticationService) {
         super(authenticationService);

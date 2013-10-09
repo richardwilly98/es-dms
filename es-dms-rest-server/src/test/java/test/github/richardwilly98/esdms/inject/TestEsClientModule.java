@@ -36,7 +36,7 @@ public class TestEsClientModule extends AbstractModule {
 
     @Override
     protected void configure() {
-	bind(Client.class).toProvider(LocalClientProvider.class).asEagerSingleton();
+        bind(Client.class).toProvider(LocalClientProvider.class).asEagerSingleton();
     }
 
 }

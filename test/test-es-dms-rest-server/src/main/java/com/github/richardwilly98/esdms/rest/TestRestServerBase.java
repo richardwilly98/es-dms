@@ -69,244 +69,231 @@ import com.google.inject.servlet.GuiceFilter;
  */
 public class TestRestServerBase {
 
-	protected final Logger log = Logger.getLogger(getClass());
-	protected final static Credential adminCredential = new CredentialImpl.Builder()
-			.username(UserService.DEFAULT_ADMIN_LOGIN)
-			.password(UserService.DEFAULT_ADMIN_PASSWORD.toCharArray()).build();
-	private final Server server;
-	final static ObjectMapper mapper = new ObjectMapper();
-	protected static String adminToken;
-	protected static Cookie adminCookie;
-	private final Client restClient;
-	// private final Client securedClient;
-	private static final int HTTP_PORT = 8081;
-	private static final int HTTPS_PORT = 50443;
+    protected final Logger log = Logger.getLogger(getClass());
+    protected final static Credential adminCredential = new CredentialImpl.Builder().username(UserService.DEFAULT_ADMIN_LOGIN)
+            .password(UserService.DEFAULT_ADMIN_PASSWORD.toCharArray()).build();
+    private final Server server;
+    final static ObjectMapper mapper = new ObjectMapper();
+    protected static String adminToken;
+    protected static Cookie adminCookie;
+    private final Client restClient;
+    // private final Client securedClient;
+    private static final int HTTP_PORT = 8081;
+    private static final int HTTPS_PORT = 50443;
 
-	@Inject
-	org.elasticsearch.client.Client client;
+    @Inject
+    org.elasticsearch.client.Client client;
 
-	protected TestRestServerBase() throws Exception {
-		// mapper.configure(
-		// DeserializationConfig.Feature.USE_ANNOTATIONS, false)
-		// .configure(SerializationConfig.Feature.USE_ANNOTATIONS, false);
-		server = new Server(HTTP_PORT);
-		// Connector secureConnector = createSecureConnector();
-		// server.setConnectors(new Connector[] {secureConnector});
-		// ClientConfig config = new DefaultClientConfig();
-		// config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING,
-		// Boolean.TRUE);
-		// config.getFeatures().add(JacksonJsonProvider.class);
-		// restClient = Client.create(config);
-		ClientConfig configuration = new ClientConfig();
-		configuration.register(MultiPartFeature.class);
-		// configuration.register(new JacksonFeature());
-		restClient = ClientBuilder.newClient(configuration);
-		// restClient.register(new JacksonFeature());
-		// restClient = Client.create(new DefaultClientConfig(
-		// JacksonJaxbJsonProvider.class));
-		// securedClient = createSecuredClient();
-	}
+    protected TestRestServerBase() throws Exception {
+        // mapper.configure(
+        // DeserializationConfig.Feature.USE_ANNOTATIONS, false)
+        // .configure(SerializationConfig.Feature.USE_ANNOTATIONS, false);
+        server = new Server(HTTP_PORT);
+        // Connector secureConnector = createSecureConnector();
+        // server.setConnectors(new Connector[] {secureConnector});
+        // ClientConfig config = new DefaultClientConfig();
+        // config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING,
+        // Boolean.TRUE);
+        // config.getFeatures().add(JacksonJsonProvider.class);
+        // restClient = Client.create(config);
+        ClientConfig configuration = new ClientConfig();
+        configuration.register(MultiPartFeature.class);
+        // configuration.register(new JacksonFeature());
+        restClient = ClientBuilder.newClient(configuration);
+        // restClient.register(new JacksonFeature());
+        // restClient = Client.create(new DefaultClientConfig(
+        // JacksonJaxbJsonProvider.class));
+        // securedClient = createSecuredClient();
+    }
 
-	final static Annotations[] BASIC_ANNOTATIONS = { Annotations.JACKSON };
+    final static Annotations[] BASIC_ANNOTATIONS = { Annotations.JACKSON };
 
-	// private Client createSecuredClient() throws Exception {
-	// TrustManager[ ] certs = new TrustManager[ ] {
-	// new X509TrustManager() {
-	// @Override
-	// public X509Certificate[] getAcceptedIssuers() {
-	// return null;
-	// }
-	// @Override
-	// public void checkServerTrusted(X509Certificate[] chain, String authType)
-	// throws CertificateException {
-	// }
-	// @Override
-	// public void checkClientTrusted(X509Certificate[] chain, String authType)
-	// throws CertificateException {
-	// }
-	// }
-	// };
-	//
-	// ClientConfig config = new DefaultClientConfig();
-	// SSLContext ctx = SSLContext.getInstance("SSL");
-	// ctx.init(null, certs, new SecureRandom());
-	// config.getProperties().put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, new
-	// HTTPSProperties(new HostnameVerifier() {
-	// @Override
-	// public boolean verify(String hostname, SSLSession session) {
-	// return true;
-	// }
-	// }, ctx));
-	// return Client.create(config);
-	// }
+    // private Client createSecuredClient() throws Exception {
+    // TrustManager[ ] certs = new TrustManager[ ] {
+    // new X509TrustManager() {
+    // @Override
+    // public X509Certificate[] getAcceptedIssuers() {
+    // return null;
+    // }
+    // @Override
+    // public void checkServerTrusted(X509Certificate[] chain, String authType)
+    // throws CertificateException {
+    // }
+    // @Override
+    // public void checkClientTrusted(X509Certificate[] chain, String authType)
+    // throws CertificateException {
+    // }
+    // }
+    // };
+    //
+    // ClientConfig config = new DefaultClientConfig();
+    // SSLContext ctx = SSLContext.getInstance("SSL");
+    // ctx.init(null, certs, new SecureRandom());
+    // config.getProperties().put(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES, new
+    // HTTPSProperties(new HostnameVerifier() {
+    // @Override
+    // public boolean verify(String hostname, SSLSession session) {
+    // return true;
+    // }
+    // }, ctx));
+    // return Client.create(config);
+    // }
 
-	// @BeforeSuite
-	protected void setUp() throws Exception {
-		log.info("*** setUp ***");
-		WebAppContext webAppContext = new WebAppContext();
-		webAppContext.setContextPath("/");
-		webAppContext.setResourceBase("src/test/webapp/");
-		webAppContext.setParentLoaderPriority(true);
-		webAppContext.addEventListener(new TestRestGuiceServletConfig());
-		webAppContext.addFilter(GuiceFilter.class, "/*", null);
-		ServletHolder servlet = new ServletHolder();
-		servlet.setName("jersey-servlet");
-		servlet.setClassName("org.glassfish.jersey.servlet.ServletContainer");
-		servlet.getInitParameters().put("javax.ws.rs.Application",
-				TestJerseyApplication.class.getCanonicalName());
-		webAppContext.addServlet(servlet, "/*");
+    // @BeforeSuite
+    protected void setUp() throws Exception {
+        log.info("*** setUp ***");
+        WebAppContext webAppContext = new WebAppContext();
+        webAppContext.setContextPath("/");
+        webAppContext.setResourceBase("src/test/webapp/");
+        webAppContext.setParentLoaderPriority(true);
+        webAppContext.addEventListener(new TestRestGuiceServletConfig());
+        webAppContext.addFilter(GuiceFilter.class, "/*", null);
+        ServletHolder servlet = new ServletHolder();
+        servlet.setName("jersey-servlet");
+        servlet.setClassName("org.glassfish.jersey.servlet.ServletContainer");
+        servlet.getInitParameters().put("javax.ws.rs.Application", TestJerseyApplication.class.getCanonicalName());
+        webAppContext.addServlet(servlet, "/*");
 
-		server.setHandler(webAppContext);
-		server.start();
+        server.setHandler(webAppContext);
+        server.start();
 
-		// ClientConfig config = new DefaultClientConfig();
-		// config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING,
-		// Boolean.TRUE);
-		// config.getClasses().add(JacksonJaxbJsonProvider.class);
-		// // config.getFeatures().add(JacksonJsonProvider.class);
-		// restClient = Client.create(config);
+        // ClientConfig config = new DefaultClientConfig();
+        // config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING,
+        // Boolean.TRUE);
+        // config.getClasses().add(JacksonJaxbJsonProvider.class);
+        // // config.getFeatures().add(JacksonJsonProvider.class);
+        // restClient = Client.create(config);
 
-		loginAdminUser();
-	}
+        loginAdminUser();
+    }
 
-	// private Connector createSecureConnector() {
-	// SslSocketConnector connector = new SslSocketConnector();
-	// connector.setPort(HTTPS_PORT);
-	// connector.setKeystore(".keystore");
-	// connector.setKeyPassword("secret");
-	// return connector;
-	// }
+    // private Connector createSecureConnector() {
+    // SslSocketConnector connector = new SslSocketConnector();
+    // connector.setPort(HTTPS_PORT);
+    // connector.setKeystore(".keystore");
+    // connector.setKeyPassword("secret");
+    // return connector;
+    // }
 
-	protected URI getBaseURI(boolean secured) {
-		if (secured) {
-			return UriBuilder.fromUri("https://localhost/").port(HTTPS_PORT)
-					.build();
-		} else {
-			return UriBuilder.fromUri("http://localhost/").port(HTTP_PORT)
-					.build();
-		}
-	}
+    protected URI getBaseURI(boolean secured) {
+        if (secured) {
+            return UriBuilder.fromUri("https://localhost/").port(HTTPS_PORT).build();
+        } else {
+            return UriBuilder.fromUri("http://localhost/").port(HTTP_PORT).build();
+        }
+    }
 
-	/**
-	 * Create a web resource whose URI refers to the base URI the Web
-	 * application is deployed at.
-	 * 
-	 * @return the created web resource
-	 */
-	protected WebTarget target() {
-		return restClient.target(getBaseURI(false));
-	}
+    /**
+     * Create a web resource whose URI refers to the base URI the Web
+     * application is deployed at.
+     * 
+     * @return the created web resource
+     */
+    protected WebTarget target() {
+        return restClient.target(getBaseURI(false));
+    }
 
-	// public WebResource securedResource() {
-	// return securedClient.resource(getBaseURI(true));
-	// }
+    // public WebResource securedResource() {
+    // return securedClient.resource(getBaseURI(true));
+    // }
 
-	/**
-	 * Get the client that is configured for this test.
-	 * 
-	 * @return the configured client.
-	 */
-	protected Client client() {
-		return restClient;
-	}
+    /**
+     * Get the client that is configured for this test.
+     * 
+     * @return the configured client.
+     */
+    protected Client client() {
+        return restClient;
+    }
 
-	private void loginAdminUser() {
-		try {
-			log.debug("*** loginAdminUser ***");
-			adminCookie = login(adminCredential);
-			checkNotNull(adminCookie);
-			adminToken = adminCookie.getValue();
-		} catch (Throwable t) {
-			log.error("loginAdminUser failed", t);
-		}
-	}
+    private void loginAdminUser() {
+        try {
+            log.debug("*** loginAdminUser ***");
+            adminCookie = login(adminCredential);
+            checkNotNull(adminCookie);
+            adminToken = adminCookie.getValue();
+        } catch (Throwable t) {
+            log.error("loginAdminUser failed", t);
+        }
+    }
 
-	protected Cookie login(Credential credential) throws Throwable {
-		// try {
-		log.debug("*** login ***");
-		WebTarget webResource = target().path("auth").path("login");
-		log.debug(webResource);
-		Response response = webResource.request(MediaType.APPLICATION_JSON)
-				.post(Entity.entity(credential, MediaType.APPLICATION_JSON));
-		log.debug("status: " + response.getStatus());
-		// Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-		for (NewCookie cookie : response.getCookies().values()) {
-			if (RestAuthencationService.ES_DMS_TICKET.equals(cookie.getName())) {
-				return new Cookie(cookie.getName(), cookie.getValue());
-			}
-		}
-		// } catch (Throwable t) {
-		// log.error("login failed", t);
-		// Assert.fail("login failed", t);
-		// }
-		return null;
-	}
+    protected Cookie login(Credential credential) throws Throwable {
+        // try {
+        log.debug("*** login ***");
+        WebTarget webResource = target().path("auth").path("login");
+        log.debug(webResource);
+        Response response = webResource.request(MediaType.APPLICATION_JSON).post(Entity.entity(credential, MediaType.APPLICATION_JSON));
+        log.debug("status: " + response.getStatus());
+        // Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+        for (NewCookie cookie : response.getCookies().values()) {
+            if (RestAuthencationService.ES_DMS_TICKET.equals(cookie.getName())) {
+                return new Cookie(cookie.getName(), cookie.getValue());
+            }
+        }
+        // } catch (Throwable t) {
+        // log.error("login failed", t);
+        // Assert.fail("login failed", t);
+        // }
+        return null;
+    }
 
-	protected void logout(Cookie cookie) throws Throwable {
-		log.debug("*** logout ***");
-		checkNotNull(cookie);
-		WebTarget webResource = target().path("auth").path("logout");
-		Response response = webResource.request().cookie(cookie)
-				.post(Entity.json(null));
-		log.debug("status: " + response.getStatus());
-		// Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-		if (response.getStatus() != Status.OK.getStatusCode()) {
-			throw new ServiceException(String.format(
-					"logout failed. Response status: %s", response.getStatus()));
-		}
+    protected void logout(Cookie cookie) throws Throwable {
+        log.debug("*** logout ***");
+        checkNotNull(cookie);
+        WebTarget webResource = target().path("auth").path("logout");
+        Response response = webResource.request().cookie(cookie).post(Entity.json(null));
+        log.debug("status: " + response.getStatus());
+        // Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+        if (response.getStatus() != Status.OK.getStatusCode()) {
+            throw new ServiceException(String.format("logout failed. Response status: %s", response.getStatus()));
+        }
 
-	}
+    }
 
-	private void logoutAdminUser() throws Throwable {
-		logout(adminCookie);
-	}
+    private void logoutAdminUser() throws Throwable {
+        logout(adminCookie);
+    }
 
-	protected User createUser(String login, String password) throws Throwable {
-		return createUser(login, password, null);
-	}
+    protected User createUser(String login, String password) throws Throwable {
+        return createUser(login, password, null);
+    }
 
-	protected User createUser(String login, String password, Set<Role> roles)
-			throws Throwable {
-		log.debug(String
-				.format("*** createUser - %s - %s ***", login, password));
-		User user = new UserImpl.Builder().id(login).name(login).email(login)
-				.login(login).password(password.toCharArray()).roles(roles)
-				.build();
-		String json = mapper.writeValueAsString(user);
-		log.trace(json);
-		Response response = target().path(RestUserService.USERS_PATH)
-				.request(MediaType.APPLICATION_JSON).cookie(adminCookie)
-				.post(Entity.json(user));
-		log.debug(String.format("status: %s", response.getStatus()));
-//		Assert.assertTrue(response.getStatus() == Status.CREATED
-//				.getStatusCode());
-		if (response.getStatus() != Status.CREATED.getStatusCode()) {
-			throw new ServiceException(String.format(
-					"createUser %s failed. Response status: %s", login,  response.getStatus()));
-		}
-		URI uri = response.getLocation();
-//		Assert.assertNotNull(uri);
-		log.debug(String.format("getItem - %s", uri));
-		response = client().target(uri).request().cookie(adminCookie)
-				.accept(MediaType.APPLICATION_JSON).get();
-		if (response.getStatus() == Status.OK.getStatusCode()) {
-			return response.readEntity(User.class);
-		}
-		log.warn(String.format("status: %s", response.getStatus()));
-		return null;
-	}
+    protected User createUser(String login, String password, Set<Role> roles) throws Throwable {
+        log.debug(String.format("*** createUser - %s - %s ***", login, password));
+        User user = new UserImpl.Builder().id(login).name(login).email(login).login(login).password(password.toCharArray()).roles(roles)
+                .build();
+        String json = mapper.writeValueAsString(user);
+        log.trace(json);
+        Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+                .post(Entity.json(user));
+        log.debug(String.format("status: %s", response.getStatus()));
+        // Assert.assertTrue(response.getStatus() == Status.CREATED
+        // .getStatusCode());
+        if (response.getStatus() != Status.CREATED.getStatusCode()) {
+            throw new ServiceException(String.format("createUser %s failed. Response status: %s", login, response.getStatus()));
+        }
+        URI uri = response.getLocation();
+        // Assert.assertNotNull(uri);
+        log.debug(String.format("getItem - %s", uri));
+        response = client().target(uri).request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+        if (response.getStatus() == Status.OK.getStatusCode()) {
+            return response.readEntity(User.class);
+        }
+        log.warn(String.format("status: %s", response.getStatus()));
+        return null;
+    }
 
-	// @AfterSuite
-	protected void tearDown() throws Throwable {
-		log.info("*** tearDown ***");
-		logoutAdminUser();
-		server.stop();
-		tearDownElasticsearch();
-	}
+    // @AfterSuite
+    protected void tearDown() throws Throwable {
+        log.info("*** tearDown ***");
+        logoutAdminUser();
+        server.stop();
+        tearDownElasticsearch();
+    }
 
-	private void tearDownElasticsearch() throws Exception {
-		log.info("*** tearDownElasticsearch ***");
-		client.admin().indices().prepareDelete().execute().actionGet();
-		client.close();
-	}
+    private void tearDownElasticsearch() throws Exception {
+        log.info("*** tearDownElasticsearch ***");
+        client.admin().indices().prepareDelete().execute().actionGet();
+        client.close();
+    }
 }

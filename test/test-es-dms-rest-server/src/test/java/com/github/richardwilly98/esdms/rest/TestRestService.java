@@ -35,8 +35,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
@@ -49,16 +49,16 @@ public class TestRestService extends TestRestServerBase {
         super();
     }
 
-    @BeforeClass
+    @BeforeSuite
     public void beforeClass() throws Throwable {
-    	setUp();
+        setUp();
     }
-    
-    @AfterClass
+
+    @AfterSuite
     public void afterClass() throws Throwable {
-    	tearDown();
+        tearDown();
     }
-    
+
     static class SimpleEntry {
         private int key;
         private String value;
@@ -85,8 +85,7 @@ public class TestRestService extends TestRestServerBase {
         log.debug("*** testGetRoleTypes ***");
         try {
             Response response;
-            response = target().path(RestRoleTypeService.ROLE_TYPES_PATH).request(MediaType.APPLICATION_JSON)
-                    .cookie(adminCookie).get();
+            response = target().path(RestRoleTypeService.ROLE_TYPES_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie).get();
             Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
             Set<SimpleEntry> roleTypes = response.readEntity(new GenericType<Set<SimpleEntry>>() {
             });
@@ -101,5 +100,5 @@ public class TestRestService extends TestRestServerBase {
             Assert.fail();
         }
     }
-    
+
 }

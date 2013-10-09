@@ -37,40 +37,40 @@ import com.google.inject.servlet.ServletModule;
 
 public class TestEsJerseyServletModule extends ServletModule {
 
-	// private final String securityFilterPath;
+    // private final String securityFilterPath;
 
-	public TestEsJerseyServletModule(String securityFilterPath) {
-		// this.securityFilterPath = securityFilterPath;
+    public TestEsJerseyServletModule(String securityFilterPath) {
+        // this.securityFilterPath = securityFilterPath;
 
-	}
+    }
 
-	@Override
-	protected void configureServlets() {
-		install();
-		bindings();
-		filters();
-	}
+    @Override
+    protected void configureServlets() {
+        install();
+        bindings();
+        filters();
+    }
 
-	/*
-	 * Install modules
-	 */
-	private void install() {
-		install(new TestProviderModule());
-	}
+    /*
+     * Install modules
+     */
+    private void install() {
+        install(new TestProviderModule());
+    }
 
-	private void bindings() {
-		/* bind jackson converters for JAXB/JSON serialization */
-		bind(MessageBodyReader.class).to(JacksonJsonProvider.class);
-		bind(MessageBodyWriter.class).to(JacksonJsonProvider.class);
+    private void bindings() {
+        /* bind jackson converters for JAXB/JSON serialization */
+        bind(MessageBodyReader.class).to(JacksonJsonProvider.class);
+        bind(MessageBodyWriter.class).to(JacksonJsonProvider.class);
 
-		// Route all requests through GuiceContainer
-		// serve("/api/*").with(GuiceContainer.class, params);
-	}
+        // Route all requests through GuiceContainer
+        // serve("/api/*").with(GuiceContainer.class, params);
+    }
 
-	private void filters() {
-		filter("/*").through(GuiceShiroFilter.class);
-		// filter("/api/*").through(GuiceContainer.class, params);
-		// filter("/*").through(GuiceContainer.class, params);
-	}
+    private void filters() {
+        filter("/*").through(GuiceShiroFilter.class);
+        // filter("/api/*").through(GuiceContainer.class, params);
+        // filter("/*").through(GuiceContainer.class, params);
+    }
 
 }

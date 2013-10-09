@@ -14,74 +14,64 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 
 public class RestAuthenticationService extends RestClientBase {
 
-	public static final String LOGOUT_PATH = "logout";
-	public static final String LOGIN_PATH = "login";
-	public static final String AUTH_PATH = "auth";
+    public static final String LOGOUT_PATH = "logout";
+    public static final String LOGIN_PATH = "login";
+    public static final String AUTH_PATH = "auth";
 
-	public RestAuthenticationService(final String url) {
-		super(url);
-	}
+    public RestAuthenticationService(final String url) {
+        super(url);
+    }
 
-	Cookie getEsDmsCookie(Credential credential) throws ServiceException {
-		Response response = getWebTarget().path(AUTH_PATH).path(LOGIN_PATH)
-				.request(MediaType.APPLICATION_JSON)
-				.post(Entity.entity(credential, MediaType.APPLICATION_JSON));
-		log.debug("status: " + response.getStatus());
-		if (response.getStatus() == Status.OK.getStatusCode()) {
-			for (NewCookie cookie : response.getCookies().values()) {
-				if (ES_DMS_TICKET.equals(cookie.getName())) {
-					return new Cookie(cookie.getName(), cookie.getValue());
-				}
-			}
-		} else {
-			throw new ServiceException(String.format(
-					"login with user %s failed. %s", credential.getUsername(),
-					response.getStatus()));
-		}
-		return null;
-	}
+    Cookie getEsDmsCookie(Credential credential) throws ServiceException {
+        Response response = target().path(AUTH_PATH).path(LOGIN_PATH).request(MediaType.APPLICATION_JSON)
+                .post(Entity.entity(credential, MediaType.APPLICATION_JSON));
+        log.debug("status: " + response.getStatus());
+        if (response.getStatus() == Status.OK.getStatusCode()) {
+            for (NewCookie cookie : response.getCookies().values()) {
+                if (ES_DMS_TICKET.equals(cookie.getName())) {
+                    return new Cookie(cookie.getName(), cookie.getValue());
+                }
+            }
+        } else {
+            throw new ServiceException(String.format("login with user %s failed. %s", credential.getUsername(), response.getStatus()));
+        }
+        return null;
+    }
 
-	public String login(Credential credential) throws ServiceException {
-		Response response = getWebTarget()
-				.path(AUTH_PATH)
-				.path(LOGIN_PATH)
-				.request(MediaType.APPLICATION_JSON)
-				.post(Entity
-						.entity(credential, MediaType.APPLICATION_JSON_TYPE));
-		if (response.getStatus() != Status.OK.getStatusCode()) {
-			throw new ServiceException(String.format("login failed for %s",
-					credential.getUsername()));
-		} else {
-			AuthenticationResponse ar = response
-					.readEntity(AuthenticationResponse.class);
-			return ar.getToken();
-		}
-	}
+    public String login(Credential credential) throws ServiceException {
+        Response response = target().path(AUTH_PATH).path(LOGIN_PATH).request(MediaType.APPLICATION_JSON)
+                .post(Entity.entity(credential, MediaType.APPLICATION_JSON_TYPE));
+        if (response.getStatus() != Status.OK.getStatusCode()) {
+            throw new ServiceException(String.format("login failed for %s", credential.getUsername()));
+        } else {
+            AuthenticationResponse ar = response.readEntity(AuthenticationResponse.class);
+            return ar.getToken();
+        }
+    }
 
-	public void logout(String token) throws ServiceException {
-		checkNotNull(token);
-		Cookie cookie = new Cookie(ES_DMS_TICKET, token);
-		Response response = getWebTarget().path(AUTH_PATH).path(LOGOUT_PATH)
-				.request().cookie(cookie).post(Entity.json(null));
-		if (response.getStatus() != Status.OK.getStatusCode()) {
-			throw new ServiceException(String.format("logout failed for %s"));
-		}
-	}
+    public void logout(String token) throws ServiceException {
+        checkNotNull(token);
+        Cookie cookie = new Cookie(ES_DMS_TICKET, token);
+        Response response = target().path(AUTH_PATH).path(LOGOUT_PATH).request().cookie(cookie).post(Entity.json(null));
+        if (response.getStatus() != Status.OK.getStatusCode()) {
+            throw new ServiceException(String.format("logout failed for %s"));
+        }
+    }
 
-	@SuppressWarnings("unused")
-	private static class AuthenticationResponse {
-		private String status;
-		private String token;
+    @SuppressWarnings("unused")
+    private static class AuthenticationResponse {
+        private String status;
+        private String token;
 
-		public AuthenticationResponse() {
-		}
+        public AuthenticationResponse() {
+        }
 
-		public String getToken() {
-			return token;
-		}
+        public String getToken() {
+            return token;
+        }
 
-		public String getStatus() {
-			return status;
-		}
-	}
+        public String getStatus() {
+            return status;
+        }
+    }
 }

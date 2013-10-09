@@ -16,35 +16,33 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 
 public abstract class RestClientBase {
 
-	public static final String ES_DMS_TICKET = "ES_DMS_TICKET";
-	
-	protected final Logger log = Logger.getLogger(getClass());
-	private final String url;
-	protected final Client restClient;
+    public static final String ES_DMS_TICKET = "ES_DMS_TICKET";
 
-	protected RestClientBase(final String url) {
-		checkNotNull(url);
-		this.url = url;
-		ClientConfig configuration = new ClientConfig();
-		configuration.register(MultiPartFeature.class);
-//		configuration.register(JacksonFeature.class);
-		restClient = ClientBuilder.newClient(configuration);
-	}
+    protected final Logger log = Logger.getLogger(getClass());
+    private final String url;
+    protected final Client restClient;
 
-	protected WebTarget getWebTarget() {
-		return restClient.target(url);
-	}
+    protected RestClientBase(final String url) {
+        checkNotNull(url);
+        this.url = url;
+        ClientConfig configuration = new ClientConfig();
+        configuration.register(MultiPartFeature.class);
+        // configuration.register(JacksonFeature.class);
+        restClient = ClientBuilder.newClient(configuration);
+    }
 
-	protected Cookie getUserCookie(String userId, char[] password) throws ServiceException {
-		RestAuthenticationService authenticationClient = new RestAuthenticationService(
-				url);
-		return authenticationClient.getEsDmsCookie(new CredentialImpl.Builder()
-				.username(userId).password(password).build());
-	}
+    protected WebTarget target() {
+        return restClient.target(url);
+    }
 
-	protected Cookie newUserCookie(String token) {
-		checkNotNull(token);
-		return new Cookie(ES_DMS_TICKET, token);
-	}
-	
+    protected Cookie getUserCookie(String userId, char[] password) throws ServiceException {
+        RestAuthenticationService authenticationClient = new RestAuthenticationService(url);
+        return authenticationClient.getEsDmsCookie(new CredentialImpl.Builder().username(userId).password(password).build());
+    }
+
+    protected Cookie newUserCookie(String token) {
+        checkNotNull(token);
+        return new Cookie(ES_DMS_TICKET, token);
+    }
+
 }

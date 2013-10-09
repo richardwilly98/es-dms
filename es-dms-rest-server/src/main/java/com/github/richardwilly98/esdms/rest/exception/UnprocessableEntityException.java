@@ -34,6 +34,6 @@ import javax.ws.rs.core.Response;
 public class UnprocessableEntityException extends WebApplicationException {
 
     public UnprocessableEntityException(String message) {
-	super(Response.status(Response.Status.BAD_REQUEST).entity(message).type(MediaType.TEXT_PLAIN).build());
+        super(Response.status(Response.Status.BAD_REQUEST).entity(message).type(MediaType.TEXT_PLAIN).build());
     }
 }

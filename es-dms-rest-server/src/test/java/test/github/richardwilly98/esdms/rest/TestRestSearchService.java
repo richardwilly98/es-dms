@@ -63,152 +63,152 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
     int tagsCount = 0;
 
     public TestRestSearchService() throws Exception {
-	super();
+        super();
     }
 
     @Test()
     public void testSearchDocument() throws Throwable {
 
-	log.info("Start testSearchDocument");
-	int max = 15;
-	String name = "testtaggingdocument" + System.currentTimeMillis();
-	String contentType = "text/plain";
-	String file = "/test/github/richardwilly98/services/test-attachment.html";
+        log.info("Start testSearchDocument");
+        int max = 15;
+        String name = "testtaggingdocument" + System.currentTimeMillis();
+        String contentType = "text/plain";
+        String file = "/test/github/richardwilly98/services/test-attachment.html";
 
-	Document document = createDocument(name, contentType, file);
-	addTag(document.getId(), "tag1", "tag2");
-	log.trace(String.format("Document created - %s", getMetadata(document.getId())));
+        Document document = createDocument(name, contentType, file);
+        addTag(document.getId(), "tag1", "tag2");
+        log.trace(String.format("Document created - %s", getMetadata(document.getId())));
 
-	document = createDocument(name, contentType, file);
-	addTag(document.getId(), "tag1", "tag2", "tag3");
-	log.trace(String.format("Document created - %s", getMetadata(document.getId())));
+        document = createDocument(name, contentType, file);
+        addTag(document.getId(), "tag1", "tag2", "tag3");
+        log.trace(String.format("Document created - %s", getMetadata(document.getId())));
 
-	document = createDocument(name, contentType, file);
-	addTag(document.getId(), "tag2", "tag3");
-	log.trace(String.format("Document created - %s", getMetadata(document.getId())));
+        document = createDocument(name, contentType, file);
+        addTag(document.getId(), "tag2", "tag3");
+        log.trace(String.format("Document created - %s", getMetadata(document.getId())));
 
-	document = createDocument(name, contentType, file);
-	addTag(document.getId(), "tag3", "tag4");
-	log.trace(String.format("Document created - %s", getMetadata(document.getId())));
+        document = createDocument(name, contentType, file);
+        addTag(document.getId(), "tag3", "tag4");
+        log.trace(String.format("Document created - %s", getMetadata(document.getId())));
 
-	document = createDocument(name, contentType, file);
-	log.trace(String.format("Document created - %s", getMetadata(document.getId())));
+        document = createDocument(name, contentType, file);
+        log.trace(String.format("Document created - %s", getMetadata(document.getId())));
 
-	SearchResult<Document> result = searchDocument(name, 0, max);
-	log.debug(String.format("Search - total hits: %s - item count: %s", result.getTotalHits(), result.getItems().size()));
-	Assert.assertTrue(result.getTotalHits() >= 0);
-	for (Document item : result.getItems()) {
-	    Assert.assertNotNull(item);
-	    Assert.assertNull(item.getCurrentVersion());
-	}
+        SearchResult<Document> result = searchDocument(name, 0, max);
+        log.debug(String.format("Search - total hits: %s - item count: %s", result.getTotalHits(), result.getItems().size()));
+        Assert.assertTrue(result.getTotalHits() >= 0);
+        for (Document item : result.getItems()) {
+            Assert.assertNotNull(item);
+            Assert.assertNull(item.getCurrentVersion());
+        }
 
-	result = searchDocument(name, 0, max, "tags");
-	log.debug(String.format("Search with facet - total hits: %s - item count: %s", result.getTotalHits(), result.getItems().size()));
-	Assert.assertTrue(result.getTotalHits() >= 0 && result.getItems().size() <= max);
-	for (Document item : result.getItems()) {
-	    Assert.assertNotNull(item);
-	    Assert.assertNull(item.getCurrentVersion());
-	}
-	Facet facet = result.getFacets().get("tags");
-	Assert.assertNotNull(facet);
+        result = searchDocument(name, 0, max, "tags");
+        log.debug(String.format("Search with facet - total hits: %s - item count: %s", result.getTotalHits(), result.getItems().size()));
+        Assert.assertTrue(result.getTotalHits() >= 0 && result.getItems().size() <= max);
+        for (Document item : result.getItems()) {
+            Assert.assertNotNull(item);
+            Assert.assertNull(item.getCurrentVersion());
+        }
+        Facet facet = result.getFacets().get("tags");
+        Assert.assertNotNull(facet);
 
-	log.debug(facet);
-	// Total number of tags
-	Assert.assertEquals(facet.getTotalCount(), tagsCount);
-	for (Term term : facet.getTerms()) {
-	    log.debug(term);
-	}
+        log.debug(facet);
+        // Total number of tags
+        Assert.assertEquals(facet.getTotalCount(), tagsCount);
+        for (Term term : facet.getTerms()) {
+            log.debug(term);
+        }
 
-	result = searchDocument(name, 0, max, "tags", newHashMap(ImmutableMap.of("tags", (Object) "tag1")));
-	log.debug(String.format("Search with facet and filters - total hits: %s - item count: %s", result.getTotalHits(), result.getItems()
-	        .size()));
-	Assert.assertEquals(result.getTotalHits(), 2);
+        result = searchDocument(name, 0, max, "tags", newHashMap(ImmutableMap.of("tags", (Object) "tag1")));
+        log.debug(String.format("Search with facet and filters - total hits: %s - item count: %s", result.getTotalHits(), result.getItems()
+                .size()));
+        Assert.assertEquals(result.getTotalHits(), 2);
 
-	result = searchDocument(name, 0, max, "tags", newHashMap(ImmutableMap.of("tags", (Object) "tag3")));
-	log.debug(String.format("Search with facet and filters - total hits: %s - item count: %s", result.getTotalHits(), result.getItems()
-	        .size()));
-	Assert.assertEquals(result.getTotalHits(), 3);
+        result = searchDocument(name, 0, max, "tags", newHashMap(ImmutableMap.of("tags", (Object) "tag3")));
+        log.debug(String.format("Search with facet and filters - total hits: %s - item count: %s", result.getTotalHits(), result.getItems()
+                .size()));
+        Assert.assertEquals(result.getTotalHits(), 3);
 
-	result = searchDocument(name, 0, max, "tags",
-	        newHashMap(ImmutableMap.of("tags", (Object) newArrayList(ImmutableList.of("tag1", "tag4")))));
-	log.debug(String.format("Search with facet and filters - total hits: %s - item count: %s", result.getTotalHits(), result.getItems()
-	        .size()));
-	for (Document item : result.getItems()) {
-	    Assert.assertNotNull(item);
-	    log.debug(item);
-	}
+        result = searchDocument(name, 0, max, "tags",
+                newHashMap(ImmutableMap.of("tags", (Object) newArrayList(ImmutableList.of("tag1", "tag4")))));
+        log.debug(String.format("Search with facet and filters - total hits: %s - item count: %s", result.getTotalHits(), result.getItems()
+                .size()));
+        for (Document item : result.getItems()) {
+            Assert.assertNotNull(item);
+            log.debug(item);
+        }
     }
 
     private SearchResult<Document> searchDocument(String criteria, int first, int pageSize) throws Throwable {
-	return searchDocument(criteria, first, pageSize, null);
+        return searchDocument(criteria, first, pageSize, null);
     }
 
     private SearchResult<Document> searchDocument(String criteria, int first, int pageSize, String facet) throws Throwable {
-	return searchDocument(criteria, first, pageSize, facet, null);
+        return searchDocument(criteria, first, pageSize, facet, null);
     }
 
     private SearchResult<Document> searchDocument(String criteria, int first, int pageSize, String facet, Map<String, Object> filters)
-	    throws Throwable {
-	// SearchResult<Document> searchResult = searchService.search(criteria,
-	// first, pageSize, facet, filters);
-	// Assert.assertNotNull(searchResult);
-	FacetedQuery query = new FacetedQuery();
-	query.setFacet(facet);
-	query.setFilters(filters);
-	Response response = target().path(RestSearchService.SEARCH_PATH).path(RestSearchService.FACET_SEARCH_ACTION).path(criteria)
-	        .request(MediaType.APPLICATION_JSON).cookie(adminCookie).accept(MediaType.APPLICATION_JSON).post(Entity.json(query));
-	log.debug(String.format("status: %s", response.getStatus()));
-	Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-	SearchResult<Document> searchResult = response.readEntity(new GenericType<SearchResult<Document>>() {
-	});
-	Assert.assertNotNull(searchResult);
-	return searchResult;
+            throws Throwable {
+        // SearchResult<Document> searchResult = searchService.search(criteria,
+        // first, pageSize, facet, filters);
+        // Assert.assertNotNull(searchResult);
+        FacetedQuery query = new FacetedQuery();
+        query.setFacet(facet);
+        query.setFilters(filters);
+        Response response = target().path(RestSearchService.SEARCH_PATH).path(RestSearchService.FACET_SEARCH_ACTION).path(criteria)
+                .request(MediaType.APPLICATION_JSON).cookie(adminCookie).accept(MediaType.APPLICATION_JSON).post(Entity.json(query));
+        log.debug(String.format("status: %s", response.getStatus()));
+        Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+        SearchResult<Document> searchResult = response.readEntity(new GenericType<SearchResult<Document>>() {
+        });
+        Assert.assertNotNull(searchResult);
+        return searchResult;
     }
 
     private void addTag(String id, String... tags) throws Throwable {
-	Document document = getMetadata(id);
-	for (String tag : tags) {
-	    document.addTag(tag);
-	    updateDocument(document);
-	    document = getMetadata(id);
-	    Assert.assertTrue(document.getTags().contains(tag));
-	    tagsCount++;
-	}
+        Document document = getMetadata(id);
+        for (String tag : tags) {
+            document.addTag(tag);
+            updateDocument(document);
+            document = getMetadata(id);
+            Assert.assertTrue(document.getTags().contains(tag));
+            tagsCount++;
+        }
     }
 
     private Document createDocument(String name, String contentType, String path) throws Throwable {
-	byte[] content = copyToBytesFromClasspath(path);
-	InputStream is = new ByteArrayInputStream(content);
+        byte[] content = copyToBytesFromClasspath(path);
+        InputStream is = new ByteArrayInputStream(content);
 
-	FormDataMultiPart form = new FormDataMultiPart();
-	form.field("name", name);
-	FormDataBodyPart p = new FormDataBodyPart("file", is, MediaType.valueOf(contentType));
-	form.bodyPart(p);
+        FormDataMultiPart form = new FormDataMultiPart();
+        form.field("name", name);
+        FormDataBodyPart p = new FormDataBodyPart("file", is, MediaType.valueOf(contentType));
+        form.bodyPart(p);
 
-	Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(RestDocumentService.UPLOAD_PATH).request()
-	        .cookie(adminCookie).post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE));
-	log.debug(String.format("status: %s", response.getStatus()));
-	Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
-	URI uri = response.getLocation();
-	Assert.assertNotNull(uri);
-	return get(uri, Document.class);
+        Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(RestDocumentService.UPLOAD_PATH).request()
+                .cookie(adminCookie).post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE));
+        log.debug(String.format("status: %s", response.getStatus()));
+        Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
+        URI uri = response.getLocation();
+        Assert.assertNotNull(uri);
+        return get(uri, Document.class);
     }
 
     private void updateDocument(Document document) throws Throwable {
-	Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(RestDocumentService.UPDATE_PATH)
-	        .request(MediaType.APPLICATION_JSON).cookie(adminCookie).put(Entity.json(document));
-	log.debug(String.format("status: %s", response.getStatus()));
-	Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+        Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(RestDocumentService.UPDATE_PATH)
+                .request(MediaType.APPLICATION_JSON).cookie(adminCookie).put(Entity.json(document));
+        log.debug(String.format("status: %s", response.getStatus()));
+        Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
     }
 
     private Document getMetadata(String id) throws Throwable {
-	Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.METADATA_PATH)
-	        .request(MediaType.APPLICATION_JSON).cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
-	log.debug(String.format("status: %s", response.getStatus()));
-	Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-	Document document = response.readEntity(Document.class);
-	Assert.assertNotNull(document);
-	return document;
+        Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.METADATA_PATH)
+                .request(MediaType.APPLICATION_JSON).cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+        log.debug(String.format("status: %s", response.getStatus()));
+        Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+        Document document = response.readEntity(Document.class);
+        Assert.assertNotNull(document);
+        return document;
     }
 
 }

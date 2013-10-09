@@ -37,25 +37,26 @@ import com.github.richardwilly98.esdms.api.Credential;
 public class TestRestAuthenticationService extends TestRestUserService {
 
     public TestRestAuthenticationService() throws Exception {
-	super();
+        super();
     }
 
     @Test()
     public void testLoginLogout() throws Throwable {
-	log.debug("*** testLoginLogout ***");
-	try {
-	    String password = "secret1";
-	    String login = "user-" + System.currentTimeMillis() + "@yahoo.com";
-	    createUser(login, password);
-	    boolean rememberMe = true;
-	    Credential credential = new CredentialImpl.Builder().username(login).password(password.toCharArray()).rememberMe(rememberMe).build();
-	    Cookie cookie = login(credential);
-	    Assert.assertNotNull(cookie);
-	    logout(cookie);
-	} catch (Throwable t) {
-	    log.error("testLoginLogout fail", t);
-	    Assert.fail();
-	}
+        log.debug("*** testLoginLogout ***");
+        try {
+            String password = "secret1";
+            String login = "user-" + System.currentTimeMillis() + "@yahoo.com";
+            createUser(login, password);
+            boolean rememberMe = true;
+            Credential credential = new CredentialImpl.Builder().username(login).password(password.toCharArray()).rememberMe(rememberMe)
+                    .build();
+            Cookie cookie = login(credential);
+            Assert.assertNotNull(cookie);
+            logout(cookie);
+        } catch (Throwable t) {
+            log.error("testLoginLogout fail", t);
+            Assert.fail();
+        }
     }
 
 }

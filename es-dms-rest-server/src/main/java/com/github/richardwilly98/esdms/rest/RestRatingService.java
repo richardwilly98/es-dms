@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.rest;
  * #L%
  */
 
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.net.URI;
@@ -53,57 +52,57 @@ import com.github.richardwilly98.esdms.services.RatingService;
 
 @Path(RestRatingService.RATINGS_PATH)
 public class RestRatingService extends RestServiceBase {
-    
+
     public static final String RATINGS_PATH = "ratings";
     public static final String ALL_PATH = "all";
     public static final String TOTAL_PATH = "total";
     public static final String AVERAGE_PATH = "average";
-    
+
     private final RatingService ratingService;
-    
+
     @Inject
     public RestRatingService(final AuthenticationService authenticationService, final RatingService ratingService) {
-	super(authenticationService);
-	this.ratingService = ratingService;
+        super(authenticationService);
+        this.ratingService = ratingService;
     }
 
     protected URI getItemUri(String itemId, Rating rating) {
-	checkNotNull(itemId);
-	checkNotNull(rating);
-	return url.getBaseUriBuilder().path(getClass()).path(itemId).path(rating.getUser()).build();
+        checkNotNull(itemId);
+        checkNotNull(rating);
+        return url.getBaseUriBuilder().path(getClass()).path(itemId).path(rating.getUser()).build();
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(RatingRequest item) {
-	checkNotNull(item);
-	if (log.isTraceEnabled()) {
-	    log.trace(String.format("create - %s", item));
-	}
-	try {
-	    Rating rating = ratingService.create(item.getItemId(), item.getScore());
-	    return Response.created(getItemUri(item.getItemId(), rating)).build();
-	} catch (ServiceException e) {
-	    throw new RestServiceException(e.getLocalizedMessage());
-	}
+        checkNotNull(item);
+        if (log.isTraceEnabled()) {
+            log.trace(String.format("create - %s", item));
+        }
+        try {
+            Rating rating = ratingService.create(item.getItemId(), item.getScore());
+            return Response.created(getItemUri(item.getItemId(), rating)).build();
+        } catch (ServiceException e) {
+            throw new RestServiceException(e.getLocalizedMessage());
+        }
     }
-    
+
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
     @Path("{id}")
     public Response get(@PathParam("id") String id) {
-	if (log.isTraceEnabled()) {
-	    log.trace(String.format("get - %s", id));
-	}
-	try {
-	    Rating rating = ratingService.get(id);
-	    if (rating == null) {
-		return Response.status(Status.NOT_FOUND).build();
-	    }
-	    return Response.ok(rating).build();
-	} catch (ServiceException e) {
-	    throw new RestServiceException(e.getLocalizedMessage());
-	}
+        if (log.isTraceEnabled()) {
+            log.trace(String.format("get - %s", id));
+        }
+        try {
+            Rating rating = ratingService.get(id);
+            if (rating == null) {
+                return Response.status(Status.NOT_FOUND).build();
+            }
+            return Response.ok(rating).build();
+        } catch (ServiceException e) {
+            throw new RestServiceException(e.getLocalizedMessage());
+        }
     }
 
     @PUT
@@ -192,27 +191,27 @@ public class RestRatingService extends RestServiceBase {
     }
 
     public static class RatingRequest {
-	private String itemId;
-	private int score;
-	
+        private String itemId;
+        private int score;
+
         public RatingRequest() {
         }
 
-	public String getItemId() {
-	    return itemId;
-	}
+        public String getItemId() {
+            return itemId;
+        }
 
-	public void setItemId(String itemId) {
-	    this.itemId = itemId;
-	}
+        public void setItemId(String itemId) {
+            this.itemId = itemId;
+        }
 
-	public int getScore() {
-	    return score;
-	}
+        public int getScore() {
+            return score;
+        }
 
-	public void setScore(int score) {
-	    this.score = score;
-	}
+        public void setScore(int score) {
+            this.score = score;
+        }
 
     }
 }

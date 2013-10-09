@@ -46,26 +46,26 @@ public class AuditWorker implements Runnable {
 
     @Inject
     public AuditWorker(final AuditService service) {
-	this.service = service;
+        this.service = service;
     }
 
     @Override
     public void run() {
-	while (true) {
-	    try {
-		Thread.sleep(5000);
-		log.debug("Run at " + new Date());
-		try {
-		    String criteria = "event:" + AuditEntry.Event.UPLOAD;
-		    SearchResult<AuditEntry> result = service.search(criteria, 0, 20);
-		    log.debug(String.format("TotalHits for %s: %s", criteria, result.getTotalHits()));
-		} catch (ServiceException sEx) {
-		    log.error("AuditService.search failed.", sEx);
-		}
-	    } catch (InterruptedException iEx) {
+        while (true) {
+            try {
+                Thread.sleep(5000);
+                log.debug("Run at " + new Date());
+                try {
+                    String criteria = "event:" + AuditEntry.Event.UPLOAD;
+                    SearchResult<AuditEntry> result = service.search(criteria, 0, 20);
+                    log.debug(String.format("TotalHits for %s: %s", criteria, result.getTotalHits()));
+                } catch (ServiceException sEx) {
+                    log.error("AuditService.search failed.", sEx);
+                }
+            } catch (InterruptedException iEx) {
 
-	    }
-	}
+            }
+        }
     }
 
 }

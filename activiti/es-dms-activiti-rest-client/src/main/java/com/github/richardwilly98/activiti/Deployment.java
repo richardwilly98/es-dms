@@ -9,55 +9,55 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  */
 public class Deployment {
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public Date getDeploymentTime() {
-		return deploymentTime;
-	}
+    public Date getDeploymentTime() {
+        return deploymentTime;
+    }
 
-	public void setDeploymentTime(Date deploymentTime) {
-		this.deploymentTime = deploymentTime;
-	}
+    public void setDeploymentTime(Date deploymentTime) {
+        this.deploymentTime = deploymentTime;
+    }
 
-	public String getCategory() {
-		return category;
-	}
+    public String getCategory() {
+        return category;
+    }
 
-	public void setCategory(String category) {
-		this.category = category;
-	}
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
-	public String getUrl() {
-		return url;
-	}
+    public String getUrl() {
+        return url;
+    }
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-	private String id;
-	private String name;
-	
-	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss")
-	private Date deploymentTime;
-	private String category;
-	private String url;
-	
-	public Deployment() {
-		
-	}
+    private String id;
+    private String name;
 
-	public String getName() {
-		return name;
-	}
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private Date deploymentTime;
+    private String category;
+    private String url;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public Deployment() {
+
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

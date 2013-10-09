@@ -53,50 +53,50 @@ public class EsJerseyServletModule extends ServletModule {
     private final String securityFilterPath;
 
     public EsJerseyServletModule(String securityFilterPath) {
-	this.securityFilterPath = securityFilterPath;
+        this.securityFilterPath = securityFilterPath;
 
-	// params.put(JERSEY_SPI_CONTAINER_CONTAINER_REQUEST_FILTERS,
-	// JERSEY_API_CONTAINER_FILTER_POST_REPLACE_FILTER);
+        // params.put(JERSEY_SPI_CONTAINER_CONTAINER_REQUEST_FILTERS,
+        // JERSEY_API_CONTAINER_FILTER_POST_REPLACE_FILTER);
 
-	/* bind dynamically the REST resources */
-	params.put(ServerProperties.PROVIDER_PACKAGES/*
-			                              * PackagesResourceConfig.
-			                              * PROPERTY_PACKAGES
-			                              */, "com.github.richardwilly98.esdms.rest;com.fasterxml.jackson.jaxrs");
+        /* bind dynamically the REST resources */
+        params.put(ServerProperties.PROVIDER_PACKAGES/*
+                                                      * PackagesResourceConfig.
+                                                      * PROPERTY_PACKAGES
+                                                      */, "com.github.richardwilly98.esdms.rest;com.fasterxml.jackson.jaxrs");
     }
 
     @Override
     protected void configureServlets() {
-	log.debug("*** configureServlets ***");
-	install();
-	bindings();
-	filters();
+        log.debug("*** configureServlets ***");
+        install();
+        bindings();
+        filters();
     }
 
     /*
      * Install modules
      */
     private void install() {
-	log.debug("*** install ***");
-	/* bind services */
-	install(new ProviderModule());
+        log.debug("*** install ***");
+        /* bind services */
+        install(new ProviderModule());
     }
 
     private void filters() {
-	filter("/api/*").through(GuiceShiroFilter.class);
-	// filter("/*").through(GuiceShiroFilter.class);
-	// filter("/api/*").through(GuiceContainer.class);
+        filter("/api/*").through(GuiceShiroFilter.class);
+        // filter("/*").through(GuiceShiroFilter.class);
+        // filter("/api/*").through(GuiceContainer.class);
     }
 
     private void bindings() {
-	/* bind jackson converters for JAXB/JSON serialization */
-	bind(MessageBodyReader.class).to(JacksonJsonProvider.class);
-	bind(MessageBodyWriter.class).to(JacksonJsonProvider.class);
+        /* bind jackson converters for JAXB/JSON serialization */
+        bind(MessageBodyReader.class).to(JacksonJsonProvider.class);
+        bind(MessageBodyWriter.class).to(JacksonJsonProvider.class);
 
-	// Route all requests through GuiceContainer
-	// serve(this.securityFilterPath).with(GuiceContainer.class, params);
-	// serve("/*").with(GuiceContainer.class, params);
-	// serve("/*").with(ServletContainer.class);
+        // Route all requests through GuiceContainer
+        // serve(this.securityFilterPath).with(GuiceContainer.class, params);
+        // serve("/*").with(GuiceContainer.class, params);
+        // serve("/*").with(ServletContainer.class);
     }
 
 }

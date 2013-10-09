@@ -48,7 +48,7 @@ public class RestRoleService extends RestItemBaseService<Role> {
 
     public static final String ROLES_PATH = "roles";
     private final RoleService roleService;
-    
+
     @Inject
     public RestRoleService(AuthenticationService authenticationService, final RoleService roleService) {
         super(authenticationService, roleService);
@@ -64,7 +64,7 @@ public class RestRoleService extends RestItemBaseService<Role> {
             @QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("20") int pageSize) {
         String type = url.getQueryParameters().getFirst("type");
         if (log.isTraceEnabled()) {
-            log.trace(String.format("findByType - %s", type));
+            log.trace(String.format("find - %s", type));
         }
         try {
             RoleType roleType = RoleType.fromValue(Integer.valueOf(type));

@@ -39,15 +39,15 @@ public class EsConfigModule extends AbstractModule {
     private final Logger log = Logger.getLogger(getClass());
 
     public EsConfigModule(ServletContext servletContext, String securityFilterPath) {
-	this.servletContext = servletContext;
-	this.securityFilterPath = securityFilterPath;
+        this.servletContext = servletContext;
+        this.securityFilterPath = securityFilterPath;
     }
 
     @Override
     protected void configure() {
-	log.debug("*** configure ***");
-	install(new EsShiroWebModule(servletContext, securityFilterPath));
-	// install(new ShiroAopModule());
+        log.debug("*** configure ***");
+        install(new EsShiroWebModule(servletContext, securityFilterPath));
+        // install(new ShiroAopModule());
     }
 
 }

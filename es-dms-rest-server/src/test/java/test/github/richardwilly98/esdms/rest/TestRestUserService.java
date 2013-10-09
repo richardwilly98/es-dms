@@ -64,6 +64,23 @@ public class TestRestUserService extends GuiceAndJettyTestBase<UserImpl> {
     }
 
     @Test
+    public void testFindUserByLogin() throws Throwable {
+        log.debug("*** testFindUserByLogin ***");
+        try {
+            Response response = target().path(RestUserService.USERS_PATH)
+                    .queryParam(RestUserService.LOGIN_PARAM, UserService.DEFAULT_ADMIN_LOGIN).request(MediaType.APPLICATION_JSON)
+                    .cookie(adminCookie).get();
+            Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
+            User user = response.readEntity(User.class);
+            Assert.assertNotNull(user);
+            Assert.assertEquals(user.getLogin(), UserService.DEFAULT_ADMIN_LOGIN);
+        } catch (Throwable t) {
+            log.error("testFindUserByLogin fail", t);
+            Assert.fail();
+        }
+    }
+
+    @Test
     public void testGetUsers() throws Throwable {
         log.debug("*** testGetUsers ***");
         try {
@@ -121,7 +138,7 @@ public class TestRestUserService extends GuiceAndJettyTestBase<UserImpl> {
                     .post(Entity.json(user));
             log.debug(String.format("status: %s", response.getStatus()));
             Assert.assertTrue(response.getStatus() == Status.CONFLICT.getStatusCode());
-            
+
         } catch (Throwable t) {
             log.error("testAvoidDuplicate fail", t);
             Assert.fail();

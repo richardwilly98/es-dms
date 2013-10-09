@@ -50,29 +50,29 @@ public abstract class RestServiceBase {
 
     @Inject
     public RestServiceBase(final AuthenticationService authenticationService) {
-	this.authenticationService = authenticationService;
+        this.authenticationService = authenticationService;
     }
 
     protected boolean isAuthenticated() {
-	return (getCurrentUser() != null);
+        return (getCurrentUser() != null);
     }
 
     protected String getCurrentUser() {
-	try {
-	    log.trace("*** getCurrentUser ***");
-	    Subject currentSubject = SecurityUtils.getSubject();
-	    if (log.isTraceEnabled()) {
-	            log.trace(String.format("currentSubject.isAuthenticated(): %s", currentSubject.isAuthenticated()));
-	            log.trace(String.format("Principal: %s", currentSubject.getPrincipal()));
-	    }
-	    if (currentSubject.getPrincipal() == null) {
-		throw new UnauthorizedException("Unauthorize request", url.getPath());
-	    } else {
-		return currentSubject.getPrincipal().toString();
-	    }
-	} catch (Throwable t) {
-	    throw new UnauthorizedException();
-	}
+        try {
+            log.trace("*** getCurrentUser ***");
+            Subject currentSubject = SecurityUtils.getSubject();
+            if (log.isTraceEnabled()) {
+                log.trace(String.format("currentSubject.isAuthenticated(): %s", currentSubject.isAuthenticated()));
+                log.trace(String.format("Principal: %s", currentSubject.getPrincipal()));
+            }
+            if (currentSubject.getPrincipal() == null) {
+                throw new UnauthorizedException("Unauthorize request", url.getPath());
+            } else {
+                return currentSubject.getPrincipal().toString();
+            }
+        } catch (Throwable t) {
+            throw new UnauthorizedException();
+        }
     }
 
 }

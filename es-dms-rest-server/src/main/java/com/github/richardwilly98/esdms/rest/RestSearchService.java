@@ -71,25 +71,25 @@ public class RestSearchService extends RestServiceBase {
 
     @Inject
     public RestSearchService(final AuthenticationService authenticationService, final SearchService<Document> searchService) {
-	super(authenticationService);
-	this.service = searchService;
+        super(authenticationService);
+        this.service = searchService;
     }
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
     @Path(SEARCH_ACTION + "/{criteria}")
     public Response search(@PathParam("criteria") String criteria, @QueryParam(SEARCH_FIRST_PARAMETER) @DefaultValue("0") int first,
-	    @QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("20") int pageSize) {
-	isAuthenticated();
-	if (log.isTraceEnabled()) {
-	    log.trace(String.format("search - %s", criteria));
-	}
-	try {
-	    SearchResult<Document> items = service.search(criteria, first, pageSize);
-	    return Response.ok(items).build();
-	} catch (ServiceException e) {
-	    throw new RestServiceException(e.getLocalizedMessage());
-	}
+            @QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("20") int pageSize) {
+        isAuthenticated();
+        if (log.isTraceEnabled()) {
+            log.trace(String.format("search - %s", criteria));
+        }
+        try {
+            SearchResult<Document> items = service.search(criteria, first, pageSize);
+            return Response.ok(items).build();
+        } catch (ServiceException e) {
+            throw new RestServiceException(e.getLocalizedMessage());
+        }
     }
 
     @POST
@@ -97,41 +97,41 @@ public class RestSearchService extends RestServiceBase {
     @Produces({ MediaType.APPLICATION_JSON })
     @Path(FACET_SEARCH_ACTION + "/{criteria}")
     public Response facetedSearch(@PathParam("criteria") String criteria, @QueryParam(SEARCH_FIRST_PARAMETER) @DefaultValue("0") int first,
-	    @QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("20") int pageSize, FacetedQuery query) {
-	isAuthenticated();
-	if (log.isTraceEnabled()) {
-	    log.trace(String.format("facetedSearch - %s", criteria));
-	}
+            @QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("20") int pageSize, FacetedQuery query) {
+        isAuthenticated();
+        if (log.isTraceEnabled()) {
+            log.trace(String.format("facetedSearch - %s", criteria));
+        }
 
-	try {
-	    SearchResult<Document> items;
-	    if (query == null) {
-		items = service.search(criteria, first, pageSize);
-	    } else {
-		items = service.search(criteria, first, pageSize, query.getFacet(), query.getFilters());
-	    }
-	    return Response.ok(items).build();
-	} catch (ServiceException e) {
-	    throw new RestServiceException(e.getLocalizedMessage());
-	}
+        try {
+            SearchResult<Document> items;
+            if (query == null) {
+                items = service.search(criteria, first, pageSize);
+            } else {
+                items = service.search(criteria, first, pageSize, query.getFacet(), query.getFilters());
+            }
+            return Response.ok(items).build();
+        } catch (ServiceException e) {
+            throw new RestServiceException(e.getLocalizedMessage());
+        }
     }
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
     @Path(MORE_LIKE_THIS_ACTION + "/{criteria}")
     public Response moreLikeThis(@PathParam("criteria") String criteria, @QueryParam(SEARCH_FIRST_PARAMETER) @DefaultValue("0") int first,
-	    @QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("5") int pageSize,
-	    @QueryParam(MORE_LIKE_THIS_MIN_TERM_FREQUENCY_PARAMETER) @DefaultValue("1") int minTermFrequency,
-	    @QueryParam(MORE_LIKE_THIS_MAX_ITEMS_PARAMETER) @DefaultValue("10") int maxItems) {
-	isAuthenticated();
-	if (log.isTraceEnabled()) {
-	    log.trace(String.format("moreLikeThis - %s", criteria));
-	}
-	try {
-	    SearchResult<Document> items = service.moreLikeThis(criteria, first, pageSize, minTermFrequency, maxItems);
-	    return Response.ok(items).build();
-	} catch (ServiceException e) {
-	    throw new RestServiceException(e.getLocalizedMessage());
-	}
+            @QueryParam(SEARCH_PAGE_SIZE_PARAMETER) @DefaultValue("5") int pageSize,
+            @QueryParam(MORE_LIKE_THIS_MIN_TERM_FREQUENCY_PARAMETER) @DefaultValue("1") int minTermFrequency,
+            @QueryParam(MORE_LIKE_THIS_MAX_ITEMS_PARAMETER) @DefaultValue("10") int maxItems) {
+        isAuthenticated();
+        if (log.isTraceEnabled()) {
+            log.trace(String.format("moreLikeThis - %s", criteria));
+        }
+        try {
+            SearchResult<Document> items = service.moreLikeThis(criteria, first, pageSize, minTermFrequency, maxItems);
+            return Response.ok(items).build();
+        } catch (ServiceException e) {
+            throw new RestServiceException(e.getLocalizedMessage());
+        }
     }
 }

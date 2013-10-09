@@ -47,21 +47,21 @@ public class TestRestGuiceServletConfig extends GuiceServletContextListener {
 
     @Override
     protected Injector getInjector() {
-	String securityFilterPath = "/api/*";
-	injector = Jsr250.createInjector(new TestEsJerseyServletModule(securityFilterPath), new TestEsShiroWebModule(servletContext,
-	        securityFilterPath));
-	return injector;
+        String securityFilterPath = "/api/*";
+        injector = Jsr250.createInjector(new TestEsJerseyServletModule(securityFilterPath), new TestEsShiroWebModule(servletContext,
+                securityFilterPath));
+        return injector;
     }
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-	servletContext = servletContextEvent.getServletContext();
-	super.contextInitialized(servletContextEvent);
+        servletContext = servletContextEvent.getServletContext();
+        super.contextInitialized(servletContextEvent);
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-	super.contextDestroyed(servletContextEvent);
+        super.contextDestroyed(servletContextEvent);
     }
 
 }

@@ -48,19 +48,19 @@ public class RestGuiceServletConfig extends GuiceServletContextListener {
 
     @Override
     protected Injector getInjector() {
-	log.debug("*** getInjector ***");
-	String securityFilterPath = "/api/*";
-	injector = Jsr250.createInjector(new EsShiroWebModule(servletContext, securityFilterPath), new ShiroAopModule(),
-	        new EsJerseyServletModule(securityFilterPath));
+        log.debug("*** getInjector ***");
+        String securityFilterPath = "/api/*";
+        injector = Jsr250.createInjector(new EsShiroWebModule(servletContext, securityFilterPath), new ShiroAopModule(),
+                new EsJerseyServletModule(securityFilterPath));
 
-	return injector;
+        return injector;
     }
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-	log.debug("*** contextInitialized ***");
-	servletContext = servletContextEvent.getServletContext();
-	super.contextInitialized(servletContextEvent);
+        log.debug("*** contextInitialized ***");
+        servletContext = servletContextEvent.getServletContext();
+        super.contextInitialized(servletContextEvent);
     }
 
 }

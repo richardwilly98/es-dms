@@ -5,99 +5,99 @@ package com.github.richardwilly98.activiti;
  */
 public class ProcessDefinition extends ItemBase {
 
-	private String key;
-	private int version;
-	private String deploymentId;
-	private String deploymentUrl;
-	private String resource;
-	private String diagramResource;
-	private String category;
-	private boolean graphicalNotationDefined;
-	private boolean suspended;
-	private boolean startFormDefined;
+    private String key;
+    private int version;
+    private String deploymentId;
+    private String deploymentUrl;
+    private String resource;
+    private String diagramResource;
+    private String category;
+    private boolean graphicalNotationDefined;
+    private boolean suspended;
+    private boolean startFormDefined;
 
-	public ProcessDefinition() {
+    public ProcessDefinition() {
 
-	}
+    }
 
-	public String getKey() {
-		return key;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-	public int getVersion() {
-		return version;
-	}
+    public int getVersion() {
+        return version;
+    }
 
-	public void setVersion(int version) {
-		this.version = version;
-	}
+    public void setVersion(int version) {
+        this.version = version;
+    }
 
-	public String getDeploymentId() {
-		return deploymentId;
-	}
+    public String getDeploymentId() {
+        return deploymentId;
+    }
 
-	public void setDeploymentId(String deploymentId) {
-		this.deploymentId = deploymentId;
-	}
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
+    }
 
-	public String getDeploymentUrl() {
-		return deploymentUrl;
-	}
+    public String getDeploymentUrl() {
+        return deploymentUrl;
+    }
 
-	public void setDeploymentUrl(String deploymentUrl) {
-		this.deploymentUrl = deploymentUrl;
-	}
+    public void setDeploymentUrl(String deploymentUrl) {
+        this.deploymentUrl = deploymentUrl;
+    }
 
-	public String getResource() {
-		return resource;
-	}
+    public String getResource() {
+        return resource;
+    }
 
-	public void setResource(String resource) {
-		this.resource = resource;
-	}
+    public void setResource(String resource) {
+        this.resource = resource;
+    }
 
-	public String getDiagramResource() {
-		return diagramResource;
-	}
+    public String getDiagramResource() {
+        return diagramResource;
+    }
 
-	public void setDiagramResource(String diagramResource) {
-		this.diagramResource = diagramResource;
-	}
+    public void setDiagramResource(String diagramResource) {
+        this.diagramResource = diagramResource;
+    }
 
-	public String getCategory() {
-		return category;
-	}
+    public String getCategory() {
+        return category;
+    }
 
-	public void setCategory(String category) {
-		this.category = category;
-	}
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
-	public boolean isGraphicalNotationDefined() {
-		return graphicalNotationDefined;
-	}
+    public boolean isGraphicalNotationDefined() {
+        return graphicalNotationDefined;
+    }
 
-	public void setGraphicalNotationDefined(boolean graphicalNotationDefined) {
-		this.graphicalNotationDefined = graphicalNotationDefined;
-	}
+    public void setGraphicalNotationDefined(boolean graphicalNotationDefined) {
+        this.graphicalNotationDefined = graphicalNotationDefined;
+    }
 
-	public boolean isSuspended() {
-		return suspended;
-	}
+    public boolean isSuspended() {
+        return suspended;
+    }
 
-	public void setSuspended(boolean suspended) {
-		this.suspended = suspended;
-	}
+    public void setSuspended(boolean suspended) {
+        this.suspended = suspended;
+    }
 
-	public boolean isStartFormDefined() {
-		return startFormDefined;
-	}
+    public boolean isStartFormDefined() {
+        return startFormDefined;
+    }
 
-	public void setStartFormDefined(boolean startFormDefined) {
-		this.startFormDefined = startFormDefined;
-	}
+    public void setStartFormDefined(boolean startFormDefined) {
+        this.startFormDefined = startFormDefined;
+    }
 
 }

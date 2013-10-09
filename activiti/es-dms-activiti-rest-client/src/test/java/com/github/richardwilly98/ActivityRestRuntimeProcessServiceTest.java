@@ -15,38 +15,39 @@ import com.github.richardwilly98.activiti.SearchResult;
 
 public class ActivityRestRuntimeProcessServiceTest extends ActivitiRestClientTest {
 
-	@Test
-	public void testRetrieveProcessDefinition() {
-		log.debug("*** testRetrieveProcessDefinition ***");
-		String id = "financialReport:1:2345";
-		Response response = target().path("repository/process-definitions").path(id).request().get();
-		Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-		ProcessDefinition processDefinition = response.readEntity(ProcessDefinition.class);
-		Assert.assertNotNull(processDefinition);
-		log.debug(processDefinition);
-	}
+    @Test
+    public void testRetrieveProcessDefinition() {
+        log.debug("*** testRetrieveProcessDefinition ***");
+        String id = "financialReport:1:2345";
+        Response response = target().path("repository/process-definitions").path(id).request().get();
+        Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+        ProcessDefinition processDefinition = response.readEntity(ProcessDefinition.class);
+        Assert.assertNotNull(processDefinition);
+        log.debug(processDefinition);
+    }
 
-	@Test
-	public void testRetrieveProcessInstance() {
-		log.debug("*** testRetrieveProcessInstance ***");
-		Response response = target().path("runtime/process-instances").request().get();
-		SearchResult<ProcessInstance> processInstanceList = response.readEntity(new GenericType<SearchResult<ProcessInstance>>() {
-	    });
-		Assert.assertNotNull(processInstanceList);
-		for (ProcessInstance processInstance : processInstanceList.getData()) {
-			log.debug(processInstance);
-		}
-	}
+    @Test
+    public void testRetrieveProcessInstance() {
+        log.debug("*** testRetrieveProcessInstance ***");
+        Response response = target().path("runtime/process-instances").request().get();
+        SearchResult<ProcessInstance> processInstanceList = response.readEntity(new GenericType<SearchResult<ProcessInstance>>() {
+        });
+        Assert.assertNotNull(processInstanceList);
+        for (ProcessInstance processInstance : processInstanceList.getData()) {
+            log.debug(processInstance);
+        }
+    }
 
-	@Test
-	public void testStartProcessInstance() {
-		log.debug("*** testStartProcessInstance ***");
-		String id = "financialReport:1:2345";
-		ProcessInstance processInstance = new ProcessInstance();
-		processInstance.setProcessDefinitionId(id);
-		Response response = target().path("runtime/process-instances").request().post(Entity.entity(processInstance, MediaType.APPLICATION_JSON));
-		processInstance = response.readEntity(ProcessInstance.class);
-		Assert.assertNotNull(processInstance);
-		log.debug(processInstance);
-	}
+    @Test
+    public void testStartProcessInstance() {
+        log.debug("*** testStartProcessInstance ***");
+        String id = "financialReport:1:2345";
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setProcessDefinitionId(id);
+        Response response = target().path("runtime/process-instances").request()
+                .post(Entity.entity(processInstance, MediaType.APPLICATION_JSON));
+        processInstance = response.readEntity(ProcessInstance.class);
+        Assert.assertNotNull(processInstance);
+        log.debug(processInstance);
+    }
 }

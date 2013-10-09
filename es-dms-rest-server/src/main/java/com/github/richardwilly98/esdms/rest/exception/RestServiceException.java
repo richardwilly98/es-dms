@@ -34,7 +34,7 @@ import javax.ws.rs.core.Response;
 public class RestServiceException extends WebApplicationException {
 
     public RestServiceException(String message) {
-	super(Response.status(Response.Status.BAD_REQUEST).entity(message).type(MediaType.TEXT_PLAIN).build());
+        super(Response.status(Response.Status.BAD_REQUEST).entity(message).type(MediaType.TEXT_PLAIN).build());
     }
 
     public RestServiceException(Response.Status status, String message) {
