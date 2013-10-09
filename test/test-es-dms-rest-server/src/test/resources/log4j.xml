@@ -45,13 +45,13 @@
 		</filter> </appender> -->
 
 	<logger name="test.github.richardwilly98" additivity="false">
-		<level value="trace" />
+		<level value="debug" />
 		<appender-ref ref="ROLLING_FILE" />
 		<appender-ref ref="STDOUT" />
 	</logger>
 
 	<logger name="com.github.richardwilly98" additivity="false">
-		<level value="trace" />
+		<level value="debug" />
 		<appender-ref ref="ROLLING_FILE" />
 		<appender-ref ref="STDOUT" />
 	</logger>
