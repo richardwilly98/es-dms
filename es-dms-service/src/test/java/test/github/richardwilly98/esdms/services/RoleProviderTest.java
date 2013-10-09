@@ -36,9 +36,9 @@ import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
+import com.github.richardwilly98.esdms.api.Role.RoleType;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
-import com.github.richardwilly98.esdms.api.Role.RoleType;
 
 public class RoleProviderTest extends ProviderTestBase {
 
@@ -123,6 +123,32 @@ public class RoleProviderTest extends ProviderTestBase {
         } catch (IllegalArgumentException ex) {
 
         }
+    }
+
+    @Test
+    public void testFindRolesByType() throws Throwable {
+        log.info("Start testFindRolesByType");
+        SearchResult<Role> roles = roleService.findByType(RoleType.SYSTEM, 0, 20);
+        Assert.assertNotNull(roles);
+        Assert.assertNotNull(roles.getTotalHits() > 0);
+        for(Role role : roles.getItems()) {
+            Assert.assertEquals(role.getType(), RoleType.SYSTEM);
+            log.trace(role);
+        }
+        
+        String name = "role-" + System.currentTimeMillis();
+        Role userDefinedRole = createRole(name, "", false, RoleType.USER_DEFINED, null);
+        roles = roleService.findByType(RoleType.USER_DEFINED, 0, 20);
+        Assert.assertNotNull(roles);
+        Assert.assertNotNull(roles.getTotalHits() > 0);
+        Assert.assertTrue(roles.getItems().contains(userDefinedRole));
+
+        Role processRole = createRole(name, "", false, RoleType.PROCESS, null);
+        roles = roleService.findByType(RoleType.PROCESS, 0, 20);
+        Assert.assertNotNull(roles);
+        Assert.assertNotNull(roles.getTotalHits() > 0);
+        Assert.assertTrue(roles.getItems().contains(processRole));
+        Assert.assertFalse(roles.getItems().contains(userDefinedRole));
     }
 
     @Test

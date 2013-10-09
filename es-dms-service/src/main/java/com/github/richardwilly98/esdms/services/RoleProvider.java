@@ -34,9 +34,12 @@ import javax.inject.Singleton;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.Role.RoleType;
+import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
 @Singleton
@@ -86,4 +89,10 @@ public class RoleProvider extends ProviderBase<Role> implements RoleService {
 	return null;
     }
 
+    @Override
+    public SearchResult<Role> findByType(RoleType type, int first, int pageSize) throws ServiceException {
+        QueryBuilder query = QueryBuilders.matchQuery("type", type.getType());
+        SearchResult<Role> searchResult = search(query, first, pageSize);
+        return searchResult;
+    }
 }

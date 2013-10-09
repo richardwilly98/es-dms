@@ -33,6 +33,8 @@ import com.github.richardwilly98.esdms.RoleImpl;
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.Role.RoleType;
+import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.services.DocumentService.DocumentPermissions;
 import com.github.richardwilly98.esdms.services.UserService.UserPermissions;
 import com.google.common.collect.ImmutableSet;
@@ -112,4 +114,5 @@ public interface RoleService extends BaseService<Role> {
         }
     }
 
+    public abstract SearchResult<Role> findByType(RoleType type, int first, int pageSize) throws ServiceException;
 }
