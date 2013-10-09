@@ -6,13 +6,15 @@ esDmsSiteApp.service('roleService', ['$log', '$rootScope', '$resource', '$http',
 		create: {method: 'POST'},
 		types: {method: 'GET', params: {id: '_types'}, isArray: true}
 	});
+	var RoleTypeResource = $resource('api/role-types', { }, {
+	});
 	var roles = [];
 	var roleTypes = [];
 	var editedRole = null;
 	return {
 		roleTypes: function(callback) {
 			if (roleTypes.length === 0) {
-				var types = new RoleResource.types({}, function(){
+				var types = new RoleTypeResource.query({}, function(){
 					$log.log('get roleTypes: ' + JSON.stringify(types));
 					roleTypes = types;
 	        callback(types);
