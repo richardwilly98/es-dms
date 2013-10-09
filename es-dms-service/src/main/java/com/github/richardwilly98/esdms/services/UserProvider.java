@@ -44,6 +44,7 @@ import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 @Singleton
@@ -89,8 +90,17 @@ public class UserProvider extends ProviderBase<User> implements UserService {
     @Override
     public User create(User user) throws ServiceException {
         try {
-            if (user.getId() == null) {
-                user.setId(generateUniqueId(user));
+            if (! Strings.isNullOrEmpty(user.getLogin())) {
+                User userByLogin = null;
+                try {
+                    userByLogin = findByLogin(user.getLogin());
+                } catch (ServiceException sEx) {
+                    
+                } finally {
+                    if (userByLogin != null) {
+                        throw new ServiceException(String.format("A user already exists with same login: %s", user.getLogin()));
+                    }
+                }
             }
             if (user.getPassword() != null) {
                 String encodedHash = computeBase64Hash(user.getPassword());
@@ -99,7 +109,6 @@ public class UserProvider extends ProviderBase<User> implements UserService {
                 }
                 user.setHash(encodedHash);
                 // user.setPassword(null);
-
             }
 
             if (user.getRoles().isEmpty()) {
@@ -122,18 +131,30 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 
     @RequiresPermissions(UserPermissions.Constants.USER_EDIT)
     @Override
-    public User update(User item) throws ServiceException {
-        checkArgument(canUserBeUpdated(item), String.format(
-                "Cannot update user %s. Missing required system roles", item.getId()));
-        if (item.getPassword() != null) {
-            String encodedHash = computeBase64Hash(item.getPassword());
-            if (log.isTraceEnabled()) {
-                log.trace(String.format("From service - hash: %s for login %s", encodedHash, item.getLogin()));
+    public User update(User user) throws ServiceException {
+        checkArgument(canUserBeUpdated(user), String.format(
+                "Cannot update user %s. Missing required system roles", user.getId()));
+        if (! Strings.isNullOrEmpty(user.getLogin())) {
+            User userByLogin = null;
+            try {
+                userByLogin = findByLogin(user.getLogin());
+            } catch (ServiceException sEx) {
+                
+            } finally {
+                if (userByLogin != null && !user.getId().equals(userByLogin.getId())) {
+                    throw new ServiceException(String.format("A user already exists with same login: %s", user.getLogin()));
+                }
             }
-            item.setHash(encodedHash);
+        }
+        if (user.getPassword() != null) {
+            String encodedHash = computeBase64Hash(user.getPassword());
+            if (log.isTraceEnabled()) {
+                log.trace(String.format("From service - hash: %s for login %s", encodedHash, user.getLogin()));
+            }
+            user.setHash(encodedHash);
             // item.setPassword(null);
         }
-        return super.update(item);
+        return super.update(user);
     }
 
     @RequiresPermissions(UserPermissions.Constants.USER_DELETE)
