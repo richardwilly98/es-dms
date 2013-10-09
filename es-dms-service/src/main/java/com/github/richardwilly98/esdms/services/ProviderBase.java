@@ -219,6 +219,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	    if (item.getId() == null) {
 		item.setId(generateUniqueId(item));
 	    }
+	    validate(item);
 	    String json;
 	    json = mapper.writeValueAsString(item);
 	    IndexResponse response = client.prepareIndex(index, type).setId(item.getId()).setSource(json).execute().actionGet();
