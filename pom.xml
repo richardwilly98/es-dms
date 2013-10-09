@@ -115,9 +115,11 @@
 		</dependency>
 	</dependencies>
 	<modules>
-		<module>es-dms-site</module>
-		<module>es-dms-service</module>
 		<module>es-dms-core</module>
+		<module>es-dms-service</module>
+		<module>es-dms-rest-server</module>
+		<module>es-dms-site</module>
+		<module>test/test-es-dms-rest-server</module>
 		<module>es-dms-rest-client</module>
 		<module>activiti/es-dms-activiti-authentication</module>
 		<module>activiti/es-dms-activiti-rest-client</module>
@@ -127,7 +129,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.0</version>
+				<version>3.1</version>
 				<configuration>
 					<source>1.7</source>
 					<target>1.7</target>
