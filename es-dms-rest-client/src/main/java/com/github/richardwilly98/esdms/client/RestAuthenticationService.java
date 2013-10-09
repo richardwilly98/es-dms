@@ -12,13 +12,13 @@ import javax.ws.rs.core.Response.Status;
 import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
-public class RestAuthenticationServiceClient extends RestClientBase {
+public class RestAuthenticationService extends RestClientBase {
 
 	public static final String LOGOUT_PATH = "logout";
 	public static final String LOGIN_PATH = "login";
 	public static final String AUTH_PATH = "auth";
 
-	public RestAuthenticationServiceClient(final String url) {
+	public RestAuthenticationService(final String url) {
 		super(url);
 	}
 

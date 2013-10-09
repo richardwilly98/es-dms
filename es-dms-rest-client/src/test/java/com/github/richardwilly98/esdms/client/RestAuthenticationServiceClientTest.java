@@ -5,16 +5,21 @@ import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.services.UserService;
 
 public class RestAuthenticationServiceClientTest extends RestClientBaseTest {
+
+	RestAuthenticationServiceClientTest() throws Exception {
+		super();
+	}
 
 	@Test
 	public void testAdminLoginLogout() {
 		log.debug("*** testAdminLoginLogout ***");
 		try {
 			String token = getRestAuthenticationServiceClient().login(
-					new CredentialImpl.Builder().username("admin")
-							.password("secret".toCharArray()).build());
+					new CredentialImpl.Builder().username(UserService.DEFAULT_ADMIN_LOGIN)
+							.password(UserService.DEFAULT_ADMIN_PASSWORD.toCharArray()).build());
 			Assert.assertNotNull(token);
 			getRestAuthenticationServiceClient().logout(token);
 		} catch (ServiceException e) {
@@ -23,7 +28,7 @@ public class RestAuthenticationServiceClientTest extends RestClientBaseTest {
 		try {
 			getRestAuthenticationServiceClient().login(
 					new CredentialImpl.Builder().username("kermit")
-							.password("secret".toCharArray()).build());
+							.password("xxxxxx".toCharArray()).build());
 			Assert.fail("Should have failed to login with kermit");
 		} catch (ServiceException e) {
 		}
@@ -35,7 +40,7 @@ public class RestAuthenticationServiceClientTest extends RestClientBaseTest {
 		try {
 			getRestAuthenticationServiceClient().login(
 					new CredentialImpl.Builder().username("kermit")
-							.password("secret".toCharArray()).build());
+							.password("xxxxxx".toCharArray()).build());
 			Assert.fail("Should have failed to login with kermit");
 		} catch (ServiceException e) {
 		}

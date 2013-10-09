@@ -3,20 +3,29 @@ package com.github.richardwilly98.esdms.client;
 import org.junit.Assert;
 import org.testng.annotations.Test;
 
+import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.User;
+import com.github.richardwilly98.esdms.services.UserService;
 
 public class RestUserServiceClientTest extends RestClientBaseTest {
+
+	RestUserServiceClientTest() throws Exception {
+		super();
+	}
 
 	@Test
 	public void testFindByUserId() {
 		log.debug("*** testFindByUserId ***");
 		try {
 			String token = loginAsAdmin();
-			User user = getRestUserServiceClient().findUserById(token, DEFAULT_ADMIN_LOGIN);
+			User user = getRestUserServiceClient().findUserById(token,
+					UserService.DEFAULT_ADMIN_LOGIN);
 			Assert.assertNotNull(user);
-			Assert.assertEquals(user.getLogin(), DEFAULT_ADMIN_LOGIN);
-			
-			user = getRestUserServiceClient().findUserById(token, "dummy-user-" + System.currentTimeMillis());
+			Assert.assertEquals(user.getLogin(),
+					UserService.DEFAULT_ADMIN_LOGIN);
+
+			user = getRestUserServiceClient().findUserById(token,
+					"dummy-user-" + System.currentTimeMillis());
 			Assert.assertNull(user);
 		} catch (Throwable t) {
 			log.error("testFindByUserId failed", t);
@@ -29,9 +38,11 @@ public class RestUserServiceClientTest extends RestClientBaseTest {
 		log.debug("*** testFindUserByEmail ***");
 		try {
 			String token = loginAsAdmin();
-			User user = getRestUserServiceClient().findUserByEmail(token, DEFAULT_ADMIN_LOGIN);
+			User user = getRestUserServiceClient().findUserByEmail(token,
+					UserService.DEFAULT_ADMIN_EMAIL);
 			Assert.assertNotNull(user);
-			Assert.assertEquals(user.getEmail(), DEFAULT_ADMIN_LOGIN);
+			Assert.assertEquals(user.getEmail(),
+					UserService.DEFAULT_ADMIN_EMAIL);
 		} catch (Throwable t) {
 			log.error("testFindUserByEmail failed", t);
 			Assert.fail("testFindUserByEmail failed");
@@ -43,9 +54,38 @@ public class RestUserServiceClientTest extends RestClientBaseTest {
 		log.debug("*** testFindUserByName ***");
 		try {
 			String token = loginAsAdmin();
-			User user = getRestUserServiceClient().findUserByName(token, DEFAULT_ADMIN_LOGIN);
+			User user = getRestUserServiceClient().findUserByName(token,
+					UserService.DEFAULT_ADMIN_LOGIN);
 			Assert.assertNotNull(user);
-			Assert.assertEquals(user.getName(), DEFAULT_ADMIN_LOGIN);
+			Assert.assertEquals(user.getName(), UserService.DEFAULT_ADMIN_LOGIN);
+		} catch (Throwable t) {
+			log.error("testFindUserByName failed", t);
+			Assert.fail("testFindUserByName failed");
+		}
+	}
+
+	@Test
+	public void testCreateUser() {
+		log.debug("*** testCreateUser ***");
+		try {
+			String token = loginAsAdmin();
+			String id = "user-" + System.currentTimeMillis() + "@gmail.com";
+			char[] password = new char[] { 11, 12, 13, 14, 15, 16, 17 };
+			User user = new UserImpl.Builder().id(id).name(id).email(id)
+					.login(id).password(password).build();
+			Assert.assertNotNull(user);
+			User user2 = getRestUserServiceClient().create(token, user);
+			Assert.assertNotNull(user2);
+			Assert.assertEquals(user.getId(), user2.getId());
+			Assert.assertEquals(user.getName(), user2.getName());
+			Assert.assertEquals(user.getLogin(), user2.getLogin());
+			Assert.assertEquals(user.getEmail(), user2.getEmail());
+
+			User user3 = getRestUserServiceClient().findUserById(token,
+					id);
+			Assert.assertNotNull(user2);
+			Assert.assertEquals(user2, user3);
+
 		} catch (Throwable t) {
 			log.error("testFindUserByName failed", t);
 			Assert.fail("testFindUserByName failed");

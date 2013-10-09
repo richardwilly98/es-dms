@@ -17,7 +17,6 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 public abstract class RestClientBase {
 
 	public static final String ES_DMS_TICKET = "ES_DMS_TICKET";
-	public static final String API_PATH = "api";
 	
 	protected final Logger log = Logger.getLogger(getClass());
 	private final String url;
@@ -33,12 +32,11 @@ public abstract class RestClientBase {
 	}
 
 	protected WebTarget getWebTarget() {
-		return restClient.target(url)
-				.path("api");
+		return restClient.target(url);
 	}
 
 	protected Cookie getUserCookie(String userId, char[] password) throws ServiceException {
-		RestAuthenticationServiceClient authenticationClient = new RestAuthenticationServiceClient(
+		RestAuthenticationService authenticationClient = new RestAuthenticationService(
 				url);
 		return authenticationClient.getEsDmsCookie(new CredentialImpl.Builder()
 				.username(userId).password(password).build());
