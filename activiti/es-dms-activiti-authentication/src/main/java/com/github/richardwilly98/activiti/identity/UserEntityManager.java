@@ -20,8 +20,8 @@ import org.activiti.engine.impl.persistence.entity.UserIdentityManager;
 import org.apache.log4j.Logger;
 
 import com.github.richardwilly98.esdms.CredentialImpl;
-import com.github.richardwilly98.esdms.client.RestAuthenticationServiceClient;
-import com.github.richardwilly98.esdms.client.RestUserServiceClient;
+import com.github.richardwilly98.esdms.client.RestAuthenticationService;
+import com.github.richardwilly98.esdms.client.RestUserService;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
@@ -32,8 +32,8 @@ public class UserEntityManager extends AbstractManager implements
 	private static final Logger log = Logger
 			.getLogger(UserEntityManager.class);
 	private final EsDmsConfigurator configurator;
-	private RestUserServiceClient restUserClient;
-	private RestAuthenticationServiceClient restAuthenticationClient;
+	private RestUserService restUserClient;
+	private RestAuthenticationService restAuthenticationClient;
 
 	public UserEntityManager(EsDmsConfigurator configurator) {
 		log.trace("*** constructor ***");
@@ -212,16 +212,16 @@ public class UserEntityManager extends AbstractManager implements
 				"LDAP user manager doesn't support querying");
 	}
 
-	private RestUserServiceClient getRestUserClient() {
+	private RestUserService getRestUserClient() {
 		if (restUserClient == null) {
-			restUserClient = new RestUserServiceClient(configurator.getUrl());
+			restUserClient = new RestUserService(configurator.getUrl());
 		}
 		return restUserClient;
 	}
 
-	private RestAuthenticationServiceClient getRestAuthenticationClient() {
+	private RestAuthenticationService getRestAuthenticationClient() {
 		if (restAuthenticationClient == null) {
-			restAuthenticationClient = new RestAuthenticationServiceClient(
+			restAuthenticationClient = new RestAuthenticationService(
 					configurator.getUrl());
 		}
 		return restAuthenticationClient;
