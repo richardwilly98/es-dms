@@ -6,23 +6,26 @@ import org.activiti.engine.impl.persistence.entity.GroupIdentityManager;
 
 public class GroupManagerFactory implements SessionFactory {
 
-	private EsDmsConfigurator configurator;
+    private EsDmsConfigurator configurator;
 
-	public GroupManagerFactory(EsDmsConfigurator configurator) {
-		this.configurator = configurator;
-	}
-	public void setConfigurator(EsDmsConfigurator configurator) {
-		this.configurator = configurator;
-	}
-	public EsDmsConfigurator getConfiguration() {
-		return this.configurator;
-	}
-	public Class<?> getSessionType() {
-		return GroupIdentityManager.class;
-	}
+    public GroupManagerFactory(EsDmsConfigurator configurator) {
+        this.configurator = configurator;
+    }
 
-	public Session openSession() {
-		return new GroupEntityManager(configurator);
-	}
+    public void setConfigurator(EsDmsConfigurator configurator) {
+        this.configurator = configurator;
+    }
+
+    public EsDmsConfigurator getConfiguration() {
+        return this.configurator;
+    }
+
+    public Class<?> getSessionType() {
+        return GroupIdentityManager.class;
+    }
+
+    public Session openSession() {
+        return new GroupEntityManager(configurator);
+    }
 
 }

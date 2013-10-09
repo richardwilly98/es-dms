@@ -19,7 +19,7 @@
 		<h2.version>1.3.170</h2.version>
 	</properties>
 	<dependencies>
-	
+
 		<dependency>
 			<groupId>com.github.richardwilly98</groupId>
 			<artifactId>es-dms-rest-client</artifactId>
