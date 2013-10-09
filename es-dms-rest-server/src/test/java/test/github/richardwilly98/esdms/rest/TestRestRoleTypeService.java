@@ -85,7 +85,7 @@ public class TestRestRoleTypeService extends GuiceAndJettyTestBase<Role> {
                 Assert.assertNotNull(type);
             }
         } catch (Throwable t) {
-            log.error("testGetRoleTypes fail", t);
+            log.error("testGetRoleTypes failed", t);
             Assert.fail();
         }
     }

@@ -40,7 +40,7 @@ import com.mycila.inject.jsr250.Jsr250;
 
 public class RestGuiceServletConfig extends GuiceServletContextListener {
 
-    private final Logger log = Logger.getLogger(this.getClass());
+    private static final Logger log = Logger.getLogger(RestGuiceServletConfig.class);
 
     private ServletContext servletContext;
 

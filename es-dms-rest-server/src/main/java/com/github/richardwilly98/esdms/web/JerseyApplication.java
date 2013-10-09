@@ -28,6 +28,7 @@ package com.github.richardwilly98.esdms.web;
 
 import javax.inject.Inject;
 
+import org.apache.log4j.Logger;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -36,12 +37,14 @@ import org.jvnet.hk2.guice.bridge.api.GuiceIntoHK2Bridge;
 
 public class JerseyApplication extends ResourceConfig {
 
+    private static final Logger log = Logger.getLogger(JerseyApplication.class);
+    
     @Inject
     public JerseyApplication(ServiceLocator serviceLocator) {
 	super(MultiPartFeature.class);
 	packages("com.github.richardwilly98.esdms.rest", "com.github.richardwilly98.esdms.web", "com.fasterxml.jackson.jaxrs");
 
-	System.out.println("Registering injectables...");
+	log.info("Registering injectables...");
 
 	GuiceBridge.getGuiceBridge().initializeGuiceBridge(serviceLocator);
 
