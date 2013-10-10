@@ -35,28 +35,26 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.testng.Assert;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.api.Role.RoleType;
 
-@Guice(modules = com.github.richardwilly98.esdms.inject.TestEsClientModule.class)
+//@Guice(modules = com.github.richardwilly98.esdms.inject.TestEsClientModule.class)
 public class TestRestService extends TestRestServerBase {
 
     public TestRestService() throws Exception {
         super();
     }
 
-    @BeforeSuite
-    public void beforeClass() throws Throwable {
-        setUp();
+    @Override
+    public void setUp() throws Throwable {
+        super.setUp();
     }
 
-    @AfterSuite
-    public void afterClass() throws Throwable {
-        tearDown();
+    
+    @Override
+    public void tearDown() throws Throwable {
+        super.tearDown();
     }
 
     static class SimpleEntry {

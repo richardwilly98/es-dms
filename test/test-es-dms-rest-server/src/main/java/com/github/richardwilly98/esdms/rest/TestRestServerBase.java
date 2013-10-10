@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.net.URI;
 import java.util.Set;
 
+import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -48,6 +49,10 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.testng.Assert;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Guice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.cfg.Annotations;
@@ -67,6 +72,7 @@ import com.google.inject.servlet.GuiceFilter;
  * TODO: Investigate why SSL does not work.
  * @see TestRestService for usage
  */
+@Guice(modules = com.github.richardwilly98.esdms.inject.TestEsClientModule.class)
 public class TestRestServerBase {
 
     protected final Logger log = Logger.getLogger(getClass());
@@ -139,8 +145,20 @@ public class TestRestServerBase {
     // return Client.create(config);
     // }
 
-    // @BeforeSuite
-    protected void setUp() throws Exception {
+    @BeforeSuite
+    void beforeSuite() throws Throwable {
+        setUp();
+    }
+
+    @AfterSuite
+    void afterSuite() throws Throwable {
+        tearDown();
+    }
+
+    /*
+     * Override this method to customize what will be run before all tests in this suite have run.
+     */
+    protected void setUp() throws Throwable {
         log.info("*** setUp ***");
         WebAppContext webAppContext = new WebAppContext();
         webAppContext.setContextPath("/");
@@ -157,14 +175,23 @@ public class TestRestServerBase {
         server.setHandler(webAppContext);
         server.start();
 
-        // ClientConfig config = new DefaultClientConfig();
-        // config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING,
-        // Boolean.TRUE);
-        // config.getClasses().add(JacksonJaxbJsonProvider.class);
-        // // config.getFeatures().add(JacksonJsonProvider.class);
-        // restClient = Client.create(config);
-
         loginAdminUser();
+    }
+
+    /*
+     * Override this method to customize what will be run after all tests in this suite have run. 
+     */
+    protected void tearDown() throws Throwable {
+        log.info("*** tearDown ***");
+        logoutAdminUser();
+        server.stop();
+        tearDownElasticsearch();
+    }
+
+    private void tearDownElasticsearch() throws Exception {
+        log.info("*** tearDownElasticsearch ***");
+        client.admin().indices().prepareDelete().execute().actionGet();
+        client.close();
     }
 
     // private Connector createSecureConnector() {
@@ -177,7 +204,8 @@ public class TestRestServerBase {
 
     protected URI getBaseURI(boolean secured) {
         if (secured) {
-            return UriBuilder.fromUri("https://localhost/").port(HTTPS_PORT).build();
+            throw new NotSupportedException("https is not supported");
+//            return UriBuilder.fromUri("https://localhost/").port(HTTPS_PORT).build();
         } else {
             return UriBuilder.fromUri("http://localhost/").port(HTTP_PORT).build();
         }
@@ -192,10 +220,6 @@ public class TestRestServerBase {
     protected WebTarget target() {
         return restClient.target(getBaseURI(false));
     }
-
-    // public WebResource securedResource() {
-    // return securedClient.resource(getBaseURI(true));
-    // }
 
     /**
      * Get the client that is configured for this test.
@@ -218,32 +242,32 @@ public class TestRestServerBase {
     }
 
     protected Cookie login(Credential credential) throws Throwable {
-        // try {
-        log.debug("*** login ***");
-        WebTarget webResource = target().path("auth").path("login");
-        log.debug(webResource);
-        Response response = webResource.request(MediaType.APPLICATION_JSON).post(Entity.entity(credential, MediaType.APPLICATION_JSON));
-        log.debug("status: " + response.getStatus());
-        // Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-        for (NewCookie cookie : response.getCookies().values()) {
-            if (RestAuthencationService.ES_DMS_TICKET.equals(cookie.getName())) {
-                return new Cookie(cookie.getName(), cookie.getValue());
+        try {
+            log.debug(String.format("login - %s", credential));
+            WebTarget webResource = target().path("auth").path("login");
+            log.debug(webResource);
+            Response response = webResource.request(MediaType.APPLICATION_JSON).post(Entity.entity(credential, MediaType.APPLICATION_JSON));
+            log.debug("status: " + response.getStatus());
+            Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
+            for (NewCookie cookie : response.getCookies().values()) {
+                if (RestAuthencationService.ES_DMS_TICKET.equals(cookie.getName())) {
+                    return new Cookie(cookie.getName(), cookie.getValue());
+                }
             }
+        } catch (Throwable t) {
+            log.error("login failed", t);
+            Assert.fail("login failed", t);
         }
-        // } catch (Throwable t) {
-        // log.error("login failed", t);
-        // Assert.fail("login failed", t);
-        // }
         return null;
     }
 
     protected void logout(Cookie cookie) throws Throwable {
-        log.debug("*** logout ***");
+        log.debug(String.format("logout - %s", cookie));
         checkNotNull(cookie);
         WebTarget webResource = target().path("auth").path("logout");
         Response response = webResource.request().cookie(cookie).post(Entity.json(null));
         log.debug("status: " + response.getStatus());
-        // Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+        Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
         if (response.getStatus() != Status.OK.getStatusCode()) {
             throw new ServiceException(String.format("logout failed. Response status: %s", response.getStatus()));
         }
@@ -283,17 +307,4 @@ public class TestRestServerBase {
         return null;
     }
 
-    // @AfterSuite
-    protected void tearDown() throws Throwable {
-        log.info("*** tearDown ***");
-        logoutAdminUser();
-        server.stop();
-        tearDownElasticsearch();
-    }
-
-    private void tearDownElasticsearch() throws Exception {
-        log.info("*** tearDownElasticsearch ***");
-        client.admin().indices().prepareDelete().execute().actionGet();
-        client.close();
-    }
 }
