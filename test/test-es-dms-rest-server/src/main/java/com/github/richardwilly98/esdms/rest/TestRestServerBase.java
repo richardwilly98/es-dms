@@ -84,8 +84,10 @@ public class TestRestServerBase {
     protected static Cookie adminCookie;
     private final Client restClient;
     // private final Client securedClient;
-    private static final int HTTP_PORT = 8081;
-    private static final int HTTPS_PORT = 50443;
+    public static final int HTTP_PORT = 8081;
+    public static final int HTTPS_PORT = 50443;
+    public static final String URL = "http://localhost:" + HTTP_PORT;
+    public static final String SECURED_URL = "https://localhost:" + HTTPS_PORT;
 
     @Inject
     org.elasticsearch.client.Client client;
@@ -156,7 +158,8 @@ public class TestRestServerBase {
     }
 
     /*
-     * Override this method to customize what will be run before all tests in this suite have run.
+     * Override this method to customize what will be run before all tests in
+     * this suite have run.
      */
     protected void setUp() throws Throwable {
         log.info("*** setUp ***");
@@ -179,7 +182,8 @@ public class TestRestServerBase {
     }
 
     /*
-     * Override this method to customize what will be run after all tests in this suite have run. 
+     * Override this method to customize what will be run after all tests in
+     * this suite have run.
      */
     protected void tearDown() throws Throwable {
         log.info("*** tearDown ***");
@@ -205,9 +209,9 @@ public class TestRestServerBase {
     protected URI getBaseURI(boolean secured) {
         if (secured) {
             throw new NotSupportedException("https is not supported");
-//            return UriBuilder.fromUri("https://localhost/").port(HTTPS_PORT).build();
+//            return UriBuilder.fromUri(SECURED_URL).build();
         } else {
-            return UriBuilder.fromUri("http://localhost/").port(HTTP_PORT).build();
+            return UriBuilder.fromUri(URL).build();
         }
     }
 
@@ -266,7 +270,6 @@ public class TestRestServerBase {
         checkNotNull(cookie);
         WebTarget webResource = target().path("auth").path("logout");
         Response response = webResource.request().cookie(cookie).post(Entity.json(null));
-        log.debug("status: " + response.getStatus());
         Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
         if (response.getStatus() != Status.OK.getStatusCode()) {
             throw new ServiceException(String.format("logout failed. Response status: %s", response.getStatus()));
@@ -283,7 +286,7 @@ public class TestRestServerBase {
     }
 
     protected User createUser(String login, String password, Set<Role> roles) throws Throwable {
-        log.debug(String.format("*** createUser - %s - %s ***", login, password));
+        log.trace(String.format("*** createUser - %s - %s ***", login, password));
         User user = new UserImpl.Builder().id(login).name(login).email(login).login(login).password(password.toCharArray()).roles(roles)
                 .build();
         String json = mapper.writeValueAsString(user);
@@ -291,14 +294,13 @@ public class TestRestServerBase {
         Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
                 .post(Entity.json(user));
         log.debug(String.format("status: %s", response.getStatus()));
-        // Assert.assertTrue(response.getStatus() == Status.CREATED
-        // .getStatusCode());
+        Assert.assertEquals(response.getStatus(), Status.CREATED.getStatusCode());
         if (response.getStatus() != Status.CREATED.getStatusCode()) {
             throw new ServiceException(String.format("createUser %s failed. Response status: %s", login, response.getStatus()));
         }
         URI uri = response.getLocation();
-        // Assert.assertNotNull(uri);
-        log.debug(String.format("getItem - %s", uri));
+        Assert.assertNotNull(uri);
+        log.trace(String.format("getItem - %s", uri));
         response = client().target(uri).request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
         if (response.getStatus() == Status.OK.getStatusCode()) {
             return response.readEntity(User.class);
