@@ -131,17 +131,18 @@ public class AuthenticationProvider implements AuthenticationService {
             }
             UsernamePasswordToken token = new UsernamePasswordToken(login, password, rememberMe);
             AuthenticationInfo info = securityManager.authenticate(token);
-            if (info instanceof SimpleAuthenticationInfo) {
-                PrincipalCollection principals = ((SimpleAuthenticationInfo) info).getPrincipals();
-
-                for (Object principal : principals.asList()) {
-                    log.debug("Principal: " + principal);
+            if (log.isTraceEnabled()) {
+                if (info instanceof SimpleAuthenticationInfo) {
+                    PrincipalCollection principals = ((SimpleAuthenticationInfo) info).getPrincipals();
+                    for (Object principal : principals.asList()) {
+                        log.trace("Principal: " + principal);
+                    }
                 }
             }
             token.clear();
             // Create subject for the current principal
             Subject subject = new Subject.Builder().principals(info.getPrincipals()).buildSubject();
-            log.trace("subject.getPrincipal(): " + subject.getPrincipal());
+//            log.trace("subject.getPrincipal(): " + subject.getPrincipal());
             // Create session
             org.apache.shiro.session.Session session = subject.getSession(true);
             if (session == null) {
@@ -149,10 +150,10 @@ public class AuthenticationProvider implements AuthenticationService {
             }
             session.setAttribute(ES_DMS_LOGIN_ATTRIBUTE, login);
             ThreadContext.bind(subject);
-            if (log.isTraceEnabled()) {
-                Subject currentUser = SecurityUtils.getSubject();
-                log.trace("currentUser.getPrincipal(): " + currentUser.getPrincipal());
-            }
+//            if (log.isTraceEnabled()) {
+//                Subject currentUser = SecurityUtils.getSubject();
+//                log.trace("currentUser.getPrincipal(): " + currentUser.getPrincipal());
+//            }
             return session.getId().toString();
         } catch (AuthenticationException aEx) {
             String message = String.format("Authentication failed for %s", login);
