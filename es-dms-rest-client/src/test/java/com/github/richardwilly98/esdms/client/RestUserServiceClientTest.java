@@ -76,8 +76,8 @@ public class RestUserServiceClientTest extends RestClientBaseTest {
     }
 
     @Test
-    public void testCreateUser() {
-        log.debug("*** testCreateUser ***");
+    public void testCreateDeleteUser() {
+        log.debug("*** testCreateDeleteUser ***");
         try {
             String token = loginAsAdmin();
             String id = "user-" + System.currentTimeMillis() + "@gmail.com";
@@ -95,9 +95,13 @@ public class RestUserServiceClientTest extends RestClientBaseTest {
             Assert.assertNotNull(user2);
             Assert.assertEquals(user2, user3);
 
+            getRestUserServiceClient().delete(token, user3);
+            user3 = getRestUserServiceClient().findUserById(token, id);
+            Assert.assertNull(user3);
+
         } catch (Throwable t) {
-            log.error("testFindUserByName failed", t);
-            Assert.fail("testFindUserByName failed");
+            log.error("testCreateDeleteUser failed", t);
+            Assert.fail("testCreateDeleteUser failed");
         }
     }
 }

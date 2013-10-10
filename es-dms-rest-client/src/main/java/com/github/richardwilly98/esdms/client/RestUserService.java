@@ -3,10 +3,8 @@ package com.github.richardwilly98.esdms.client;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Sets.newHashSet;
 
-import java.net.URI;
 import java.util.Collection;
 
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
@@ -18,7 +16,7 @@ import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.google.common.collect.Iterables;
 
-public class RestUserService extends RestClientBase {
+public class RestUserService extends RestItemBaseClient<User> {
 
     public static final String SEARCH_PATH = "search";
     public static final String SEARCH_FIRST_PARAMETER = "fi";
@@ -27,7 +25,7 @@ public class RestUserService extends RestClientBase {
     public static final String LOGIN_PARAM = "login";
 
     public RestUserService(String url) {
-        super(url);
+        super(url, USERS_PATH, User.class);
     }
 
     public Collection<User> findUsersById(String token, String id, int... params) throws ServiceException {
@@ -41,7 +39,7 @@ public class RestUserService extends RestClientBase {
         checkNotNull(token);
         checkNotNull(id);
         Cookie cookie = newUserCookie(token);
-        Response response = target().path(USERS_PATH).path(id).request(MediaType.APPLICATION_JSON).cookie(cookie).get();
+        Response response = target().path(id).request(MediaType.APPLICATION_JSON).cookie(cookie).get();
         if (response.getStatus() == Status.OK.getStatusCode()) {
             return response.readEntity(User.class);
         }
@@ -86,27 +84,8 @@ public class RestUserService extends RestClientBase {
         checkNotNull(token);
         checkNotNull(login);
         Cookie cookie = newUserCookie(token);
-        Response response = target().path(RestUserService.USERS_PATH).queryParam(RestUserService.LOGIN_PARAM, login)
+        Response response = target().queryParam(RestUserService.LOGIN_PARAM, login)
                 .request(MediaType.APPLICATION_JSON).cookie(cookie).get();
-        if (response.getStatus() == Status.OK.getStatusCode()) {
-            return response.readEntity(User.class);
-        }
-        return null;
-    }
-
-    public User create(String token, User user) throws ServiceException {
-        checkNotNull(token);
-        checkNotNull(user);
-        Cookie cookie = newUserCookie(token);
-        Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).cookie(cookie)
-                .post(Entity.json(user));
-        log.debug(String.format("status: %s", response.getStatus()));
-        if (response.getStatus() != Status.CREATED.getStatusCode()) {
-            throw new ServiceException(String.format("Fail to create user. Response stauts: %s", response.getStatus()));
-        }
-        URI uri = response.getLocation();
-        log.debug(String.format("getItem - %s", uri));
-        response = restClient.target(uri).request().cookie(cookie).accept(MediaType.APPLICATION_JSON).get();
         if (response.getStatus() == Status.OK.getStatusCode()) {
             return response.readEntity(User.class);
         }
@@ -124,7 +103,7 @@ public class RestUserService extends RestClientBase {
             pageSize = params[1];
         }
 
-        Response response = target().path(USERS_PATH).path(SEARCH_PATH).path(criteria).queryParam(SEARCH_FIRST_PARAMETER, first)
+        Response response = target().path(SEARCH_PATH).path(criteria).queryParam(SEARCH_FIRST_PARAMETER, first)
                 .queryParam(SEARCH_PAGE_SIZE_PARAMETER, pageSize).request(MediaType.APPLICATION_JSON).cookie(cookie).get();
         if (response.getStatus() == Status.OK.getStatusCode()) {
             SearchResult<User> users = response.readEntity(new GenericType<SearchResult<User>>() {

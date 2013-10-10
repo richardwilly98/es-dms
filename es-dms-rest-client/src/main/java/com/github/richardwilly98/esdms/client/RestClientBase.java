@@ -20,11 +20,14 @@ public abstract class RestClientBase {
 
     protected final Logger log = Logger.getLogger(getClass());
     private final String url;
+    private final String rootResource;
     protected final Client restClient;
 
-    protected RestClientBase(final String url) {
+    protected RestClientBase(final String url, final String rootResource) {
         checkNotNull(url);
+        checkNotNull(rootResource);
         this.url = url;
+        this.rootResource = rootResource;
         ClientConfig configuration = new ClientConfig();
         configuration.register(MultiPartFeature.class);
         // configuration.register(JacksonFeature.class);
@@ -32,7 +35,7 @@ public abstract class RestClientBase {
     }
 
     protected WebTarget target() {
-        return restClient.target(url);
+        return restClient.target(url).path(rootResource);
     }
 
     protected Cookie getUserCookie(String userId, char[] password) throws ServiceException {

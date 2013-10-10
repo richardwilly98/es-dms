@@ -14,16 +14,16 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 
 public class RestAuthenticationService extends RestClientBase {
 
+    public static final String AUTH_PATH = "auth";
     public static final String LOGOUT_PATH = "logout";
     public static final String LOGIN_PATH = "login";
-    public static final String AUTH_PATH = "auth";
 
     public RestAuthenticationService(final String url) {
-        super(url);
+        super(url, AUTH_PATH);
     }
 
     Cookie getEsDmsCookie(Credential credential) throws ServiceException {
-        Response response = target().path(AUTH_PATH).path(LOGIN_PATH).request(MediaType.APPLICATION_JSON)
+        Response response = target().path(LOGIN_PATH).request(MediaType.APPLICATION_JSON)
                 .post(Entity.entity(credential, MediaType.APPLICATION_JSON));
         log.debug("status: " + response.getStatus());
         if (response.getStatus() == Status.OK.getStatusCode()) {
@@ -39,7 +39,7 @@ public class RestAuthenticationService extends RestClientBase {
     }
 
     public String login(Credential credential) throws ServiceException {
-        Response response = target().path(AUTH_PATH).path(LOGIN_PATH).request(MediaType.APPLICATION_JSON)
+        Response response = target().path(LOGIN_PATH).request(MediaType.APPLICATION_JSON)
                 .post(Entity.entity(credential, MediaType.APPLICATION_JSON_TYPE));
         if (response.getStatus() != Status.OK.getStatusCode()) {
             throw new ServiceException(String.format("login failed for %s", credential.getUsername()));
@@ -52,7 +52,7 @@ public class RestAuthenticationService extends RestClientBase {
     public void logout(String token) throws ServiceException {
         checkNotNull(token);
         Cookie cookie = new Cookie(ES_DMS_TICKET, token);
-        Response response = target().path(AUTH_PATH).path(LOGOUT_PATH).request().cookie(cookie).post(Entity.json(null));
+        Response response = target().path(LOGOUT_PATH).request().cookie(cookie).post(Entity.json(null));
         if (response.getStatus() != Status.OK.getStatusCode()) {
             throw new ServiceException(String.format("logout failed for %s"));
         }
