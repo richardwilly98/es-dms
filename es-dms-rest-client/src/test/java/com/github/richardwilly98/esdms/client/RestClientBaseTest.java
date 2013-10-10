@@ -1,16 +1,10 @@
 package com.github.richardwilly98.esdms.client;
 
-import org.apache.log4j.Logger;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Guice;
-
 import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.rest.TestRestServerBase;
 import com.github.richardwilly98.esdms.services.UserService;
 
-@Guice(modules = com.github.richardwilly98.esdms.inject.TestEsClientModule.class)
 public abstract class RestClientBaseTest extends TestRestServerBase {
 
     private RestAuthenticationService restAuthenticationServiceClient;
@@ -22,18 +16,6 @@ public abstract class RestClientBaseTest extends TestRestServerBase {
         super();
         url = getBaseURI(false).toString();
         log.debug("getBaseURI: " + url);
-    }
-
-    protected final Logger log = Logger.getLogger(getClass());
-
-    @BeforeSuite
-    public void beforeClass() throws Throwable {
-        setUp();
-    }
-
-    @AfterSuite
-    public void afterClass() throws Throwable {
-        tearDown();
     }
 
     protected RestAuthenticationService getRestAuthenticationServiceClient() {
