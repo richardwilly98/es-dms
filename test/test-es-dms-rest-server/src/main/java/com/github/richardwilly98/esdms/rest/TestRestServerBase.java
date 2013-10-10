@@ -146,12 +146,12 @@ public class TestRestServerBase {
     // }
 
     @BeforeSuite
-    void beforeSuite() throws Throwable {
+    public final void beforeSuite() throws Throwable {
         setUp();
     }
 
     @AfterSuite
-    void afterSuite() throws Throwable {
+    public final void afterSuite() throws Throwable {
         tearDown();
     }
 
