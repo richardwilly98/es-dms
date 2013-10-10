@@ -2,85 +2,171 @@ package com.github.richardwilly98;
 
 import org.activiti.engine.identity.User;
 import org.activiti.engine.identity.UserQuery;
-import org.activiti.spring.impl.test.SpringActivitiTestCase;
-import org.apache.log4j.Logger;
-import org.springframework.test.context.ContextConfiguration;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
-@ContextConfiguration("classpath:activiti-context.xml")
-public class UserEntityManagerTest extends SpringActivitiTestCase {
+import com.github.richardwilly98.esdms.CredentialImpl;
+import com.github.richardwilly98.esdms.client.RestAuthenticationService;
+import com.github.richardwilly98.esdms.client.RestRoleService;
+import com.github.richardwilly98.esdms.client.RestUserService;
+import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.rest.TestRestServerBase;
+import com.github.richardwilly98.esdms.services.RoleService;
+import com.github.richardwilly98.esdms.services.UserService;
+import com.google.common.collect.ImmutableSet;
 
-    private static final Logger log = Logger.getLogger(UserEntityManagerTest.class);
+public class UserEntityManagerTest extends TestRestServerWithActivitiBase {
 
+    final RestUserService restUserService;
+    final RestAuthenticationService restAuthenticationService;
+    final RestRoleService restRoleService;
+
+    public UserEntityManagerTest() throws Exception {
+        super();
+        log.trace("REST api url: " + TestRestServerBase.URL);
+        restUserService = new RestUserService(TestRestServerBase.URL);
+        restAuthenticationService = new RestAuthenticationService(TestRestServerBase.URL);
+        restRoleService = new RestRoleService(TestRestServerBase.URL);
+    }
+
+    @Test
     public void testCheckPassword() {
         log.debug("*** checkPassword ***");
         boolean isAuthenticated = identityService.checkPassword("kermit", "kermit");
-        assertFalse(isAuthenticated);
-        isAuthenticated = identityService.checkPassword("admin", "secret");
-        assertTrue(isAuthenticated);
+        Assert.assertFalse(isAuthenticated);
+        isAuthenticated = identityService.checkPassword(UserService.DEFAULT_ADMIN_LOGIN, UserService.DEFAULT_ADMIN_PASSWORD);
+        Assert.assertTrue(isAuthenticated);
     }
 
+    @Test
     public void testFindUserById() {
+
         log.debug("*** findUserById ***");
         UserQuery query = identityService.createUserQuery().userId("kermit-" + System.currentTimeMillis());
-        assertTrue(query.list().size() == 0);
+        Assert.assertEquals(query.list().size(), 0);
 
-        query = identityService.createUserQuery().userId("admin");
-        assertTrue(query.list().size() > 0);
+        query = identityService.createUserQuery().userId(UserService.DEFAULT_ADMIN_LOGIN);
+        Assert.assertTrue(query.list().size() > 0);
         log.debug("query count: " + query.list().size());
         User user = query.singleResult();
-        assertNotNull(user);
+        Assert.assertNotNull(user);
         log.debug(user);
 
-        query = identityService.createUserQuery().userId("testbpm@gmail.com");
-        assertTrue(query.list().size() > 0);
-        log.debug("query count: " + query.list().size());
-        user = query.singleResult();
-        assertNotNull(user);
-        log.debug(user);
+        String login = "testbpm-" + System.currentTimeMillis() + "@activiti";
+        String password = login;
+        try {
+            com.github.richardwilly98.esdms.api.User tempUser = createUser(login, password);
+            Assert.assertNotNull(tempUser);
+            query = identityService.createUserQuery().userId(login);
+            Assert.assertEquals(query.list().size(), 1);
+            user = query.singleResult();
+            Assert.assertNotNull(user);
+            Assert.assertEquals(tempUser.getId(), user.getId());
+            String token = restAuthenticationService.login(new CredentialImpl.Builder().username(UserService.DEFAULT_ADMIN_LOGIN)
+                    .password(UserService.DEFAULT_ADMIN_PASSWORD.toCharArray()).build());
+            Assert.assertNotNull(token);
+            Assert.assertNotNull(restUserService);
+            deleteUser(tempUser);
+        } catch (Throwable t) {
+            Assert.fail();
+        }
     }
 
+    private void deleteUser(com.github.richardwilly98.esdms.api.User user) throws ServiceException {
+        Assert.assertNotNull(user);
+        restUserService.delete(adminToken, user);
+    }
+
+    @Test
     public void testFindUserByEmail() {
         log.debug("*** testFindUserByEmail ***");
-        UserQuery query = identityService.createUserQuery().userEmail("kermit-" + System.currentTimeMillis());
-        assertTrue(query.list().size() == 0);
+        try {
+            String email = "testbpm-" + System.currentTimeMillis() + "@activiti";
+            // Find admin email
+            UserQuery query = identityService.createUserQuery().userEmail(UserService.DEFAULT_ADMIN_EMAIL);
+            Assert.assertEquals(query.list().size(), 1);
 
-        query = identityService.createUserQuery().userEmail("admin");
-        assertTrue(query.list().size() > 0);
-        log.debug("query count: " + query.list().size());
-        User user = query.singleResult();
-        assertNotNull(user);
-        assertEquals(user.getEmail(), "admin");
-        log.debug(user);
+            query = identityService.createUserQuery().userEmail(email);
+            Assert.assertEquals(query.list().size(), 0);
+            com.github.richardwilly98.esdms.api.User tempUser = createUser(email, email);
+            Assert.assertNotNull(tempUser);
+            Assert.assertNotNull(tempUser.getId());
+            query = identityService.createUserQuery().userEmail(email);
+            // tempUser does not belong to bpm-user or bpm-admin role
+            Assert.assertEquals(query.list().size(), 0);
+            deleteUser(tempUser);
+
+            // Get a new email address because the old will generate a conflict
+            // (by default index.refresh is 1 sec).
+            tempUser = createUser(email, email, ImmutableSet.of(RoleService.DefaultRoles.PROCESS_USER.getRole()));
+            Assert.assertNotNull(tempUser);
+            query = identityService.createUserQuery().userEmail(email);
+            // tempUser belongs to bpm-user role
+            Assert.assertEquals(query.list().size(), 1);
+            User user = query.singleResult();
+            Assert.assertNotNull(user);
+            Assert.assertEquals(user.getEmail(), email);
+            deleteUser(tempUser);
+
+            tempUser = createUser(email, email, ImmutableSet.of(RoleService.DefaultRoles.PROCESS_ADMINISTRATOR.getRole()));
+            Assert.assertNotNull(tempUser);
+            query = identityService.createUserQuery().userEmail(email);
+            // tempUser belongs to bpm-admin role
+            Assert.assertEquals(query.list().size(), 1);
+            user = query.singleResult();
+            Assert.assertNotNull(user);
+            Assert.assertEquals(user.getEmail(), email);
+            deleteUser(tempUser);
+        } catch (Throwable t) {
+            log.error("testFindUserByEmail failed", t);
+            Assert.fail();
+        }
     }
 
+    @Test
     public void testFindUserByLastName() {
         log.debug("*** testFindUserByLastName ***");
-        UserQuery query = identityService.createUserQuery().userLastName("kermit-" + System.currentTimeMillis());
-        assertTrue(query.list().size() == 0);
+        try {
+            String login = "testbpm-" + System.currentTimeMillis() + "@activiti";
+            // Find admin login
+            UserQuery query = identityService.createUserQuery().userLastName(UserService.DEFAULT_ADMIN_LOGIN);
+            Assert.assertEquals(query.list().size(), 1);
 
-        query = identityService.createUserQuery().userLastName("admin");
-        assertTrue(query.list().size() > 0);
-        log.debug("query count: " + query.list().size());
-        User user = query.singleResult();
-        assertNotNull(user);
-        assertEquals(user.getLastName(), "admin");
-    }
+            query = identityService.createUserQuery().userEmail(login);
+            Assert.assertEquals(query.list().size(), 0);
+            com.github.richardwilly98.esdms.api.User tempUser = createUser(login, login);
+            Assert.assertNotNull(tempUser);
+            Assert.assertNotNull(tempUser.getId());
+            query = identityService.createUserQuery().userLastName(tempUser.getName());
+            // tempUser does not belong to bpm-user or bpm-admin role
+            Assert.assertEquals(query.list().size(), 0);
+            deleteUser(tempUser);
 
-    public void testFindUsersById() {
-        log.debug("*** testFindUsersById ***");
-        UserQuery query = identityService.createUserQuery().userId("user*");
-        log.debug(query.list().size());
-        if (query.list().size() > 0) {
-            for (User user : query.list()) {
-                assertTrue(user.getId().contains("user"));
-            }
+            // Get a new email address because the old will generate a conflict
+            // (by default index.refresh is 1 sec).
+            tempUser = createUser(login, login, ImmutableSet.of(RoleService.DefaultRoles.PROCESS_USER.getRole()));
+            Assert.assertNotNull(tempUser);
+            query = identityService.createUserQuery().userLastName(tempUser.getName());
+            // tempUser belongs to bpm-user role
+            Assert.assertEquals(query.list().size(), 1);
+            User user = query.singleResult();
+            Assert.assertNotNull(user);
+            Assert.assertEquals(user.getLastName(), tempUser.getName());
+            deleteUser(tempUser);
+
+            tempUser = createUser(login, login, ImmutableSet.of(RoleService.DefaultRoles.PROCESS_ADMINISTRATOR.getRole()));
+            Assert.assertNotNull(tempUser);
+            query = identityService.createUserQuery().userEmail(tempUser.getName());
+            // tempUser belongs to bpm-admin role
+            Assert.assertEquals(query.list().size(), 1);
+            user = query.singleResult();
+            Assert.assertNotNull(user);
+            Assert.assertEquals(user.getLastName(), tempUser.getName());
+            deleteUser(tempUser);
+        } catch (Throwable t) {
+            log.error("testFindUserByLastName failed", t);
+            Assert.fail();
         }
-
-        // query = identityService.createUserQuery().userId("admin");
-        // assertTrue(query.list().size() > 0);
-        // log.debug("query count: " + query.list().size());
-        // User user = query.singleResult();
-        // assertNotNull(user);
-        // log.debug(user);
     }
+
 }

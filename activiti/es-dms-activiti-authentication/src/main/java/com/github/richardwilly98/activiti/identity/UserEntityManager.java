@@ -236,6 +236,16 @@ public class UserEntityManager extends AbstractManager implements UserIdentityMa
         return false;
     }
 
+    private static boolean isProcessUser(com.github.richardwilly98.esdms.api.User user) {
+        Optional<Role> role = Iterables.tryFind(user.getRoles(), new Predicate<Role>() {
+            public boolean apply(Role r) {
+                log.debug("Check role id: " + r.getId());
+                return r.getId().equals(RoleService.DefaultRoles.PROCESS_ADMINISTRATOR.getRole().getId())
+                        || r.getId().equals(RoleService.DefaultRoles.PROCESS_USER.getRole().getId());
+            }
+        });
+        return role.isPresent();
+    }
     public List<User> findPotentialStarterUsers(String proceDefId) {
         log.debug(String.format("findPotentialStarterUsers - %s", proceDefId));
         throw new ActivitiException("LDAP user manager doesn't support querying");
@@ -278,9 +288,11 @@ public class UserEntityManager extends AbstractManager implements UserIdentityMa
         if (users != null && users.size() > 0) {
             List<User> userEntityList = newArrayList();
             for (com.github.richardwilly98.esdms.api.User user : users) {
-                UserEntity userEntity = convertToUserEntity(user);
-                if (userEntity != null) {
-                    userEntityList.add(userEntity);
+                if (isProcessUser(user)) {
+                    UserEntity userEntity = convertToUserEntity(user);
+                    if (userEntity != null) {
+                        userEntityList.add(userEntity);
+                    }
                 }
             }
             return userEntityList;
