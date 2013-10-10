@@ -3,6 +3,7 @@ package com.github.richardwilly98;
 import org.activiti.engine.identity.User;
 import org.activiti.engine.identity.UserQuery;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.CredentialImpl;
@@ -23,7 +24,8 @@ public class UserEntityManagerTest extends TestRestServerWithActivitiBase {
 
     public UserEntityManagerTest() throws Exception {
         super();
-        log.trace("REST api url: " + TestRestServerBase.URL);
+        log.debug("*** constructor UserEntityManagerTest ***");
+        log.info("TestRestServerBase.URL: " + TestRestServerBase.URL);
         restUserService = new RestUserService(TestRestServerBase.URL);
         restAuthenticationService = new RestAuthenticationService(TestRestServerBase.URL);
         restRoleService = new RestRoleService(TestRestServerBase.URL);

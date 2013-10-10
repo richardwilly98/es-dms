@@ -50,4 +50,4 @@ Restart Tomcat
 
 cUrl Examples
 ----
-curl -XGET --user admin:secret http://localhost:18080/activiti-rest/repository/process-definitions
+curl -XGET --user admin:secret http://localhost:18080/activiti-rest/service/repository/process-definitions

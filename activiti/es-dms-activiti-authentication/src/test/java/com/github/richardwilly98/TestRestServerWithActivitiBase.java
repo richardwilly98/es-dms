@@ -21,14 +21,14 @@ public class TestRestServerWithActivitiBase extends TestRestServerBase {
     protected String configurationResource = "activiti.cfg.xml";
     protected String deploymentId = null;
 
-    protected ProcessEngine processEngine;
-    protected RepositoryService repositoryService;
-    protected RuntimeService runtimeService;
-    protected TaskService taskService;
-    protected HistoryService historyService;
-    protected IdentityService identityService;
-    protected ManagementService managementService;
-    protected FormService formService;
+    protected static ProcessEngine processEngine;
+    protected static RepositoryService repositoryService;
+    protected static RuntimeService runtimeService;
+    protected static TaskService taskService;
+    protected static HistoryService historyService;
+    protected static IdentityService identityService;
+    protected static ManagementService managementService;
+    protected static FormService formService;
 
     // protected ActivitiMockSupport mockSupport;
 
@@ -59,10 +59,12 @@ public class TestRestServerWithActivitiBase extends TestRestServerBase {
     }
 
     protected void initializeProcessEngine() {
+        log.debug(String.format("*** initializeProcessEngine - %s ***", configurationResource));
         processEngine = TestHelper.getProcessEngine(configurationResource);
     }
 
     protected void initializeServices() {
+        log.debug("*** initializeServices ***");
         repositoryService = processEngine.getRepositoryService();
         runtimeService = processEngine.getRuntimeService();
         taskService = processEngine.getTaskService();
@@ -83,6 +85,7 @@ public class TestRestServerWithActivitiBase extends TestRestServerBase {
     }
 
     private void startActiviti() {
+        log.info("*** Start Activiti Engine ***");
         if (processEngine == null) {
             initializeProcessEngine();
             initializeServices();
@@ -116,10 +119,8 @@ public class TestRestServerWithActivitiBase extends TestRestServerBase {
         // }
     }
 
-    // @Rule
-    // public ActivitiRule activitiRule = new ActivitiRule();
-
     private void stopActiviti() {
+        log.info("*** Stop Activiti Engine ***");
         finished();
 
     }
@@ -153,24 +154,4 @@ public class TestRestServerWithActivitiBase extends TestRestServerBase {
         TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, method.getDeclaringClass(), method.getName());
     }
 
-//    @Test
-//    @Deployment(resources = { "org/activiti/test/my-test-process.bpmn20.xml" })
-//    public void testStartProcessInstance() {
-//        try {
-//            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("my-process");
-//            Assert.assertNotNull(processInstance);
-//
-//            Task task = taskService.createTaskQuery().singleResult();
-//            Assert.assertEquals("Activiti is awesome!", task.getName());
-//        } catch (Throwable t) {
-//            log.error("testStartProcessInstance failed", t);
-//            Assert.fail();
-//        }
-//    }
-//
-//    @Test
-//    public void testAuthentication() {
-//        boolean authenticated = identityService.checkPassword(UserService.DEFAULT_ADMIN_LOGIN, UserService.DEFAULT_ADMIN_PASSWORD);
-//        Assert.assertEquals(authenticated, true);
-//    }
 }
