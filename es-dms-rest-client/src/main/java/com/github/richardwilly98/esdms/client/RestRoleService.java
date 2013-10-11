@@ -40,7 +40,6 @@ public class RestRoleService extends RestItemBaseClient<Role> {
     public Collection<Role> findRolesByType(String token, RoleType type) throws ServiceException {
         checkNotNull(token);
         checkNotNull(type);
-        // Collection<Role> roles = find(token, "id:" + id);
         Cookie cookie = newUserCookie(token);
         Response response = target().queryParam("type", type.getType()).request(MediaType.APPLICATION_JSON)
                 .cookie(cookie).get();
@@ -55,6 +54,23 @@ public class RestRoleService extends RestItemBaseClient<Role> {
             log.warn(String.format("users/search returned reponse status: %s", response.getStatus()));
         }
         return newHashSet();
+    }
+
+    public Role findRoleByName(String token, String name) throws ServiceException {
+        checkNotNull(token);
+        checkNotNull(name);
+        Collection<Role> roles = findRolesByName(token, name);
+        if (roles.size() > 0) {
+            return Iterables.get(roles, 0);
+        }
+        return null;
+    }
+
+    public Collection<Role> findRolesByName(String token, String name) throws ServiceException {
+        checkNotNull(token);
+        checkNotNull(name);
+        Collection<Role> users = find(token, "name:" + name);
+        return users;
     }
 
     public Collection<Role> findRolesById(String token, String id) throws ServiceException {
@@ -80,16 +96,6 @@ public class RestRoleService extends RestItemBaseClient<Role> {
         checkNotNull(email);
         Collection<Role> users = find(token, "email:" + email);
         return users;
-    }
-
-    public Role findUserByEmail(String token, String email) throws ServiceException {
-        checkNotNull(token);
-        checkNotNull(email);
-        Collection<Role> users = find(token, "email:" + email);
-        if (users.size() > 0) {
-            return Iterables.get(users, 0);
-        }
-        return null;
     }
 
     public Collection<Role> findUsersByName(String token, String name) throws ServiceException {
