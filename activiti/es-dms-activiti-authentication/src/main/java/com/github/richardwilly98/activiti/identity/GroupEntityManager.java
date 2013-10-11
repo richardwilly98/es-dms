@@ -96,7 +96,6 @@ public class GroupEntityManager extends AbstractManager implements GroupIdentity
 
     public List<Group> findGroupByQueryCriteria(GroupQueryImpl query, Page page) {
         log.debug(String.format("findGroupByQueryCriteria - %s - %s", dumpGroupQueryImpl(query), page));
-        // Only support for groupMember() at the moment
         try {
             if (query.getUserId() != null) {
                 return findGroupsByUser(query.getUserId());
@@ -110,10 +109,7 @@ public class GroupEntityManager extends AbstractManager implements GroupIdentity
             } else if (!Strings.isNullOrEmpty(query.getName())) {
                 return convertToGroupEntityList(getRestRoleClient().findRolesByName(getUserToken(), query.getName()));
             } else {
-                // throw new ActivitiIllegalArgumentException(
-                // "This query is not supported by the LDAPGroupManager");
                 return convertToGroupEntityList(getRestRoleClient().findRolesByType(getUserToken(), RoleType.PROCESS));
-                // return findGroupsByUser("*");
             }
         } catch (ServiceException ex) {
             log.warn("findGroupByQueryCriteria failed", ex);
@@ -179,11 +175,11 @@ public class GroupEntityManager extends AbstractManager implements GroupIdentity
     }
 
     public List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
-        throw new ActivitiException("LDAP group manager doesn't support querying");
+        throw new ActivitiException("es-dms group manager doesn't support querying");
     }
 
     public long findGroupCountByNativeQuery(Map<String, Object> parameterMap) {
-        throw new ActivitiException("LDAP group manager doesn't support querying");
+        throw new ActivitiException("es-dms group manager doesn't support querying");
     }
 
     public static GroupEntity convertToGroupEntity(com.github.richardwilly98.esdms.api.Role role) {

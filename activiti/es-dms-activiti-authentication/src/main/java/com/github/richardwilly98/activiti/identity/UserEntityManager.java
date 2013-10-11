@@ -198,26 +198,11 @@ public class UserEntityManager extends AbstractManager implements UserIdentityMa
                                 || r.getId().equals(RoleService.DefaultRoles.PROCESS_USER.getRole().getId());
                     }
                 });
-                log.debug(String.format("Is %s a process user?", userId, role.isPresent()));
+                log.debug(String.format("Is %s a process user? %s", userId, role.isPresent()));
                 if (role.isPresent()) {
                     String token = getRestAuthenticationClient().login(
                             new CredentialImpl.Builder().username(userId).password(password.toCharArray()).build());
                     return !Strings.isNullOrEmpty(token);
-                    // }
-                    // if
-                    // (user.getRoles().contains(RoleService.DefaultRoles.PROCESS_USER.getRole())
-                    // ||
-                    // user.getRoles().contains(RoleService.DefaultRoles.PROCESS_ADMINISTRATOR.getRole()))
-                    // {
-                    // log.debug(String.format("User %s contains %s or %s roles",
-                    // user.getLogin(),
-                    // RoleService.DefaultRoles.PROCESS_ADMINISTRATOR.getRole().getId(),
-                    // RoleService.DefaultRoles.PROCESS_USER
-                    // .getRole().getId()));
-                    // String token = getRestAuthenticationClient().login(
-                    // new
-                    // CredentialImpl.Builder().username(userId).password(password.toCharArray()).build());
-                    // return !Strings.isNullOrEmpty(token);
                 } else {
                     if (log.isDebugEnabled()) {
                         log.debug(String.format("Find user % but do not belong to %s or %s roles", user.getLogin(),
@@ -246,17 +231,17 @@ public class UserEntityManager extends AbstractManager implements UserIdentityMa
     }
     public List<User> findPotentialStarterUsers(String proceDefId) {
         log.debug(String.format("findPotentialStarterUsers - %s", proceDefId));
-        throw new ActivitiException("LDAP user manager doesn't support querying");
+        throw new ActivitiException("es-dms user manager doesn't support querying");
     }
 
     public List<User> findUsersByNativeQuery(Map<String, Object> parameterMap, int firstResult, int maxResults) {
         log.debug(String.format("findUsersByNativeQuery - %s - %s - %s", parameterMap, firstResult, maxResults));
-        throw new ActivitiException("LDAP user manager doesn't support querying");
+        throw new ActivitiException("es-dms user manager doesn't support querying");
     }
 
     public long findUserCountByNativeQuery(Map<String, Object> parameterMap) {
         log.debug(String.format("findUserCountByNativeQuery - %s", parameterMap));
-        throw new ActivitiException("LDAP user manager doesn't support querying");
+        throw new ActivitiException("es-dms user manager doesn't support querying");
     }
 
     private com.github.richardwilly98.esdms.api.User findUserByLogin(String login) throws ServiceException {
