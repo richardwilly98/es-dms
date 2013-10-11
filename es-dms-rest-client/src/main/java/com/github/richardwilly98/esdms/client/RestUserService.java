@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import com.github.richardwilly98.esdms.api.Role.RoleType;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
@@ -26,6 +27,13 @@ public class RestUserService extends RestItemBaseClient<User> {
 
     public RestUserService(String url) {
         super(url, USERS_PATH, User.class);
+    }
+
+    public Collection<User> findUsersByRoleType(String token, RoleType type, int... params) throws ServiceException {
+        checkNotNull(token);
+        checkNotNull(type);
+        Collection<User> users = find(token, "roles.type:" + type.getType(), params);
+        return users;
     }
 
     public Collection<User> findUsersById(String token, String id, int... params) throws ServiceException {
