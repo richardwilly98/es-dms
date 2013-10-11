@@ -6,6 +6,7 @@ import org.activiti.engine.test.Deployment;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.github.richardwilly98.activiti.TestRestServerWithActivitiBase;
 import com.github.richardwilly98.esdms.services.UserService;
 
 public class SimpleRestServerWithActivitiTest extends TestRestServerWithActivitiBase {

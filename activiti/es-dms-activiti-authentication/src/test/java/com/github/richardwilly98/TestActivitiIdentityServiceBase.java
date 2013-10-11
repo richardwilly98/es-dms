@@ -2,6 +2,7 @@ package com.github.richardwilly98;
 
 import org.testng.Assert;
 
+import com.github.richardwilly98.activiti.TestRestServerWithActivitiBase;
 import com.github.richardwilly98.esdms.RoleImpl;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.Role.RoleType;

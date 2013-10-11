@@ -1,4 +1,4 @@
-package com.github.richardwilly98;
+package com.github.richardwilly98.activiti;
 
 import java.lang.reflect.Method;
 
