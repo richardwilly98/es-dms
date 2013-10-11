@@ -4,7 +4,6 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.test.Deployment;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.services.UserService;
@@ -29,12 +28,6 @@ public class SimpleRestServerWithActivitiTest extends TestRestServerWithActiviti
             log.error("testStartProcessInstance failed", t);
             Assert.fail();
         }
-    }
-
-    @BeforeClass
-    public void beforeClass() {
-        Assert.assertNotNull(processEngine, "ProcessEngine must not be null");
-        Assert.assertNotNull(identityService, "IdentityService must not be null");
     }
 
     @Test

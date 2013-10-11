@@ -3,32 +3,19 @@ package com.github.richardwilly98;
 import org.activiti.engine.identity.User;
 import org.activiti.engine.identity.UserQuery;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.CredentialImpl;
-import com.github.richardwilly98.esdms.client.RestAuthenticationService;
-import com.github.richardwilly98.esdms.client.RestRoleService;
-import com.github.richardwilly98.esdms.client.RestUserService;
-import com.github.richardwilly98.esdms.exception.ServiceException;
-import com.github.richardwilly98.esdms.rest.TestRestServerBase;
+import com.github.richardwilly98.esdms.api.Role;
+import com.github.richardwilly98.esdms.api.Role.RoleType;
 import com.github.richardwilly98.esdms.services.RoleService;
 import com.github.richardwilly98.esdms.services.UserService;
 import com.google.common.collect.ImmutableSet;
 
-public class UserEntityManagerTest extends TestRestServerWithActivitiBase {
-
-    final RestUserService restUserService;
-    final RestAuthenticationService restAuthenticationService;
-    final RestRoleService restRoleService;
+public class UserEntityManagerTest extends TestActivitiIdentityServiceBase {
 
     public UserEntityManagerTest() throws Exception {
         super();
-        log.debug("*** constructor UserEntityManagerTest ***");
-        log.info("TestRestServerBase.URL: " + TestRestServerBase.URL);
-        restUserService = new RestUserService(TestRestServerBase.URL);
-        restAuthenticationService = new RestAuthenticationService(TestRestServerBase.URL);
-        restRoleService = new RestRoleService(TestRestServerBase.URL);
     }
 
     @Test
@@ -38,6 +25,36 @@ public class UserEntityManagerTest extends TestRestServerWithActivitiBase {
         Assert.assertFalse(isAuthenticated);
         isAuthenticated = identityService.checkPassword(UserService.DEFAULT_ADMIN_LOGIN, UserService.DEFAULT_ADMIN_PASSWORD);
         Assert.assertTrue(isAuthenticated);
+    }
+
+    @Test
+    public void testFindAllUsers() {
+
+        log.debug("*** testFindAllUsers ***");
+        try {
+            UserQuery query = identityService.createUserQuery();
+            Assert.assertEquals(query.list().size(), 0);
+
+            String name = "bpm-role-" + System.currentTimeMillis();
+            Role role = createGroup(name, RoleType.PROCESS);
+            Assert.assertNotNull(role);
+            String login1 = "bpm-user-" + System.currentTimeMillis() + "@activiti";
+            String login2 = "bpm-user2-" + System.currentTimeMillis() + "@activiti";
+            com.github.richardwilly98.esdms.api.User user1 = createUser(login1, login1,
+                    ImmutableSet.of(RoleService.DefaultRoles.PROCESS_USER.getRole(), role));
+            Assert.assertNotNull(user1);
+            com.github.richardwilly98.esdms.api.User user2 = createUser(login2, login2,
+                    ImmutableSet.of(RoleService.DefaultRoles.PROCESS_USER.getRole(), role));
+            Assert.assertNotNull(user2);
+            query = identityService.createUserQuery();
+            Assert.assertEquals(query.list().size(), 2);
+            deleteGroup(role);
+            deleteUser(user1);
+            deleteUser(user2);
+        } catch (Throwable t) {
+            log.error("testFindAllUsers failed", t);
+            Assert.fail();
+        }
     }
 
     @Test
@@ -70,13 +87,9 @@ public class UserEntityManagerTest extends TestRestServerWithActivitiBase {
             Assert.assertNotNull(restUserService);
             deleteUser(tempUser);
         } catch (Throwable t) {
+            log.error("testFindUserById failed", t);
             Assert.fail();
         }
-    }
-
-    private void deleteUser(com.github.richardwilly98.esdms.api.User user) throws ServiceException {
-        Assert.assertNotNull(user);
-        restUserService.delete(adminToken, user);
     }
 
     @Test

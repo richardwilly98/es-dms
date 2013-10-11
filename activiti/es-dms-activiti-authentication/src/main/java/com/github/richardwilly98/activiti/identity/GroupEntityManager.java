@@ -29,11 +29,16 @@ import com.github.richardwilly98.esdms.services.RoleService;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 
 public class GroupEntityManager extends AbstractManager implements GroupIdentityManager {
 
     private static final Logger log = Logger.getLogger(GroupEntityManager.class);
+    public static final String ADMIN_GROUP_ID = "admin";
+    public static final String ADMIN_GROUP_NAME = "admin";
+    public static final String ADMIN_GROUP_TYPE = "security-role";
     private final EsDmsConfigurator configurator;
     private RestAuthenticationService restAuthenticationClient;
     private RestRoleService restRoleClient;
@@ -42,9 +47,9 @@ public class GroupEntityManager extends AbstractManager implements GroupIdentity
 
     public GroupEntityManager(EsDmsConfigurator configurator) {
         this.configurator = configurator;
-        adminGroup = new GroupEntity("admin");
-        adminGroup.setName("admin");
-        adminGroup.setType("security-role");
+        adminGroup = new GroupEntity(ADMIN_GROUP_ID);
+        adminGroup.setName(ADMIN_GROUP_NAME);
+        adminGroup.setType(ADMIN_GROUP_TYPE);
     }
 
     private RestAuthenticationService getRestAuthenticationClient() {
@@ -92,12 +97,27 @@ public class GroupEntityManager extends AbstractManager implements GroupIdentity
     public List<Group> findGroupByQueryCriteria(GroupQueryImpl query, Page page) {
         log.debug(String.format("findGroupByQueryCriteria - %s - %s", dumpGroupQueryImpl(query), page));
         // Only support for groupMember() at the moment
-        if (query.getUserId() != null) {
-            return findGroupsByUser(query.getUserId());
-        } else {
-            // throw new ActivitiIllegalArgumentException(
-            // "This query is not supported by the LDAPGroupManager");
-            return findGroupsByUser("*");
+        try {
+            if (query.getUserId() != null) {
+                return findGroupsByUser(query.getUserId());
+            } else if (!Strings.isNullOrEmpty(query.getId())) {
+                List<Group> groupList = newArrayList();
+                Group group = convertToGroupEntity(getRestRoleClient().findRoleById(getUserToken(), query.getId()));
+                if (group != null) {
+                    groupList.add(group);
+                }
+                return groupList;
+            } else if (!Strings.isNullOrEmpty(query.getName())) {
+                return convertToGroupEntityList(getRestRoleClient().findRolesByName(getUserToken(), query.getName()));
+            } else {
+                // throw new ActivitiIllegalArgumentException(
+                // "This query is not supported by the LDAPGroupManager");
+                return convertToGroupEntityList(getRestRoleClient().findRolesByType(getUserToken(), RoleType.PROCESS));
+                // return findGroupsByUser("*");
+            }
+        } catch (ServiceException ex) {
+            log.warn("findGroupByQueryCriteria failed", ex);
+            return newArrayList();
         }
         // TODO: you can add other search criteria that will allow extended
         // support using the Activiti engine API
@@ -133,15 +153,23 @@ public class GroupEntityManager extends AbstractManager implements GroupIdentity
                 Optional<Role> role = Iterables.tryFind(user.getRoles(), new Predicate<Role>() {
                     public boolean apply(Role r) {
                         log.debug("Check role id: " + r.getId());
-                        return r.getId().equals(RoleService.DefaultRoles.PROCESS_ADMINISTRATOR.getRole().getId());
+                        return r.getId().equals(RoleService.DefaultRoles.Constants.PROCESS_ADMINISTRATOR_ROLE_ID);
                     }
                 });
-                log.info("Found process-admin role?" + role.isPresent());
+                log.info("Found process-admin role? " + role.isPresent());
                 if (role.isPresent()) {
                     log.debug(String.format("Add admin group for user %s", userId));
                     groups.add(adminGroup);
                 }
-                groups.addAll(convertToGroupEntityList(user.getRoles()));
+
+                Collection<Role> roles = Collections2.filter(user.getRoles(), new Predicate<Role>() {
+                    public boolean apply(Role r) {
+                        log.debug("Check role id: " + r.getId());
+                        return r.getType() == RoleType.PROCESS;
+                    }
+                });
+                log.info("Found process role? " + roles.iterator().hasNext());
+                groups.addAll(convertToGroupEntityList(roles));
             }
             return groups;
         } catch (ServiceException sEx) {

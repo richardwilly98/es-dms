@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 
 import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.api.Role;
+import com.github.richardwilly98.esdms.api.Role.RoleType;
 import com.github.richardwilly98.esdms.client.RestAuthenticationService;
 import com.github.richardwilly98.esdms.client.RestUserService;
 import com.github.richardwilly98.esdms.exception.ServiceException;
@@ -121,10 +122,7 @@ public class UserEntityManager extends AbstractManager implements UserIdentityMa
                 }
                 return convertToUserEntityList(getRestUserClient().findUsersByName(getUserToken(), criteria));
             } else {
-                // TODO: get all users from your identity domain and convert
-                // them to
-                // List<User>
-                return newArrayList();
+                return convertToUserEntityList(getRestUserClient().findUsersByRoleType(getUserToken(), RoleType.PROCESS));
             }
         } catch (ServiceException ex) {
             log.warn("findUserByQueryCriteria failed", ex);
