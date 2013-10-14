@@ -44,4 +44,19 @@ public class RestAuthenticationServiceClientTest extends RestClientBaseTest {
         }
     }
 
+    @Test
+    public void testLoginValidate() {
+        try {
+            String login = "user-" + System.currentTimeMillis() + "@yahoo.com";
+            createUser(login, login);
+            String token = getRestAuthenticationServiceClient().login(
+                    new CredentialImpl.Builder().username(login).password(login.toCharArray()).build());
+            Assert.assertNotNull(token);
+            getRestAuthenticationServiceClient().validate(token);
+            getRestAuthenticationServiceClient().logout(token);
+        } catch (Throwable t) {
+            log.error("testLoginValidate fail", t);
+            Assert.fail();
+        }
+    }
 }

@@ -2,6 +2,8 @@ package com.github.richardwilly98.esdms.client;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.net.URI;
+
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
@@ -10,6 +12,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.github.richardwilly98.esdms.api.Credential;
+import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
 public class RestAuthenticationService extends RestClientBase {
@@ -17,6 +20,7 @@ public class RestAuthenticationService extends RestClientBase {
     public static final String AUTH_PATH = "auth";
     public static final String LOGOUT_PATH = "logout";
     public static final String LOGIN_PATH = "login";
+    private static final String VALIDATE_PATH = "validate";
 
     public RestAuthenticationService(final String url) {
         super(url, AUTH_PATH);
@@ -54,8 +58,25 @@ public class RestAuthenticationService extends RestClientBase {
         Cookie cookie = new Cookie(ES_DMS_TICKET, token);
         Response response = target().path(LOGOUT_PATH).request().cookie(cookie).post(Entity.json(null));
         if (response.getStatus() != Status.OK.getStatusCode()) {
-            throw new ServiceException(String.format("logout failed for %s"));
+            throw new ServiceException(String.format("logout failed for %s", token));
         }
+    }
+
+    public User validate(String token) throws ServiceException {
+        checkNotNull(token);
+        Cookie cookie = new Cookie(ES_DMS_TICKET, token);
+        Response response = target().path(VALIDATE_PATH).request(MediaType.APPLICATION_JSON).cookie(cookie).post(Entity.json(null));
+        if (response.getStatus() != Status.OK.getStatusCode()) {
+            throw new ServiceException(String.format("validate failed for %s", token));
+        }
+        
+        URI uri = response.readEntity(URI.class);
+        response = restClient.target(uri).request(MediaType.APPLICATION_JSON).cookie(cookie).get();
+        if (response.getStatus() != Status.OK.getStatusCode()) {
+            throw new ServiceException(String.format("Cannot get user from uri %s - status %s", uri, response.getStatus()));
+        }
+        User user = response.readEntity(User.class);
+        return user;
     }
 
     @SuppressWarnings("unused")

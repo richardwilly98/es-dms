@@ -52,6 +52,7 @@ import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
+import org.joda.time.DateTime;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.esdms.SessionImpl;
@@ -65,6 +66,7 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 public class AuthenticationProvider implements AuthenticationService {
 
     public static final String ES_DMS_LOGIN_ATTRIBUTE = "ES_DMS_LOGIN";
+    public static final String ES_DMS_ID_ATTRIBUTE = "ES_DMS_ID";
 
     private static Logger log = Logger.getLogger(AuthenticationProvider.class);
 
@@ -100,6 +102,7 @@ public class AuthenticationProvider implements AuthenticationService {
             }
             String json = response.getSourceAsString();
             SessionImpl session = mapper.readValue(json, SessionImpl.class);
+            validateSession(session);
             return session;
         } catch (Throwable t) {
             log.error("get failed", t);
@@ -142,18 +145,20 @@ public class AuthenticationProvider implements AuthenticationService {
             token.clear();
             // Create subject for the current principal
             Subject subject = new Subject.Builder().principals(info.getPrincipals()).buildSubject();
-//            log.trace("subject.getPrincipal(): " + subject.getPrincipal());
+            // log.trace("subject.getPrincipal(): " + subject.getPrincipal());
             // Create session
             org.apache.shiro.session.Session session = subject.getSession(true);
             if (session == null) {
                 throw new ServiceException(String.format("Unable to create session for ", login));
             }
             session.setAttribute(ES_DMS_LOGIN_ATTRIBUTE, login);
+            session.setAttribute(ES_DMS_ID_ATTRIBUTE, ((User)subject.getPrincipal()).getId());
             ThreadContext.bind(subject);
-//            if (log.isTraceEnabled()) {
-//                Subject currentUser = SecurityUtils.getSubject();
-//                log.trace("currentUser.getPrincipal(): " + currentUser.getPrincipal());
-//            }
+            // if (log.isTraceEnabled()) {
+            // Subject currentUser = SecurityUtils.getSubject();
+            // log.trace("currentUser.getPrincipal(): " +
+            // currentUser.getPrincipal());
+            // }
             return session.getId().toString();
         } catch (AuthenticationException aEx) {
             String message = String.format("Authentication failed for %s", login);
@@ -170,6 +175,17 @@ public class AuthenticationProvider implements AuthenticationService {
         Subject subject = getSubjectBySessionId(token);
         if (subject != null) {
             subject.logout();
+        }
+    }
+
+    private void validateSession(SessionImpl session) throws ServiceException {
+        long timeout = session.getTimeout();
+        if (timeout != 0) {
+            DateTime lastAccessTime = new DateTime(session.getLastAccessTime().getTime());
+            DateTime timeoutTime = lastAccessTime.plus(timeout);
+            if (timeoutTime.isBeforeNow()) {
+                throw new ServiceException(String.format("Session %s has timed-out", session.getId()));
+            }
         }
     }
 
@@ -206,12 +222,13 @@ public class AuthenticationProvider implements AuthenticationService {
     }
 
     @Override
-    public void validate(String token) throws ServiceException {
+    public SessionImpl validate(String token) throws ServiceException {
         SessionImpl session = get(token);
         if (session != null) {
             session.setLastAccessTime(new Date());
-            update(session);
+            return update(session);
         }
+        throw new ServiceException(String.format("Cannot validate session %s", token));
     }
 
     @Override

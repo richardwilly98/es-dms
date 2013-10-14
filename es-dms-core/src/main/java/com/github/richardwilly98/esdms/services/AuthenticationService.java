@@ -38,7 +38,7 @@ public interface AuthenticationService extends BaseService<SessionImpl> {
 
     public abstract void logout(String token) throws ServiceException;
 
-    public abstract void validate(String token) throws ServiceException;
+    public abstract SessionImpl validate(String token) throws ServiceException;
 
     public boolean hasRole(String token, String role) throws ServiceException;
 
