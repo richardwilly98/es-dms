@@ -70,7 +70,7 @@ module.exports = function (grunt) {
           port: 8080,
           //port: 8443,
           //https: true,
-          changeOrigin: false,
+          changeOrigin: true,
           rewrite: {
             '^/api': '/es-dms-site/api'
           }
