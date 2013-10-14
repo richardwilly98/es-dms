@@ -45,7 +45,7 @@ import org.apache.shiro.web.util.WebUtils;
 import com.github.richardwilly98.esdms.api.Session;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
-import com.github.richardwilly98.esdms.rest.RestAuthencationService;
+import com.github.richardwilly98.esdms.rest.RestAuthenticationService;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.UserService;
 import com.google.inject.Inject;
@@ -93,16 +93,16 @@ public class EsAuthenticationFilter extends UserFilter {
             Enumeration enumeration = request.getHeaderNames();
             while (enumeration.hasMoreElements()) {
                 Object name = enumeration.nextElement();
-                if (name != null && RestAuthencationService.ES_DMS_TICKET.equalsIgnoreCase(name.toString())) {
-                    String token = request.getHeader(RestAuthencationService.ES_DMS_TICKET);
+                if (name != null && RestAuthenticationService.ES_DMS_TICKET.equalsIgnoreCase(name.toString())) {
+                    String token = request.getHeader(RestAuthenticationService.ES_DMS_TICKET);
                     return getSubjectFromSessionId(token);
                 }
             }
             enumeration = request.getParameterNames();
             while (enumeration.hasMoreElements()) {
                 Object name = enumeration.nextElement();
-                if (name != null && RestAuthencationService.ES_DMS_TICKET.equalsIgnoreCase(name.toString())) {
-                    String token = request.getParameter(RestAuthencationService.ES_DMS_TICKET);
+                if (name != null && RestAuthenticationService.ES_DMS_TICKET.equalsIgnoreCase(name.toString())) {
+                    String token = request.getParameter(RestAuthenticationService.ES_DMS_TICKET);
                     return getSubjectFromSessionId(token);
                 }
             }
@@ -115,9 +115,9 @@ public class EsAuthenticationFilter extends UserFilter {
 
     private Subject getSubjectFromCookie(HttpServletRequest httpRequest) {
         for (Cookie cookie : httpRequest.getCookies()) {
-            if (RestAuthencationService.ES_DMS_TICKET.equalsIgnoreCase(cookie.getName())) {
+            if (RestAuthenticationService.ES_DMS_TICKET.equalsIgnoreCase(cookie.getName())) {
                 String token = cookie.getValue();
-                log.debug(String.format("Find cookie %s: [%s]", RestAuthencationService.ES_DMS_TICKET, token));
+                log.debug(String.format("Find cookie %s: [%s]", RestAuthenticationService.ES_DMS_TICKET, token));
                 try {
                     Subject subject = getSubjectFromSessionId(token);
                     if (subject != null) {

@@ -70,8 +70,8 @@ public class RestUserService extends RestItemBaseService<User> {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(User item) {
         checkNotNull(item);
-        checkNotNull(item.getEmail());
-        item.setId(item.getEmail());
+//        checkNotNull(item.getEmail());
+//        item.setId(item.getEmail());
         if (item.getPassword() != null) {
             String encodedHash = hashService.toBase64(String.valueOf(item.getPassword()).getBytes());
             log.trace("From service - hash: " + encodedHash);

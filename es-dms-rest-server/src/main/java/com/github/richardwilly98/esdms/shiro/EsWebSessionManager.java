@@ -31,7 +31,7 @@ import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 
-import com.github.richardwilly98.esdms.rest.RestAuthencationService;
+import com.github.richardwilly98.esdms.rest.RestAuthenticationService;
 import com.google.inject.Inject;
 
 public class EsWebSessionManager extends DefaultWebSessionManager {
@@ -42,7 +42,7 @@ public class EsWebSessionManager extends DefaultWebSessionManager {
         // this.setDeleteInvalidSessions(true);
         // this.setSessionFactory(new SimpleSessionFactory());
         this.setSessionDAO(sessionDAO);
-        Cookie cookie = new SimpleCookie(RestAuthencationService.ES_DMS_TICKET);
+        Cookie cookie = new SimpleCookie(RestAuthenticationService.ES_DMS_TICKET);
         cookie.setHttpOnly(true);
         setSessionIdCookie(cookie);
         // Cookie session is enabled. Cookie is managed in AuthenticationService

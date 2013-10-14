@@ -52,7 +52,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.api.ItemBase;
-import com.github.richardwilly98.esdms.rest.RestAuthencationService;
+import com.github.richardwilly98.esdms.rest.RestAuthenticationService;
 import com.github.richardwilly98.esdms.services.UserService;
 import com.github.richardwilly98.esdms.web.JerseyApplication;
 
@@ -138,7 +138,7 @@ public class GuiceAndJerseyTestBase<T extends ItemBase> extends JerseyTest {
             log.debug("status: " + response.getStatus());
             Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
             for (NewCookie cookie : response.getCookies().values()) {
-                if (RestAuthencationService.ES_DMS_TICKET.equals(cookie.getName())) {
+                if (RestAuthenticationService.ES_DMS_TICKET.equals(cookie.getName())) {
                     return new Cookie(cookie.getName(), cookie.getValue());
                 }
             }

@@ -46,11 +46,11 @@ public class EsSessionDAO extends AbstractSessionDAO {
 
     Logger log = Logger.getLogger(this.getClass());
 
-    final AuthenticationService service;
+    final AuthenticationService authenticationService;
 
     @Inject
-    public EsSessionDAO(AuthenticationService service) {
-	this.service = service;
+    public EsSessionDAO(final AuthenticationService authenticationService) {
+	this.authenticationService = authenticationService;
     }
 
     @Override
@@ -60,12 +60,12 @@ public class EsSessionDAO extends AbstractSessionDAO {
 		log.warn("Session id is null.");
 		return;
 	    }
-	    SessionImpl s = service.get(session.getId().toString());
+	    SessionImpl s = authenticationService.get(session.getId().toString());
 	    if (s != null) {
-		if (session.getAttribute(AuthenticationProvider.ES_DMS_LOGIN_ATTRIBUTE) != null) {
-		    s.setUserId(session.getAttribute(AuthenticationProvider.ES_DMS_LOGIN_ATTRIBUTE).toString());
+		if (session.getAttribute(AuthenticationProvider.ES_DMS_ID_ATTRIBUTE) != null) {
+		    s.setUserId(session.getAttribute(AuthenticationProvider.ES_DMS_ID_ATTRIBUTE).toString());
 		}
-		service.update(s);
+		authenticationService.update(s);
 	    } else {
 		throw new UnknownSessionException(String.format("update session failed for %s", session.getId()));
 	    }
@@ -77,9 +77,9 @@ public class EsSessionDAO extends AbstractSessionDAO {
     @Override
     public void delete(Session session) {
 	try {
-	    SessionImpl s = service.get(session.getId().toString());
+	    SessionImpl s = authenticationService.get(session.getId().toString());
 	    if (s != null) {
-		service.delete(s);
+		authenticationService.delete(s);
 	    }
 	} catch (ServiceException ex) {
 	    log.error("delete failed", ex);
@@ -90,7 +90,7 @@ public class EsSessionDAO extends AbstractSessionDAO {
     public Collection<Session> getActiveSessions() {
 	try {
 	    log.trace("*** getActiveSessions");
-	    Set<SessionImpl> sessions = service.getItems("active:true");
+	    Set<SessionImpl> sessions = authenticationService.getItems("active:true");
 	    Set<Session> activeSessions = new HashSet<Session>();
 	    for (com.github.richardwilly98.esdms.api.Session session : sessions) {
 		activeSessions.add(new EsSession(session));
@@ -112,8 +112,8 @@ public class EsSessionDAO extends AbstractSessionDAO {
 	    assignSessionId(session, sessionId);
 
 	    SessionImpl s = new SessionImpl.Builder().id(sessionId.toString()).createTime(session.getStartTimestamp())
-		    .lastAccessTime(session.getLastAccessTime()).active(true).build();
-	    s = service.create(s);
+		    .lastAccessTime(session.getLastAccessTime()).active(true).timeout(session.getTimeout()).build();
+	    s = authenticationService.create(s);
 	    EsSession esSession = new EsSession(s);
 	    return esSession.getId();
 	} catch (ServiceException ex) {
@@ -128,7 +128,7 @@ public class EsSessionDAO extends AbstractSessionDAO {
 	    // if (log.isTraceEnabled()) {
 	    // log.trace(String.format("*** doReadSession - %s", sessionId));
 	    // }
-	    com.github.richardwilly98.esdms.api.Session session = service.get(sessionId.toString());
+	    com.github.richardwilly98.esdms.api.Session session = authenticationService.get(sessionId.toString());
 	    if (session == null) {
 		return null;
 	    }
