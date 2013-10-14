@@ -37,6 +37,10 @@ public class UnauthorizedException extends WebApplicationException {
         this("Please authenticate.", "Name of your web service");
     }
 
+    public UnauthorizedException(String message) {
+        this(message, "es-dms-site");
+    }
+    
     public UnauthorizedException(String message, String realm) {
         super(Response.status(Status.UNAUTHORIZED)
         // .header(HttpHeaders.WWW_AUTHENTICATE,

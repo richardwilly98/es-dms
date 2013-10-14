@@ -82,7 +82,6 @@ public class UserImpl extends PersonImpl implements User {
 
         public UserImpl build() {
             UserImpl user = new UserImpl(this);
-//            checkArgument(!Strings.isNullOrEmpty(user.getLogin()), "login is required");
             return user;
         }
     }
