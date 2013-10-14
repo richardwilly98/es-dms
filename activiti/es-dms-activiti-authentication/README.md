@@ -42,6 +42,15 @@ Update webapps/activiti-explorer/WEB-INF/activiti-standalone-context.xml and web
     </property>
   ...
   </bean>
+
+  ...
+  <!-- Only in activiti-explorer -->
+  <bean id="activitiLoginHandler" class="com.github.richardwilly98.activiti.explorer.login.EsDmsLoginHandler">
+    <property name="url" value="http://localhost:9000/api" />
+    <property name="userId" value="admin" />
+    <property name="password" value="secret" />
+    <property name="identityService" ref="identityService" />
+  </bean>
 ```
 
 From same xml file configurations remove the demoDataGenerator bean
@@ -50,4 +59,6 @@ Restart Tomcat
 
 cUrl Examples
 ----
+```
 curl -XGET --user admin:secret http://localhost:18080/activiti-rest/service/repository/process-definitions
+```

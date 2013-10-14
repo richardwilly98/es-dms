@@ -36,8 +36,8 @@ public class UserEntityManager extends AbstractManager implements UserIdentityMa
 
     private static final Logger log = Logger.getLogger(UserEntityManager.class);
     private final EsDmsConfigurator configurator;
-    private RestUserService restUserClient;
-    private RestAuthenticationService restAuthenticationClient;
+    private transient RestUserService restUserClient;
+    private transient RestAuthenticationService restAuthenticationClient;
 
     public UserEntityManager(EsDmsConfigurator configurator) {
         this.configurator = configurator;

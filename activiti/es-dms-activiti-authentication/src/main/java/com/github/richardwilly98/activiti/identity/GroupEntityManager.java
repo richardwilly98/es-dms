@@ -40,9 +40,9 @@ public class GroupEntityManager extends AbstractManager implements GroupIdentity
     public static final String ADMIN_GROUP_NAME = "admin";
     public static final String ADMIN_GROUP_TYPE = "security-role";
     private final EsDmsConfigurator configurator;
-    private RestAuthenticationService restAuthenticationClient;
-    private RestRoleService restRoleClient;
-    private RestUserService restUserClient;
+    private transient RestAuthenticationService restAuthenticationClient;
+    private transient RestRoleService restRoleClient;
+    private transient RestUserService restUserClient;
     private final GroupEntity adminGroup;
 
     public GroupEntityManager(EsDmsConfigurator configurator) {

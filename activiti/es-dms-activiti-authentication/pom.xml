@@ -49,6 +49,11 @@
 			<version>${activiti.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-explorer</artifactId>
+			<version>${activiti.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<version>${h2.version}</version>
@@ -100,6 +105,12 @@
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
 			<artifactId>jackson-jaxrs-json-provider</artifactId>
 			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.0.1</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<build>
