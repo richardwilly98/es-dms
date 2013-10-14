@@ -79,7 +79,7 @@ public class TestRestServerBase {
     protected final static Credential adminCredential = new CredentialImpl.Builder().username(UserService.DEFAULT_ADMIN_LOGIN)
             .password(UserService.DEFAULT_ADMIN_PASSWORD.toCharArray()).build();
     private final Server server;
-    final static ObjectMapper mapper = new ObjectMapper();
+    protected final static ObjectMapper mapper = new ObjectMapper();
     protected static String adminToken;
     protected static Cookie adminCookie;
     private final Client restClient;
