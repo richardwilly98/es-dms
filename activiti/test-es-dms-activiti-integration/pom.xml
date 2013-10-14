@@ -28,11 +28,6 @@
 		</dependency>
 		<dependency>
 			<groupId>com.github.richardwilly98</groupId>
-			<artifactId>test-es-dms-rest-server</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.richardwilly98</groupId>
 			<artifactId>es-dms-rest-client</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
@@ -40,6 +35,19 @@
 			<groupId>com.github.richardwilly98</groupId>
 			<artifactId>es-dms-core</artifactId>
 			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.richardwilly98</groupId>
+			<artifactId>es-dms-rest-server</artifactId>
+			<version>${project.parent.version}</version>
+			<type>test-jar</type>
+			<!-- <scope>test</scope> -->
+		</dependency>
+		<dependency>
+			<groupId>com.github.richardwilly98</groupId>
+			<artifactId>es-dms-rest-server</artifactId>
+			<version>${project.parent.version}</version>
+			<!-- <scope>test</scope> -->
 		</dependency>
 		<dependency>
 			<groupId>org.activiti</groupId>

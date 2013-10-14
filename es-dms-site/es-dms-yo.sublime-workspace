@@ -140,13 +140,10 @@
 			}
 		},
 		{
-			"contents": "'use strict';\n\nesDmsSiteApp.service('roleService', ['$log', '$rootScope', '$resource', '$http', function roleService($log, $rootScope, $resource, $http) {\n	var resource = $resource('api/roles/:id/:action', { }, {\n		update: {method: 'PUT'},\n		create: {method: 'POST'},\n		types: {method: 'GET', params: {id: '_types'}, isArray: true}\n	});\n	var roles = [];\n	var roleTypes = [];\n	var editedRole = null;\n	return {\n		roleTypes: function(callback) {\n			if (roleTypes.length === 0) {\n				var types = new resource.types({}, function(){\n					$log.log('get roleTypes: ' + JSON.stringify(types));\n					roleTypes = types;\n	        callback(types);\n				});\n			}\n		},\n		search: function(criteria, callback) {\n			$http.get('api/roles/search/' + criteria).success(function (data) {\n				roles = data.items;\n				callback(data);\n			});\n		},\n		edit: function(id) {\n			$log.log('edit role: ' + id);\n			if (id === 'new') {\n				editedRole = null;\n			} else {\n				editedRole = id;\n			}\n			$rootScope.$broadcast('role:edit');\n		},\n		currentRole: function(callback) {\n			if (editedRole) {\n				var role = new resource.get({'id': editedRole}, function(){\n					callback(role);\n				});\n			} else {\n				return callback(new resource());\n			}\n		},\n		save: function(role, isNew) {\n			$log.log('save role: ' + JSON.stringify(role));\n			if (isNew) {\n				role.$create({}, function() {\n					$rootScope.$broadcast('role:updated', {id: role.id});\n				});\n			} else {\n				role.$update({id: role.id}, function() {\n					$rootScope.$broadcast('role:updated', {id: role.id});\n				});\n			}\n		}\n	};\n}]);\n",
 			"file": "yo/app/scripts/services/roleService.js",
-			"file_size": 1612,
-			"file_write_time": 130257130154423392,
 			"settings":
 			{
-				"buffer_size": 1556,
+				"buffer_size": 1640,
 				"line_ending": "Windows"
 			}
 		},
@@ -154,18 +151,31 @@
 			"file": "yo/app/scripts/services/userService.js",
 			"settings":
 			{
-				"buffer_size": 2051,
+				"buffer_size": 2054,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"contents": "'use strict';\n\nesDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$rootScope', '$http', 'userService', 'roleService',\n	function ($log, $scope, $rootScope, $http, userService, roleService) {\n	$scope.user = null;\n	$scope.newUser = false;\n	$scope.uid = '';\n	$scope.user = {};\n	$scope.pw1 = '';\n	$scope.pw2 = '';\n	$scope.pwError = false;\n	$scope.incomplete = false;\n	$scope.selectedRoles = [];\n	$scope.roles = [];\n\n	/*\n	$rootScope.$on('user:edit', function() {\n		$log.log('on user:edit');\n		var editUser = userService.currentUser();\n		if (editUser.id) {\n			$scope.user = editUser;\n			$log.log('user.roles: ' + JSON.stringify($scope.user.roles));\n			//$scope.selectedRoles = $scope.user.roles;\n			$scope.newUser = false;\n		} else {\n			$scope.newUser = true;\n			$scope.incomplete = true;\n			$scope.user = {roles: []};\n			$scope.pw1 = '';\n			$scope.pw2 = '';\n		}\n		roleService.search('*', function(result) {\n			$scope.roles = result.items;\n			if (!$scope.newUser) {\n				// TODO: Must be optimized.\n				// TODO: Check the reason orderBy filter does not work. Items not selected.\n				_.each($scope.roles, function(role) {\n					_.find($scope.user.roles, function(item) {\n						if (item !== null && role.id === item.id) {\n							$scope.selectedRoles.push(role);\n						}\n					});\n				});\n				$log.log('$scope.selectedRoles: ' + JSON.stringify($scope.selectedRoles));\n			}\n			$log.log('roles: ' + JSON.stringify($scope.roles));\n		});\n    $scope.shouldBeOpen = true;\n	});\n	*/\n	\n	$rootScope.$on('user:edit', function() {\n		$log.log('on user:edit');\n		userService.currentUser(function(user){\n			if (user.id) {\n				$scope.user = user;\n				$log.log('user.roles: ' + JSON.stringify($scope.user.roles));\n				//$scope.selectedRoles = $scope.user.roles;\n				$scope.newUser = false;\n			} else {\n				$scope.newUser = true;\n				$scope.incomplete = true;\n				// $scope.user = {roles: []};\n				$scope.user = user;\n				$scope.pw1 = '';\n				$scope.pw2 = '';\n			}\n			roleService.search('*', function(result) {\n				$scope.roles = result.items;\n				if (!$scope.newUser) {\n					// TODO: Must be optimized.\n					// TODO: Check the reason orderBy filter does not work. Items not selected.\n					_.each($scope.roles, function(role) {\n						_.find($scope.user.roles, function(item) {\n							if (item !== null && role.id === item.id) {\n								$scope.selectedRoles.push(role);\n							}\n						});\n					});\n					$log.log('$scope.selectedRoles: ' + JSON.stringify($scope.selectedRoles));\n				}\n				$log.log('roles: ' + JSON.stringify($scope.roles));\n			});\n	    $scope.shouldBeOpen = true;\n		});\n	});\n	\n  $scope.close = function() {\n    $scope.shouldBeOpen = false;\n  };\n\n  $scope.opts = {\n    backdropFade: true,\n    dialogFade:true\n  };\n\n	$scope.save = function() {\n		if ($scope.newUser) {\n			$scope.user.password = $scope.pw1;\n		}\n		$log.log('About to save user: ' + JSON.stringify($scope.user));\n		$scope.user.roles = $scope.selectedRoles;\n		userService.save($scope.user, $scope.newUser	);\n    $scope.shouldBeOpen = false;\n	};\n	\n	$scope.$watch('pw1', function() {\n		$scope.pwError = $scope.pw1 !== $scope.pw2;\n		$scope.incompleteTest();\n	});\n	\n	$scope.$watch('pw2', function() {\n		$scope.pwError = $scope.pw1 !== $scope.pw2;\n		$scope.incompleteTest();\n	});\n\n	$scope.$watch('username', function() {\n		$scope.incompleteTest();\n	});\n\n	$scope.incompleteTest = function() {\n		if ($scope.newUser) {\n			$scope.incomplete = !$scope.user.name.length || !$scope.pw1.length || !$scope.pw2.length;\n		} else {\n			$scope.incomplete = false;\n		}\n	};\n}]);\n",
-			"file": "yo/app/scripts/controllers/userEdit.js",
-			"file_size": 3638,
-			"file_write_time": 130257145300059673,
+			"file": "/D/Apps/apache-tomcat-7.0.42/webapps/activiti-rest/WEB-INF/classes/activiti-context.xml",
 			"settings":
 			{
-				"buffer_size": 3511,
+				"buffer_size": 2771,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/D/Apps/apache-tomcat-7.0.42/webapps/activiti-explorer/WEB-INF/activiti-standalone-context.xml",
+			"settings":
+			{
+				"buffer_size": 3884,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "yo/app/scripts/controllers/userEdit.js",
+			"settings":
+			{
+				"buffer_size": 3510,
 				"line_ending": "Windows"
 			}
 		},
@@ -205,7 +215,7 @@
 			"file": "yo/app/scripts/controllers/roleEdit.js",
 			"settings":
 			{
-				"buffer_size": 1261,
+				"buffer_size": 1245,
 				"line_ending": "Windows"
 			}
 		}
@@ -281,7 +291,21 @@
 	},
 	"file_history":
 	[
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/activiti/es-dms-activiti-authentication/README.md",
+		"/D/Users/Richard/Downloads/credentials (1).csv",
+		"/D/Users/Richard/Desktop/Junk/Danilo/danilos-amazon-s3-credentials.csv",
+		"/D/Users/Richard/Downloads/credentials.csv",
+		"/D/Apps/apache-tomcat-7.0.42/webapps/es-dms-site/WEB-INF/classes/log4j.xml",
+		"/D/Apps/apache-tomcat-7.0.42/webapps/activiti-rest/WEB-INF/classes/log4j.properties",
+		"/D/Users/Richard/Desktop/Junk/Danilo/es-dms-logs/tomcat7-stdout.2013-10-10.log",
+		"/D/Apps/apache-tomcat-7.0.42/webapps/activiti-explorer/WEB-INF/classes/log4j.properties",
+		"/D/Apps/apache-tomcat-7.0.42/webapps/activiti-rest/WEB-INF/classes/activiti-context.xml",
+		"/D/Apps/apache-tomcat-7.0.42/webapps/activiti-explorer/WEB-INF/activiti-standalone-context.xml",
+		"/D/Apps/apache-tomcat-7.0.42/logs/activiti-explorer.log.2013-10-05.log",
+		"/D/Apps/apache-tomcat-7.0.42/logs/catalina.2013-10-05.log",
+		"/D/Apps/apache-tomcat-7.0.42/logs/localhost.2013-10-05.log",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/pom.xml",
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-rest-server/pom.xml",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/test/test-es-dms-rest-server/pom.xml",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/README.md",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/scripts/controllers/navbar.js",
@@ -291,14 +315,11 @@
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/scripts/directives/esdmsTagging.js",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/scripts/services/sharedService.js",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/index.html",
-		"/D/Apps/apache-tomcat-7.0.42/webapps/activiti-explorer/WEB-INF/activiti-standalone-context.xml",
-		"/D/Apps/apache-tomcat-7.0.42/webapps/activiti-rest/WEB-INF/classes/activiti-context.xml",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/views/users/search-users.html",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/scripts/controllers/userEdit.js",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/views/users/edit-user.html",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/pom.xml",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/views/users/user-profile.html",
-		"/D/Apps/apache-tomcat-7.0.42/webapps/activiti-explorer/WEB-INF/classes/log4j.properties",
 		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/README.md",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/Gruntfile.js",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/target/web.xml",
@@ -307,7 +328,6 @@
 		"/D/Users/Richard/Desktop/cleanup-photos.js",
 		"/D/Projects/Java/kepler-workspace/Activiti/modules/activiti-rest/pom.xml",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-rest-client/README.md",
-		"/D/Projects/Java/elasticsearch-workspace/es-dms/activiti/es-dms-activiti-authentication/README.md",
 		"/D/Apps/apache-tomcat-7.0.42/logs/activiti-explorer.log",
 		"/D/Apps/apache-tomcat-7.0.42/logs/activiti-explorer",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-core/pom.xml",
@@ -398,17 +418,7 @@
 		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb.wiki/Home.textile",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/scripts/services/searchService.js",
 		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/app/scripts/controllers/login.js",
-		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/test/spec/controllers/documents/Details.js",
-		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/test/spec/controllers/documents/DocumentsDetails.js",
-		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/test/spec/controllers/DocumentsDetails.js",
-		"/C/Dev/elasticsearch/plugins/river-mongodb/_site/index.html",
-		"/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/src/test/java/org/elasticsearch/river/jdbc/strategy/simple/SimpleRiverMouthTests.java",
-		"/D/Users/Richard/Documents/GitHub/elasticsearch-river-jdbc/src/test/java/org/elasticsearch/river/jdbc/strategy/simple/AbstractRiverTest.java",
-		"/D/temp/test-jersey-2.0/pom.xml",
-		"/D/Projects/Java/elasticsearch-workspace/elasticsearch-river-mongodb/src/main/java/org/elasticsearch/river/mongodb/MongoDBRiver.java",
-		"/D/Users/Richard/Documents/GitHub/jersey/examples/json-jackson/pom.xml",
-		"/C/Dev/elasticsearch/plugins/river-mongodb/_site/scripts/app.js",
-		"/D/temp/entando/Entando_portalexample-standalone_3.2.0/README"
+		"/D/Projects/Java/elasticsearch-workspace/es-dms/es-dms-site/yo/test/spec/controllers/documents/Details.js"
 	],
 	"find":
 	{
@@ -427,6 +437,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"userResource",
+			"es-dms-site",
 			"es-dms-rest-client",
 			"currentRole",
 			"update",
@@ -488,6 +500,8 @@
 		"regex": false,
 		"replace_history":
 		[
+			"UserResource",
+			"es-dms-rest-server",
 			"test-es-dms-rest-server",
 			"\"",
 			"ROLLING_FILE",
@@ -687,15 +701,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1556,
+						"buffer_size": 1640,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1297,
-								1543
+								390,
+								390
 							]
 						],
 						"settings":
@@ -704,7 +718,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 540.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -715,15 +729,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2051,
+						"buffer_size": 2054,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1723,
-								1815
+								1098,
+								1108
 							]
 						],
 						"settings":
@@ -732,18 +746,74 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 660.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 8,
+					"file": "/D/Apps/apache-tomcat-7.0.42/webapps/activiti-rest/WEB-INF/classes/activiti-context.xml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2771,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2269,
+								2269
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/XML/XML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "/D/Apps/apache-tomcat-7.0.42/webapps/activiti-explorer/WEB-INF/activiti-standalone-context.xml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3884,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1787,
+								2921
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/XML/XML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 387.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 10,
 					"file": "yo/app/scripts/controllers/userEdit.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3511,
+						"buffer_size": 3510,
 						"regions":
 						{
 						},
@@ -766,7 +836,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 9,
+					"buffer": 11,
 					"file": "yo/app/scripts/controllers/role.js",
 					"semi_transient": false,
 					"settings":
@@ -795,7 +865,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 10,
+					"buffer": 12,
 					"file": "yo/app/views/roles/edit-role.html",
 					"semi_transient": false,
 					"settings":
@@ -823,7 +893,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 11,
+					"buffer": 13,
 					"file": "yo/app/views/roles/search-roles.html",
 					"semi_transient": false,
 					"settings":
@@ -851,7 +921,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 12,
+					"buffer": 14,
 					"file": "yo/app/views/users/edit-user.html",
 					"semi_transient": false,
 					"settings":
@@ -879,20 +949,20 @@
 					"type": "text"
 				},
 				{
-					"buffer": 13,
+					"buffer": 15,
 					"file": "yo/app/scripts/controllers/roleEdit.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1261,
+						"buffer_size": 1245,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								537,
-								537
+								249,
+								249
 							]
 						],
 						"settings":
