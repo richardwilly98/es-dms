@@ -254,7 +254,7 @@ public class TestRestServerBase {
             log.debug("status: " + response.getStatus());
             Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
             for (NewCookie cookie : response.getCookies().values()) {
-                if (RestAuthencationService.ES_DMS_TICKET.equals(cookie.getName())) {
+                if (RestAuthenticationService.ES_DMS_TICKET.equals(cookie.getName())) {
                     return new Cookie(cookie.getName(), cookie.getValue());
                 }
             }

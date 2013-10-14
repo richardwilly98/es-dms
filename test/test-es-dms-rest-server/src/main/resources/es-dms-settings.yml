@@ -1,7 +1,0 @@
-library: es-dms
-es:
-	host: localhost
-	port: 9300
-	index:
-		refresh: true
-		

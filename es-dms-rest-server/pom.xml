@@ -58,12 +58,8 @@
 			<artifactId>jackson-jaxrs-json-provider</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
-		<!-- <dependency>
-			<groupId>com.github.richardwilly98</groupId>
-			<artifactId>es-dms-core</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-		 -->
+		<!-- <dependency> <groupId>com.github.richardwilly98</groupId> <artifactId>es-dms-core</artifactId> 
+			<version>1.0-SNAPSHOT</version> </dependency> -->
 		<dependency>
 			<groupId>com.github.richardwilly98</groupId>
 			<artifactId>es-dms-service</artifactId>
@@ -83,13 +79,11 @@
 			<groupId>org.apache.shiro</groupId>
 			<artifactId>shiro-web</artifactId>
 			<version>${shiro.version}</version>
-			<!-- type>bundle</type -->
 		</dependency>
 		<dependency>
 			<groupId>org.apache.shiro</groupId>
 			<artifactId>shiro-guice</artifactId>
 			<version>${shiro.version}</version>
-			<!-- type>bundle</type -->
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
@@ -101,8 +95,6 @@
 			<artifactId>guice-bridge</artifactId>
 			<version>${hk2.version}</version>
 		</dependency>
-		<!-- <dependency> <groupId>javax.servlet</groupId> <artifactId>servlet-api</artifactId> 
-			<version>2.5</version> <scope>provided</scope> </dependency> -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -172,6 +164,18 @@
 							<goal>update-file-header</goal>
 						</goals>
 						<phase>process-sources</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>

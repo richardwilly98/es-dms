@@ -119,7 +119,7 @@
 		<module>es-dms-service</module>
 		<module>es-dms-rest-server</module>
 		<module>es-dms-site</module>
-		<module>test/test-es-dms-rest-server</module>
+		<!-- <module>test/test-es-dms-rest-server</module> -->
 		<module>es-dms-rest-client</module>
 		<module>activiti/test-es-dms-activiti-integration</module>
 		<module>activiti/es-dms-activiti-authentication</module>

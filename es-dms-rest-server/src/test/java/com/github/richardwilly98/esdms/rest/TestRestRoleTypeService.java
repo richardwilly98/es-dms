@@ -37,24 +37,14 @@ import javax.ws.rs.core.Response.Status;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.Role.RoleType;
+import com.github.richardwilly98.esdms.rest.RestRoleTypeService;
 
-//@Guice(modules = com.github.richardwilly98.esdms.inject.TestEsClientModule.class)
-public class TestRestService extends TestRestServerBase {
+public class TestRestRoleTypeService extends GuiceAndJettyTestBase<Role> {
 
-    public TestRestService() throws Exception {
+    public TestRestRoleTypeService() throws Exception {
         super();
-    }
-
-    @Override
-    public void setUp() throws Throwable {
-        super.setUp();
-    }
-
-    
-    @Override
-    public void tearDown() throws Throwable {
-        super.tearDown();
     }
 
     static class SimpleEntry {
@@ -94,7 +84,7 @@ public class TestRestService extends TestRestServerBase {
                 Assert.assertNotNull(type);
             }
         } catch (Throwable t) {
-            log.error("testGetRoleTypes fail", t);
+            log.error("testGetRoleTypes failed", t);
             Assert.fail();
         }
     }

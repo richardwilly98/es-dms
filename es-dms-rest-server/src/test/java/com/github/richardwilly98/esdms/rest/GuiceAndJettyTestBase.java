@@ -39,6 +39,8 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.testng.Assert;
+
 import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.api.ItemBase;
@@ -66,13 +68,10 @@ public class GuiceAndJettyTestBase<T extends ItemBase> extends TestRestServerBas
     }
 
     protected T get(URI uri, Class<T> type) throws Throwable {
-        log.debug(String.format("getItem - %s", uri));
+        log.trace(String.format("getItem - %s", uri));
         Response response = client().target(uri).request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
-        log.debug(String.format("status: %s", response.getStatus()));
-        // log.debug(String.format("get - body: %s",
-        // response.getEntity(String.class)));
+        log.trace(String.format("status: %s", response.getStatus()));
         if (response.getStatus() == Status.OK.getStatusCode()) {
-            // return deserialize(response.getEntity(String.class), type);
             return response.readEntity(type);
         }
         return null;
@@ -89,7 +88,6 @@ public class GuiceAndJettyTestBase<T extends ItemBase> extends TestRestServerBas
 
     protected void delete(String id, String path) throws Throwable {
         Response response = target().path(path).path(id).request().cookie(adminCookie).delete();
-        log.debug(String.format("status: %s", response.getStatus()));
         if (response.getStatus() != Status.OK.getStatusCode()) {
             throw new ServiceException(String.format("delete failed. Response status: %s", response.getStatus()));
         }
@@ -97,14 +95,12 @@ public class GuiceAndJettyTestBase<T extends ItemBase> extends TestRestServerBas
 
     protected Cookie login(Credential credential) throws Throwable {
         // try {
-        log.debug("*** login ***");
-        WebTarget webResource = target().path("auth").path("login");
-        log.debug(webResource);
+        log.trace("*** login ***");
+        WebTarget webResource = target().path(RestAuthenticationService.AUTH_PATH).path(RestAuthenticationService.LOGIN_PATH);
         Response response = webResource.request(MediaType.APPLICATION_JSON).post(Entity.entity(credential, MediaType.APPLICATION_JSON));
-        log.debug("status: " + response.getStatus());
-        // Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+        Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
         for (NewCookie cookie : response.getCookies().values()) {
-            if (RestAuthencationService.ES_DMS_TICKET.equals(cookie.getName())) {
+            if (RestAuthenticationService.ES_DMS_TICKET.equals(cookie.getName())) {
                 return new Cookie(cookie.getName(), cookie.getValue());
             }
         }
@@ -116,12 +112,11 @@ public class GuiceAndJettyTestBase<T extends ItemBase> extends TestRestServerBas
     }
 
     protected void logout(Cookie cookie) throws Throwable {
-        log.debug("*** logout ***");
+        log.trace("*** logout ***");
         checkNotNull(cookie);
-        WebTarget webResource = target().path("auth").path("logout");
+        WebTarget webResource = target().path(RestAuthenticationService.AUTH_PATH).path(RestAuthenticationService.LOGOUT_PATH);
         Response response = webResource.request().cookie(cookie).post(Entity.json(null));
-        log.debug("status: " + response.getStatus());
-        // Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+        Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
         if (response.getStatus() != Status.OK.getStatusCode()) {
             throw new ServiceException(String.format("logout failed. Response status: %s", response.getStatus()));
         }
@@ -140,14 +135,12 @@ public class GuiceAndJettyTestBase<T extends ItemBase> extends TestRestServerBas
         log.trace(json);
         Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
                 .post(Entity.json(user));
-        log.debug(String.format("status: %s", response.getStatus()));
-        // Assert.assertTrue(response.getStatus() == Status.CREATED
-        // .getStatusCode());
+        Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
         if (response.getStatus() != Status.CREATED.getStatusCode()) {
             throw new ServiceException(String.format("createUser %s failed. Response status: %s", login, response.getStatus()));
         }
         URI uri = response.getLocation();
-        // Assert.assertNotNull(uri);
+        Assert.assertNotNull(uri);
         log.debug(String.format("getItem - %s", uri));
         response = client().target(uri).request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
         if (response.getStatus() == Status.OK.getStatusCode()) {
