@@ -17,6 +17,9 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 
 public class EsDmsRestAuthenticator implements RestAuthenticator {
 
+    static final String ES_DMS_PROPERTIES = "es-dms.properties";
+    static final String ESDMS_URL = "esdms.url";
+
     private static final Logger log = Logger.getLogger(EsDmsRestAuthenticator.class);
 
     private transient RestAuthenticationService restAuthenticationClient;
@@ -30,13 +33,13 @@ public class EsDmsRestAuthenticator implements RestAuthenticator {
 
     private void loadProperties() {
         try {
-            InputStream stream = getClass().getClassLoader().getResourceAsStream("es-dms.properties");
+            InputStream stream = getClass().getClassLoader().getResourceAsStream(ES_DMS_PROPERTIES);
             if (stream == null) {
                 log.warn("Cannot load properties from es-dms.properties");
             }
             Properties props = new Properties();
             props.load(stream);
-            url = props.getProperty("esdms.url");
+            url = props.getProperty(ESDMS_URL);
         } catch (IOException ex) {
             log.error("loadProperties failed.", ex);
         }
@@ -53,7 +56,6 @@ public class EsDmsRestAuthenticator implements RestAuthenticator {
 
     @Override
     public boolean requestRequiresAuthentication(Request request) {
-        log.debug("*** requestRequiresAuthentication ***");
         String token = extractTokenFromRequest(request);
         if (token != null) {
             setUserInfo(request, token);
@@ -82,7 +84,6 @@ public class EsDmsRestAuthenticator implements RestAuthenticator {
 
     @Override
     public boolean isRequestAuthorized(Request request) {
-        log.debug("*** isRequestAuthorized ***");
         String token = extractTokenFromRequest(request);
         if (token != null) {
             setUserInfo(request, token);
@@ -91,21 +92,20 @@ public class EsDmsRestAuthenticator implements RestAuthenticator {
     }
 
     private String extractTokenFromRequest(Request request) {
-        log.debug("*** extractTokenFromRequest ***");
         String token = null;
         if (request != null) {
             log.debug(request);
             if (request.getResourceRef() != null && request.getResourceRef().getQueryAsForm() != null) {
                 token = request.getResourceRef().getQueryAsForm().getFirstValue("token");
-                log.debug("Found token from query string: " + token);
+                log.trace("Found token from query string: " + token);
             } else {
                 log.info("ResourceRef is null");
             }
             for (Cookie cookie : request.getCookies()) {
-                log.debug(cookie.getName() + " - " + cookie.getValue());
+                log.trace(cookie.getName() + " - " + cookie.getValue());
                 if (RestAuthenticationService.ES_DMS_TICKET.equals(cookie.getName())) {
                     token = cookie.getValue();
-                    log.debug("Found token from cookie: " + token);
+                    log.trace("Found token from cookie: " + token);
                     break;
                 }
             }

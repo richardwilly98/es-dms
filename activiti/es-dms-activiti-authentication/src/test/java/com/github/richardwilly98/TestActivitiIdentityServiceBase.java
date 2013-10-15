@@ -2,7 +2,7 @@ package com.github.richardwilly98;
 
 import org.testng.Assert;
 
-import com.github.richardwilly98.activiti.TestRestServerWithActivitiBase;
+import com.github.richardwilly98.activiti.EsDmsServerWithActivitiBase;
 import com.github.richardwilly98.esdms.RoleImpl;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.Role.RoleType;
@@ -13,7 +13,7 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.rest.TestRestServerBase;
 
 
-public class TestActivitiIdentityServiceBase extends TestRestServerWithActivitiBase {
+public class TestActivitiIdentityServiceBase extends EsDmsServerWithActivitiBase {
 
     final RestUserService restUserService;
     final RestAuthenticationService restAuthenticationService;

@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.services.UserService;
 
-public class RestLoginTest extends TestRestActivitiServerBase {
+public class RestLoginTest extends EsDmsServerWithRestActivitiServerBase {
 
     public RestLoginTest() throws Exception {
         super();
