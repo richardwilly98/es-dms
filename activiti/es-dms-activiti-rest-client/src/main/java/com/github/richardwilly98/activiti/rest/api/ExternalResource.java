@@ -1,4 +1,4 @@
-package com.github.richardwilly98.activiti;
+package com.github.richardwilly98.activiti.rest.api;
 
 public class ExternalResource extends ItemBase {
 

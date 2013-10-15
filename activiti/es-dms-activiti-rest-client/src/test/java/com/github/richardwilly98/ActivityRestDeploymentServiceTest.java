@@ -7,12 +7,12 @@ import javax.ws.rs.core.Response.Status;
 import org.junit.Assert;
 import org.testng.annotations.Test;
 
-import com.github.richardwilly98.activiti.Deployment;
-import com.github.richardwilly98.activiti.SearchResult;
+import com.github.richardwilly98.activiti.rest.api.Deployment;
+import com.github.richardwilly98.activiti.rest.api.SearchResult;
 
 public class ActivityRestDeploymentServiceTest extends ActivitiRestClientTest {
 
-    @Test
+    @Test(enabled = false)
     public void testRetrieveDeployments() {
         log.debug("*** testRetrieveDeployments ***");
         Response response = target().path("repository/deployments").request().get();

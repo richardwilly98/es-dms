@@ -1,23 +1,14 @@
-package com.github.richardwilly98.activiti;
+package com.github.richardwilly98.activiti.rest.api;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.common.base.Objects;
 
 /*
  * DEBUG [com.githug.richardwilly98.ActivityRestDeploymentServiceTest] {"data":[{"id":"20","name":"Demo processes","deploymentTime":"2013-10-02T16:21:15EDT","category":null,"url":"http://localhost:8080/activiti-rest/service/repository/deployments/20"},{"id":"2330","name":"FinancialReportProcess.bpmn20.xml","deploymentTime":"2013-10-02T17:09:08EDT","category":null,"url":"http://localhost:8080/activiti-rest/service/repository/deployments/2330"},{"id":"604","name":"Demo reports","deploymentTime":"2013-10-02T16:25:52EDT","category":null,"url":"http://localhost:8080/activiti-rest/service/repository/deployments/604"}],"total":3,"start":0,"sort":"id","order":"asc","size":3} 
  */
-@JsonInclude(Include.NON_DEFAULT)
-public abstract class ItemBase {
-
-    private String id;
-    private String url;
-    private String name;
-    private String description;
-
-    protected ItemBase() {
-
-    }
+public class Deployment {
 
     public String getId() {
         return id;
@@ -25,6 +16,22 @@ public abstract class ItemBase {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Date getDeploymentTime() {
+        return deploymentTime;
+    }
+
+    public void setDeploymentTime(Date deploymentTime) {
+        this.deploymentTime = deploymentTime;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public String getUrl() {
@@ -35,6 +42,18 @@ public abstract class ItemBase {
         this.url = url;
     }
 
+    private String id;
+    private String name;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private Date deploymentTime;
+    private String category;
+    private String url;
+
+    public Deployment() {
+
+    }
+
     public String getName() {
         return name;
     }
@@ -43,17 +62,10 @@ public abstract class ItemBase {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     @Override
     public String toString() {
-        return Objects.toStringHelper(this).add("id", id).add("name", name).add("description", description).add("url", url).toString();
+        return Objects.toStringHelper(this).add("id", id).add("name", name).add("deploymentTime", deploymentTime).add("url", url)
+                .add("category", category).toString();
     }
 
 }

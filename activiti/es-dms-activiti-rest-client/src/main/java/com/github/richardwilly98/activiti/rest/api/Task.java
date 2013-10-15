@@ -1,4 +1,4 @@
-package com.github.richardwilly98.activiti;
+package com.github.richardwilly98.activiti.rest.api;
 
 import java.util.Date;
 

@@ -10,14 +10,14 @@ import org.junit.Assert;
 import org.testng.annotations.Test;
 import org.testng.util.Strings;
 
-import com.github.richardwilly98.activiti.Comment;
-import com.github.richardwilly98.activiti.ExternalResource;
-import com.github.richardwilly98.activiti.SearchResult;
-import com.github.richardwilly98.activiti.Task;
+import com.github.richardwilly98.activiti.rest.api.Comment;
+import com.github.richardwilly98.activiti.rest.api.ExternalResource;
+import com.github.richardwilly98.activiti.rest.api.SearchResult;
+import com.github.richardwilly98.activiti.rest.api.Task;
 
 public class ActivityRestRuntimeTaskServiceTest extends ActivitiRestClientTest {
 
-    @Test
+    @Test(enabled = false)
     public void testCleanUpTasks() {
         log.debug("*** testCleanUpTasks ***");
         Response response = target().path("runtime/tasks").queryParam("size", 100).request().get();
@@ -33,7 +33,7 @@ public class ActivityRestRuntimeTaskServiceTest extends ActivitiRestClientTest {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void testRetrieveTasks() {
         log.debug("*** testRetrieveTasks ***");
         Response response = target().path("runtime/tasks").request().get();
@@ -59,7 +59,7 @@ public class ActivityRestRuntimeTaskServiceTest extends ActivitiRestClientTest {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     public void testAddComment() {
         log.debug("*** testAddComment ***");
         Response response = target().path("runtime/tasks").request().get();
@@ -86,7 +86,7 @@ public class ActivityRestRuntimeTaskServiceTest extends ActivitiRestClientTest {
         log.debug(comment);
     }
 
-    @Test
+    @Test(enabled = false)
     public void testAddExternalResource() {
         log.debug("*** testAddExternalResource ***");
         String id = "4803";
