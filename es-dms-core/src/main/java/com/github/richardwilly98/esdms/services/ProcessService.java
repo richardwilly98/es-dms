@@ -29,12 +29,20 @@ package com.github.richardwilly98.esdms.services;
 
 import java.util.Set;
 
+import com.github.richardwilly98.esdms.api.ItemBase;
 import com.github.richardwilly98.esdms.bpm.api.ProcessDefinition;
+import com.github.richardwilly98.esdms.bpm.api.ProcessInstance;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
 public interface ProcessService {
 
-    public abstract String startProcessInstance(String processDefinitionId) throws ServiceException;
+    public abstract ProcessInstance startProcessInstance(ProcessDefinition processDefinition) throws ServiceException;
     
     public abstract Set<ProcessDefinition> getProcessDefinitions() throws ServiceException;
+    
+    public abstract ProcessDefinition getProcessDefinition(String id) throws ServiceException;
+    
+    public abstract ProcessInstance getProcessInstance(String id) throws ServiceException;
+
+    public abstract void attach(ProcessInstance processInstance, ItemBase item) throws ServiceException;
 }
