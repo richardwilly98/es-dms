@@ -11,8 +11,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.activiti.rest.api.RestUrls;
 
-import com.github.richardwilly98.activiti.rest.api.Deployment;
-import com.github.richardwilly98.activiti.rest.api.SearchResult;
+import com.github.richardwilly98.activiti.rest.api.RestDeployment;
+import com.github.richardwilly98.activiti.rest.api.RestSearchResult;
 
 public class RestDeploymentServiceClient extends RestClientBase {
 
@@ -22,23 +22,23 @@ public class RestDeploymentServiceClient extends RestClientBase {
         super(url);
     }
 
-    public SearchResult<Deployment> getDeployments() {
+    public RestSearchResult<RestDeployment> getDeployments() {
         log.debug("*** getDeployments ***");
-        SearchResult<Deployment> deploymentList = null;
+        RestSearchResult<RestDeployment> deploymentList = null;
         Response response = target().path(path).request().cookie(new Cookie("ES_DMS_TICKET", getToken())).get();
         if(response.getStatus() == Status.OK.getStatusCode()) {
-            deploymentList = response.readEntity(new GenericType<SearchResult<Deployment>>() {
+            deploymentList = response.readEntity(new GenericType<RestSearchResult<RestDeployment>>() {
             });
         }
         return deploymentList;
     }
     
-    public Deployment getDeploment(String id) {
+    public RestDeployment getDeploment(String id) {
         checkNotNull(id);
-        Deployment deployment = null;
+        RestDeployment deployment = null;
         Response response = target().path(path).path(id).request().cookie(new Cookie("ES_DMS_TICKET", getToken())).get();
         if(response.getStatus() == Status.OK.getStatusCode()) {
-            deployment = response.readEntity(Deployment.class);
+            deployment = response.readEntity(RestDeployment.class);
         }
         return deployment;
     }

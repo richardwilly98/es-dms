@@ -1,11 +1,13 @@
 package com.github.richardwilly98.activiti.rest.api;
 
-public class Comment extends ItemBase {
+import com.google.common.base.Objects;
+
+public class RestComment extends RestItemBase {
 
     private String author;
     private String message;
 
-    public Comment() {
+    public RestComment() {
     }
 
     public String getAuthor() {
@@ -22,5 +24,10 @@ public class Comment extends ItemBase {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this).add("author", author).add("message", message).toString();
     }
 }

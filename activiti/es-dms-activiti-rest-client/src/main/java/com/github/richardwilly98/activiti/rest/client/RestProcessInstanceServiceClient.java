@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.net.URI;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.GenericType;
@@ -13,8 +14,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.activiti.rest.api.RestUrls;
 
-import com.github.richardwilly98.activiti.rest.api.ProcessInstance;
-import com.github.richardwilly98.activiti.rest.api.SearchResult;
+import com.github.richardwilly98.activiti.rest.api.RestProcessInstance;
+import com.github.richardwilly98.activiti.rest.api.RestSearchResult;
 
 public class RestProcessInstanceServiceClient extends RestClientBase {
 
@@ -24,33 +25,36 @@ public class RestProcessInstanceServiceClient extends RestClientBase {
         super(url);
     }
 
-    public SearchResult<ProcessInstance> getProcessInstances() {
-        log.debug("*** getProcessInstances ***");
-        SearchResult<ProcessInstance> processInstances = null;
+    public RestSearchResult<RestProcessInstance> getProcessInstances() {
+        log.trace("*** getProcessInstances ***");
         Response response = target().path(path).request().cookie(new Cookie("ES_DMS_TICKET", getToken())).get();
         if(response.getStatus() == Status.OK.getStatusCode()) {
-            processInstances = response.readEntity(new GenericType<SearchResult<ProcessInstance>>() {
+            return  response.readEntity(new GenericType<RestSearchResult<RestProcessInstance>>() {
             });
         }
-        return processInstances;
+        throw new WebApplicationException(response);
     }
     
-    public ProcessInstance getProcessInstance(String id) {
+    public RestProcessInstance getProcessInstance(String id) {
+        log.trace(String.format("*** getProcessInstance - %s ***", id));
         checkNotNull(id);
-        ProcessInstance processInstance = null;
         Response response = target().path(path).path(id).request().cookie(new Cookie("ES_DMS_TICKET", getToken())).get();
         if(response.getStatus() == Status.OK.getStatusCode()) {
-            processInstance = response.readEntity(ProcessInstance.class);
+            return response.readEntity(RestProcessInstance.class);
         }
-        return processInstance;
+        throw new WebApplicationException(response);
     }
     
-    public ProcessInstance startProcessInstance(String processDefinitionId) {
+    public RestProcessInstance startProcessInstance(String processDefinitionId) {
+        log.trace(String.format("*** startProcessInstance - %s ***", processDefinitionId));
         checkNotNull(processDefinitionId);
-        ProcessInstance processInstance = new ProcessInstance();
+        RestProcessInstance processInstance = new RestProcessInstance();
         processInstance.setProcessDefinitionId(processDefinitionId);
         Response response = target().path(path).request().cookie(new Cookie("ES_DMS_TICKET", getToken())).post(Entity.entity(processInstance, MediaType.APPLICATION_JSON));
-        return response.readEntity(ProcessInstance.class);
+        if (response.getStatus() == Status.CREATED.getStatusCode()) {
+            return response.readEntity(RestProcessInstance.class);
+        }
+        throw new WebApplicationException(response);
     }
 
 

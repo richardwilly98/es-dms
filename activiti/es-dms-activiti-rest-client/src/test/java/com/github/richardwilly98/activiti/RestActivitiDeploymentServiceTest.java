@@ -4,8 +4,8 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.activiti.rest.EsDmsServerWithRestActivitiServerBase;
-import com.github.richardwilly98.activiti.rest.api.Deployment;
-import com.github.richardwilly98.activiti.rest.api.SearchResult;
+import com.github.richardwilly98.activiti.rest.api.RestDeployment;
+import com.github.richardwilly98.activiti.rest.api.RestSearchResult;
 import com.github.richardwilly98.activiti.rest.client.RestDeploymentServiceClient;
 
 public class RestActivitiDeploymentServiceTest extends EsDmsServerWithRestActivitiServerBase {
@@ -20,11 +20,11 @@ public class RestActivitiDeploymentServiceTest extends EsDmsServerWithRestActivi
         log.debug("*** testGetDeployments ***");
         RestDeploymentServiceClient client = new RestDeploymentServiceClient(getBaseURI());
         client.setToken(adminToken);
-        SearchResult<Deployment> deployments = client.getDeployments();
+        RestSearchResult<RestDeployment> deployments = client.getDeployments();
         log.debug(deployments);
         Assert.assertNotNull(deployments);
         Assert.assertEquals(deployments.getSize(), 1);
-        Deployment deployment = deployments.getData().get(0);
+        RestDeployment deployment = deployments.getData().get(0);
         Assert.assertNotNull(deployment);
         log.debug(deployment.getId());
         deployment = client.getDeploment(deployment.getId());
@@ -37,11 +37,11 @@ public class RestActivitiDeploymentServiceTest extends EsDmsServerWithRestActivi
         log.debug("*** testGetDeployments ***");
         RestDeploymentServiceClient client = new RestDeploymentServiceClient(getBaseURI());
         client.setToken(adminToken);
-        SearchResult<Deployment> deployments = client.getDeployments();
+        RestSearchResult<RestDeployment> deployments = client.getDeployments();
         log.debug(deployments);
         Assert.assertNotNull(deployments);
         Assert.assertEquals(deployments.getSize(), 1);
-        Deployment deployment = deployments.getData().get(0);
+        RestDeployment deployment = deployments.getData().get(0);
         Assert.assertNotNull(deployment);
         log.debug(deployment.getId());
         deployment = client.getDeploment(deployment.getId());

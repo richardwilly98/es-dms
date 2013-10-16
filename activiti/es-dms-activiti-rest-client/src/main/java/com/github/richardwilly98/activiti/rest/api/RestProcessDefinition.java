@@ -1,9 +1,11 @@
 package com.github.richardwilly98.activiti.rest.api;
 
+import com.google.common.base.Objects;
+
 /*
  * DEBUG [com.githug.richardwilly98.ActivityRestDeploymentServiceTest] {"data":[{"id":"20","name":"Demo processes","deploymentTime":"2013-10-02T16:21:15EDT","category":null,"url":"http://localhost:8080/activiti-rest/service/repository/deployments/20"},{"id":"2330","name":"FinancialReportProcess.bpmn20.xml","deploymentTime":"2013-10-02T17:09:08EDT","category":null,"url":"http://localhost:8080/activiti-rest/service/repository/deployments/2330"},{"id":"604","name":"Demo reports","deploymentTime":"2013-10-02T16:25:52EDT","category":null,"url":"http://localhost:8080/activiti-rest/service/repository/deployments/604"}],"total":3,"start":0,"sort":"id","order":"asc","size":3} 
  */
-public class ProcessDefinition extends ItemBase {
+public class RestProcessDefinition extends RestItemBase {
 
     private String key;
     private int version;
@@ -16,7 +18,7 @@ public class ProcessDefinition extends ItemBase {
     private boolean suspended;
     private boolean startFormDefined;
 
-    public ProcessDefinition() {
+    public RestProcessDefinition() {
 
     }
 
@@ -100,4 +102,12 @@ public class ProcessDefinition extends ItemBase {
         this.startFormDefined = startFormDefined;
     }
 
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this).add("id", getId()).add("name", getName()).add("description", getDescription())
+                .add("url", getUrl()).add("key", key).add("version", version).add("deploymentId", deploymentId)
+                .add("deploymentUrl", deploymentUrl).add("resource", resource).add("diagramResource", diagramResource)
+                .add("category", category).add("graphicalNotationDefined", graphicalNotationDefined).add("suspended", suspended)
+                .add("startFormDefined", startFormDefined).toString();
+    }
 }

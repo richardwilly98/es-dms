@@ -11,8 +11,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.activiti.rest.api.RestUrls;
 
-import com.github.richardwilly98.activiti.rest.api.ProcessDefinition;
-import com.github.richardwilly98.activiti.rest.api.SearchResult;
+import com.github.richardwilly98.activiti.rest.api.RestProcessDefinition;
+import com.github.richardwilly98.activiti.rest.api.RestSearchResult;
 
 public class RestProcessDefinitionServiceClient extends RestClientBase {
 
@@ -22,23 +22,45 @@ public class RestProcessDefinitionServiceClient extends RestClientBase {
         super(url);
     }
 
-    public SearchResult<ProcessDefinition> getProcessDefinitions() {
+    public RestSearchResult<RestProcessDefinition> getProcessDefinitions() {
         log.debug("*** getProcessDefinitions ***");
-        SearchResult<ProcessDefinition> processDefinitionList = null;
+        RestSearchResult<RestProcessDefinition> processDefinitionList = null;
         Response response = target().path(path).request().cookie(new Cookie("ES_DMS_TICKET", getToken())).get();
         if(response.getStatus() == Status.OK.getStatusCode()) {
-            processDefinitionList = response.readEntity(new GenericType<SearchResult<ProcessDefinition>>() {
+            processDefinitionList = response.readEntity(new GenericType<RestSearchResult<RestProcessDefinition>>() {
             });
         }
         return processDefinitionList;
     }
     
-    public ProcessDefinition getProcessDefinition(String id) {
+    public RestSearchResult<RestProcessDefinition> getProcessDefinitionsByCategory(String category) {
+        log.debug("*** getProcessDefinitionsByDeplomentId ***");
+        RestSearchResult<RestProcessDefinition> processDefinitionList = null;
+        Response response = target().path(path).queryParam("category", category).request().cookie(new Cookie("ES_DMS_TICKET", getToken())).get();
+        if(response.getStatus() == Status.OK.getStatusCode()) {
+            processDefinitionList = response.readEntity(new GenericType<RestSearchResult<RestProcessDefinition>>() {
+            });
+        }
+        return processDefinitionList;
+    }
+
+    public RestSearchResult<RestProcessDefinition> getProcessDefinitionsByDeplomentId(String deploymentId) {
+        log.debug("*** getProcessDefinitionsByDeplomentId ***");
+        RestSearchResult<RestProcessDefinition> processDefinitionList = null;
+        Response response = target().path(path).queryParam("deploymentId", deploymentId).request().cookie(new Cookie("ES_DMS_TICKET", getToken())).get();
+        if(response.getStatus() == Status.OK.getStatusCode()) {
+            processDefinitionList = response.readEntity(new GenericType<RestSearchResult<RestProcessDefinition>>() {
+            });
+        }
+        return processDefinitionList;
+    }
+
+    public RestProcessDefinition getProcessDefinition(String id) {
         checkNotNull(id);
-        ProcessDefinition processDefinition = null;
+        RestProcessDefinition processDefinition = null;
         Response response = target().path(path).path(id).request().cookie(new Cookie("ES_DMS_TICKET", getToken())).get();
         if(response.getStatus() == Status.OK.getStatusCode()) {
-            processDefinition = response.readEntity(ProcessDefinition.class);
+            processDefinition = response.readEntity(RestProcessDefinition.class);
         }
         return processDefinition;
     }
