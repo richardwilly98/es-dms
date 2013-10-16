@@ -54,7 +54,7 @@ import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.api.ItemBase;
 import com.github.richardwilly98.esdms.rest.RestAuthenticationService;
 import com.github.richardwilly98.esdms.services.UserService;
-import com.github.richardwilly98.esdms.web.JerseyApplication;
+import com.github.richardwilly98.esdms.web.TestJerseyApplication;
 
 //@Guice(modules = TestEsClientModule.class)
 public class GuiceAndJerseyTestBase<T extends ItemBase> extends JerseyTest {
@@ -62,7 +62,7 @@ public class GuiceAndJerseyTestBase<T extends ItemBase> extends JerseyTest {
     @Override
     protected Application configure() {
         enable(TestProperties.LOG_TRAFFIC);
-        final JerseyApplication application = new JerseyApplication(null);
+        final TestJerseyApplication application = new TestJerseyApplication(null);
         application.property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true);
         return application;
     }
