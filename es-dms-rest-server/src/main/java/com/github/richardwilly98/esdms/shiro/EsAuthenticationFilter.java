@@ -61,7 +61,6 @@ public class EsAuthenticationFilter extends UserFilter {
     public EsAuthenticationFilter(final AuthenticationService authenticationService, final UserService userService) {
         this.authenticationService = authenticationService;
         this.userService = userService;
-        // setLoginUrl("/#/login");
     }
 
     @Override
