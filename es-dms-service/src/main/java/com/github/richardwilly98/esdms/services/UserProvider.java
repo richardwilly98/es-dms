@@ -65,7 +65,9 @@ public class UserProvider extends ProviderBase<User> implements UserService {
 
     @Override
     protected void loadInitialData() throws ServiceException {
-        create(UserService.DefaultUsers.ADMINISTRATOR.getUser());
+        User admin = UserService.DefaultUsers.ADMINISTRATOR.getUser();
+        admin.setHash(computeBase64Hash(admin.getPassword()));
+        super.create(admin);
     }
 
     @Override
