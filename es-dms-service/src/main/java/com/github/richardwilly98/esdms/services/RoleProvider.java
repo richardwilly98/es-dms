@@ -55,11 +55,11 @@ public class RoleProvider extends ProviderBase<Role> implements RoleService {
     @Override
     protected void loadInitialData() throws ServiceException {
 
-	create(RoleService.DefaultRoles.READER.getRole());
-	create(RoleService.DefaultRoles.WRITER.getRole());
-	create(RoleService.DefaultRoles.ADMINISTRATOR.getRole());
-        create(RoleService.DefaultRoles.PROCESS_ADMINISTRATOR.getRole());
-        create(RoleService.DefaultRoles.PROCESS_USER.getRole());
+	super.create(RoleService.DefaultRoles.READER.getRole());
+	super.create(RoleService.DefaultRoles.WRITER.getRole());
+	super.create(RoleService.DefaultRoles.ADMINISTRATOR.getRole());
+	super.create(RoleService.DefaultRoles.PROCESS_ADMINISTRATOR.getRole());
+	super.create(RoleService.DefaultRoles.PROCESS_USER.getRole());
     }
 
     @RequiresPermissions(RolePermissions.Constants.ROLE_CREATE)
