@@ -72,10 +72,9 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 			$scope.totalHits = result.totalHits;
 			$scope.elapsedTime = result.elapsedTime;
 			$scope.facets = result.facets[$scope.facet];
+      $scope.alerts = [];
       if ($scope.totalHits === 0) {
         $scope.alerts.push({ msg: 'No document found.' });
-      } else {
-        $scope.alerts = [];
       }
 		});
   }
