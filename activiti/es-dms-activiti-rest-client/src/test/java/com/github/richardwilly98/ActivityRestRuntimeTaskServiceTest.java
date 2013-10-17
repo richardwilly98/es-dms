@@ -10,10 +10,10 @@ import org.junit.Assert;
 import org.testng.annotations.Test;
 import org.testng.util.Strings;
 
-import com.github.richardwilly98.activiti.rest.api.Comment;
-import com.github.richardwilly98.activiti.rest.api.ExternalResource;
-import com.github.richardwilly98.activiti.rest.api.SearchResult;
-import com.github.richardwilly98.activiti.rest.api.Task;
+import com.github.richardwilly98.activiti.rest.api.RestComment;
+import com.github.richardwilly98.activiti.rest.api.RestExternalResource;
+import com.github.richardwilly98.activiti.rest.api.RestSearchResult;
+import com.github.richardwilly98.activiti.rest.api.RestTask;
 
 public class ActivityRestRuntimeTaskServiceTest extends ActivitiRestClientTest {
 
@@ -22,10 +22,10 @@ public class ActivityRestRuntimeTaskServiceTest extends ActivitiRestClientTest {
         log.debug("*** testCleanUpTasks ***");
         Response response = target().path("runtime/tasks").queryParam("size", 100).request().get();
         Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-        SearchResult<Task> taskList = response.readEntity(new GenericType<SearchResult<Task>>() {
+        RestSearchResult<RestTask> taskList = response.readEntity(new GenericType<RestSearchResult<RestTask>>() {
         });
         Assert.assertNotNull(taskList);
-        for (Task task : taskList.getData()) {
+        for (RestTask task : taskList.getData()) {
             if (Strings.isNullOrEmpty(task.getProcessInstanceId())) {
                 log.debug(String.format("Delete task %s", task.getId()));
                 target().path("runtime/tasks").path(task.getId()).request().delete();
@@ -38,10 +38,10 @@ public class ActivityRestRuntimeTaskServiceTest extends ActivitiRestClientTest {
         log.debug("*** testRetrieveTasks ***");
         Response response = target().path("runtime/tasks").request().get();
         Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-        SearchResult<Task> taskList = response.readEntity(new GenericType<SearchResult<Task>>() {
+        RestSearchResult<RestTask> taskList = response.readEntity(new GenericType<RestSearchResult<RestTask>>() {
         });
         Assert.assertNotNull(taskList);
-        for (Task task : taskList.getData()) {
+        for (RestTask task : taskList.getData()) {
             log.debug(task);
         }
     }
@@ -51,10 +51,10 @@ public class ActivityRestRuntimeTaskServiceTest extends ActivitiRestClientTest {
         log.debug("*** testNewTasks ***");
         Response response = target().path("runtime/tasks").request().get();
         Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-        SearchResult<Task> taskList = response.readEntity(new GenericType<SearchResult<Task>>() {
+        RestSearchResult<RestTask> taskList = response.readEntity(new GenericType<RestSearchResult<RestTask>>() {
         });
         Assert.assertNotNull(taskList);
-        for (Task task : taskList.getData()) {
+        for (RestTask task : taskList.getData()) {
             log.debug(task);
         }
     }
@@ -64,24 +64,24 @@ public class ActivityRestRuntimeTaskServiceTest extends ActivitiRestClientTest {
         log.debug("*** testAddComment ***");
         Response response = target().path("runtime/tasks").request().get();
         Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-        SearchResult<Task> taskList = response.readEntity(new GenericType<SearchResult<Task>>() {
+        RestSearchResult<RestTask> taskList = response.readEntity(new GenericType<RestSearchResult<RestTask>>() {
         });
         Assert.assertNotNull(taskList);
         String id = null;
-        for (Task task : taskList.getData()) {
+        for (RestTask task : taskList.getData()) {
             log.debug(task);
             id = task.getId();
             break;
         }
         id = "2340";
         Assert.assertNotNull(id);
-        Comment comment = new Comment();
+        RestComment comment = new RestComment();
         comment.setAuthor(ADMIN_USERNAME);
         comment.setMessage("This is my first comment");
         response = target().path("runtime/tasks").path(id).path("comments").request()
                 .post(Entity.entity(comment, MediaType.APPLICATION_JSON_TYPE));
         Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
-        comment = response.readEntity(Comment.class);
+        comment = response.readEntity(RestComment.class);
         Assert.assertNotNull(comment);
         log.debug(comment);
     }
@@ -90,7 +90,7 @@ public class ActivityRestRuntimeTaskServiceTest extends ActivitiRestClientTest {
     public void testAddExternalResource() {
         log.debug("*** testAddExternalResource ***");
         String id = "4803";
-        ExternalResource externalResource = new ExternalResource();
+        RestExternalResource externalResource = new RestExternalResource();
         externalResource.setName("Simple Attachment - " + System.currentTimeMillis());
         externalResource.setDescription("Simple Attachment description");
         externalResource.setType("simpleType");
@@ -99,7 +99,7 @@ public class ActivityRestRuntimeTaskServiceTest extends ActivitiRestClientTest {
         Response response = target().path("runtime/tasks").path(id).path("attachments").request()
                 .post(Entity.entity(externalResource, MediaType.APPLICATION_JSON_TYPE));
         Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
-        externalResource = response.readEntity(ExternalResource.class);
+        externalResource = response.readEntity(RestExternalResource.class);
         Assert.assertNotNull(externalResource);
         log.debug(externalResource);
     }

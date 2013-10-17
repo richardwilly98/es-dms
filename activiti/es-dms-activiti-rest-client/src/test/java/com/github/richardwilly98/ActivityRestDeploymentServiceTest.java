@@ -7,8 +7,8 @@ import javax.ws.rs.core.Response.Status;
 import org.junit.Assert;
 import org.testng.annotations.Test;
 
-import com.github.richardwilly98.activiti.rest.api.Deployment;
-import com.github.richardwilly98.activiti.rest.api.SearchResult;
+import com.github.richardwilly98.activiti.rest.api.RestDeployment;
+import com.github.richardwilly98.activiti.rest.api.RestSearchResult;
 
 public class ActivityRestDeploymentServiceTest extends ActivitiRestClientTest {
 
@@ -18,7 +18,7 @@ public class ActivityRestDeploymentServiceTest extends ActivitiRestClientTest {
         Response response = target().path("repository/deployments").request().get();
         log.debug("Response status: " + response.getStatus());
         Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-        SearchResult<Deployment> deploymentList = response.readEntity(new GenericType<SearchResult<Deployment>>() {
+        RestSearchResult<RestDeployment> deploymentList = response.readEntity(new GenericType<RestSearchResult<RestDeployment>>() {
         });
         Assert.assertNotNull(deploymentList);
     }

@@ -9,9 +9,9 @@ import javax.ws.rs.core.Response.Status;
 import org.junit.Assert;
 import org.testng.annotations.Test;
 
-import com.github.richardwilly98.activiti.rest.api.ProcessDefinition;
-import com.github.richardwilly98.activiti.rest.api.ProcessInstance;
-import com.github.richardwilly98.activiti.rest.api.SearchResult;
+import com.github.richardwilly98.activiti.rest.api.RestProcessDefinition;
+import com.github.richardwilly98.activiti.rest.api.RestProcessInstance;
+import com.github.richardwilly98.activiti.rest.api.RestSearchResult;
 
 public class ActivityRestRuntimeProcessServiceTest extends ActivitiRestClientTest {
 
@@ -21,7 +21,7 @@ public class ActivityRestRuntimeProcessServiceTest extends ActivitiRestClientTes
         String id = "financialReport:1:2345";
         Response response = target().path("repository/process-definitions").path(id).request().get();
         Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-        ProcessDefinition processDefinition = response.readEntity(ProcessDefinition.class);
+        RestProcessDefinition processDefinition = response.readEntity(RestProcessDefinition.class);
         Assert.assertNotNull(processDefinition);
         log.debug(processDefinition);
     }
@@ -30,10 +30,10 @@ public class ActivityRestRuntimeProcessServiceTest extends ActivitiRestClientTes
     public void testRetrieveProcessInstance() {
         log.debug("*** testRetrieveProcessInstance ***");
         Response response = target().path("runtime/process-instances").request().get();
-        SearchResult<ProcessInstance> processInstanceList = response.readEntity(new GenericType<SearchResult<ProcessInstance>>() {
+        RestSearchResult<RestProcessInstance> processInstanceList = response.readEntity(new GenericType<RestSearchResult<RestProcessInstance>>() {
         });
         Assert.assertNotNull(processInstanceList);
-        for (ProcessInstance processInstance : processInstanceList.getData()) {
+        for (RestProcessInstance processInstance : processInstanceList.getData()) {
             log.debug(processInstance);
         }
     }
@@ -42,11 +42,11 @@ public class ActivityRestRuntimeProcessServiceTest extends ActivitiRestClientTes
     public void testStartProcessInstance() {
         log.debug("*** testStartProcessInstance ***");
         String id = "financialReport:1:2345";
-        ProcessInstance processInstance = new ProcessInstance();
+        RestProcessInstance processInstance = new RestProcessInstance();
         processInstance.setProcessDefinitionId(id);
         Response response = target().path("runtime/process-instances").request()
                 .post(Entity.entity(processInstance, MediaType.APPLICATION_JSON));
-        processInstance = response.readEntity(ProcessInstance.class);
+        processInstance = response.readEntity(RestProcessInstance.class);
         Assert.assertNotNull(processInstance);
         log.debug(processInstance);
     }

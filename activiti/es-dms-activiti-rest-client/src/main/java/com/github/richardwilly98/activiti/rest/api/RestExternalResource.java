@@ -1,6 +1,8 @@
 package com.github.richardwilly98.activiti.rest.api;
 
-public class ExternalResource extends ItemBase {
+import com.google.common.base.Objects;
+
+public class RestExternalResource extends RestItemBase {
 
     private String type;
     private String externalUrl;
@@ -8,7 +10,7 @@ public class ExternalResource extends ItemBase {
     private String processInstanceUrl;
     private String contentUrl;
 
-    public ExternalResource() {
+    public RestExternalResource() {
     }
 
     public String getType() {
@@ -49,5 +51,12 @@ public class ExternalResource extends ItemBase {
 
     public void setContentUrl(String contentUrl) {
         this.contentUrl = contentUrl;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this).add("id", getId()).add("name", getName()).add("description", getDescription())
+                .add("url", getUrl()).add("type", type).add("externalUrl", externalUrl).add("taskUrl", taskUrl)
+                .add("processInstanceUrl", processInstanceUrl).add("contentUrl", contentUrl).toString();
     }
 }

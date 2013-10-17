@@ -33,7 +33,7 @@ import com.google.inject.AbstractModule;
 
 public class ProviderModule extends AbstractModule {
 
-    private final Logger log = Logger.getLogger(this.getClass());
+    private static final Logger log = Logger.getLogger(ProviderModule.class);
 
     @Override
     protected void configure() {

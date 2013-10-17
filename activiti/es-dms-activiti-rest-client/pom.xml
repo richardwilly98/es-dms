@@ -16,11 +16,22 @@
 		<jackson.version>2.2.2</jackson.version>
 		<activiti.version>5.13</activiti.version>
 		<jetty.version>8.1.0.RC4</jetty.version>
+		<shiro.version>1.2.1</shiro.version>
 
 		<!-- Maven plugins versions -->
 		<maven.surefire.version>2.12.3</maven.surefire.version>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-core</artifactId>
+			<version>${shiro.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-guice</artifactId>
+			<version>${shiro.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.activiti</groupId>
 			<artifactId>activiti-rest</artifactId>

@@ -69,6 +69,7 @@ public class TestEsJerseyServletModule extends ServletModule {
 
     private void filters() {
         filter("/*").through(GuiceShiroFilter.class);
+//        filter("/api/*").through(GuiceShiroFilter.class);
         // filter("/api/*").through(GuiceContainer.class, params);
         // filter("/*").through(GuiceContainer.class, params);
     }
