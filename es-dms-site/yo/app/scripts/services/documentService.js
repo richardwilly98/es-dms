@@ -1,6 +1,6 @@
 'use strict';
 
-esDmsSiteApp.service('documentService', ['$log', '$rootScope', '$resource', '$http', function documentService($log, $rootScope, $resource, $http) {
+esDmsSiteApp.service('documentService', ['$sce', '$log', '$rootScope', '$resource', '$http', function documentService($sce, $log, $rootScope, $resource, $http) {
   var documentResource = $resource('api/documents/:id/:action/:parameter' , {id:'@id'}, {
       checkout: {method:'POST', params: {action: 'checkout'}},
       checkin: {method:'POST', params: {action: 'checkin'}},
@@ -104,7 +104,7 @@ esDmsSiteApp.service('documentService', ['$log', '$rootScope', '$resource', '$ht
     preview: function(id, criteria, callback) {
       $log.log('preview document: ' + id + ' - criteria: ' + criteria);
       var response = documentResource.preview({'id': id, 'cr': criteria/*, 'fs': 100*/}, function () {
-        callback(response.content);
+        callback($sce.trustAsHtml(response.content));
       });
     }
 	};
