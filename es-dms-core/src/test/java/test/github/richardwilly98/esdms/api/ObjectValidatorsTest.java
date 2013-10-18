@@ -21,6 +21,7 @@ import com.github.richardwilly98.esdms.AuditEntryImpl;
 import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.DocumentImpl;
 import com.github.richardwilly98.esdms.FileImpl;
+import com.github.richardwilly98.esdms.ParameterImpl;
 import com.github.richardwilly98.esdms.RoleImpl;
 import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.AuditEntry;
@@ -30,7 +31,9 @@ import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
 import com.github.richardwilly98.esdms.api.File;
+import com.github.richardwilly98.esdms.api.Parameter;
 import com.github.richardwilly98.esdms.api.Role;
+import com.github.richardwilly98.esdms.api.Parameter.ParameterType;
 import com.github.richardwilly98.esdms.api.Role.RoleType;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.services.UserService;
@@ -229,7 +232,19 @@ public class ObjectValidatorsTest {
             log.info(cv.getMessage());
         }
         Assert.assertEquals(constraintViolations.size(), 0);
-
     }
 
+    @Test
+    public void testParameterValidation() {
+        String id = "user-" + System.currentTimeMillis();
+        String name = id;
+        Parameter parameter1 = new ParameterImpl.Builder().id(id).name(name).type(ParameterType.USER).build();
+        Set<ConstraintViolation<Parameter>> constraintViolations = validator.validate(parameter1);
+        Assert.assertEquals(constraintViolations.size(), 0);
+        
+        parameter1 = new ParameterImpl.Builder().id(id).name(name).build();
+        constraintViolations = validator.validate(parameter1);
+        Assert.assertEquals(constraintViolations.size(), 1);
+        Assert.assertEquals(constraintViolations.iterator().next().getMessage(), "type is required");
+    }
 }
