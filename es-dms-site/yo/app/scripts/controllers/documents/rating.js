@@ -1,29 +1,29 @@
 'use strict';
 
 angular.module('esDmsSiteApp')
-  .controller('DocumentsRatingCtrl', function ($log, $scope, sharedService, ratingService) {
+  .controller('DocumentsRatingCtrl', ['$log', '$scope', 'sharedService', 'ratingService',
+    function ($log, $scope, sharedService, ratingService) {
     $scope.rating = { score: 0, overStar: false };
+    $scope.id;
 
     $scope.getRating = function(document) {
+      $scope.id = document.id;
       $log.log('getRating: ' + document.id + ' - ' + sharedService.getCurrentUser().id);
       _.find(document.ratings, function(rating) {
         if (rating.user === sharedService.getCurrentUser().id) {
+          $log.log('Found rating: ' + rating.score);
           $scope.rating.score = rating.score;
           return false;
         }
       });
-    };
-    $scope.hoveringRating = function(score) {
-      $scope.rating.score = score;
-      $scope.rating.overStar = true;
+      $scope.$watch('rating.score', function(newValue, oldValue) {
+        if (newValue !== 0) {
+          addRating();
+        }
+      });
     };
   
-    $scope.addRating = function(id) {
-        $log.log('Add rating - ' + $scope.rating.overStar + ' - ' + id + ' - ' + $scope.rating.score);
-      if ($scope.rating.overStar === true) {
-        $log.log('Add rating - ' + id + ' - ' + $scope.rating.score);
-        ratingService.create(id, $scope.rating.score);
-        $scope.rating.overStar = false;
-      }
+    function addRating() {
+      ratingService.create($scope.id, $scope.rating.score);
     };
-  });
+  }]);
