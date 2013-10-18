@@ -26,14 +26,20 @@ package test.github.richardwilly98.esdms.api;
  * #L%
  */
 
+import static com.google.common.collect.Maps.newHashMap;
+
 import java.util.Date;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.testng.annotations.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.richardwilly98.esdms.ParameterImpl;
 import com.github.richardwilly98.esdms.SessionImpl;
+import com.github.richardwilly98.esdms.api.Parameter;
+import com.github.richardwilly98.esdms.api.Parameter.ParameterType;
 
 public class SessionSerializationTest {
 
@@ -56,5 +62,23 @@ public class SessionSerializationTest {
 	SessionImpl session2 = mapper.readValue(json, SessionImpl.class);
 	log.debug(session2);
 	Assert.assertEquals(session.getId(), session2.getId());
+    }
+
+    @Test
+    public void testSerializeDeserializeParameter() throws Throwable {
+        log.debug("*** testSerializeDeserializeParameter ***");
+        String id = "user-" + System.currentTimeMillis();
+        String name = id;
+        Map<String, Object> attributes = newHashMap();
+        attributes.put("key-1", "value-1");
+        attributes.put("key-2", new Date().getTime());
+        Parameter parameter1 = new ParameterImpl.Builder().id(id).name(name).attributes(attributes).type(ParameterType.USER).build();
+        log.debug(parameter1);
+        String json = mapper.writeValueAsString(parameter1);
+        log.debug(json);
+        Assert.assertNotNull(json);
+        Parameter parameter2 = mapper.readValue(json, Parameter.class);
+        log.debug(parameter2);
+        Assert.assertEquals(parameter1, parameter2);
     }
 }
