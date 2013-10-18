@@ -1,0 +1,16 @@
+{
+	"parameter": {
+		"properties": {
+				"id" : {
+					"type": "string"
+				},
+				"name" : {
+					"type": "string"
+				},
+				"type" : {
+					"type": "integer"
+				}
+			}
+		}
+	}
+}

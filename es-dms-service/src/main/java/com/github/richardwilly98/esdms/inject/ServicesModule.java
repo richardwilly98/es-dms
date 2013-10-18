@@ -34,6 +34,8 @@ import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.DocumentProvider;
 import com.github.richardwilly98.esdms.services.DocumentService;
 import com.github.richardwilly98.esdms.services.HashService;
+import com.github.richardwilly98.esdms.services.ParameterProvider;
+import com.github.richardwilly98.esdms.services.ParameterService;
 import com.github.richardwilly98.esdms.services.PermissionProvider;
 import com.github.richardwilly98.esdms.services.PermissionService;
 import com.github.richardwilly98.esdms.services.RatingProvider;
@@ -58,6 +60,7 @@ public class ServicesModule extends AbstractModule {
     protected void configure() {
 
 	bind(HashService.class).to(SHA512HashProvider.class).asEagerSingleton();
+        bind(ParameterService.class).to(ParameterProvider.class).asEagerSingleton();
 	bind(AuthenticationService.class).to(AuthenticationProvider.class).asEagerSingleton();
 	bind(PermissionService.class).to(PermissionProvider.class).asEagerSingleton();
 	bind(RoleService.class).to(RoleProvider.class).asEagerSingleton();
