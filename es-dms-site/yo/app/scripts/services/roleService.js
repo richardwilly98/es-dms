@@ -14,7 +14,7 @@ esDmsSiteApp.service('roleService', ['$log', '$rootScope', '$resource', '$http',
 	return {
 		roleTypes: function(callback) {
 			if (roleTypes.length === 0) {
-				var types = new RoleTypeResource.query({}, function(){
+				var types = RoleTypeResource.query(function(){
 					$log.log('get roleTypes: ' + JSON.stringify(types));
 					roleTypes = types;
 	        callback(types);
