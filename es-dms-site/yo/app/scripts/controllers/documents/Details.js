@@ -12,6 +12,7 @@ angular.module('esDmsSiteApp')
 
   $rootScope.$on('document:showDetails', function() {
     var current = documentService.current();
+    $log.log('document:showDetails');
     if (current) {
       $scope.document.id = current;
       documentService.metadata(current, function(doc) {
