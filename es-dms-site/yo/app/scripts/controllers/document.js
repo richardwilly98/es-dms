@@ -1,6 +1,7 @@
 'use strict';
 
-esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService, searchService, sharedService) {
+esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', 'documentService', 'searchService', 'sharedService',
+  function ($log, $scope, documentService, searchService, sharedService) {
   $scope.alerts = [];
   $scope.documents = [];
   $scope.facet = null;
@@ -57,7 +58,7 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
       $scope.facets = [];
       searchService.criteria($scope.criteria);
 			$scope.facet = 'tags';
-			find(0, $scope.criteria, /*term,*/ true);
+			find(0, $scope.criteria, true);
 		}
   };
 
@@ -242,4 +243,4 @@ esDmsSiteApp.controller('DocumentCtrl', function ($log, $scope, documentService,
 		currentDocument = document;
   };
 
-});
+}]);
