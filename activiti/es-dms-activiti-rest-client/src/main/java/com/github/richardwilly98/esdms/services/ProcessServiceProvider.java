@@ -1,10 +1,14 @@
 package com.github.richardwilly98.esdms.services;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.net.URI;
+import java.util.Map;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
@@ -21,29 +25,63 @@ import com.github.richardwilly98.activiti.rest.client.RestDeploymentServiceClien
 import com.github.richardwilly98.activiti.rest.client.RestProcessDefinitionServiceClient;
 import com.github.richardwilly98.activiti.rest.client.RestProcessInstanceServiceClient;
 import com.github.richardwilly98.activiti.rest.client.RestTaskServiceClient;
+import com.github.richardwilly98.esdms.ParameterImpl;
 import com.github.richardwilly98.esdms.api.ItemBase;
+import com.github.richardwilly98.esdms.api.Parameter;
+import com.github.richardwilly98.esdms.api.Parameter.ParameterType;
 import com.github.richardwilly98.esdms.bpm.api.ProcessDefinition;
 import com.github.richardwilly98.esdms.bpm.api.ProcessInstance;
 import com.github.richardwilly98.esdms.exception.ServiceException;
-import com.github.richardwilly98.esdms.rest.ProcessServiceUtils;
+import com.github.richardwilly98.esdms.util.ProcessServiceUtils;
 
 public class ProcessServiceProvider implements ProcessService {
 
-    public static final String ACTIVITI_REST_URL = "http://localhost:18080/activiti-rest/service";
+    private static final String ACTIVITI_APPLICATION_NAME = "Activiti Settings";
+    private static final String ACTIVITI_APPLICATION_ID = "activiti";
+    private static final String REST_URL = "rest.url";
+    public static final String ACTIVITI_REST_URL = "http://localhost:8080/activiti-rest/service";
     public static final String ES_DMS_CATEGORY = "es-dms";
 
     private final static Logger log = Logger.getLogger(ProcessServiceProvider.class);
 
-    private final RestProcessDefinitionServiceClient processDefinitionService;
-    private final RestProcessInstanceServiceClient processInstanceService;
-    private final RestDeploymentServiceClient deploymentService;
-    private final RestTaskServiceClient taskService;
+    private final ParameterService parameterService;
+    private RestProcessDefinitionServiceClient processDefinitionService;
+    private RestProcessInstanceServiceClient processInstanceService;
+    private RestDeploymentServiceClient deploymentService;
+    private RestTaskServiceClient taskService;
 
-    ProcessServiceProvider() {
-        processDefinitionService = new RestProcessDefinitionServiceClient(URI.create(ACTIVITI_REST_URL));
-        processInstanceService = new RestProcessInstanceServiceClient(URI.create(ACTIVITI_REST_URL));
-        deploymentService = new RestDeploymentServiceClient(URI.create(ACTIVITI_REST_URL));
-        taskService = new RestTaskServiceClient(URI.create(ACTIVITI_REST_URL));
+    @Inject
+    ProcessServiceProvider(final ParameterService parameterService) {
+        this.parameterService = parameterService;
+        initializeServices();
+    }
+
+    private void initializeServices() {
+        Parameter parameter = null;
+        String activitiUrl = ACTIVITI_REST_URL;
+        try {
+            parameter = parameterService.get(ACTIVITI_APPLICATION_ID);
+            if (parameter == null) {
+                Map<String, Object> attributes = newHashMap();
+                attributes.put(REST_URL, ACTIVITI_REST_URL);
+                parameter = new ParameterImpl.Builder().id(ACTIVITI_APPLICATION_ID).name(ACTIVITI_APPLICATION_NAME)
+                        .type(ParameterType.SYSTEM).attributes(attributes).build();
+                parameterService.create(parameter);
+            } else {
+                Map<String, Object> attributes = parameter.getAttributes();
+                if (attributes != null && attributes.containsKey(REST_URL)) {
+                    activitiUrl = attributes.get(REST_URL).toString();
+                }
+            }
+        } catch (ServiceException e) {
+            log.info("Cannot get activiti parameter.", e);
+        }
+        log.info(String.format("Using REST Activiti: %s", activitiUrl));
+        URI uri = URI.create(activitiUrl);
+        processDefinitionService = new RestProcessDefinitionServiceClient(uri);
+        processInstanceService = new RestProcessInstanceServiceClient(uri);
+        deploymentService = new RestDeploymentServiceClient(uri);
+        taskService = new RestTaskServiceClient(uri);
     }
 
     protected String getCurrentToken() {

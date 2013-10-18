@@ -1,4 +1,4 @@
-package com.github.richardwilly98.esdms.rest;
+package com.github.richardwilly98.esdms.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
