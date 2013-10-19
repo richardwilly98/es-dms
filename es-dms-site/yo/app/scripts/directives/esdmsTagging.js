@@ -8,22 +8,14 @@ esDmsSiteApp.directive('esdmsTagging', ['$log', '$compile', function ($log, $com
     compile: function() {
       return {
         pre: function(scope) {
-          // transform tags (array of string) in array of object (with id, text attribute)
-          scope.select2tags = _(scope.tags).map(function(arg) {
-            return {'id': arg, 'text': arg};
-          }).value();
-
-          scope.getTags = function () {
-            $log.log('getTags');
-            return {
-              tags: function() {
-                $log.log('tags');
-                return null;
-              },
-              tokenSeparators: [',', ' ']
-            };
+          
+          scope.select2options = {
+            'simple_tags': true,
+            'tags': [],
+            'tokenSeparators': [',', ' ']
           };
-          scope.$watch('select2tags', function(newValue, oldValue) {
+
+          scope.$watch('tags', function(newValue, oldValue) {
             function add(tag) {
               $log.log('newtag: ' + tag + ' for doc: ' + scope.id);
               scope.$emit('document:addtag', {'id': scope.id, 'tag': tag});
@@ -35,25 +27,25 @@ esDmsSiteApp.directive('esdmsTagging', ['$log', '$compile', function ($log, $com
 
             if (newValue !== undefined && oldValue!== undefined && newValue !== oldValue) {
               var tag;
-              $log.log('change tags: ' + scope.tags + ' - newValue: ' + JSON.stringify(newValue) + ' - oldValue: ' + JSON.stringify(oldValue));
+              $log.log('select2tags has been updated - newValue: ' + newValue + ' - oldValue: ' + oldValue);
               if (newValue.length === 0 && oldValue.length > 0) {
                 tag = _.first(oldValue);
-                $log.log('remove tag ' + tag.id);
-                remove(tag.id);
+                $log.log('remove tag ' + tag);
+                remove(tag);
               } else if (newValue.length > oldValue.length) {
                 tag = _.first(_.difference(newValue, oldValue));
-                $log.log('add tag ' + tag.id);
-                add(tag.id);
+                $log.log('add tag ' + tag);
+                add(tag);
               } else if (newValue.length < oldValue.length) {
                 tag = _.first(_.difference(oldValue, newValue));
-                $log.log('remove tag ' + tag.id);
-                remove(tag.id);
+                $log.log('remove tag ' + tag);
+                remove(tag);
               }
             }
           });
         },
         post : function(scope, element) {
-          var template = '<input ui-select2="getTags()" ng-change="change()" ng-model="select2tags" />';
+          var template = '<input ui-select2="select2options" ng-model="tags" />';
           element.replaceWith($compile(template)(scope));
         }
       };
