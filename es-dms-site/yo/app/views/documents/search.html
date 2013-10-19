@@ -40,7 +40,10 @@
 									newtag="newtag"></esdms-tagging></td>
 							<td>
 								<div data-ng-bind="document.name"></div>
-								<esdms-preview preview="preview(document.id)" id="document.id"></esdms-preview>
+								<div>
+									<esdms-start-process id="document.id"></esdms-start-process>
+									<esdms-preview preview="preview(document.id)" id="document.id"></esdms-preview>
+								</div>
 							</td>
 							<td>{{ document.attributes.author }}</td>
 							<td>{{ document.attributes.status }}</td>
