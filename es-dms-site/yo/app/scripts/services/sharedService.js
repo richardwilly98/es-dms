@@ -1,10 +1,11 @@
 /* exported sharedService */
 'use strict';
 
-esDmsSiteApp.service('sharedService', function ($log, $rootScope) {
+esDmsSiteApp.service('sharedService', ['$log', '$rootScope', function ($log, $rootScope) {
   var settings = {
     user : {
-      pageSize: 12
+      pageSize: 12,
+      isProcessUser: true
     },
     search : {
       criteria: null,
@@ -68,4 +69,4 @@ esDmsSiteApp.service('sharedService', function ($log, $rootScope) {
       }
     }
   };
-});
+}]);

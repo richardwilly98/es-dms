@@ -2,9 +2,9 @@
 'use strict';
 
 var esDmsSiteApp = angular.module('esDmsSiteApp',
-  ['ngResource', 'ngSanitize', 'authentication', 'ui.router', 'http-auth-interceptor', 'ui.bootstrap', 'ui.select2']);
+  ['ngCookies', 'ngResource', 'ngSanitize', 'authentication', 'ui.router', 'http-auth-interceptor', 'ui.bootstrap', 'ui.select2']);
 
-esDmsSiteApp.config(function (/*$routeProvider,*/ $stateProvider) {
+esDmsSiteApp.config(function (/*$routeProvider,*/ $stateProvider, $locationProvider) {
 
   $stateProvider
     .state('index', {
@@ -43,4 +43,17 @@ esDmsSiteApp.config(function (/*$routeProvider,*/ $stateProvider) {
       controller: 'DocumentsDetailsCtrl'
     })*/
     ;
+
+  $locationProvider.html5Mode(false);
 });
+
+esDmsSiteApp.run(['$log', 'authenticationService', '$cookies', function($log, authenticationService, $cookies) {
+  $log.log('*** run ***');
+  var token = $cookies.ES_DMS_TICKET;
+  if (token !== '') {
+    $log.log('initialize - token: ' + token);
+    authenticationService.validate(token);
+  } else {
+    $log.log('No ES_DMS_TICKET cookie found.');
+  }
+}]);

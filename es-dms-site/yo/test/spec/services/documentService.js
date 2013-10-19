@@ -1,5 +1,7 @@
 'use strict';
 
+var validate = {id: "admin", url: "http://localhost:18080"};
+var user = {id: "admin", login: "admin"};
 var doc = {id: 3, name: "dummy", attributes: {author: "admin"}};
 var doc2 = {id: 4, name: "dummy", attributes: {author: "admin"}, tags: ["tag1", "tag2"]};
 var documents = [
@@ -30,6 +32,8 @@ describe('Service: documentService', function () {
   });
 
   beforeEach(function(){
+    $httpBackend.whenPOST('api/auth/validate').respond(validate);
+    $httpBackend.whenGET('api/users/admin').respond(user);
     $httpBackend.whenGET('api/documents/search/dummy?fi=0&ps=20').respond(documents);
     $httpBackend.whenGET('api/documents/3').respond(doc);
     $httpBackend.whenPUT('api/documents/3').respond(200, '');
