@@ -1,6 +1,6 @@
 'use strict';
 
-esDmsSiteApp.controller('UserCtrl', ['$scope', 'userService', function ($scope, userService) {
+esDmsSiteApp.controller('UserCtrl', ['$scope', '$modal', 'userService', function ($scope, $modal, userService) {
   $scope.users = [];
   $scope.totalHits = 0;
   $scope.elapsedTime = 0;
@@ -26,6 +26,15 @@ esDmsSiteApp.controller('UserCtrl', ['$scope', 'userService', function ($scope, 
   };
   $scope.edit = function(id) {
     userService.edit(id);
+    $modal.open({
+        templateUrl: 'views/users/edit-user.html',
+        controller: 'UserEditCtrl',
+        resolve: {
+          userId: function() {
+            return id;
+          }
+        }
+      });
   };
   $scope.delete = function(id) {
 		userService.remove(id);

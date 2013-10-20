@@ -23,8 +23,7 @@ esDmsSiteApp.service('authenticationService', ['$log', '$http', 'esdmsAuthentica
 		validate: function(token) {
 			esdmsAuthenticationService.validate(token, function(response) {
 				if (response !== undefined) {
-					userService.get(response.id, function(user){
-						$log.log('user -> ' + JSON.stringify(user));
+					userService.get(response.id, function(user) {
 						sharedService.setCurrentUser(user);
 					});
 				}

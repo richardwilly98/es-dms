@@ -1,7 +1,7 @@
 'use strict';
 
-esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', 'documentService', 'searchService', 'sharedService',
-  function ($log, $scope, documentService, searchService, sharedService) {
+esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$modal', 'documentService', 'searchService', 'sharedService',
+  function ($log, $scope, $modal, documentService, searchService, sharedService) {
   $scope.alerts = [];
   $scope.documents = [];
   $scope.facet = null;
@@ -198,6 +198,16 @@ esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', 'documentService', 's
 
   $scope.showDetails = function(id) {
     documentService.showDetails(id);
+    $scope.documentId = id;
+    $modal.open({
+      templateUrl: 'views/documents/details.html',
+      controller: 'DocumentsDetailsCtrl',
+      resolve: {
+        documentId: function() {
+          return $scope.documentId;
+        }
+      }
+    });
   };
 
   $scope.checkout = function(id) {

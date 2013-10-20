@@ -1,9 +1,18 @@
 'use strict';
 
-esDmsSiteApp.controller('DocumentsFileUploadCtrl', 
-  ['$scope', '$rootScope', 'uploadService', 'userService', function ($scope, $rootScope, uploadService, userService) {
+esDmsSiteApp.controller('ModalDocumentsFileUploadCtrl', ['$scope', '$modal',
+  function ($scope, $modal) {
+    $scope.open = function() {
+      $modal.open({
+        templateUrl: 'views/documents/file-upload.html',
+        controller: 'DocumentsFileUploadCtrl'
+      });
+    };
+}]);
 
-  $scope.shouldBeOpen = false;
+esDmsSiteApp.controller('DocumentsFileUploadCtrl', 
+  ['$scope', '$rootScope', '$modalInstance', 'uploadService', 'userService', function ($scope, $rootScope, $modalInstance, uploadService, userService) {
+
   $scope.files = [];
   $scope.percentage = 0;
 
@@ -23,19 +32,7 @@ esDmsSiteApp.controller('DocumentsFileUploadCtrl',
   });
 
   $scope.close = function() {
-    $scope.shouldBeOpen = false;
+    $modalInstance.close();
   };
   
-  $scope.open = function() {
-    // TODO: Hack to check if user if authenticated before to display the form
-    // userService.get('admin', function (data) {
-      $scope.shouldBeOpen = true;
-    // });
-  };
-
-  $scope.opts = {
-    backdropFade: true,
-    dialogFade:true
-  };
-
 }]);

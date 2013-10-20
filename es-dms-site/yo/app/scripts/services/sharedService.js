@@ -23,6 +23,14 @@ esDmsSiteApp.service('sharedService', ['$log', '$rootScope', function ($log, $ro
   
   var currentUser = {};
   var message = '';
+  function $hasRole(id) {
+    if (currentUser !== null) {
+      var role = _.find(currentUser.roles, {'id' : id});
+      return (role !== undefined);
+    } else {
+      return false;
+    }
+  }
   return {
     setCurrentUser: function (cu) {
       currentUser = cu;
@@ -46,13 +54,16 @@ esDmsSiteApp.service('sharedService', ['$log', '$rootScope', function ($log, $ro
       return settings;
     },
     hasRole: function(id) {
-      if (currentUser !== null) {
-        var role = _.find(currentUser.roles, {'id' : id});
-        return (role !== undefined);
-      } else {
-        return false;
-      }
+      return $hasRole(id);
     },
+    // hasRole: function(id) {
+    //   if (currentUser !== null) {
+    //     var role = _.find(currentUser.roles, {'id' : id});
+    //     return (role !== undefined);
+    //   } else {
+    //     return false;
+    //   }
+    // },
     hasPermission: function(id) {
       if (currentUser !== null) {
         $log.log('hasPermission: ' + id + ' in ' + currentUser.id);
@@ -64,6 +75,13 @@ esDmsSiteApp.service('sharedService', ['$log', '$rootScope', function ($log, $ro
           }
         });
         return (permission !== undefined);
+      } else {
+        return false;
+      }
+    },
+    isProcessUser: function () {
+      if (currentUser !== null) {
+        return $hasRole('process-admin') || $hasRole('process-user');
       } else {
         return false;
       }

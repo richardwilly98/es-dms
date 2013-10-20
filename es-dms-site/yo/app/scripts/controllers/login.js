@@ -1,18 +1,21 @@
 'use strict';
 
-esDmsSiteApp.controller('LoginCtrl', ['$log', '$scope', 'authenticationService', 'authService', 'sharedService', 'dialog',
-  function ($log, $scope, authenticationService, authService, sharedService, dialog) {
+esDmsSiteApp.controller('LoginCtrl', ['$log', '$scope', 'authenticationService', 'authService', 'sharedService', '$modalInstance',
+  function ($log, $scope, authenticationService, authService, sharedService, $modalInstance) {
+    $scope.credential = {};
     $scope.login = function() {
-      $log.log('loginController - login');
-      authenticationService.login($scope.username, $scope.password, $scope.rememberMe, function(data) {
+      $log.log('loginController - login - ' + $scope.credential.username);
+      authenticationService.login($scope.credential.username, $scope.credential.password, $scope.credential.rememberMe, function(data) {
         $log.log('data: ' + JSON.stringify(data));
         if (data.status === 'AUTHENTICATED') {
-          dialog.close();
+          // dialog.close();
+          $modalInstance.close();
         }
       });
     };
 
     $scope.close = function () {
-      dialog.close();
+      // dialog.close();
+      $modalInstance.dismiss('cancel');
     };
   }]);

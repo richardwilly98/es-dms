@@ -3,7 +3,10 @@
 	<form data-ng-submit="search()" class="form-search">
 		<input type="text" class="input-xlarge" data-ng-model="criteria" />
 		<button type="button" class="btn btn-primary" data-ng-click="search()">Search</button>
-		<div data-ng-include src="'views/search/options.html'"></div>
+		<div data-ng-controller="ModalSearchOptionsCtrl">
+			<a data-ng-click="open()">Options</a>
+		</div>
+
 	</form>
 	<br />
 	<alert data-ng-repeat="alert in alerts" type="alert.type"
@@ -60,9 +63,11 @@
 										class="caret"></span>
 									</a>
 									<ul data-ng-switch-when="A" class="dropdown-menu">
-										<li><a data-ng-click="showDetails(document.id)"
+										<li>
+											<a data-ng-click="showDetails(document.id)">Details</a>
+										<!--<a data-ng-click="showDetails(document.id)"
 											data-toggle="modal"
-											href="#documents/details/{{ document.id }}">Details</a></li>
+											href="#documents/details/{{ document.id }}">Details</a --></li>
 										<li><a href="api/documents/{{ document.id }}/view"
 											target="_blank">View</a></li>
 										<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
@@ -90,6 +95,5 @@
 			</div>
 		</div>
 	</div>
-	<div class="modal hide fade"
-		ng-include="'views/documents/details.html'" id="documents/details"></div>
+	<!-- div data-ng-include="'views/documents/details.html'" id="documents/details"></div -->
 </div>

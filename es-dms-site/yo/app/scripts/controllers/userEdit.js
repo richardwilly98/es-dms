@@ -1,7 +1,7 @@
 'use strict';
 
-esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$rootScope', '$http', 'userService', 'roleService',
-	function ($log, $scope, $rootScope, $http, userService, roleService) {
+esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$modalInstance', '$rootScope', '$http', 'userService', 'roleService', 'userId',
+	function ($log, $scope, $modalInstance, $rootScope, $http, userService, roleService, userId) {
 	$scope.user = null;
 	$scope.newUser = false;
 	$scope.uid = '';
@@ -49,8 +49,9 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$rootScope', '$http'
 	});
 	*/
 	
-	$rootScope.$on('user:edit', function() {
-		$log.log('on user:edit');
+	$log.log('Edit user: ' + userId);
+
+	function init() {
 		userService.currentUser(function(user){
 			if (user.id) {
 				$scope.user = user;
@@ -81,17 +82,11 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$rootScope', '$http'
 				}
 				$log.log('roles: ' + JSON.stringify($scope.roles));
 			});
-	    $scope.shouldBeOpen = true;
 		});
-	});
+	}
 	
   $scope.close = function() {
-    $scope.shouldBeOpen = false;
-  };
-
-  $scope.opts = {
-    backdropFade: true,
-    dialogFade:true
+    $modalInstance.close();
   };
 
 	$scope.save = function() {
@@ -101,7 +96,7 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$rootScope', '$http'
 		$log.log('About to save user: ' + JSON.stringify($scope.user));
 		$scope.user.roles = $scope.selectedRoles;
 		userService.save($scope.user, $scope.newUser);
-    $scope.shouldBeOpen = false;
+    $modalInstance.close();
 	};
 	
 	$scope.$watch('pw1', function() {
@@ -114,15 +109,17 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$rootScope', '$http'
 		$scope.incompleteTest();
 	});
 
-	$scope.$watch('username', function() {
+	$scope.$watch('user.name', function() {
 		$scope.incompleteTest();
 	});
 
 	$scope.incompleteTest = function() {
-		if ($scope.newUser) {
+		if ($scope.newUser && $scope.user.name !== undefined) {
 			$scope.incomplete = !$scope.user.name.length || !$scope.pw1.length || !$scope.pw2.length;
 		} else {
 			$scope.incomplete = false;
 		}
 	};
+
+	init();
 }]);

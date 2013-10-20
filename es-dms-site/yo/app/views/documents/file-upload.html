@@ -1,12 +1,10 @@
-<div data-ng-controller="DocumentsFileUploadCtrl">
-	<div modal="shouldBeOpen" close="close()" options="opts">
+<div>
+	<div close="close()">
 		<div class="modal-header">
 			<button type="button" class="close" data-ng-click="close()"
 				aria-hidden="true">&times;</button>
 			<h2>File Upload</h2>
 		</div>
-		<!-- form class="form-horizontal" action="api/documents/upload" enctype="multipart/form-data"
-					ng-upload -->
 		<div class="modal-body">
 			<div class="control-group">
 				<label class="control-label">File:</label> <span
@@ -31,9 +29,5 @@
 			<button type="submit" class="btn btn-primary pull-left"
 				ng-click="upload()">Upload</button>
 		</div>
-		<!-- /form -->
 	</div>
-
-	<button data-ng-click="open()" class="btn btn-primary">File
-		Upload</button>
 </div>
