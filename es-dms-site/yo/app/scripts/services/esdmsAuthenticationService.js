@@ -11,6 +11,9 @@ esDmsSiteApp.service('esdmsAuthenticationService', ['$http', function ($http) {
     },
     logout: function() {
       $http.post('api/auth/logout');
+    },
+    validate: function(token, callback) {
+      $http.post('api/auth/validate').success(callback);
     }
   };
 }]);
