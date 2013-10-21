@@ -103,6 +103,7 @@ public class RestAuthenticationService extends RestItemBaseService<SessionImpl> 
 
     @POST
     @Path(VALIDATE_PATH)
+    @Produces({ MediaType.APPLICATION_JSON })
     public Response validate(@CookieParam(value = ES_DMS_TICKET) String token) {
         try {
             if (log.isTraceEnabled()) {
@@ -114,14 +115,14 @@ public class RestAuthenticationService extends RestItemBaseService<SessionImpl> 
             checkNotNull(userId);
             URI uri = url.getBaseUriBuilder().path(RestUserService.class).path(userId).build();
             log.debug(String.format("Uri for user %s: %s", userId, uri));
-            return Response.ok(uri).build();
+            return Response.ok(new ItemResponse(userId, uri.toString())).build();
         } catch (Throwable t) {
             log.error("validate failed", t);
             throw new UnauthorizedException(t.getLocalizedMessage());
         }
     }
 
-    private class AuthenticationResponse {
+    static class AuthenticationResponse {
         private final String status;
         private final String token;
 
@@ -130,14 +131,33 @@ public class RestAuthenticationService extends RestItemBaseService<SessionImpl> 
             this.token = token;
         }
 
-        @SuppressWarnings("unused")
         public String getToken() {
             return token;
         }
 
-        @SuppressWarnings("unused")
         public String getStatus() {
             return status;
         }
+    }
+    
+    static class ItemResponse {
+        public String getUrl() {
+            return url;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        private String url;
+        private String id;
+
+        public ItemResponse() {}
+        
+        public ItemResponse(String id, String url) {
+            this.id = id;
+            this.url = url;
+        }
+
     }
 }

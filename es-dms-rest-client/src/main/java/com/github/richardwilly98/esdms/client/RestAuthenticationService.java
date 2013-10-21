@@ -2,8 +2,6 @@ package com.github.richardwilly98.esdms.client;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.net.URI;
-
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
@@ -70,10 +68,10 @@ public class RestAuthenticationService extends RestClientBase {
             throw new ServiceException(String.format("validate failed for %s", token));
         }
         
-        URI uri = response.readEntity(URI.class);
-        response = restClient.target(uri).request(MediaType.APPLICATION_JSON).cookie(cookie).get();
+        ItemResponse item = response.readEntity(ItemResponse.class);
+        response = restClient.target(item.getUrl()).request(MediaType.APPLICATION_JSON).cookie(cookie).get();
         if (response.getStatus() != Status.OK.getStatusCode()) {
-            throw new ServiceException(String.format("Cannot get user from uri %s - status %s", uri, response.getStatus()));
+            throw new ServiceException(String.format("Cannot get user from uri %s - status %s", item, response.getStatus()));
         }
         User user = response.readEntity(User.class);
         return user;
@@ -93,6 +91,22 @@ public class RestAuthenticationService extends RestClientBase {
 
         public String getStatus() {
             return status;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private static class ItemResponse {
+        private String url;
+        private String id;
+
+        public ItemResponse() {}
+        
+        public String getUrl() {
+            return url;
+        }
+
+        public String getId() {
+            return id;
         }
     }
 }

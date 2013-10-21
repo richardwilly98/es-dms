@@ -45,6 +45,7 @@ import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.rest.RestAuthenticationService.ItemResponse;
 
 public class TestRestAuthenticationService extends TestRestUserService {
 
@@ -97,8 +98,8 @@ public class TestRestAuthenticationService extends TestRestUserService {
         WebTarget webResource = target().path(RestAuthenticationService.AUTH_PATH).path(RestAuthenticationService.VALIDATE_PATH);
         Response response = webResource.request(MediaType.APPLICATION_JSON).cookie(cookie).post(Entity.json(null));
         Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
-        URI uri = response.readEntity(URI.class);
-        Assert.assertNotNull(uri);
+        ItemResponse itemResponse = response.readEntity(ItemResponse.class);
+        Assert.assertNotNull(itemResponse);
     }
 
     private User createUser(String id, String login, String password, Set<Role> roles) throws Throwable {
