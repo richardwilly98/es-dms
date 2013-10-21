@@ -24,6 +24,7 @@ body {
   font-weight: bolder;
 }
 
+/* Used for http error message */
 .message-list {
   position: absolute;
   top: 0;

@@ -1,23 +1,9 @@
 'use strict';
 
-esDmsSiteApp.controller('mainController', function ($log, $scope, $location, sharedService, authenticationService) {
+esDmsSiteApp.controller('mainController', function ($log, $scope, $location, $modal, sharedService, userService, authenticationService) {
   $scope.$location = $location;
   $scope.user = { name: ''};
   $scope.service = sharedService;
-  // $scope.$on('handleBroadcast', function() {
-  //   $log.log('Receive brodcast message');
-  //   //$scope.showLogout = sharedService.message.logout;
-		// // $scope.username = sharedService.message.user;
-  // });
-  
-  /*$scope.$watch('service.getUserSettings()',
-    function(newValue) {
-      $log.log('watch - name: ' + newValue.name);
-      if (newValue) {
-        $log.log('username ' + newValue.name);
-        $scope.user.name = newValue.name;
-      }
-    });*/
 
   $scope.$watch('service.getCurrentUser()',
     function(newValue) {
@@ -39,5 +25,21 @@ esDmsSiteApp.controller('mainController', function ($log, $scope, $location, sha
 
   $scope.logout = function() {
     authenticationService.logout();
+  };
+
+  $scope.showUserDetails = function() {
+    var userId = sharedService.getCurrentUser().id;
+    if (userId !== undefined) {
+      userService.edit(userId);
+      $modal.open({
+          templateUrl: 'views/users/edit-user.html',
+          controller: 'UserEditCtrl',
+          resolve: {
+            userId: function() {
+              return userId;
+            }
+          }
+        });
+    }
   };
 });
