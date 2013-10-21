@@ -3,7 +3,7 @@
 <div data-ng-controller="mainController">
 
 	<!-- Navigation bar -->
-	<div class="navbar" data-ng-controller="NavbarCtrl" data-bs-navbar="">
+	<div class="navbar navbar-fixed-top" data-ng-controller="NavbarCtrl" data-bs-navbar="">
 		<div class="navbar-inner">
 			<a class="brand" href="#">ElasticSearch Dms Client</a>
 			<ul class="nav">
@@ -29,6 +29,8 @@
 		</div>
 	</div>
 
+	<div class="message-list" app-messages></div>
+			
 	<!-- Placeholder for views -->
 	<div id="content" ui-view></div>
 

@@ -2,10 +2,10 @@
 @import url('../bower_components/blueimp-file-upload/css/jquery.fileupload-ui.css');
 
 /* Add top padding for navbar-top-fixed */
-/*body {
+body {
   padding-top: 60px;
   padding-bottom: 40px;
-}*/
+}
 
 /* Remove top padding when top navbar goes static in narrow viewports */
 @media ( max-width : 979px) {
@@ -22,4 +22,13 @@
 .highlight-tag {
   font-style: italic;
   font-weight: bolder;
+}
+
+.message-list {
+  position: absolute;
+  top: 0;
+  right: 0;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  background-color: #fcf8e3;
+  border: 1px solid #fbeed5;
 }
