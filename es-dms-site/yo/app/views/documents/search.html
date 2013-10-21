@@ -89,11 +89,9 @@
 					</tbody>
 				</table>
 				<div data-ng-show="totalPages > 1">
-					<pagination num-pages="totalPages" current-page="currentPage"
-						max-size="maxPages"></pagination>
+					<pagination total-items="totalHits" item-per-page="pageSize" page="currentPage" max-size="maxPages"></pagination>
 				</div>
 			</div>
 		</div>
 	</div>
-	<!-- div data-ng-include="'views/documents/details.html'" id="documents/details"></div -->
 </div>
