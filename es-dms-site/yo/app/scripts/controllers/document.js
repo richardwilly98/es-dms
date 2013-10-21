@@ -94,8 +94,6 @@ esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$modal', 'documentSe
 		var pageSize = result.pageSize;
 		var totalHits = result.totalHits;
 		var firstIndex = result.firstIndex;
-    $scope.pageSize = pageSize;
-    $scope.totalHits = totalHits;
 		$scope.totalPages = Math.ceil(totalHits / pageSize);
 		$scope.currentPage = 1 + (firstIndex / pageSize);
 		$log.log('totalPages: ' + $scope.totalPages + ' - currentPage: ' + $scope.currentPage);

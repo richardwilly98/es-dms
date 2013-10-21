@@ -9,8 +9,8 @@ esDmsSiteApp.service('authenticationService', ['$log', '$http', 'esdmsAuthentica
 					authService.loginConfirmed();
 					sharedService.prepForBroadcast({logout: true});
 	        sharedService.updateUserSettings('name', username);
-	        userService.get(username, function(data) {
-						sharedService.setCurrentUser(data);
+	        userService.get(username, function(user) {
+						sharedService.setCurrentUser(user);
 	        });
 				}
         callback(data);
@@ -18,7 +18,7 @@ esDmsSiteApp.service('authenticationService', ['$log', '$http', 'esdmsAuthentica
 		},
 		logout: function() {
 			esdmsAuthenticationService.logout();
-			sharedService.updateUserSettings('name', null);
+			sharedService.setCurrentUser(null);
 		},
 		validate: function(token) {
 			esdmsAuthenticationService.validate(token, function(response) {
