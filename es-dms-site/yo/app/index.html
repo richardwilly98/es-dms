@@ -63,10 +63,14 @@
 
 	<!-- script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap.js"></script-->
 	<!-- script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script -->
+
 	<!-- Use SNAPSHOT version to be able to use popover with template -->
-	<!-- script type="text/javascript" src="scripts/vendors/angular-bootstrap/ui-bootstrap-0.5.0-SNAPSHOT.js"></script -->
 	<script type="text/javascript"
-		src="scripts/vendors/angular-bootstrap/ui-bootstrap-tpls-0.5.0-SNAPSHOT.js"></script>
+		src="scripts/vendors/angular-bootstrap/ui-bootstrap-tpls-0.6.0.js"></script>
+
+	<!-- Uncomment when angular-bootstrap 0.6.0+ is released. Above version fix: https://github.com/angular-ui/bootstrap/pull/1059 -->
+	<!-- script type="text/javascript"
+		src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script -->
 
 	<script type="text/javascript"
 		src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
@@ -136,13 +140,13 @@
 	<script type="text/javascript" src="scripts/directives/esdmsUpload.js"></script>
 
 	<!-- test accordion -->
-	<script type="text/javascript"
-		src="scripts/controllers/test/accordion.js"></script>
+	<script type="text/javascript" src="scripts/controllers/test/accordion.js"></script>
 	<script src="scripts/controllers/documents/details.js"></script>
 	<script src="scripts/directives/esdmsPreview.js"></script>
 	<script src="scripts/services/ratingService.js"></script>
-<script src="scripts/controllers/documents/rating.js"></script>
-<script src="scripts/services/processService.js"></script>
+	<script src="scripts/controllers/documents/rating.js"></script>
+	<script src="scripts/services/processService.js"></script>
+	<script src="scripts/directives/esdmsStartProcess.js"></script>
 	<!-- endbuild -->
 
 </body>
