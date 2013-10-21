@@ -19,6 +19,8 @@ esDmsSiteApp.service('roleService', ['$log', '$rootScope', '$resource', '$http',
 					roleTypes = types;
 	        callback(types);
 				});
+			} else {
+				callback(roleTypes);
 			}
 		},
 		search: function(criteria, callback) {

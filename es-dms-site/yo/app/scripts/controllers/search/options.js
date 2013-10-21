@@ -1,25 +1,27 @@
 'use strict';
 
-esDmsSiteApp.controller('SearchOptionsCtrl', function ($log, $scope, sharedService) {
-	$scope.shouldBeOpen = false;
-  $scope.pageSizeList = [12, 24, 48, 96];
-  $scope.options = {pageSize: sharedService.getSettings().user.pageSize};
+esDmsSiteApp.controller('ModalSearchOptionsCtrl', ['$scope', '$modal',
+  function ($scope, $modal) {
+    $scope.open = function() {
+      $modal.open({
+        templateUrl: 'views/search/options.html',
+        controller: 'SearchOptionsCtrl'
+      });
+    };
+}]);
 
-  $scope.save = function() {
-    sharedService.updateUserSettings('pageSize', $scope.options.pageSize);
-    $scope.shouldBeOpen = false;
-  };
+esDmsSiteApp.controller('SearchOptionsCtrl', ['$log', '$scope', '$modalInstance', 'sharedService',
+  function ($log, $scope, $modalInstance, sharedService) {
+    $scope.pageSizeList = [12, 24, 48, 96];
+    $scope.options = {pageSize: sharedService.getSettings().user.pageSize};
 
-  $scope.close = function() {
-    $scope.shouldBeOpen = false;
-  };
+    $scope.save = function() {
+      sharedService.updateUserSettings('pageSize', $scope.options.pageSize);
+      $modalInstance.close();
+    };
 
-  $scope.open = function() {
-    $scope.shouldBeOpen = true;
-  };
+    $scope.close = function() {
+      $modalInstance.close();
+    };
 
-  $scope.opts = {
-    backdropFade: true,
-    dialogFade:true
-  };
-});
+}]);

@@ -1,32 +1,30 @@
 'use strict';
 
 angular.module('esDmsSiteApp')
-  .controller('DocumentsDetailsCtrl', ['$log', '$scope', '$rootScope', '$state', 'documentService', 'searchService', 
-    function ($log, $scope, $rootScope, $state, documentService, searchService) {
-  $scope.shouldBeOpen = false;
+  .controller('DocumentsDetailsCtrl', ['$log', '$scope', '$state', 'documentService', 'searchService', '$modalInstance', 'documentId',
+    function ($log, $scope, $state, documentService, searchService, $modalInstance, documentId) {
   $scope.document = {};
   $scope.auditEntries = {};
   $scope.moreLikeThis = {};
   $scope.isAvailable = false;
   $scope.tags = null;
 
-  $rootScope.$on('document:showDetails', function() {
-    var current = documentService.current();
-    $log.log('document:showDetails');
-    if (current) {
-      $scope.document.id = current;
-      documentService.metadata(current, function(doc) {
-        $scope.document = doc;
-        if (doc.tags) {
-          $scope.tags = _(doc.tags).toString();
-        }
-        $log.log('$scope.tags: ' + $scope.tags);
-      });
-    } else {
-      $scope.document = {};
+  $log.log('document details ' + documentId);
+  init();
+
+  function init() {
+    if (documentId === undefined) {
+      $log.log('documentId is undefined!');
+      return;
     }
-    $scope.shouldBeOpen = true;
-  });
+    documentService.metadata(documentId, function(doc) {
+      $scope.document = doc;
+      if (doc.tags) {
+        $scope.tags = _(doc.tags).toString();
+      }
+      $log.log('$scope.tags: ' + $scope.tags);
+    });
+  };
   
   $scope.loadAudit = function() {
     $log.log('loadAudit: ' + $scope.document.id);
@@ -47,15 +45,7 @@ angular.module('esDmsSiteApp')
     $log.log('End moreLikeThis');
   };
   $scope.close = function() {
-    $scope.shouldBeOpen = false;
-  };
-  $scope.open = function() {
-    $scope.shouldBeOpen = true;
-  };
-
-  $scope.opts = {
-    backdropFade: true,
-    dialogFade:true
+    $modalInstance.close();
   };
 
   }]);

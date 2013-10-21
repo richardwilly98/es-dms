@@ -1,15 +1,15 @@
 'use strict';
 
-esDmsSiteApp.controller('RoleCtrl', ['$log', '$scope', 'roleService', function ($log, $scope, roleService) {
+esDmsSiteApp.controller('RoleCtrl', ['$log', '$scope', '$modal', 'roleService', function ($log, $scope, $modal, roleService) {
   $scope.roles = [];
   // $scope.roleTypes = [];
   $scope.totalHits = 0;
   $scope.elapsedTime = 0;
   
   function init() {
-    // roleService.roleTypes(function(result) {
-    //   $scope.roleTypes = result;
-    // });
+    roleService.roleTypes(function(result) {
+      $scope.roleTypes = result;
+    });
   }
 
   init();
@@ -35,6 +35,15 @@ esDmsSiteApp.controller('RoleCtrl', ['$log', '$scope', 'roleService', function (
   
   $scope.edit = function(id) {
     roleService.edit(id);
+    $modal.open({
+        templateUrl: 'views/roles/edit-role.html',
+        controller: 'RoleEditCtrl',
+        resolve: {
+          roleId: function() {
+            return id;
+          }
+        }
+      });
   };
   
   $scope.add = function () {

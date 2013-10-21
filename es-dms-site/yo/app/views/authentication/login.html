@@ -8,15 +8,15 @@
 		<div id="loginbox">
 			<form>
 				<fieldset>
-					<label>Username</label> <input type="text" name="username"
-						data-ng-model="username" placeholder="Username"
-						autofocus="autofocus" required /> <label>Password</label> <input
-						type="password" name="password" data-ng-model="password"
-						placeholder="Password" required /> <label class="checkbox">
-						<input type="checkbox" value="rememberMe"
-						data-ng-model="rememberMe" /> Remember me
-					</label> <input type="submit" class="btn btn-success" value="Login"
-						data-dismiss="modal" ng-click="login()" />
+					<label>Username</label>
+					<input type="text" name="username" data-ng-model="credential.username" placeholder="Username" autofocus="autofocus" required /> 
+					<label>Password</label>
+					<input type="password" name="password" data-ng-model="credential.password" placeholder="Password" required />
+					<label class="checkbox">
+						<input type="checkbox" value="rememberMe" data-ng-model="credential.rememberMe" />
+						Remember me
+					</label>
+					<input type="submit" class="btn btn-success" value="Login" data-dismiss="modal" ng-click="login()" />
 				</fieldset>
 			</form>
 		</div>

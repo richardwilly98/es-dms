@@ -1,6 +1,6 @@
 'use strict';
 
-esDmsSiteApp.directive('esdmsAuthenticationDirective', ['$log', '$dialog', function ($log, $dialog) {
+esDmsSiteApp.directive('esdmsAuthenticationDirective', ['$log', '$modal', function ($log, $modal) {
   $log.log('Start esdmsAuthenticationDirective');
   return {
     restrict: 'E',
@@ -9,14 +9,10 @@ esDmsSiteApp.directive('esdmsAuthenticationDirective', ['$log', '$dialog', funct
       
       $scope.$on('event:auth-loginRequired', function() {
         $log.log('event:auth-loginRequired - Show login');
-        var options = {
-          backdropFade: true,
-          dialogFade: true,
-          controller: 'LoginCtrl',
-          templateUrl : $scope.view
-        };
-        var dialog = $dialog.dialog(options);
-        dialog.open();
+        $modal.open({
+          templateUrl : $scope.view,
+          controller: 'LoginCtrl'
+        });
       });
       
       $scope.$on('event:auth-loginConfirmed', function() {
