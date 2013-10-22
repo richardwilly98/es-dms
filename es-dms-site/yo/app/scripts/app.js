@@ -2,7 +2,7 @@
 'use strict';
 
 var esDmsSiteApp = angular.module('esDmsSiteApp',
-  ['ngCookies', 'ngResource', 'ngSanitize', 'authentication', 'ui.router', 'http-auth-interceptor', 'ui.bootstrap', 'ui.select2']);
+  ['ngCookies', 'ngResource', 'ngSanitize', 'authentication', 'ui.router', 'http-auth-interceptor', 'ui.bootstrap', 'ui.select2', 'toaster']);
 
 esDmsSiteApp.config(function (/*$routeProvider,*/ $stateProvider, $locationProvider) {
 
@@ -47,55 +47,35 @@ esDmsSiteApp.config(function (/*$routeProvider,*/ $stateProvider, $locationProvi
   $locationProvider.html5Mode(false);
 });
 
-esDmsSiteApp.config(function($provide, $httpProvider, $compileProvider) {
-  var elementsList = $();
-  var showMessage = function(content, cl, time) {
-    $('<div/>')
-    .addClass('message')
-    .addClass(cl)
-    .hide()
-    .fadeIn('fast')
-    .delay(time)
-    .fadeOut('fast', function() { $(this).remove(); })
-    .appendTo(elementsList)
-    .text(content);
-  };
+esDmsSiteApp.config(['$httpProvider', function($httpProvider) {
         
-  $httpProvider.responseInterceptors.push(function($timeout, $q) {
+  $httpProvider.responseInterceptors.push(function($timeout, $q, messagingService) {
     return function(promise) {
       return promise.then(function(successResponse) {
         if (successResponse.config.method.toUpperCase() !== 'GET') {
-          // showMessage('Success', 'successMessage', 2000);
+          // messagingService.push({'type': 'info', 'title': 'Success', 'content': 'successMessage', 'timeout': 1000});
         }
         return successResponse;
       }, function(errorResponse) {
         switch (errorResponse.status) {
         case 401:
-          showMessage('Wrong usename or password', 'errorMessage', 20000);
+          messagingService.push({'type': 'error', 'title': 'Login failed', 'content': 'Wrong usename or password', 'timeout': 5000});
           break;
         case 403:
-          showMessage('You don\'t have the right to do this', 'errorMessage', 20000);
+          messagingService.push({'type': 'error', 'title': 'Access Denied', 'content': 'You don\'t have the right to do this', 'timeout': 5000});
           break;
         case 500:
-          showMessage('Server internal error: ' + errorResponse.data, 'errorMessage', 20000);
+          messagingService.push({'type': 'error', 'title': 'Server Error', 'content': 'Server internal error:' + errorResponse.data, 'timeout': 5000});
           break;
         default:
-          showMessage('Error ' + errorResponse.status + ': ' + errorResponse.data, 'errorMessage', 20000);
+          messagingService.push({'type': 'error', 'title': 'Error', 'content': 'Error ' + errorResponse.status + ': ' + errorResponse.data, 'timeout': 5000});
         }
         return $q.reject(errorResponse);
       });
     };
   });
 
-  $compileProvider.directive('appMessages', function() {
-    var directiveDefinitionObject = {
-      link: function(scope, element) {
-        elementsList.push($(element));
-      }
-    };
-    return directiveDefinitionObject;
-  });
-});
+}]);
 
 esDmsSiteApp.run(['$log', 'authenticationService', '$cookies', function($log, authenticationService, $cookies) {
   $log.log('*** run ***');
