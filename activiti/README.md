@@ -28,3 +28,20 @@ es-dms-activiti-rest-client
 It can be imported from Activiti login as Administrator. Manage -> Deployments -> Upload New
 
 - Known issue: explorer seems buggy with sessions. It might be necessary to remove JSESSIONID (/activiti-explorer/) if login fails.
+
+- New system parameter for activiti integration. This parameter will be created during ProcessService bootstrap with the default url: http://localhost:8080/activiti-rest/service.
+Activiti REST url is stored in /system/parameters/activiti:
+```
+{
+  "id": "activiti",
+  "name": "Activiti Settings",
+  "type": 0,
+  "attributes": {
+    "rest.url": "http://localhost:8080/activiti-rest/service"
+}
+```
+
+There is currently no way to change this parameter from es-dms-site. Use Sense plugin or curl:
+```curl -XPUT localhost:9200/system/parameter/activiti -d @system-parameter-activiti.json```
+
+json file cannot be found es-dms-activiti-rest-client/install/system-parameter-activiti.json

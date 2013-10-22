@@ -1,0 +1,8 @@
+{
+  "id": "activiti",
+  "name": "Activiti Settings",
+  "type": 0,
+  "attributes": {
+    "rest.url": "http://localhost:8080/activiti-rest/service"
+  }
+}
