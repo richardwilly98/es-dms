@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="es-dms">
+
+  <process id="es-dms-first-process" name="The Two Task Process" activiti:candidateStarterUsers="admin">
+    <documentation>Two task process for es-dms</documentation>
+  
+    <startEvent id="theStart" activiti:initiator="initiator" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
+    <userTask id="theTask" name="my task" activiti:assignee="${initiator}" />
+    <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theSecondTask" />
+    <userTask id="theSecondTask" name="my task" />
+    <sequenceFlow id="flow3" sourceRef="theSecondTask" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

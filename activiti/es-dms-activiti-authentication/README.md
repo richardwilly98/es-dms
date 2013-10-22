@@ -1,3 +1,12 @@
+How to install SSO between es-dms and Activiti
+----------------------------------------------
+
+Tested with Activiti 5.13
+
+- Deploy activiti-explorer.war and activiti-rest.war in Tomcat 7
+- Stop Tomcat
+- Remove the war files but keep the folders activiti-explorer and activiti-rest
+
 Dependencies to be copied in webapps/activiti-explorer/WEB-INF/lib and webapps/activiti-rest/WEB-INF/lib
 ```
 es-dms-activiti-authentication-1.0-SNAPSHOT.jar
@@ -27,37 +36,15 @@ javax.el-2.2.4.jar
 javax.el-api-2.2.4.jar
 ```
 
-Update webapps/activiti-explorer/WEB-INF/activiti-standalone-context.xml and webapps/activiti-rest/WEB-INF/classes/activiti-context.xml
-```
-  <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
-  ...
-    <property name="configurators">
-      <list>
-          <bean class="com.github.richardwilly98.activiti.identity.EsDmsConfigurator">
-            <property name="url" value="http://localhost:9000/api" />
-            <property name="userId" value="admin" />
-            <property name="password" value="secret" />
-          </bean>
-      </list>
-    </property>
-  ...
-  </bean>
+Use mvn:dependency copy:dependencies to get the jar files from ```target/dependency``` folder
 
-  ...
-  <!-- Only in activiti-explorer -->
-  <bean id="activitiLoginHandler" class="com.github.richardwilly98.activiti.explorer.login.EsDmsLoginHandler">
-    <property name="url" value="http://localhost:9000/api" />
-    <property name="userId" value="admin" />
-    <property name="password" value="secret" />
-    <property name="identityService" ref="identityService" />
-  </bean>
-```
+If required changes settings in ```install/webapps/activiti-rest/WEB-INF/classes/es-dms.properties``` and in ```install/webapps/activiti-explorer/WEB-INF/classes/es-dms.properties```
 
-From same xml file configurations remove the demoDataGenerator bean
+- Copy and replace install/webapps in $TOMCAT_HOME/webapps
 
-Restart Tomcat
+- Restart Tomcat
 
-cUrl Examples
+Validate the integration from cUrl:
 ----
 ```
 curl -XGET --user admin:secret http://localhost:18080/activiti-rest/service/repository/process-definitions
