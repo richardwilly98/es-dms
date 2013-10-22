@@ -192,9 +192,9 @@ public class ProcessServiceProvider implements ProcessService {
             resource.setDescription("Document - " + item.getName());
             resource.setType("simpleType");
             resource.setExternalUrl("http://www.google.com?q=activiti");
-            taskService.addExternalResource(task.getId(), resource);
+            resource = taskService.addExternalResource(task.getId(), resource);
+            log.debug(String.format("New resource created: %s", resource));
         }
-        throw new ServiceException(String.format("No task found for instance %s.", processInstance.getId()));
     }
 
     @Override

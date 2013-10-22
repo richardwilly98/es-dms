@@ -1,17 +1,18 @@
 'use strict';
 
 angular.module('esDmsSiteApp')
-  .service('processService', ['$log', '$resource', function ProcessService($log, $resource) {
+  .service('processService', ['$log', '$resource', '$http', function ProcessService($log, $resource, $http) {
+    
     var ProcessResource = $resource('api/process/:action', {}, {
       listProcessDefinitions: {method:'GET', params: {action: 'process-definitions'}, isArray: true},
-      //listTaskByProcessInstance: {method:'GET', params: {action: 'process-instances/:instanceId/tasks'}, isArray: true},
-      startProcessInstance: {method:'POST', params: {action: 'process-instances'}},
-      //assignTask: {method:'POST', params: {action: 'tasks/:taskId'}},
-      attach: {method:'POST', params: {action: 'process-instances'}}
+      startProcessInstance: {method:'POST', params: {action: 'process-instances'}}
     });
+    
     var ProcessInstancesResource = $resource('api/process/process-instances/:id/:action', {id:'@id'}, {
-      listTaskByProcessInstance: {method:'GET', params: {action: 'tasks'}, isArray: true}
+      listTaskByProcessInstance: {method:'GET', params: {action: 'tasks'}, isArray: true},
+      attach: {method:'POST', params: {action: 'process-instances/:id/attachments/:itemId'}}
     });
+    
     var TasksResource = $resource('api/process/tasks/:id', {id:'@id'}, {
       assignTask: {method:'POST', params: {}}
     });
@@ -62,6 +63,15 @@ angular.module('esDmsSiteApp')
         task.assignee = userId;
         task.$assignTask({}, function(data) {
           callback(data);
+        });
+      },
+      attach: function(id, itemId, callback) {
+        $log.log('Attach document: ' + itemId + ' to process: ' + id);
+        if (id === undefined || itemId === undefined) {
+          return;
+        }
+        $http.post('api/process/process-instances/'+id+'/attachments/'+itemId, {}).success(function() {
+          callback();
         });
       }
     };
