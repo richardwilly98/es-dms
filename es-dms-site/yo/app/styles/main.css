@@ -28,3 +28,8 @@ body {
 .toast-top-right {
   padding-top: 50px;
 }
+
+.navbar-fixed-top .navbar-inner {
+  padding-left: 10px;
+  padding-right: 10px;
+}
