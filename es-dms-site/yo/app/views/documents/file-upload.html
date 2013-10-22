@@ -15,13 +15,13 @@
 				</span>
 			</div>
 			<div>
-				<span ng-show="!files.length">No files selected</span>
+				<span ng-show="uploadMessage">{{ uploadMessage }}</span>
 				<ul>
 					<li ng-repeat="file in files">{{file}}</li>
 				</ul>
 			</div>
-			<div class="progress" ng-show="percentage">
-				<div class="bar" style="width: {{percentage"></div>
+			<div ng-show="percentage">
+				<progress percent="percentage"></progress>
 			</div>
 		</div>
 		<div class="modal-footer">

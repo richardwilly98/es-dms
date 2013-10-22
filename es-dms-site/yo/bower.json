@@ -13,7 +13,7 @@
     "angular-http-auth": "git://github.com/qloo/angular-http-auth.git",
     "angular-authentication": "~1.0.4",
     "angular-bootstrap": "~0.6.0",
-    "blueimp-file-upload": "~8.8.5",
+    "blueimp-file-upload": "~8.9.0",
     "angular-ui": "~0.4.0",
     "angular-ui-router": "~0.2.0",
     "angular-ui-select2": "~0.0.2",

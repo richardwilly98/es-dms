@@ -11,26 +11,34 @@ esDmsSiteApp.controller('ModalDocumentsFileUploadCtrl', ['$scope', '$modal',
 }]);
 
 esDmsSiteApp.controller('DocumentsFileUploadCtrl', 
-  ['$scope', '$rootScope', '$modalInstance', 'uploadService', 'userService', function ($scope, $rootScope, $modalInstance, uploadService, userService) {
+  ['$log', '$scope', '$rootScope', '$modalInstance', 'uploadService', 'userService',
+  function ($log, $scope, $rootScope, $modalInstance, uploadService, userService) {
 
   $scope.files = [];
   $scope.percentage = 0;
+  $scope.uploadMessage = 'No files selected';
 
   $scope.upload = function () {
     uploadService.upload();
-    $scope.files = [];
   };
 
-  $rootScope.$on('fileAdded', function (e, call) {
+  $rootScope.$on('uploadService:fileAdded', function (e, call) {
     $scope.files.push(call);
+    $scope.uploadMessage = '';
     $scope.$apply();
   });
 
-  $rootScope.$on('uploadProgress', function (e, call) {
+  $rootScope.$on('uploadService:uploadProgress', function (e, call) {
+    $log.log('uploadProgress: ' + call)
     $scope.percentage = call;
     $scope.$apply();
   });
 
+  $rootScope.$on('uploadService:uploadCompleted', function() {
+    $scope.uploadMessage = $scope.files.length + ' file(s) have been uploaded';
+    $scope.files = [];
+  });
+  
   $scope.close = function() {
     $modalInstance.close();
   };

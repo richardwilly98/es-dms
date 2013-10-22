@@ -2,10 +2,11 @@
 
 esDmsSiteApp.service('uploadService', ['$rootScope', function uploadService($rootScope) {
   var _files = [];
+  var _fileCount = 0;
   return {
     add: function (file) {
       _files.push(file);
-      $rootScope.$broadcast('fileAdded', file.files[0].name);
+      $rootScope.$broadcast('uploadService:fileAdded', file.files[0].name);
     },
     clear: function () {
       _files = [];
@@ -18,13 +19,18 @@ esDmsSiteApp.service('uploadService', ['$rootScope', function uploadService($roo
       return fileNames;
     },
     upload: function () {
+      _fileCount = _files.length;
       $.each(_files, function (index, file) {
         file.submit();
       });
       this.clear();
     },
     setProgress: function (percentage) {
-      $rootScope.$broadcast('uploadProgress', percentage);
+      _fileCount--;
+      $rootScope.$broadcast('uploadService:uploadProgress', percentage);
+      if (_fileCount === 0) {
+        $rootScope.$broadcast('uploadService:uploadCompleted');
+      }
     }
   };
 }]);
