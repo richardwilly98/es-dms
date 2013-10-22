@@ -17,7 +17,7 @@ esDmsSiteApp.directive('esdmsTagging', ['$log', '$compile', function ($log, $com
 
           scope.$watch('tags', function(newValue, oldValue) {
             function add(tag) {
-              $log.log('newtag: ' + tag + ' for doc: ' + scope.id);
+              $log.log('add tag: ' + tag + ' for doc: ' + scope.id);
               scope.$emit('document:addtag', {'id': scope.id, 'tag': tag});
             }
             // This is the ng-click handler to remove an item

@@ -59,10 +59,7 @@ public class RatingProvider implements RatingService {
 
     protected void isAuthenticated() throws ServiceException {
 	try {
-	    log.debug("*** isAuthenticated ***");
 	    Subject currentSubject = SecurityUtils.getSubject();
-	    log.debug("currentSubject.isAuthenticated(): " + currentSubject.isAuthenticated());
-	    log.debug("Principal: " + currentSubject.getPrincipal());
 	    if (currentSubject.getPrincipal() == null) {
 		throw new ServiceException("Unauthorize request");
 	    } else {

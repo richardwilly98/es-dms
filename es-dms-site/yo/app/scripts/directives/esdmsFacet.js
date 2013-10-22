@@ -18,8 +18,6 @@ esDmsSiteApp.directive('esdmsFacet', ['$log', function ($log) {
       }
       scope.toggle = function() {
         scope.term.selected = !scope.term.selected;
-        // $log.log('select term: ' + scope.term.term + ' - selected: ' + scope.term.selected);
-        // label.toggleClass('label-info');
         scope.$emit('search:applyfacet', {'term': scope.term.term, 'selected': scope.term.selected});
       };
     }
