@@ -1,9 +1,8 @@
 'use strict';
 
-esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$modal', 'documentService', 'searchService', 'sharedService',
-  function ($log, $scope, $modal, documentService, searchService, sharedService) {
+esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$modal', 'documentService', 'searchService', 'sharedService', 'messagingService',
+  function ($log, $scope, $modal, documentService, searchService, sharedService, messagingService) {
 
-  $scope.alerts = [];
   $scope.documents = [];
   $scope.facet = null;
   $scope.facets = [];
@@ -33,20 +32,10 @@ esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$modal', 'documentSe
       }
     });
 
-  $scope.mySearch = function() {
-		$log.log('mySearch');
-		if ($scope.criteria === '' || $scope.criteria === '*') {
-			$scope.alerts.push({ msg: 'Empty or wildcard not allowed' });
-			$scope.documents = [];
-		} else {
-			find(0,  'document.attributes.author: "' + $scope.criteria + '"', true);
-		}
-	};
-
   $scope.search = function(/*term*/) {
 		$log.log('search');
-		if ($scope.criteria === '' || $scope.criteria === '*') {
-			$scope.alerts.push({ msg: 'Empty or wildcard not allowed' });
+		if ($scope.criteria === undefined || $scope.criteria === '' || $scope.criteria === '*') {
+      messagingService.push({'type': 'info', 'title': 'Search', 'content': 'Empty or wildcard not allowed', 'timeout': 2000});
       $scope.totalHits = 0;
       $scope.totalPages = 0;
 			$scope.documents = [];
@@ -80,9 +69,8 @@ esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$modal', 'documentSe
         term.selected = (_.contains($scope.terms, term.term));
       });
 
-      $scope.alerts = [];
       if ($scope.totalHits === 0) {
-        $scope.alerts.push({ msg: 'No document found.' });
+        messagingService.push({'type': 'info', 'title': 'Search', 'content': 'No document found', 'timeout': 2000});
       }
 		});
   }
@@ -198,10 +186,6 @@ esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$modal', 'documentSe
 		}
 		find(0, $scope.criteria, true);
   });
-
-  $scope.closeAlert = function (index) {
-    $scope.alerts.splice(index, 1);
-  };
 
   $scope.showDetails = function(id) {
     documentService.showDetails(id);
