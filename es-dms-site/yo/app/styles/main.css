@@ -24,12 +24,7 @@ body {
   font-weight: bolder;
 }
 
-/* Used for http error message */
-.message-list {
-  position: absolute;
-  top: 0;
-  right: 0;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-  background-color: #fcf8e3;
-  border: 1px solid #fbeed5;
+/* Custom position for Toaster */
+.toast-top-right {
+  padding-top: 50px;
 }
