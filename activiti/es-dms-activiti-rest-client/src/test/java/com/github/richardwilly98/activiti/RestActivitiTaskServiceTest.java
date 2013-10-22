@@ -88,4 +88,59 @@ public class RestActivitiTaskServiceTest extends EsDmsServerWithRestActivitiServ
         Assert.assertEquals(externalResource.getName(), externalResource2.getName());
         Assert.assertEquals(externalResource.getType(), externalResource2.getType());
     }
+
+    @Test
+    @org.activiti.engine.test.Deployment(resources = { "com/github/richardwilly98/activiti/rest/service/runtime/ProcessInstanceIdentityLinkResourceTest.process.bpmn20.xml" })
+    public void testGetTasksByProcessInstance() throws ServiceException {
+        log.debug("*** testGetTasksByProcessInstance ***");
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        RestProcessInstanceServiceClient processInstanceClient = new RestProcessInstanceServiceClient(getBaseURI());
+        processInstanceClient.setToken(adminToken);
+        RestSearchResult<RestProcessInstance> instances = processInstanceClient.getProcessInstances();
+        log.debug(instances);
+        Assert.assertNotNull(instances);
+        Assert.assertEquals(instances.getSize(), 1);
+        RestProcessInstance instance = instances.getData().get(0);
+        Assert.assertNotNull(instance);
+        log.debug(instance.getId());
+        instance = processInstanceClient.getProcessInstance(instance.getId());
+        Assert.assertNotNull(instance);
+        RestTaskServiceClient taskClient = new RestTaskServiceClient(getBaseURI());
+        taskClient.setToken(adminToken);
+        RestSearchResult<RestTask> tasks = taskClient.getTasksByProcessInstance(instance.getId());
+        log.debug(tasks);
+        Assert.assertNotNull(tasks);
+        Assert.assertEquals(tasks.getSize(), 1);
+    }
+
+    @Test
+    @org.activiti.engine.test.Deployment(resources = { "com/github/richardwilly98/activiti/rest/service/runtime/ProcessInstanceIdentityLinkResourceTest.process.bpmn20.xml" })
+    public void testSetTaskAssignee() throws ServiceException {
+        log.debug("*** testSetTaskAssignee ***");
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        RestProcessInstanceServiceClient processInstanceClient = new RestProcessInstanceServiceClient(getBaseURI());
+        processInstanceClient.setToken(adminToken);
+        RestSearchResult<RestProcessInstance> instances = processInstanceClient.getProcessInstances();
+        log.debug(instances);
+        Assert.assertNotNull(instances);
+        Assert.assertEquals(instances.getSize(), 1);
+        RestProcessInstance instance = instances.getData().get(0);
+        Assert.assertNotNull(instance);
+        log.debug(instance.getId());
+        instance = processInstanceClient.getProcessInstance(instance.getId());
+        Assert.assertNotNull(instance);
+        RestTaskServiceClient taskClient = new RestTaskServiceClient(getBaseURI());
+        taskClient.setToken(adminToken);
+        RestSearchResult<RestTask> tasks = taskClient.getTasksByProcessInstance(instance.getId());
+        log.debug(tasks);
+        Assert.assertNotNull(tasks);
+        Assert.assertEquals(tasks.getSize(), 1);
+        RestTask task = tasks.getData().get(0);
+        Assert.assertNotNull(task);
+        Assert.assertNull(task.getAssignee());
+        task.setAssignee(UserService.DEFAULT_ADMIN_LOGIN);
+        log.debug("Try to update " + task);
+        task = taskClient.update(task);
+        Assert.assertEquals(task.getAssignee(), UserService.DEFAULT_ADMIN_LOGIN);
+    }
 }

@@ -12,8 +12,6 @@ import com.github.richardwilly98.activiti.rest.client.RestProcessInstanceService
 
 public class RestActivitiProcessInstanceServiceTest extends EsDmsServerWithRestActivitiServerBase {
 
-//    private String url = "http://localhost:" + REST_PORT;
-
     public RestActivitiProcessInstanceServiceTest() throws Exception {
         super();
     }

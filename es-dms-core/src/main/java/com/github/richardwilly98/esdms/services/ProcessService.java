@@ -32,6 +32,7 @@ import java.util.Set;
 import com.github.richardwilly98.esdms.api.ItemBase;
 import com.github.richardwilly98.esdms.bpm.api.ProcessDefinition;
 import com.github.richardwilly98.esdms.bpm.api.ProcessInstance;
+import com.github.richardwilly98.esdms.bpm.api.Task;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
 public interface ProcessService {
@@ -45,4 +46,10 @@ public interface ProcessService {
     public abstract ProcessInstance getProcessInstance(String id) throws ServiceException;
 
     public abstract void attach(ProcessInstance processInstance, ItemBase item) throws ServiceException;
+    
+    public abstract Set<Task> getTasksByProcessInstance(String id) throws ServiceException;
+    
+    public abstract void assignTask(String id, String userId) throws ServiceException;
+    
+    public abstract Task getTask(String id) throws ServiceException;
 }

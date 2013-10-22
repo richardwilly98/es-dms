@@ -31,6 +31,7 @@ import com.github.richardwilly98.esdms.api.Parameter;
 import com.github.richardwilly98.esdms.api.Parameter.ParameterType;
 import com.github.richardwilly98.esdms.bpm.api.ProcessDefinition;
 import com.github.richardwilly98.esdms.bpm.api.ProcessInstance;
+import com.github.richardwilly98.esdms.bpm.api.Task;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.util.ProcessServiceUtils;
 
@@ -108,6 +109,7 @@ public class ProcessServiceProvider implements ProcessService {
 
     @Override
     public ProcessInstance startProcessInstance(ProcessDefinition processDefinition) throws ServiceException {
+        log.debug("*** startProcessInstance ***");
         checkNotNull(processDefinition);
         String token = getCurrentToken();
         processInstanceService.setToken(token);
@@ -119,6 +121,7 @@ public class ProcessServiceProvider implements ProcessService {
     @Override
     public Set<ProcessDefinition> getProcessDefinitions() throws ServiceException {
         log.debug("*** getProcessDefinitions ***");
+        try {
         String token = getCurrentToken();
         String deploymentId = getFirstDeployment(token);
         log.debug("First deployment it: " + deploymentId);
@@ -126,6 +129,10 @@ public class ProcessServiceProvider implements ProcessService {
         RestSearchResult<RestProcessDefinition> processDefinitions = processDefinitionService
                 .getProcessDefinitionsByCategory(ES_DMS_CATEGORY);
         return convertRestProcessDefinitions(processDefinitions);
+        } catch (Throwable t) {
+            log.error("getProcessDefinitions failed", t);
+            throw new ServiceException(t.getLocalizedMessage());
+        }
     }
 
     @Override
@@ -136,8 +143,9 @@ public class ProcessServiceProvider implements ProcessService {
         RestProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(id);
         if (processDefinition != null) {
             return ProcessServiceUtils.convertToProcessDefinition(processDefinition);
+        } else {
+            throw new ServiceException(String.format("No process definition found for %s.", id));
         }
-        throw new ServiceException(String.format("No process definition found for %s.", id));
     }
 
     @Override
@@ -187,6 +195,42 @@ public class ProcessServiceProvider implements ProcessService {
             taskService.addExternalResource(task.getId(), resource);
         }
         throw new ServiceException(String.format("No task found for instance %s.", processInstance.getId()));
+    }
+
+    @Override
+    public Set<Task> getTasksByProcessInstance(String id) throws ServiceException {
+        log.debug(String.format("*** getTasksByProcessInstance - %s ***", id));
+        String token = getCurrentToken();
+        taskService.setToken(token);
+        RestSearchResult<RestTask> tasks = taskService.getTasksByProcessInstance(id);
+        Set<Task> ts = newHashSet();
+        for (RestTask task : tasks.getData()) {
+            ts.add(ProcessServiceUtils.convertToTask(task));
+        }
+        return ts;
+    }
+
+    @Override
+    public void assignTask(String id, String userId) throws ServiceException {
+        log.debug(String.format("*** assignTask - %s - %s ***", id, userId));
+        String token = getCurrentToken();
+        taskService.setToken(token);
+        RestTask task = taskService.getTask(id);
+        checkNotNull(task);
+        task.setAssignee(userId);
+        taskService.update(task);
+    }
+
+    @Override
+    public Task getTask(String id) throws ServiceException {
+        log.debug(String.format("*** getTask - %s ***", id));
+        String token = getCurrentToken();
+        taskService.setToken(token);
+        RestTask task = taskService.getTask(id);
+        if (task != null) {
+            return ProcessServiceUtils.convertToTask(task);
+        }
+        throw new ServiceException(String.format("No task found for %s.", id));
     }
 
 }
