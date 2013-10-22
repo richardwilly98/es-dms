@@ -3,8 +3,7 @@
 esDmsSiteApp.service('roleService', ['$log', '$rootScope', '$resource', '$http', function roleService($log, $rootScope, $resource, $http) {
 	var RoleResource = $resource('api/roles/:id/:action', { }, {
 		update: {method: 'PUT'},
-		create: {method: 'POST'},
-		types: {method: 'GET', params: {id: '_types'}, isArray: true}
+		create: {method: 'POST'}
 	});
 	var RoleTypeResource = $resource('api/role-types', { }, {
 	});

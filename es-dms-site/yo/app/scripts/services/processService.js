@@ -22,7 +22,7 @@ angular.module('esDmsSiteApp')
         $log.log('Get process definitions');
         if (processDefinitions.length === 0) {
           var definitions = ProcessResource.listProcessDefinitions(function() {
-            $log.log('get definitions: ' + JSON.stringify(definitions));
+            // $log.log('get definitions: ' + JSON.stringify(definitions));
             processDefinitions = definitions;
             callback(definitions);
           });
@@ -35,9 +35,9 @@ angular.module('esDmsSiteApp')
         var instance = new ProcessResource();
         instance.processDefinitionId = id;
         instance.$startProcessInstance({}, function(value, headers) {
-          $log.log('*** startProcessInstance: ' + JSON.stringify(value));
+          // $log.log('*** startProcessInstance: ' + JSON.stringify(value));
           var location = headers('location');
-          $log.log('*** location: ' + location);
+          // $log.log('*** location: ' + location);
           var id = _.last(location.split('/'));
           instance.id = id;
           callback(instance);

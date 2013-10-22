@@ -12,12 +12,15 @@ esDmsSiteApp.directive('esdmsFacet', ['$log', function ($log) {
       '<span class="badge badge-info">{{ term.count }}</span>' +
       '</div>',
     link: function ( scope, element ) {
-      scope.toggle = function() {
-        scope.selected = !scope.selected;
-        $log.log('select term: ' + scope.term.term);
-        var label = element.find('.label');
+      var label = element.find('.label');
+      if (scope.term.selected) {
         label.toggleClass('label-info');
-        scope.$emit('search:applyfacet', {'term': scope.term.term, 'selected': scope.selected});
+      }
+      scope.toggle = function() {
+        scope.term.selected = !scope.term.selected;
+        // $log.log('select term: ' + scope.term.term + ' - selected: ' + scope.term.selected);
+        // label.toggleClass('label-info');
+        scope.$emit('search:applyfacet', {'term': scope.term.term, 'selected': scope.term.selected});
       };
     }
 	};

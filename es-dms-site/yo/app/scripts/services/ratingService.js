@@ -9,7 +9,7 @@ angular.module('esDmsSiteApp')
     });
     return {
       create: function(id, score) {
-        $log.log('creating rating: ' + id + ' - ' + score);
+        $log.info('creating rating: ' + id + ' - ' + score);
         var ratingRequest = {'itemId': id, 'score': score};
         var rating = new resource.save(ratingRequest);
         $log.log('saved rating: ' + rating);

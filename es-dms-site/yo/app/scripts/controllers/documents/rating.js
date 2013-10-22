@@ -8,7 +8,7 @@ angular.module('esDmsSiteApp')
 
     $scope.getRating = function(document) {
       $scope.id = document.id;
-      $log.log('getRating: ' + document.id + ' - ' + sharedService.getCurrentUser().id);
+      // $log.log('getRating: ' + document.id + ' - ' + sharedService.getCurrentUser().id);
       _.find(document.ratings, function(rating) {
         if (rating.user === sharedService.getCurrentUser().id) {
           $log.log('Found rating: ' + rating.score);
@@ -17,10 +17,10 @@ angular.module('esDmsSiteApp')
         }
       });
       $scope.$watch('rating.score', function(newValue, oldValue) {
-        if (newValue !== 0) {
+        if (newValue !== oldValue) {
           addRating();
         }
-      });
+      }, true);
     };
   
     function addRating() {

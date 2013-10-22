@@ -74,6 +74,12 @@ esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$modal', 'documentSe
 			$scope.totalHits = result.totalHits;
 			$scope.elapsedTime = result.elapsedTime;
 			$scope.facets = result.facets[$scope.facet];
+
+      // Mark as selected the terms
+      _.each($scope.facets.terms, function(term){
+        term.selected = (_.contains($scope.terms, term.term));
+      });
+
       $scope.alerts = [];
       if ($scope.totalHits === 0) {
         $scope.alerts.push({ msg: 'No document found.' });
@@ -190,7 +196,7 @@ esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$modal', 'documentSe
 				}
 			}
 		}
-		find(0, $scope.criteria, /*term,*/ true);
+		find(0, $scope.criteria, true);
   });
 
   $scope.closeAlert = function (index) {

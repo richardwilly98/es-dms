@@ -42,7 +42,7 @@ esDmsSiteApp.directive('esdmsTagging', ['$log', '$compile', function ($log, $com
                 remove(tag);
               }
             }
-          });
+          }, true);
         },
         post : function(scope, element) {
           var template = '<input ui-select2="select2options" ng-model="tags" />';

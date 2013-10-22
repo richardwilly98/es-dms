@@ -20,8 +20,9 @@
 				<div class="well sidebar-nav" data-ng-show="facets">
 					<ul class="nav nav-list">
 						<li class="nav-header">{{ facet }}</li>
-						<li data-ng-repeat="term in facets.terms"><esdms-facet
-								term="term"></esdms-facet></li>
+						<li data-ng-repeat="term in facets.terms">
+							<esdms-facet term="term"></esdms-facet>
+						</li>
 					</ul>
 				</div>
 			</div>
