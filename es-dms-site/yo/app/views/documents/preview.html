@@ -1,8 +1,19 @@
 <div>
   <div class="modal-header">
+    <button type="button" class="close" data-ng-click="close()"
+      aria-hidden="true">&times;</button>
     <h4>Preview</h4>
   </div>
   <div class="modal-body">
+    <div data-ng-show="!document.preview">
+      <div class="well well-large well-transparent lead">
+        <i class="icon-spinner icon-spin icon-large"></i>
+        Generating preview...
+      </div>
+    </div>
     <div ng-bind-html="document.preview"></div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn" data-ng-click="close()">Close</button>
   </div>
 </div>

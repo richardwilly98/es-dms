@@ -45,6 +45,7 @@ esDmsSiteApp.config(function (/*$routeProvider,*/ $stateProvider, $locationProvi
     ;
 
   $locationProvider.html5Mode(false);
+  // $locationProvider.hashPrefix('!');
 });
 
 esDmsSiteApp.config(['$httpProvider', function($httpProvider) {

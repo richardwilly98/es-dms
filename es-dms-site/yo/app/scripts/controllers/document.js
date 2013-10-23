@@ -16,8 +16,6 @@ esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$modal', 'documentSe
   $scope.service = sharedService;
   $scope.pageSize = $scope.service.getSettings().user.pageSize;
 
-  var currentDocument = null;
-
   function init() {
   }
 
@@ -229,19 +227,6 @@ esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$modal', 'documentSe
         $scope.documents.splice(index, 1);
       }
     });
-  };
-
-  $scope.preview = function(id) {
-		var document = getDocument(id);
-		if (currentDocument !== document) {
-			documentService.preview(id, $scope.criteria, function(response) {
-				$log.log('Preview document - ' + document.id);
-        document.preview = response;
-			});
-		} else {
-			$log.log('Do not fetch preview again!');
-		}
-		currentDocument = document;
   };
 
 }]);

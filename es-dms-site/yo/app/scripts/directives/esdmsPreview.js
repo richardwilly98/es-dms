@@ -1,19 +1,26 @@
 'use strict';
 
 angular.module('esDmsSiteApp')
-  .directive('esdmsPreview', ['$log', function ($log) {
+  .directive('esdmsPreview', ['$log', '$modal', function ($log, $modal) {
     return {
-      template: '<div class="dropdown">' +
-        '<a class="dropdown-toggle label"><i class="icon-white icon-picture"></i>&nbsp;Preview</a>' +
-        '<div class="dropdown-menu" data-ng-include="\'views/documents/preview.html\'"></div>' +
-        '</div>',
+      template: '<a class="label"><i class="icon-white icon-picture"></i>&nbsp;Preview</a>',
       restrict: 'E',
+      scope: { id: '=', criteria: '='},
       link: function (scope, element) {
-        var toggle = element.find('.dropdown-toggle');
-        toggle.bind('click', function() {
-          // TODO: should be provided by directive attributes.
-          $log.log('click preview');
-          scope.$apply('preview(document.id)');
+        element.bind('click', function() {
+          $log.log('click preview for ' + scope.id + ' with criteria ' + scope.criteria);
+          $modal.open({
+            templateUrl: 'views/documents/preview.html',
+            controller: 'DocumentPreviewCtrl',
+            resolve: {
+              documentId: function() {
+                return scope.id;
+              },
+              criteria: function() {
+                return scope.criteria;
+              }
+            }
+          });
         });
       }
     };
