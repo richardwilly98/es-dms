@@ -35,6 +35,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.richardwilly98.esdms.api.File;
+import com.google.common.base.Objects;
 
 @JsonInclude(Include.NON_NULL)
 public class FileImpl implements Serializable, File {
@@ -61,66 +62,76 @@ public class FileImpl implements Serializable, File {
     @JsonProperty("author")
     private String author;
 
+    @JsonProperty("language")
+    private String language;
+
     public static class Builder {
 
-	private String author;
-	private String contentType;
-	private byte[] content;
-	private Date date;
-	private String name;
-	private String title;
+        private String author;
+        private String contentType;
+        private byte[] content;
+        private Date date;
+        private String name;
+        private String title;
+        private String language;
 
-	public Builder content(byte[] content) {
-	    this.content = content;
-	    return this;
-	}
+        public Builder content(byte[] content) {
+            this.content = content;
+            return this;
+        }
 
-	public Builder name(String name) {
-	    this.name = name;
-	    return this;
-	}
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
 
-	public Builder contentType(String contentType) {
-	    this.contentType = contentType;
-	    return this;
-	}
+        public Builder contentType(String contentType) {
+            this.contentType = contentType;
+            return this;
+        }
 
-	public Builder date(Date date) {
-	    this.date = date;
-	    return this;
-	}
+        public Builder date(Date date) {
+            this.date = date;
+            return this;
+        }
 
-	public Builder title(String title) {
-	    this.title = title;
-	    return this;
-	}
+        public Builder title(String title) {
+            this.title = title;
+            return this;
+        }
 
-	public Builder author(String author) {
-	    this.author = author;
-	    return this;
-	}
+        public Builder author(String author) {
+            this.author = author;
+            return this;
+        }
 
-	public File build() {
-	    return new FileImpl(this);
-	}
+        public Builder language(String language) {
+            this.language = language;
+            return this;
+        }
+
+        public File build() {
+            return new FileImpl(this);
+        }
     }
 
     FileImpl() {
-	this(null);
+        this(null);
     }
 
     protected FileImpl(Builder builder) {
-	if (builder != null) {
-	    this.author = builder.author;
-	    this.content = builder.content;
-	    this.contentType = builder.contentType;
-	    this.date = builder.date;
-	    this.name = builder.name;
-	    this.title = builder.title;
-	}
-	if (this.content == null) {
-	    this.content = new byte[0];
-	}
+        if (builder != null) {
+            this.author = builder.author;
+            this.content = builder.content;
+            this.contentType = builder.contentType;
+            this.date = builder.date;
+            this.name = builder.name;
+            this.title = builder.title;
+            this.language = builder.language;
+        }
+        if (this.content == null) {
+            this.content = new byte[0];
+        }
     }
 
     /*
@@ -130,7 +141,7 @@ public class FileImpl implements Serializable, File {
      */
     @Override
     public byte[] getContent() {
-	return content;
+        return content;
     }
 
     /*
@@ -140,7 +151,7 @@ public class FileImpl implements Serializable, File {
      */
     @Override
     public void setContent(byte[] content) {
-	this.content = content;
+        this.content = content;
     }
 
     /*
@@ -150,7 +161,7 @@ public class FileImpl implements Serializable, File {
      */
     @Override
     public String getName() {
-	return name;
+        return name;
     }
 
     /*
@@ -160,7 +171,7 @@ public class FileImpl implements Serializable, File {
      */
     @Override
     public void setName(String name) {
-	this.name = name;
+        this.name = name;
     }
 
     /*
@@ -170,7 +181,7 @@ public class FileImpl implements Serializable, File {
      */
     @Override
     public String getContentType() {
-	return contentType;
+        return contentType;
     }
 
     /*
@@ -180,7 +191,7 @@ public class FileImpl implements Serializable, File {
      */
     @Override
     public void setContentType(String contentType) {
-	this.contentType = contentType;
+        this.contentType = contentType;
     }
 
     /*
@@ -190,7 +201,7 @@ public class FileImpl implements Serializable, File {
      */
     @Override
     public Date getDate() {
-	return date;
+        return date;
     }
 
     /*
@@ -200,7 +211,7 @@ public class FileImpl implements Serializable, File {
      */
     @Override
     public void setDate(Date date) {
-	this.date = date;
+        this.date = date;
     }
 
     /*
@@ -210,7 +221,7 @@ public class FileImpl implements Serializable, File {
      */
     @Override
     public String getTitle() {
-	return title;
+        return title;
     }
 
     /*
@@ -220,7 +231,7 @@ public class FileImpl implements Serializable, File {
      */
     @Override
     public void setTitle(String title) {
-	this.title = title;
+        this.title = title;
     }
 
     /*
@@ -230,7 +241,7 @@ public class FileImpl implements Serializable, File {
      */
     @Override
     public String getAuthor() {
-	return author;
+        return author;
     }
 
     /*
@@ -240,7 +251,27 @@ public class FileImpl implements Serializable, File {
      */
     @Override
     public void setAuthor(String author) {
-	this.author = author;
+        this.author = author;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.github.richardwilly98.api.File#getLanguage()
+     */
+    @Override
+    public String getLanguage() {
+        return language;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.github.richardwilly98.api.File#setLanguage(java.lang.String)
+     */
+    @Override
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     @Override
@@ -254,6 +285,7 @@ public class FileImpl implements Serializable, File {
         result = prime * result + ((highlight == null) ? 0 : highlight.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + ((title == null) ? 0 : title.hashCode());
+        result = prime * result + ((language == null) ? 0 : language.hashCode());
         return result;
     }
 
@@ -298,7 +330,17 @@ public class FileImpl implements Serializable, File {
                 return false;
         } else if (!title.equals(other.title))
             return false;
+        if (language == null) {
+            if (other.language != null)
+                return false;
+        } else if (!language.equals(other.language))
+            return false;
         return true;
     }
 
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this).add("author", author).add("contentType", contentType).add("date", date).add("name", name)
+                .add("title", title).add("language", language).toString();
+    }
 }

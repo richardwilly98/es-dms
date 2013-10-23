@@ -45,6 +45,7 @@ import com.github.richardwilly98.esdms.VersionImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
+import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Rating;
 import com.github.richardwilly98.esdms.api.Version;
 
@@ -119,7 +120,7 @@ public class DocumentSerializationTest {
 	Map<String, Object> attributes = newHashMap();
 	Set<Version> versions = newHashSet();
 	versions.add(new VersionImpl.Builder().documentId(id)
-	        .file(new FileImpl.Builder().content(content).name("test.html").contentType("text/html").build()).current(true)
+	        .file(new FileImpl.Builder().content(content).name("test.html").contentType("text/html").language("en").title("my-title").build()).current(true)
 	        .versionId(1).build());
 	versions.add(new VersionImpl.Builder().documentId(id)
 	        .file(new FileImpl.Builder().content(content).name("test.html").contentType("text/html").build()).current(false)
@@ -143,6 +144,15 @@ public class DocumentSerializationTest {
 	Assert.assertEquals(version.getParentId(), 0);
 	// Version.documentId matches document.id
 	Assert.assertEquals(version.getDocumentId(), id);
+        // Version.documentId matches document.id
+        Assert.assertEquals(version.getDocumentId(), id);
+        File file = version.getFile();
+        Assert.assertNotNull(file);
+        log.debug(file);
+        // File.language matches en
+        Assert.assertEquals(file.getLanguage(), "en");
+        // File.title matches my-title
+        Assert.assertEquals(file.getTitle(), "my-title");
 	// Version #1 is parent of Version #2
 	version = document2.getVersion(2);
 	Assert.assertEquals(version.getParentId(), 1);

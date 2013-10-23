@@ -65,4 +65,7 @@ public interface File {
 
     public abstract void setAuthor(String author);
 
+    public abstract String getLanguage();
+
+    public abstract void setLanguage(String language);
 }
