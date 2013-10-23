@@ -279,7 +279,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 
             log.debug("query: " + query);
 
-            SearchRequestBuilder srb = client.prepareSearch(index).setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH).setNoFields()
+            SearchRequestBuilder srb = client.prepareSearch(index).setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH).addField("versions.file")//.setNoFields()
                     .setQuery(query).setHighlighterPreTags("<span class='highlight-tag'>").setHighlighterPostTags("</span>")
                     .setHighlighterOrder("score").addHighlightedField("file", size, 1);
             log.trace("++ Search request: " + srb);
@@ -297,7 +297,16 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
                         }
                     }
                 }
+                if (preview == null) {
+                    log.info("Preview is empty. Try to fetch file.summary from current version.");
+                    preview = hit.getFields().get("versions.file").getValue().toString();
+                    if (preview != null && preview.length() > 1024) {
+                        preview = preview.substring(0, 1023);
+                    }
+                    log.trace(String.format("summary: %s", preview));
+                }
             }
+            
             return preview;
         } catch (Throwable t) {
             log.error("preview failed", t);

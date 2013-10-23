@@ -1,7 +1,7 @@
 'use strict';
 
-esDmsSiteApp.controller('DocumentPreviewCtrl', ['$timeout','$log', '$scope', 'documentService', '$modalInstance', 'documentId', 'criteria',
-  function ($timeout,$log, $scope, documentService, $modalInstance, documentId, criteria) {
+esDmsSiteApp.controller('DocumentPreviewCtrl', ['$log', '$scope', 'documentService', '$modalInstance', 'documentId', 'criteria',
+  function ($log, $scope, documentService, $modalInstance, documentId, criteria) {
 
   $scope.document = {};
 
@@ -17,7 +17,11 @@ esDmsSiteApp.controller('DocumentPreviewCtrl', ['$timeout','$log', '$scope', 'do
     }
     $scope.document.id = documentId;
     documentService.preview(documentId, criteria, function(response) {
-      $scope.document.preview = response;
+      if (response !== null) {
+        $scope.document.preview = response;
+      } else {
+        $scope.document.preview = 'No preview available for document ' + $scope.document.id;
+      }
     });
   };
 
