@@ -45,7 +45,8 @@ esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$modal', 'documentSe
       $scope.terms = [];
       $scope.facets = [];
       searchService.criteria($scope.criteria);
-			$scope.facet = 'tags';
+			// $scope.facet = 'tags';
+      $scope.facet = 'versions.file.language';
 			find(0, $scope.criteria, true);
 		}
   };
@@ -57,18 +58,20 @@ esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$modal', 'documentSe
 			if (updatePagination) {
 				setPagination(result);
 			}
-			$scope.documents = result.items;
-			$scope.totalHits = result.totalHits;
-			$scope.elapsedTime = result.elapsedTime;
-			$scope.facets = result.facets[$scope.facet];
 
-      // Mark as selected the terms
-      _.each($scope.facets.terms, function(term){
-        term.selected = (_.contains($scope.terms, term.term));
-      });
-
+      $scope.documents = result.items;
+      $scope.totalHits = result.totalHits;
       if ($scope.totalHits === 0) {
+        $scope.facets = [];
         messagingService.push({'type': 'info', 'title': 'Search', 'content': 'No document found', 'timeout': 2000});
+      } else {
+        $scope.elapsedTime = result.elapsedTime;
+        $scope.facets = result.facets[$scope.facet];
+
+        // Mark as selected the terms
+        _.each($scope.facets.terms, function(term){
+          term.selected = (_.contains($scope.terms, term.term));
+        });
       }
 		});
   }
