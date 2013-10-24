@@ -20,11 +20,12 @@ esDmsSiteApp.service('authenticationService', ['$log', '$http', 'esdmsAuthentica
 			esdmsAuthenticationService.logout();
 			sharedService.setCurrentUser(null);
 		},
-		validate: function(token) {
+		validate: function(token, callback) {
 			esdmsAuthenticationService.validate(token, function(response) {
 				if (response !== undefined) {
 					userService.get(response.id, function(user) {
 						sharedService.setCurrentUser(user);
+						callback();
 					});
 				}
 			});

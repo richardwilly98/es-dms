@@ -1,8 +1,10 @@
 /* exported sharedService */
 'use strict';
 
-esDmsSiteApp.service('sharedService', ['$log', '$rootScope', function ($log, $rootScope) {
+esDmsSiteApp.service('sharedService', ['$log', '$rootScope', '$http', function ($log, $rootScope, $http) {
   var settings = {
+    system : {
+    },
     user : {
       pageSize: 12,
       isProcessUser: true
@@ -85,6 +87,15 @@ esDmsSiteApp.service('sharedService', ['$log', '$rootScope', function ($log, $ro
       } else {
         return false;
       }
+    },
+    loadSystemSettings: function () {
+      // TODO: es-dms should not be hardcoded.
+      $http.get('api/parameters/es-dms').success(function (data) {
+        settings.system = data.attributes;
+      });
+    },
+    getSystemSettings: function() {
+      return settings.system;
     }
   };
 }]);

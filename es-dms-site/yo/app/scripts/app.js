@@ -78,12 +78,14 @@ esDmsSiteApp.config(['$httpProvider', function($httpProvider) {
 
 }]);
 
-esDmsSiteApp.run(['$log', 'authenticationService', '$cookies', function($log, authenticationService, $cookies) {
+esDmsSiteApp.run(['$log', 'authenticationService', 'sharedService', '$cookies', function($log, authenticationService, sharedService, $cookies) {
   $log.log('*** run ***');
   var token = $cookies.ES_DMS_TICKET;
   if (token !== '') {
     $log.log('initialize - token: ' + token);
-    authenticationService.validate(token);
+    authenticationService.validate(token, function () {
+      sharedService.loadSystemSettings();
+    });
   } else {
     $log.log('No ES_DMS_TICKET cookie found.');
   }

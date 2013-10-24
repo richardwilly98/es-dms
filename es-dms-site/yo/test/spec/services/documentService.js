@@ -1,5 +1,10 @@
 'use strict';
 
+var systemSettings = {id: 'es-dms', name:'es-dms', 
+  attributes: {
+    'preview.length': 2048
+  }
+};
 var validate = {id: "admin", url: "http://localhost:18080"};
 var user = {id: "admin", login: "admin"};
 var doc = {id: 3, name: "dummy", attributes: {author: "admin"}};
@@ -33,6 +38,7 @@ describe('Service: documentService', function () {
 
   beforeEach(function(){
     $httpBackend.whenPOST('api/auth/validate').respond(validate);
+    $httpBackend.whenGET('api/parameters/es-dms').respond(systemSettings);
     $httpBackend.whenGET('api/users/admin').respond(user);
     $httpBackend.whenGET('api/documents/search/dummy?fi=0&ps=20').respond(documents);
     $httpBackend.whenGET('api/documents/3').respond(doc);
