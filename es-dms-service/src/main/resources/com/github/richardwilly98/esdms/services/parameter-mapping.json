@@ -2,13 +2,16 @@
 	"parameter": {
 		"properties": {
 				"id" : {
-					"type": "string"
+					"type": "string",
+					"index": "not_analyzed"
 				},
 				"name" : {
-					"type": "string"
+					"type": "string",
+					"index": "not_analyzed"
 				},
 				"type" : {
-					"type": "integer"
+					"type": "integer",
+					"index": "not_analyzed"
 				}
 			}
 		}

@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -63,6 +64,7 @@ import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.inject.SystemParametersModule;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -73,6 +75,10 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
     private static final String DOCUMENT_MAPPING_JSON = "/com/github/richardwilly98/esdms/services/document-mapping.json";
     private final static String type = "document";
     private final VersionService versionService;
+
+    @Inject
+    @Named(SystemParametersModule.PREVIEW_LENGTH)
+    public int previewLength;
 
     @Inject
     DocumentProvider(Client client, BootstrapService bootstrapService, VersionService versionService) throws ServiceException {
@@ -271,7 +277,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
     public String preview(Document document, /* int versionId, */
             String criteria, int size) throws ServiceException {
         try {
-            log.trace("*** preview ***");
+            log.trace("*** preview - length " + previewLength + " ***");
             String query = jsonBuilder().startObject().startObject("bool").startArray("must").startObject().startObject("queryString")
                     .field("query", criteria).array("fields", "_all", "file").endObject().endObject().startObject()
                     .startObject("queryString").field("query", document.getId()).field("default_field", "id").endObject().endObject()
@@ -279,7 +285,12 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 
             log.debug("query: " + query);
 
-            SearchRequestBuilder srb = client.prepareSearch(index).setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH).addField("versions.file")//.setNoFields()
+            // TODO: This query must be in 2 cuts:
+            // 1. Try to retrieve highlight fragment.
+            // 2. If highlight is not available retrieve versions.file
+            SearchRequestBuilder srb = client.prepareSearch(index).setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH)
+                    .addField("versions.file")
+                    // .setNoFields()
                     .setQuery(query).setHighlighterPreTags("<span class='highlight-tag'>").setHighlighterPostTags("</span>")
                     .setHighlighterOrder("score").addHighlightedField("file", size, 1);
             log.trace("++ Search request: " + srb);
@@ -300,13 +311,13 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
                 if (preview == null) {
                     log.info("Preview is empty. Try to fetch file.summary from current version.");
                     preview = hit.getFields().get("versions.file").getValue().toString();
-                    if (preview != null && preview.length() > 1024) {
-                        preview = preview.substring(0, 1023);
+                    if (preview != null && preview.length() > size) {
+                        preview = preview.substring(0, size - 1);
                     }
                     log.trace(String.format("summary: %s", preview));
                 }
             }
-            
+
             return preview;
         } catch (Throwable t) {
             log.error("preview failed", t);

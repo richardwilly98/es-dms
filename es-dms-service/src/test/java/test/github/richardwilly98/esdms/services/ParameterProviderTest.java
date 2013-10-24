@@ -37,6 +37,7 @@ import com.github.richardwilly98.esdms.ParameterImpl;
 import com.github.richardwilly98.esdms.api.Parameter;
 import com.github.richardwilly98.esdms.api.Parameter.ParameterType;
 import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.services.ParameterService;
 import com.google.inject.Inject;
 
@@ -46,7 +47,8 @@ public class ParameterProviderTest extends ProviderTestBase {
     ParameterService parameterService;
 
     private Parameter createParameter(String id, String name, ParameterType type, Map<String, Object> attributes) throws Throwable {
-        Parameter parameter = parameterService.create(new ParameterImpl.Builder().id(id).name(name).type(type).attributes(attributes).build());
+        Parameter parameter = parameterService.create(new ParameterImpl.Builder().id(id).name(name).type(type).attributes(attributes)
+                .build());
         Assert.assertNotNull(parameter);
         Parameter parameter2 = parameterService.get(id);
         Assert.assertNotNull(parameter2);
@@ -64,11 +66,11 @@ public class ParameterProviderTest extends ProviderTestBase {
         Parameter parameter = createParameter(id, id, ParameterType.SYSTEM, attributes);
         Assert.assertEquals(id, parameter.getId());
         Assert.assertEquals(ParameterType.SYSTEM, parameter.getType());
-        
+
         parameter = createParameter(id, id, ParameterType.USER, attributes);
         Assert.assertEquals(id, parameter.getId());
         Assert.assertEquals(ParameterType.USER, parameter.getType());
-        
+
         parameter = createParameter(id, id, ParameterType.CUSTOM, attributes);
         Assert.assertEquals(id, parameter.getId());
         Assert.assertEquals(ParameterType.CUSTOM, parameter.getType());
@@ -109,11 +111,11 @@ public class ParameterProviderTest extends ProviderTestBase {
         SearchResult<Parameter> parameters = parameterService.findByType(ParameterType.SYSTEM, 0, 20);
         Assert.assertNotNull(parameters);
         long total = parameters.getTotalHits();
-        for(Parameter parameter : parameters.getItems()) {
+        for (Parameter parameter : parameters.getItems()) {
             Assert.assertEquals(parameter.getType(), ParameterType.SYSTEM);
             log.trace(parameter);
         }
-        
+
         String id = "param-1";
         Map<String, Object> attributes = newHashMap();
         attributes.put("key-1", "value-1");
@@ -135,5 +137,57 @@ public class ParameterProviderTest extends ProviderTestBase {
         Assert.assertEquals(parameters.getTotalHits(), total + 1);
         Assert.assertTrue(parameters.getItems().contains(parameter2));
         Assert.assertFalse(parameters.getItems().contains(parameter));
+    }
+
+    @Test
+    public void testGetParameterValue() throws Throwable {
+        log.info("Start testGetParameterValue");
+        String id = "id-" + System.currentTimeMillis();
+        String name = "name-" + System.currentTimeMillis();
+        ParameterType type = ParameterType.SYSTEM;
+        Map<String, Object> attributes = newHashMap();
+        attributes.put("key-1", "value-1");
+        Parameter parameter = createParameter(id, name, type, attributes);
+        Assert.assertNotNull(parameter);
+        Object object = parameterService.getParameterValue(id);
+        Assert.assertEquals(parameter, object);
+        object = parameterService.getParameterValue(id + ".id");
+        Assert.assertEquals(id, object);
+        object = parameterService.getParameterValue(id + ".name");
+        Assert.assertEquals(name, object);
+        object = parameterService.getParameterValue(id + ".type");
+        Assert.assertEquals(type, object);
+        object = parameterService.getParameterValue(id + ".attributes");
+        Assert.assertEquals(attributes, object);
+        object = parameterService.getParameterValue(id + ".attributes(key-1)");
+        Assert.assertEquals(attributes.get("key-1"), object);
+        object = parameterService.getParameterValue(id + ".attributes(key-2)");
+        Assert.assertNull(object);
+        try {
+            object = parameterService.getParameterValue(id + ".dummyProperty");
+            Assert.fail("This test should not fail - property dummayProperty does not exist.");
+        } catch (ServiceException sEx) {
+
+        }
+        parameterService.delete(parameter);
+        object = parameterService.getParameterValue(id);
+        Assert.assertNull(object);
+    }
+    
+    @Test
+    public void testSetParameterValue() throws Throwable {
+        log.info("Start testSetParameterValue");
+        String id = "id-" + System.currentTimeMillis();
+        String name = "name-" + System.currentTimeMillis();
+        ParameterType type = ParameterType.SYSTEM;
+        Map<String, Object> attributes = newHashMap();
+        attributes.put("key-1", "value-1");
+        Parameter parameter = createParameter(id, name, type, attributes);
+        Assert.assertNotNull(parameter);
+        name = "name-" + System.currentTimeMillis();
+        parameter = parameterService.setParameterValue(parameter, "name", name);
+        Assert.assertEquals(parameter.getName(), name);
+        parameter = parameterService.setParameterValue(parameter, "attributes(key-2)", "value-2");
+        Assert.assertEquals(parameter.getAttributes().get("key-2"), "value-2");
     }
 }

@@ -61,6 +61,7 @@ public class ServicesModule extends AbstractModule {
 
 	bind(HashService.class).to(SHA512HashProvider.class).asEagerSingleton();
         bind(ParameterService.class).to(ParameterProvider.class).asEagerSingleton();
+        install(new SystemParametersModule());
 	bind(AuthenticationService.class).to(AuthenticationProvider.class).asEagerSingleton();
 	bind(PermissionService.class).to(PermissionProvider.class).asEagerSingleton();
 	bind(RoleService.class).to(RoleProvider.class).asEagerSingleton();

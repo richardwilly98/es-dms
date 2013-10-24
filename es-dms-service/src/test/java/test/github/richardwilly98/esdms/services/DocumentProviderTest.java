@@ -52,6 +52,8 @@ import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.inject.SystemParametersModule;
+import com.github.richardwilly98.esdms.services.DocumentProvider;
 import com.github.richardwilly98.esdms.services.UserService;
 import com.google.common.collect.ImmutableSet;
 
@@ -641,6 +643,13 @@ public class DocumentProviderTest extends ProviderTestBase {
         Assert.assertTrue(document.getTags().equals(newHashSet(ImmutableSet.of("tag1"))));
 
         deleteDocument(document);
+    }
+    
+    @Test
+    public void testSystemParameter() throws Throwable {
+        DocumentProvider provider = (DocumentProvider)documentService;
+        Assert.assertNotNull(provider);
+        Assert.assertEquals(provider.previewLength, SystemParametersModule.DEFAULT_PREVIEW_LENGTH);
     }
 
     @Test(enabled = false)

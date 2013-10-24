@@ -26,6 +26,7 @@ package com.github.richardwilly98.esdms.services;
  * #L%
  */
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
 
 import java.io.IOException;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -73,5 +75,41 @@ public class ParameterProvider extends ProviderBase<Parameter> implements Parame
         QueryBuilder query = QueryBuilders.matchQuery("type", type.getType());
         SearchResult<Parameter> searchResult = search(query, first, pageSize);
         return searchResult;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see com.github.richardwilly98.esdms.services.ParameterService#getParameterValue(java.lang.String)
+     * Follow syntax from http://commons.apache.org/proper/commons-beanutils/apidocs/org/apache/commons/beanutils/package-summary.html#standard.background
+     * For example: parameter-id.name, parameter-id.attributes, parameter-id.attributes(key) ...
+     */
+    @Override
+    public Object getParameterValue(String name) throws ServiceException {
+        checkNotNull(name);
+        if (name.contains(".")) {
+            String id = name.substring(0, name.indexOf("."));
+            String propertyName = name.substring(name.indexOf(".") + 1);
+            Parameter parameter = super.get(id);
+            try {
+                return PropertyUtils.getProperty(parameter, propertyName);
+            } catch (Exception ex) {
+                log.error(String.format("getParameterValue %s failed", name), ex);
+                throw new ServiceException(ex.getLocalizedMessage());
+            }
+        } else
+            return super.get(name);
+    }
+
+    @Override
+    public Parameter setParameterValue(Parameter parameter, String name, Object value) throws ServiceException {
+        checkNotNull(parameter);
+        checkNotNull(name);
+        try {
+            PropertyUtils.setProperty(parameter, name, value);
+            return update(parameter);
+        } catch (Exception ex) {
+            log.error(String.format("setParameterValue %s - %s failed", parameter, name), ex);
+            throw new ServiceException(ex.getLocalizedMessage());
+        }
     }
 }

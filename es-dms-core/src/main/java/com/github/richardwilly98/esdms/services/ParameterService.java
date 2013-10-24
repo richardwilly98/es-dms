@@ -34,5 +34,9 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 public interface ParameterService extends BaseService<Parameter> {
 
     public abstract SearchResult<Parameter> findByType(ParameterType type, int first, int pageSize) throws ServiceException;
+    
+    public abstract Object getParameterValue(String name) throws ServiceException;
+    
+    public abstract Parameter setParameterValue(Parameter parameter, String name, Object value) throws ServiceException;
 
 }
