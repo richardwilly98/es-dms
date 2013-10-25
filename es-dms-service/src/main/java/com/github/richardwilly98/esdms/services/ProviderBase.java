@@ -240,8 +240,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	    if (log.isTraceEnabled()) {
 		log.trace(String.format("update - %s", item));
 	    }
-	    String json;
-	    json = mapper.writeValueAsString(item);
+	    String json = mapper.writeValueAsString(item);
 	    UpdateResponse response = client.prepareUpdate(index, type, item.getId())
 		    .setScript("ctx._source.remove('attributes'); ctx._source.remove('tags'); ctx._source.remove('ratings');").execute().actionGet();
 	    response = client.prepareUpdate(index, type, item.getId()).setDoc(json).execute().actionGet();

@@ -6,8 +6,10 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$modalInstance', '$r
 	$scope.newUser = false;
 	$scope.uid = '';
 	$scope.user = {};
-	$scope.pw1 = '';
-	$scope.pw2 = '';
+	$scope.password = {
+		'pw1': '',
+		'pw2': ''
+	};
 	$scope.pwError = false;
 	$scope.incomplete = false;
 	$scope.selectedRoles = [];
@@ -52,19 +54,15 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$modalInstance', '$r
 	$log.log('Edit user: ' + userId);
 
 	function init() {
-		userService.currentUser(function(user){
-			if (user.id) {
+		userService.currentUser(function(user) {
+			if (user.id !== undefined) {
 				$scope.user = user;
 				$log.log('user.roles: ' + JSON.stringify($scope.user.roles));
-				//$scope.selectedRoles = $scope.user.roles;
 				$scope.newUser = false;
 			} else {
 				$scope.newUser = true;
 				$scope.incomplete = true;
-				// $scope.user = {roles: []};
 				$scope.user = user;
-				$scope.pw1 = '';
-				$scope.pw2 = '';
 			}
 			roleService.search('*', function(result) {
 				$scope.roles = result.items;
@@ -91,7 +89,7 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$modalInstance', '$r
 
 	$scope.save = function() {
 		if ($scope.newUser) {
-			$scope.user.password = $scope.pw1;
+			$scope.user.password = $scope.password.pw1;
 		}
 		$log.log('About to save user: ' + JSON.stringify($scope.user));
 		$scope.user.roles = $scope.selectedRoles;
@@ -99,13 +97,13 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$modalInstance', '$r
     $modalInstance.close();
 	};
 	
-	$scope.$watch('pw1', function() {
-		$scope.pwError = $scope.pw1 !== $scope.pw2;
+	$scope.$watch('password.pw1', function() {
+		$scope.pwError = $scope.password.pw1 !== $scope.password.pw2;
 		$scope.incompleteTest();
 	});
 	
-	$scope.$watch('pw2', function() {
-		$scope.pwError = $scope.pw1 !== $scope.pw2;
+	$scope.$watch('password.pw2', function() {
+		$scope.pwError = $scope.password.pw1 !== $scope.password.pw2;
 		$scope.incompleteTest();
 	});
 
@@ -115,7 +113,7 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$modalInstance', '$r
 
 	$scope.incompleteTest = function() {
 		if ($scope.newUser && $scope.user.name !== undefined) {
-			$scope.incomplete = !$scope.user.name.length || !$scope.pw1.length || !$scope.pw2.length;
+			$scope.incomplete = !$scope.user.name.length || !$scope.password.pw1.length || !$scope.password.pw2.length;
 		} else {
 			$scope.incomplete = false;
 		}
