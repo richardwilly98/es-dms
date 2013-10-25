@@ -9,6 +9,13 @@ Tested with Activiti 5.13
 
 Copy ```target/es-dms-activiti-authentication-1.0-SNAPSHOT.jar``` in webapps/activiti-explorer/WEB-INF/lib and webapps/activiti-rest/WEB-INF/lib
 
+Use ```mvn dependency:copy-dependencies``` to get the jar files from ```target/dependency``` folder
+
+Dependencies to be copied in $TOMCAT_HOME\lib
+```
+guava-13.0.1.jar
+```
+
 Dependencies to be copied in webapps/activiti-explorer/WEB-INF/lib and webapps/activiti-rest/WEB-INF/lib
 ```
 es-dms-core-1.0-SNAPSHOT.jar
@@ -35,8 +42,6 @@ classmate-0.8.0.jar
 jboss-logging-3.1.1.GA.jar
 javax.el-2.2.4.jar
 ```
-
-Use ```mvn dependency:copy-dependencies``` to get the jar files from ```target/dependency``` folder
 
 If required changes settings in ```install/webapps/activiti-rest/WEB-INF/classes/es-dms.properties``` and in ```install/webapps/activiti-explorer/WEB-INF/classes/es-dms.properties```
 
