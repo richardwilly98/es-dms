@@ -347,5 +347,12 @@ public class ProviderTestBase {
         log.info(String.format("New document created #%s", newDocument.getId()));
         return id;
     }
+    
+    protected void deleteDocument(String id) throws ServiceException {
+        Document document = documentService.get(id);
+        Assert.assertNotNull(document);
+        documentService.markDeleted(document);
+        documentService.delete(documentService.get(id));
+    }
 
 }

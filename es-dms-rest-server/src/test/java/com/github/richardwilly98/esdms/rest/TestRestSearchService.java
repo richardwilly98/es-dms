@@ -33,6 +33,7 @@ import static org.elasticsearch.common.io.Streams.copyToBytesFromClasspath;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.client.Entity;
@@ -47,14 +48,19 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.api.Document;
-import com.github.richardwilly98.esdms.api.Facet;
-import com.github.richardwilly98.esdms.api.SearchResult;
-import com.github.richardwilly98.esdms.api.Term;
+import com.github.richardwilly98.esdms.search.FacetRequestImpl;
+import com.github.richardwilly98.esdms.search.TermRequestImpl;
+import com.github.richardwilly98.esdms.search.api.Facet;
+import com.github.richardwilly98.esdms.search.api.FacetRequest;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
+import com.github.richardwilly98.esdms.search.api.Term;
+import com.github.richardwilly98.esdms.search.api.TermRequest;
 import com.github.richardwilly98.esdms.rest.RestDocumentService;
 import com.github.richardwilly98.esdms.rest.RestSearchService;
 import com.github.richardwilly98.esdms.rest.entity.FacetedQuery;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
     // public class TestRestDocumentService extends
@@ -102,7 +108,12 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
             Assert.assertNull(item.getCurrentVersion());
         }
 
-        result = searchDocument(name, 0, max, "tags");
+        TermRequest termRequest = new TermRequestImpl.Builder().fieldName("tags").size(10).build();
+        FacetRequest facetRequest = new FacetRequestImpl.Builder().name("tags").terms(ImmutableSet.of(termRequest)).build();
+        List<FacetRequest> facetsRequest = newArrayList();
+        facetsRequest.add(facetRequest);
+
+        result = searchDocument(name, 0, max, facetsRequest);
         log.debug(String.format("Search with facet - total hits: %s - item count: %s", result.getTotalHits(), result.getItems().size()));
         Assert.assertTrue(result.getTotalHits() >= 0 && result.getItems().size() <= max);
         for (Document item : result.getItems()) {
@@ -119,17 +130,17 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
             log.debug(term);
         }
 
-        result = searchDocument(name, 0, max, "tags", newHashMap(ImmutableMap.of("tags", (Object) "tag1")));
+        result = searchDocument(name, 0, max, facetsRequest, newHashMap(ImmutableMap.of("tags", (Object) "tag1")));
         log.debug(String.format("Search with facet and filters - total hits: %s - item count: %s", result.getTotalHits(), result.getItems()
                 .size()));
         Assert.assertEquals(result.getTotalHits(), 2);
 
-        result = searchDocument(name, 0, max, "tags", newHashMap(ImmutableMap.of("tags", (Object) "tag3")));
+        result = searchDocument(name, 0, max, facetsRequest, newHashMap(ImmutableMap.of("tags", (Object) "tag3")));
         log.debug(String.format("Search with facet and filters - total hits: %s - item count: %s", result.getTotalHits(), result.getItems()
                 .size()));
         Assert.assertEquals(result.getTotalHits(), 3);
 
-        result = searchDocument(name, 0, max, "tags",
+        result = searchDocument(name, 0, max, facetsRequest,
                 newHashMap(ImmutableMap.of("tags", (Object) newArrayList(ImmutableList.of("tag1", "tag4")))));
         log.debug(String.format("Search with facet and filters - total hits: %s - item count: %s", result.getTotalHits(), result.getItems()
                 .size()));
@@ -143,17 +154,17 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
         return searchDocument(criteria, first, pageSize, null);
     }
 
-    private SearchResult<Document> searchDocument(String criteria, int first, int pageSize, String facet) throws Throwable {
-        return searchDocument(criteria, first, pageSize, facet, null);
+    private SearchResult<Document> searchDocument(String criteria, int first, int pageSize, List<FacetRequest> facets) throws Throwable {
+        return searchDocument(criteria, first, pageSize, facets, null);
     }
 
-    private SearchResult<Document> searchDocument(String criteria, int first, int pageSize, String facet, Map<String, Object> filters)
+    private SearchResult<Document> searchDocument(String criteria, int first, int pageSize, List<FacetRequest> facets, Map<String, Object> filters)
             throws Throwable {
         // SearchResult<Document> searchResult = searchService.search(criteria,
         // first, pageSize, facet, filters);
         // Assert.assertNotNull(searchResult);
         FacetedQuery query = new FacetedQuery();
-        query.setFacet(facet);
+        query.setFacets(facets);
         query.setFilters(filters);
         Response response = target().path(RestSearchService.SEARCH_PATH).path(RestSearchService.FACET_SEARCH_ACTION).path(criteria)
                 .request(MediaType.APPLICATION_JSON).cookie(adminCookie).accept(MediaType.APPLICATION_JSON).post(Entity.json(query));

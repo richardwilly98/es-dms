@@ -56,12 +56,12 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightField;
 
 import com.github.richardwilly98.esdms.DocumentImpl;
-import com.github.richardwilly98.esdms.SearchResultImpl;
+import com.github.richardwilly98.esdms.search.SearchResultImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
 import com.github.richardwilly98.esdms.api.File;
-import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.inject.SystemParametersModule;

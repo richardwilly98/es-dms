@@ -1,4 +1,4 @@
-package com.github.richardwilly98.esdms;
+package com.github.richardwilly98.esdms.search;
 
 /*
  * #%L
@@ -26,69 +26,69 @@ package com.github.richardwilly98.esdms;
  * #L%
  */
 
-import com.github.richardwilly98.esdms.api.Term;
+import com.github.richardwilly98.esdms.search.api.TermRequest;
 import com.google.common.base.Objects;
 
-public class TermImpl implements Term {
+public class TermRequestImpl implements TermRequest {
 
-    private String term;
-    private int count;
+    private String field;
+    private int size;
 
     public static class Builder {
 
-	private String term;
-	private int count;
+	private String field;
+	private int size;
 
-	public Builder term(String term) {
-	    this.term = term;
+	public Builder fieldName(String field) {
+	    this.field = field;
 	    return this;
 	}
 
-	public Builder count(int count) {
-	    this.count = count;
+	public Builder size(int size) {
+	    this.size = size;
 	    return this;
 	}
 
-	public TermImpl build() {
-	    return new TermImpl(this);
+	public TermRequestImpl build() {
+	    return new TermRequestImpl(this);
 	}
     }
 
-    TermImpl() {
+    TermRequestImpl() {
 	this(null);
     }
 
-    public TermImpl(Builder builder) {
+    public TermRequestImpl(Builder builder) {
 	if (builder != null) {
-	    this.term = builder.term;
-	    this.count = builder.count;
+	    this.field = builder.field;
+	    this.size = builder.size;
 	}
     }
 
     @Override
-    public String getTerm() {
-	return term;
+    public String getField() {
+	return field;
     }
 
     @Override
-    public int getCount() {
-	return count;
+    public int getSize() {
+	return size;
     }
 
-    void setTerm(String term) {
-	this.term = term;
+    void setFieldName(String fieldName) {
+	this.field = fieldName;
     }
 
-    void setCount(int count) {
-	this.count = count;
+    void setSize(int size) {
+	this.size = size;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + count;
-        result = prime * result + ((term == null) ? 0 : term.hashCode());
+        result = prime * result + size;
+        result = prime * result + ((field == null) ? 0 : field.hashCode());
         return result;
     }
 
@@ -100,20 +100,20 @@ public class TermImpl implements Term {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        TermImpl other = (TermImpl) obj;
-        if (count != other.count)
+        TermRequestImpl other = (TermRequestImpl) obj;
+        if (size != other.size)
             return false;
-        if (term == null) {
-            if (other.term != null)
+        if (field == null) {
+            if (other.field != null)
                 return false;
-        } else if (!term.equals(other.term))
+        } else if (!field.equals(other.field))
             return false;
         return true;
     }
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this).add("term", term).add("count", count).toString();
+        return Objects.toStringHelper(this).add("fieldName", field).add("size", size).toString();
     }
 
 }

@@ -33,7 +33,7 @@ import com.github.richardwilly98.esdms.RoleImpl;
 import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.Role.RoleType;
-import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.services.DocumentService.DocumentPermissions;
 import com.github.richardwilly98.esdms.services.UserService.UserPermissions;

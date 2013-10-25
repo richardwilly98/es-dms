@@ -29,17 +29,23 @@ package test.github.richardwilly98.esdms.services;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 
+import java.util.List;
 import java.util.Map;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.api.Document;
-import com.github.richardwilly98.esdms.api.Facet;
-import com.github.richardwilly98.esdms.api.SearchResult;
-import com.github.richardwilly98.esdms.api.Term;
+import com.github.richardwilly98.esdms.search.FacetRequestImpl;
+import com.github.richardwilly98.esdms.search.TermRequestImpl;
+import com.github.richardwilly98.esdms.search.api.Facet;
+import com.github.richardwilly98.esdms.search.api.FacetRequest;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
+import com.github.richardwilly98.esdms.search.api.Term;
+import com.github.richardwilly98.esdms.search.api.TermRequest;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 public class SearchProviderTest extends ProviderTestBase {
 
@@ -49,13 +55,13 @@ public class SearchProviderTest extends ProviderTestBase {
 	return searchDocument(criteria, first, pageSize, null);
     }
 
-    private SearchResult<Document> searchDocument(String criteria, int first, int pageSize, String facet) throws Throwable {
-	return searchDocument(criteria, first, pageSize, facet, null);
+    private SearchResult<Document> searchDocument(String criteria, int first, int pageSize, List<FacetRequest> facets) throws Throwable {
+	return searchDocument(criteria, first, pageSize, facets, null);
     }
 
-    private SearchResult<Document> searchDocument(String criteria, int first, int pageSize, String facet, Map<String, Object> filters)
+    private SearchResult<Document> searchDocument(String criteria, int first, int pageSize, List<FacetRequest> facets, Map<String, Object> filters)
 	    throws Throwable {
-	SearchResult<Document> searchResult = searchService.search(criteria, first, pageSize, facet, filters);
+	SearchResult<Document> searchResult = searchService.search(criteria, first, pageSize, facets, filters);
 	Assert.assertNotNull(searchResult);
 	return searchResult;
     }
@@ -76,22 +82,29 @@ public class SearchProviderTest extends ProviderTestBase {
 
 	log.info("Start testSearchDocument");
 	loginAdminUser();
+	List <String> ids = newArrayList();
+	tagsCount = 0;
 	int max = 15;
 	String name = "test-tagging-document";
 
 	String id = createDocument(name, "text/plain", "/test/github/richardwilly98/services/test-attachment.txt");
+	ids.add(id);
 	addTag(id, "tag1", "tag2");
 
 	id = createDocument(name, "text/plain", "/test/github/richardwilly98/services/test-attachment.txt");
+	ids.add(id);
 	addTag(id, "tag1", "tag2", "tag3");
 
 	id = createDocument(name, "text/plain", "/test/github/richardwilly98/services/test-attachment.txt");
+	ids.add(id);
 	addTag(id, "tag2", "tag3");
 
 	id = createDocument(name, "text/plain", "/test/github/richardwilly98/services/test-attachment.txt");
+	ids.add(id);
 	addTag(id, "tag3", "tag4");
 
 	id = createDocument(name, "text/plain", "/test/github/richardwilly98/services/test-attachment.txt");
+	ids.add(id);
 
 	SearchResult<Document> result = searchDocument(name, 0, max);
 	log.debug(String.format("Search - total hits: %s - item count: %s", result.getTotalHits(), result.getItems().size()));
@@ -101,7 +114,10 @@ public class SearchProviderTest extends ProviderTestBase {
 	    Assert.assertNull(item.getCurrentVersion());
 	}
 
-	result = searchDocument(name, 0, max, "tags");
+	TermRequest termRequest = new TermRequestImpl.Builder().fieldName("tags").size(10).build();
+	FacetRequest facetRequest = new FacetRequestImpl.Builder().name("tags").terms(ImmutableSet.of(termRequest)).build();
+	List<FacetRequest> facetsRequest = newArrayList(facetRequest);
+	result = searchDocument(name, 0, max, facetsRequest);
 	log.debug(String.format("Search with facet - total hits: %s - item count: %s", result.getTotalHits(), result.getItems().size()));
 	Assert.assertTrue(result.getTotalHits() >= 0 && result.getItems().size() <= max);
 	for (Document item : result.getItems()) {
@@ -112,30 +128,127 @@ public class SearchProviderTest extends ProviderTestBase {
 	Assert.assertNotNull(facet);
 
 	log.debug(facet);
+	// Danilo not sure about this test tagsCount is incremental
 	// Total number of tags
 	Assert.assertEquals(facet.getTotalCount(), tagsCount);
 	for (Term term : facet.getTerms()) {
 	    log.debug(term);
 	}
 
-	result = searchDocument(name, 0, max, "tags", newHashMap(ImmutableMap.of("tags", (Object) "tag1")));
+	result = searchDocument(name, 0, max, facetsRequest, newHashMap(ImmutableMap.of("tags", (Object) "tag1")));
 	log.debug(String.format("Search with facet and filters - total hits: %s - item count: %s", result.getTotalHits(), result.getItems()
 	        .size()));
 	Assert.assertEquals(result.getTotalHits(), 2);
 
-	result = searchDocument(name, 0, max, "tags", newHashMap(ImmutableMap.of("tags", (Object) "tag3")));
+	result = searchDocument(name, 0, max, facetsRequest, newHashMap(ImmutableMap.of("tags", (Object) "tag3")));
 	log.debug(String.format("Search with facet and filters - total hits: %s - item count: %s", result.getTotalHits(), result.getItems()
 	        .size()));
 	Assert.assertEquals(result.getTotalHits(), 3);
 
-	result = searchDocument(name, 0, max, "tags",
+	result = searchDocument(name, 0, max, facetsRequest,
 	        newHashMap(ImmutableMap.of("tags", (Object) newArrayList(ImmutableList.of("tag1", "tag4")))));
 	log.debug(String.format("Search with facet and filters - total hits: %s - item count: %s", result.getTotalHits(), result.getItems()
 	        .size()));
 	for (Document item : result.getItems()) {
 	    Assert.assertNotNull(item);
-	    log.debug(item);
+	}
+	
+	for(String _id  : ids) {
+	    deleteDocument(_id);
 	}
     }
 
+    @Test()
+    public void testFacetedSearchDocument() throws Throwable {
+
+        log.info("Start testFacetedSearchDocument");
+        loginAdminUser();
+        List <String> ids = newArrayList();
+        tagsCount = 0;
+        int max = 15;
+        String name = "test-tagging-document";
+        String tag1= "tag1_" + System.currentTimeMillis();
+        String tag2= "tag2_" + System.currentTimeMillis();
+        String tag3= "tag3_" + System.currentTimeMillis();
+        String tag4= "tag4_" + System.currentTimeMillis();
+
+        String id = createDocument(name, "text/plain", "/test/github/richardwilly98/services/test-attachment.txt");
+        ids.add(id);
+        addTag(id, tag1, tag2);
+
+        id = createDocument(name, "text/plain", "/test/github/richardwilly98/services/test-attachment.txt");
+        ids.add(id);
+        addTag(id, tag1, tag2, tag3);
+
+        id = createDocument(name, "text/plain", "/test/github/richardwilly98/services/test-attachment.txt");
+        ids.add(id);
+        addTag(id, tag2, tag3);
+
+        id = createDocument(name, "text/plain", "/test/github/richardwilly98/services/test-attachment.txt");
+        ids.add(id);
+        addTag(id, tag3, tag4);
+
+        id = createDocument(name, "text/plain", "/test/github/richardwilly98/services/test-attachment.txt");
+        ids.add(id);
+
+        SearchResult<Document> result = searchDocument(name, 0, max);
+        log.debug(String.format("Search - total hits: %s - item count: %s", result.getTotalHits(), result.getItems().size()));
+        Assert.assertTrue(result.getTotalHits() >= 0);
+        for (Document item : result.getItems()) {
+            Assert.assertNotNull(item);
+            Assert.assertNull(item.getCurrentVersion());
+        }
+
+        TermRequest termRequest = new TermRequestImpl.Builder().fieldName("tags").size(10).build();
+        FacetRequest facetRequest = new FacetRequestImpl.Builder().name("tags").terms(ImmutableSet.of(termRequest)).build();
+        List<FacetRequest> facetsRequest = newArrayList();
+        facetsRequest.add(facetRequest);
+        
+        termRequest = new TermRequestImpl.Builder().fieldName("attributes.author").size(10).build();
+        facetRequest = new FacetRequestImpl.Builder().name("Author").terms(ImmutableSet.of(termRequest)).build();
+        facetsRequest.add(facetRequest);
+        
+        result = searchDocument(name, 0, max, facetsRequest);
+        log.debug(String.format("Search with facet - total hits: %s - item count: %s", result.getTotalHits(), result.getItems().size()));
+        Assert.assertTrue(result.getTotalHits() >= 0 && result.getItems().size() <= max);
+        for (Document item : result.getItems()) {
+            Assert.assertNotNull(item);
+            Assert.assertNull(item.getCurrentVersion());
+        }
+        Facet facet = result.getFacets().get("tags");
+        Assert.assertNotNull(facet);
+        
+        log.debug(facet);
+        // Total number of tags
+        Assert.assertEquals(facet.getTotalCount(), tagsCount);
+        for (Term term : facet.getTerms()) {
+            log.debug(term);
+        }
+
+        facet = result.getFacets().get("Author");
+        Assert.assertNotNull(facet);
+
+        result = searchDocument(name, 0, max, facetsRequest, newHashMap(ImmutableMap.of("tags", (Object) tag1)));
+        log.debug(String.format("Search with facet and filters - total hits: %s - item count: %s", result.getTotalHits(), result.getItems()
+                .size()));
+        Assert.assertEquals(result.getTotalHits(), 2);
+
+        result = searchDocument(name, 0, max, facetsRequest, newHashMap(ImmutableMap.of("tags", (Object) tag3)));
+        log.debug(String.format("Search with facet and filters - total hits: %s - item count: %s", result.getTotalHits(), result.getItems()
+                .size()));
+        Assert.assertEquals(result.getTotalHits(), 3);
+
+        result = searchDocument(name, 0, max, facetsRequest,
+                newHashMap(ImmutableMap.of("tags", (Object) newArrayList(ImmutableList.of(tag1, tag4)))));
+        log.debug(String.format("Search with facet and filters - total hits: %s - item count: %s", result.getTotalHits(), result.getItems()
+                .size()));
+        for (Document item : result.getItems()) {
+            Assert.assertNotNull(item);
+            log.debug(item);
+        }
+
+        for(String _id  : ids) {
+            deleteDocument(_id);
+        }
+    }
 }

@@ -39,7 +39,7 @@ import org.testng.annotations.Test;
 import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.Role.RoleType;
-import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.rest.RestRoleService;
 import com.github.richardwilly98.esdms.services.RoleService;
 

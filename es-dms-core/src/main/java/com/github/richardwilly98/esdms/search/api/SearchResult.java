@@ -1,4 +1,4 @@
-package com.github.richardwilly98.esdms.api;
+package com.github.richardwilly98.esdms.search.api;
 
 /*
  * #%L
@@ -30,7 +30,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.github.richardwilly98.esdms.SearchResultImpl;
+import com.github.richardwilly98.esdms.api.ItemBase;
+import com.github.richardwilly98.esdms.search.SearchResultImpl;
 
 @JsonDeserialize(as = SearchResultImpl.class)
 public interface SearchResult<T extends ItemBase> {

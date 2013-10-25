@@ -1,4 +1,7 @@
-package com.github.richardwilly98.esdms.api;
+package com.github.richardwilly98.esdms.search.api;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.github.richardwilly98.esdms.search.TermRequestImpl;
 
 /*
  * #%L
@@ -26,19 +29,9 @@ package com.github.richardwilly98.esdms.api;
  * #L%
  */
 
-import java.util.Set;
+@JsonDeserialize(as = TermRequestImpl.class)
+public interface TermRequest {
+    public abstract String getField();
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.github.richardwilly98.esdms.FacetImpl;
-
-@JsonDeserialize(as = FacetImpl.class)
-public interface Facet {
-
-    public abstract Set<Term> getTerms();
-
-    public abstract long getMissingCount();
-
-    public abstract long getOtherCount();
-
-    public abstract long getTotalCount();
+    public abstract int getSize();
 }

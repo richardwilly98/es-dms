@@ -1,4 +1,4 @@
-package com.github.richardwilly98.esdms;
+package com.github.richardwilly98.esdms.search;
 
 /*
  * #%L
@@ -34,9 +34,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.richardwilly98.esdms.api.Facet;
+import com.github.richardwilly98.esdms.search.api.Facet;
 import com.github.richardwilly98.esdms.api.ItemBase;
-import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.google.common.base.Objects;
 
 public class SearchResultImpl<T extends ItemBase> implements SearchResult<T> {

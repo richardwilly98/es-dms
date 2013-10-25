@@ -26,19 +26,21 @@ package com.github.richardwilly98.esdms.services;
  * #L%
  */
 
+import java.util.List;
 import java.util.Map;
 
 import com.github.richardwilly98.esdms.api.ItemBase;
-import com.github.richardwilly98.esdms.api.SearchResult;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.search.api.FacetRequest;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 
 public interface SearchService<T extends ItemBase> {
 
     public abstract SearchResult<T> search(String criteria, int first, int pageSize) throws ServiceException;
 
-    public abstract SearchResult<T> search(String criteria, int first, int pageSize, String facet) throws ServiceException;
+    public abstract SearchResult<T> search(String criteria, int first, int pageSize, List<FacetRequest> facets) throws ServiceException;
 
-    public abstract SearchResult<T> search(String criteria, int first, int pageSize, String facet, Map<String, Object> filters)
+    public abstract SearchResult<T> search(String criteria, int first, int pageSize, List<FacetRequest> facets, Map<String, Object> filters)
 	    throws ServiceException;
 
     public abstract SearchResult<T> moreLikeThis(String criteria, int first, int pageSize, int minTermFrequency, int maxItems)

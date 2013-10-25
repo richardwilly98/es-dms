@@ -55,10 +55,10 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.richardwilly98.esdms.SearchResultImpl;
+import com.github.richardwilly98.esdms.search.SearchResultImpl;
 import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.ItemBase;
-import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Settings;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 

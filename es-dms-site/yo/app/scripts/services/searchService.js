@@ -6,8 +6,8 @@ esDmsSiteApp.service('searchService', ['$http', function searchService($http) {
     criteria : function(criteria) {
       currentCriteria = criteria;
     },
-		facetedSearch: function(first, pageSize, criteria, facet, filters, callback) {
-			var payload = {facet: facet, filters: filters};
+		facetedSearch: function(first, pageSize, criteria, facets, filters, callback) {
+			var payload = {facets: facets, filters: filters};
 			var config = {
         headers: {'Content-Type':'application/json; charset=UTF-8'}
 			};

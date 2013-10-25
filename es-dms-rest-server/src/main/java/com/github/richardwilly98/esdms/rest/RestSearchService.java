@@ -43,7 +43,7 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.log4j.Logger;
 
 import com.github.richardwilly98.esdms.api.Document;
-import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.rest.entity.FacetedQuery;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
@@ -108,7 +108,7 @@ public class RestSearchService extends RestServiceBase {
             if (query == null) {
                 items = service.search(criteria, first, pageSize);
             } else {
-                items = service.search(criteria, first, pageSize, query.getFacet(), query.getFilters());
+                items = service.search(criteria, first, pageSize, query.getFacets(), query.getFilters());
             }
             return Response.ok(items).build();
         } catch (ServiceException e) {

@@ -1,4 +1,4 @@
-package com.github.richardwilly98.esdms;
+package com.github.richardwilly98.esdms.search;
 
 /*
  * #%L
@@ -30,12 +30,14 @@ import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.Set;
 
-import com.github.richardwilly98.esdms.api.Facet;
-import com.github.richardwilly98.esdms.api.Term;
+import com.github.richardwilly98.esdms.search.api.Facet;
+import com.github.richardwilly98.esdms.search.api.Term;
 import com.google.common.base.Objects;
 
 public class FacetImpl implements Facet {
 
+    private String name;
+    private String type;
     private final Set<Term> terms = newHashSet();
     private long missingCount;
     private long otherCount;
@@ -43,12 +45,24 @@ public class FacetImpl implements Facet {
 
     public static class Builder {
 
+        private String name;
+        private String type;
 	private final Set<Term> terms = newHashSet();
 	private long missingCount;
 	private long otherCount;
 	private long totalCount;
 
-	public Builder terms(Set<Term> terms) {
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder type(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder terms(Set<Term> terms) {
 	    if (terms != null) {
 		this.terms.addAll(terms);
 	    }
@@ -81,11 +95,23 @@ public class FacetImpl implements Facet {
 
     protected FacetImpl(Builder builder) {
 	if (builder != null) {
+	    this.name = builder.name;
+	    this.type = builder.type;
 	    this.terms.addAll(builder.terms);
 	    this.missingCount = builder.missingCount;
 	    this.otherCount = builder.otherCount;
 	    this.totalCount = builder.totalCount;
 	}
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+    
+    @Override
+    public String getType() {
+        return type;
     }
 
     @Override
@@ -124,6 +150,8 @@ public class FacetImpl implements Facet {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
         result = prime * result + (int) (missingCount ^ (missingCount >>> 32));
         result = prime * result + (int) (otherCount ^ (otherCount >>> 32));
         result = prime * result + ((terms == null) ? 0 : terms.hashCode());
@@ -140,6 +168,16 @@ public class FacetImpl implements Facet {
         if (getClass() != obj.getClass())
             return false;
         FacetImpl other = (FacetImpl) obj;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        if (type == null) {
+            if (other.type != null)
+                return false;
+        } else if (!type.equals(other.type))
+            return false;
         if (missingCount != other.missingCount)
             return false;
         if (otherCount != other.otherCount)
@@ -156,7 +194,7 @@ public class FacetImpl implements Facet {
 
     @Override
     public String toString() {
-	return Objects.toStringHelper(this).add("terms", terms).add("missingCount", missingCount).add("otherCount", otherCount)
+	return Objects.toStringHelper(this).add("name", name).add("type", type).add("terms", terms).add("missingCount", missingCount).add("otherCount", otherCount)
 	        .add("totalCount", totalCount).toString();
     }
 

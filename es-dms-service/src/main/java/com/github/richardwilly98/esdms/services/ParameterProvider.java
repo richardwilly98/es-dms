@@ -41,7 +41,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 
 import com.github.richardwilly98.esdms.api.Parameter;
 import com.github.richardwilly98.esdms.api.Parameter.ParameterType;
-import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
 @Singleton

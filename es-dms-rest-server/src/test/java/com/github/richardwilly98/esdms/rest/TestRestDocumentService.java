@@ -51,7 +51,7 @@ import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.api.AuditEntry;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Rating;
-import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;

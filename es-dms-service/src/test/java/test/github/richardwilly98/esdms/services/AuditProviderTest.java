@@ -36,7 +36,7 @@ import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.AuditEntryImpl;
 import com.github.richardwilly98.esdms.api.AuditEntry;
-import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.services.UserService;
 
 public class AuditProviderTest extends ProviderTestBase {

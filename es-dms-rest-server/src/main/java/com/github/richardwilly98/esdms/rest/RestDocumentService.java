@@ -71,7 +71,7 @@ import com.github.richardwilly98.esdms.VersionImpl;
 import com.github.richardwilly98.esdms.api.AuditEntry;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.File;
-import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
 import com.github.richardwilly98.esdms.exception.ServiceException;

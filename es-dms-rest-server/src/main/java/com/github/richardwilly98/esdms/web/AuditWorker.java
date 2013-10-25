@@ -34,7 +34,7 @@ import javax.inject.Singleton;
 import org.apache.log4j.Logger;
 
 import com.github.richardwilly98.esdms.api.AuditEntry;
-import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.services.AuditService;
 

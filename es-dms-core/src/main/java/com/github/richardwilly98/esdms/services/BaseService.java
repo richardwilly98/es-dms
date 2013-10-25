@@ -27,7 +27,7 @@ package com.github.richardwilly98.esdms.services;
  */
 
 import com.github.richardwilly98.esdms.api.ItemBase;
-import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
 public interface BaseService<T extends ItemBase> {

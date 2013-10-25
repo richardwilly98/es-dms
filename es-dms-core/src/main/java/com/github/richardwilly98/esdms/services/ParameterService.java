@@ -28,7 +28,7 @@ package com.github.richardwilly98.esdms.services;
 
 import com.github.richardwilly98.esdms.api.Parameter;
 import com.github.richardwilly98.esdms.api.Parameter.ParameterType;
-import com.github.richardwilly98.esdms.api.SearchResult;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
 public interface ParameterService extends BaseService<Parameter> {
