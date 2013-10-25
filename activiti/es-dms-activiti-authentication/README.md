@@ -36,7 +36,7 @@ javax.el-2.2.4.jar
 javax.el-api-2.2.4.jar
 ```
 
-Use mvn:dependency copy:dependencies to get the jar files from ```target/dependency``` folder
+Use ```mvn dependency:copy-dependencies``` to get the jar files from ```target/dependency``` folder
 
 If required changes settings in ```install/webapps/activiti-rest/WEB-INF/classes/es-dms.properties``` and in ```install/webapps/activiti-explorer/WEB-INF/classes/es-dms.properties```
 
