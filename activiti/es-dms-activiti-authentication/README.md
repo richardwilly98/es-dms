@@ -7,9 +7,10 @@ Tested with Activiti 5.13
 - Stop Tomcat
 - Remove the war files but keep the folders activiti-explorer and activiti-rest
 
+Copy ```target/es-dms-activiti-authentication-1.0-SNAPSHOT.jar``` in webapps/activiti-explorer/WEB-INF/lib and webapps/activiti-rest/WEB-INF/lib
+
 Dependencies to be copied in webapps/activiti-explorer/WEB-INF/lib and webapps/activiti-rest/WEB-INF/lib
 ```
-es-dms-activiti-authentication-1.0-SNAPSHOT.jar
 es-dms-core-1.0-SNAPSHOT.jar
 es-dms-rest-client-1.0-SNAPSHOT.jar
 hk2-api-2.2.0-b14.jar
@@ -33,7 +34,6 @@ validation-api-1.1.0.Final.jar
 classmate-0.8.0.jar
 jboss-logging-3.1.1.GA.jar
 javax.el-2.2.4.jar
-javax.el-api-2.2.4.jar
 ```
 
 Use ```mvn dependency:copy-dependencies``` to get the jar files from ```target/dependency``` folder
