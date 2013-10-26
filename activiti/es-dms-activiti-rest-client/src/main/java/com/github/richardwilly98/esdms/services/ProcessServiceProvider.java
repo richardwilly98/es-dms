@@ -15,13 +15,11 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
 
-import com.github.richardwilly98.activiti.rest.api.RestDeployment;
 import com.github.richardwilly98.activiti.rest.api.RestExternalResource;
 import com.github.richardwilly98.activiti.rest.api.RestProcessDefinition;
 import com.github.richardwilly98.activiti.rest.api.RestProcessInstance;
 import com.github.richardwilly98.activiti.rest.api.RestSearchResult;
 import com.github.richardwilly98.activiti.rest.api.RestTask;
-import com.github.richardwilly98.activiti.rest.client.RestDeploymentServiceClient;
 import com.github.richardwilly98.activiti.rest.client.RestProcessDefinitionServiceClient;
 import com.github.richardwilly98.activiti.rest.client.RestProcessInstanceServiceClient;
 import com.github.richardwilly98.activiti.rest.client.RestTaskServiceClient;
@@ -48,7 +46,6 @@ public class ProcessServiceProvider implements ProcessService {
     private final ParameterService parameterService;
     private RestProcessDefinitionServiceClient processDefinitionService;
     private RestProcessInstanceServiceClient processInstanceService;
-    private RestDeploymentServiceClient deploymentService;
     private RestTaskServiceClient taskService;
 
     @Inject
@@ -81,7 +78,6 @@ public class ProcessServiceProvider implements ProcessService {
         URI uri = URI.create(activitiUrl);
         processDefinitionService = new RestProcessDefinitionServiceClient(uri);
         processInstanceService = new RestProcessInstanceServiceClient(uri);
-        deploymentService = new RestDeploymentServiceClient(uri);
         taskService = new RestTaskServiceClient(uri);
     }
 
@@ -122,13 +118,14 @@ public class ProcessServiceProvider implements ProcessService {
     public Set<ProcessDefinition> getProcessDefinitions() throws ServiceException {
         log.debug("*** getProcessDefinitions ***");
         try {
-        String token = getCurrentToken();
-        String deploymentId = getFirstDeployment(token);
-        log.debug("First deployment it: " + deploymentId);
-        processDefinitionService.setToken(token);
-        RestSearchResult<RestProcessDefinition> processDefinitions = processDefinitionService
-                .getProcessDefinitionsByCategory(ES_DMS_CATEGORY);
-        return convertRestProcessDefinitions(processDefinitions);
+            String token = getCurrentToken();
+            processDefinitionService.setToken(token);
+            RestSearchResult<RestProcessDefinition> processDefinitions = processDefinitionService
+                    .getProcessDefinitionsByCategory(ES_DMS_CATEGORY);
+            if (processDefinitions == null) {
+                throw new ServiceException("Nor process definitions found for category " + ES_DMS_CATEGORY);
+            }
+            return convertRestProcessDefinitions(processDefinitions);
         } catch (Throwable t) {
             log.error("getProcessDefinitions failed", t);
             throw new ServiceException(t.getLocalizedMessage());
@@ -167,15 +164,6 @@ public class ProcessServiceProvider implements ProcessService {
             pds.add(ProcessServiceUtils.convertToProcessDefinition(processDefinition));
         }
         return pds;
-    }
-
-    private String getFirstDeployment(String token) throws ServiceException {
-        deploymentService.setToken(token);
-        RestSearchResult<RestDeployment> deployments = deploymentService.getDeployments();
-        if (deployments.getSize() > 0) {
-            return deployments.getData().get(0).getId();
-        }
-        throw new ServiceException("No deployment found.");
     }
 
     @Override
