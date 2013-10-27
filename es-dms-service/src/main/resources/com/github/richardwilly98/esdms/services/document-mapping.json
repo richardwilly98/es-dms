@@ -63,6 +63,10 @@
 					},
 					"author": {
 						"type": "string"
+					},
+					"status": {
+						"type": "string",
+						"index":"not_analyzed"
 					}
 				}
 			},
