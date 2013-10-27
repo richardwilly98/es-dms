@@ -1,4 +1,4 @@
-package test.github.richardwilly98.esdms;
+package com.github.richardwilly98.esdms.services;
 
 /*
  * #%L
@@ -31,12 +31,12 @@ import org.junit.Assert;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
-import test.github.richardwilly98.esdms.inject.ProviderModule;
 
+import com.github.richardwilly98.esdms.inject.TestProviderModule;
 import com.github.richardwilly98.esdms.services.HashService;
 import com.google.inject.Inject;
 
-@Guice(modules = ProviderModule.class)
+@Guice(modules = TestProviderModule.class)
 public class HashServiceTest {
 
     private static Logger log = Logger.getLogger(HashServiceTest.class);

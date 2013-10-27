@@ -1,4 +1,4 @@
-package test.github.richardwilly98.esdms.services;
+package com.github.richardwilly98.esdms.services;
 
 /*
  * #%L
@@ -42,7 +42,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Guice;
 
-import test.github.richardwilly98.esdms.inject.ProviderModule;
 
 import com.github.richardwilly98.esdms.CredentialImpl;
 import com.github.richardwilly98.esdms.DocumentImpl;
@@ -62,6 +61,7 @@ import com.github.richardwilly98.esdms.api.Session;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.inject.TestProviderModule;
 import com.github.richardwilly98.esdms.services.AuditService;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.DocumentService;
@@ -75,7 +75,7 @@ import com.google.inject.Inject;
 /*
  * Base class for all test providers
  */
-@Guice(modules = ProviderModule.class)
+@Guice(modules = TestProviderModule.class)
 public class ProviderTestBase {
 
     final protected Logger log = Logger.getLogger(this.getClass());

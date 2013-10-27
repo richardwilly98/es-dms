@@ -1,4 +1,4 @@
-package test.github.richardwilly98.esdms.inject;
+package com.github.richardwilly98.esdms.inject;
 
 /*
  * #%L
@@ -28,8 +28,8 @@ package test.github.richardwilly98.esdms.inject;
 
 import org.elasticsearch.client.Client;
 
-import test.github.richardwilly98.esdms.inject.LocalClientProvider;
 
+import com.github.richardwilly98.esdms.inject.LocalClientProvider;
 import com.google.inject.AbstractModule;
 
 public class TestEsClientModule extends AbstractModule {

@@ -1,4 +1,4 @@
-package test.github.richardwilly98.esdms.inject;
+package com.github.richardwilly98.esdms.inject;
 
 /*
  * #%L
