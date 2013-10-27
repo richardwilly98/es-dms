@@ -1,4 +1,4 @@
-package test.github.richardwilly98.esdms.api;
+package com.github.richardwilly98.esdms.api;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
