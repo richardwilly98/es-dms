@@ -103,6 +103,8 @@ public class RestDocumentService extends RestItemBaseService<Document> {
     public static final String VERSIONS_PATH = "versions";
     public static final String MARKDELETED_PATH = "deleted";
     public static final String UNDELETE_PATH = "undelete";
+    public static final String TAGS_PATH = "tags";
+    
     private final DocumentService documentService;
     private final AuditService auditService;
 
@@ -737,7 +739,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
     }
 
     @POST
-    @Path("{id}/{vid}/" + MARKDELETED_PATH)
+    @Path("{id}/" + VERSIONS_PATH + "/{vid}/" + MARKDELETED_PATH)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
     public Response queueDelete(@PathParam("id") String id, @PathParam("vid") String vid) {
@@ -758,7 +760,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
     }
 
     @DELETE
-    @Path("{id}/{vid}/")
+    @Path("{id}/" + VERSIONS_PATH + "/{vid}/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
     public Response delete(@PathParam("id") String id, @PathParam("vid") String vid) {
@@ -781,6 +783,74 @@ public class RestDocumentService extends RestItemBaseService<Document> {
         } catch (Throwable t) {
             log.error(String.format("Check if document %s exists", id), t);
             return Response.status(Status.NOT_FOUND).build();
+        }
+    }
+
+    @GET
+    @Path("{id}/" + TAGS_PATH)
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response getTags(@PathParam("id") String id) {
+        try {
+            Document document = service.get(id);
+            checkNotNull(document);
+            return Response.ok(document.getTags()).build();
+        } catch (ServiceException t) {
+            String message = String.format("Error getting tags for document %s", id);
+            log.error(message, t);
+            throw new RestServiceException(message);
+        }
+    }
+
+    @POST
+    @Path("{id}/" + TAGS_PATH + "/{tag}/")
+    public Response addTag(@PathParam("id") String id, @PathParam("tag") String tag) {
+        try {
+            Document document = service.get(id);
+            checkNotNull(document);
+
+            document.getTags().add(tag);
+            service.update(document);
+            return Response.created(getItemUri(document, TAGS_PATH, tag)).build();
+//            return Response.ok(super.update(id, document)).build();
+        } catch (ServiceException t) {
+            String message = String.format("Error adding tag %s for document %s", tag, id);
+            log.error(message, t);
+            throw new RestServiceException(message);
+        }
+    }
+
+    @DELETE
+    @Path("{id}/" + TAGS_PATH + "/{tag}/")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response deleteTag(@PathParam("id") String id, @PathParam("tag") String tag) {
+        try {
+            Document document = service.get(id);
+            checkNotNull(document);
+
+            document.getTags().remove(tag);
+            document = service.update(document);
+            return Response.ok(document.getTags()).build();
+        } catch (ServiceException t) {
+            String message = String.format("Error deleting tag %s for document %s", tag, id);
+            log.error(message, t);
+            throw new RestServiceException(message);
+        }
+    }
+
+    @DELETE
+    @Path("{id}/" + TAGS_PATH)
+    public Response deleteTags(@PathParam("id") String id) {
+        try {
+            Document document = service.get(id);
+            checkNotNull(document);
+
+            document.getTags().clear();
+            service.update(document);
+            return Response.noContent().build();
+        } catch (ServiceException t) {
+            String message = String.format("Error deleting tags for document %s", id);
+            log.error(message, t);
+            throw new RestServiceException(message);
         }
     }
 

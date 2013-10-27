@@ -180,6 +180,46 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
         }
     }
 
+    @Test
+    public void testCRUDTags() throws Throwable {
+        log.debug("*** testCRUDTags ***");
+        try {
+            String name = "test-document-crud-tag";
+            Document document = createDocument(name, "text/html", "/test/github/richardwilly98/services/test-attachment.html");
+            Assert.assertNotNull(document);
+            log.info(String.format("New document created %s", document));
+
+            document.addTag("tag1");
+            updateDocument(document);
+
+            Set<String> tags = getTags(document.getId());
+            Assert.assertEquals(document.getTags().size(), 1);
+            Assert.assertEquals(document.getTags(), tags);
+            
+            addTag(document.getId(), "tag2");
+            document = getDocument(document.getId());
+            tags = getTags(document.getId());
+            Assert.assertEquals(document.getTags().size(), 2);
+            Assert.assertEquals(document.getTags(), tags);
+            
+            tags = removeTag(document.getId(), "tag2");
+            document = getDocument(document.getId());
+            Assert.assertEquals(document.getTags().size(), 1);
+            Assert.assertEquals(document.getTags(), tags);
+            
+            removeTags(document.getId());
+            tags = getTags(document.getId());
+            document = getDocument(document.getId());
+            Assert.assertEquals(document.getTags().size(), 0);
+            Assert.assertEquals(document.getTags(), tags);
+            
+            deleteDocument(document.getId());
+        } catch (Throwable t) {
+            log.error("testCRUDTags fail", t);
+            Assert.fail();
+        }
+    }
+
     @Test()
     public void testDownloadDocument() throws Throwable {
         log.debug("*** testDownloadDocument ***");
@@ -676,13 +716,19 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
     private void updateDocument(Document document) throws Throwable {
         Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(RestDocumentService.UPDATE_PATH)
                 .request(MediaType.APPLICATION_JSON).cookie(adminCookie).put(Entity.entity(document, MediaType.APPLICATION_JSON));
-        log.debug(String.format("status: %s", response.getStatus()));
-        Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+        Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
     }
 
+    private void deleteDocument(String id) throws Throwable {
+        markDeletedDocument(id);
+        Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id)
+                .request().cookie(adminCookie).delete();
+        Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
+        Assert.assertNull(getDocument(id));
+    }
+    
     private Document getDocument(String id) throws Throwable {
         Document document = get(id, Document.class, RestDocumentService.DOCUMENTS_PATH);
-        Assert.assertNotNull(document);
         return document;
     }
 
@@ -700,6 +746,36 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
         Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.MARKDELETED_PATH).request()
                 .cookie(adminCookie).post(null);
         log.debug(String.format("status: %s", response.getStatus()));
+        Assert.assertTrue(response.getStatus() == Status.NO_CONTENT.getStatusCode());
+    }
+
+    private Set<String> getTags(String id) throws Throwable {
+        Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.TAGS_PATH)
+                .request(MediaType.APPLICATION_JSON).cookie(adminCookie).get();
+        Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
+        Set<String> tags = response.readEntity(new GenericType<Set<String>>() {
+        });
+        return tags;
+    }
+
+    private void addTag(String id, String tag) throws Throwable {
+        Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.TAGS_PATH).path(tag)
+                .request().cookie(adminCookie).post(Entity.json(null));
+        Assert.assertEquals(response.getStatus(), Status.CREATED.getStatusCode());
+    }
+
+    private Set<String> removeTag(String id, String tag) throws Throwable {
+        Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.TAGS_PATH).path(tag)
+                .request(MediaType.APPLICATION_JSON).cookie(adminCookie).delete();
+        Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
+        Set<String> tags = response.readEntity(new GenericType<Set<String>>() {
+        });
+        return tags;
+    }
+
+    private void removeTags(String id) throws Throwable {
+        Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.TAGS_PATH)
+                .request(MediaType.APPLICATION_JSON).cookie(adminCookie).delete();
         Assert.assertTrue(response.getStatus() == Status.NO_CONTENT.getStatusCode());
     }
 }

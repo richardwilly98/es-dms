@@ -79,6 +79,11 @@ public abstract class RestItemBaseService<T extends ItemBase> extends RestServic
         return url.getBaseUriBuilder().path(getClass()).path(item.getId()).build();
     }
 
+    protected URI getItemUri(T item, String... segments) {
+        checkNotNull(item);
+        return url.getBaseUriBuilder().path(getClass()).path(item.getId()).segment(segments).build();
+    }
+
     protected Response.ResponseBuilder includeItemIdInHeaders(Response.ResponseBuilder builder, T item) {
         checkNotNull(builder);
         checkNotNull(item);
@@ -123,7 +128,7 @@ public abstract class RestItemBaseService<T extends ItemBase> extends RestServic
     }
 
     @DELETE
-    @Produces({ MediaType.APPLICATION_JSON })
+//    @Produces({ MediaType.APPLICATION_JSON })
     @Path("{id}")
     public Response delete(@PathParam("id") String id) {
         if (log.isTraceEnabled()) {
