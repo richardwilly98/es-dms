@@ -13,6 +13,11 @@ esDmsSiteApp.service('documentService', ['$sce', '$log', '$rootScope', '$resourc
         update: {method:'PUT', params: {}}
       });
 
+    var TagResource = $resource('api/documents/:id/tags/:tag' , {}, {
+        addTag: {method:'POST', params: {}},
+        removeTag: {method:'DELETE', params: {}}
+      });
+
     var currentDocumentId = null;
     return {
       find: function(first, pageSize, criteria, callback) {
@@ -66,7 +71,7 @@ esDmsSiteApp.service('documentService', ['$sce', '$log', '$rootScope', '$resourc
           }
           document.tags.push(tag);
           $log.log('save document: ' + JSON.stringify(document));
-          document.$update();
+          new TagResource().$addTag({'id': id, 'tag': tag});
           callback(document);
         });
       },
@@ -80,7 +85,7 @@ esDmsSiteApp.service('documentService', ['$sce', '$log', '$rootScope', '$resourc
           //document.tags.splice(tag, 1);
           document.tags = _.without(document.tags, tag);
           $log.log('save document: ' + JSON.stringify(document));
-          document.$update();
+          new TagResource().$removeTag({'id': id, 'tag': tag});
           callback(document);
         });
       },

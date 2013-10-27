@@ -827,9 +827,13 @@ public class RestDocumentService extends RestItemBaseService<Document> {
             Document document = service.get(id);
             checkNotNull(document);
 
+            if (document.getTags().contains(tag)) {
             document.getTags().remove(tag);
             document = service.update(document);
-            return Response.ok(document.getTags()).build();
+            return Response.noContent().build();
+            } else {
+                return Response.status(Status.NOT_FOUND).build();
+            }
         } catch (ServiceException t) {
             String message = String.format("Error deleting tag %s for document %s", tag, id);
             log.error(message, t);

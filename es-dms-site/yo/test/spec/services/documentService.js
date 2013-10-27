@@ -45,10 +45,12 @@ describe('Service: documentService', function () {
     $httpBackend.whenPUT('api/documents/3').respond(200, '');
     $httpBackend.whenGET('api/documents/3/metadata').respond(doc);
     $httpBackend.whenPOST('api/documents/3/checkout').respond(204, '');
+    $httpBackend.whenPOST('api/documents/3/tags/tag1').respond(201, '');
 
     $httpBackend.whenGET('api/documents/4').respond(doc2);
     $httpBackend.whenPUT('api/documents/4').respond(200, '');
     $httpBackend.whenGET('api/documents/4/metadata').respond(doc2);
+    $httpBackend.whenDELETE('api/documents/4/tags/tag2').respond(204, '');
   });
 
   afterEach(function() {
@@ -66,7 +68,7 @@ describe('Service: documentService', function () {
 
   it('should call documentService addTag method', function() {
     $httpBackend.expectGET('api/documents/3/metadata');
-    $httpBackend.expectPUT('api/documents/3');
+    $httpBackend.expectPOST('api/documents/3/tags/tag1');
     documentService.addTag(3, 'tag1', function(data) {
       expect(data.tags).toContain('tag1');
     });
@@ -75,7 +77,7 @@ describe('Service: documentService', function () {
 
   it('should call documentService removeTag method', function() {
     $httpBackend.expectGET('api/documents/4/metadata');
-    $httpBackend.expectPUT('api/documents/4');
+    $httpBackend.expectDELETE('api/documents/4/tags/tag2');
     documentService.removeTag(4, 'tag2', function(data) {
       expect(data.tags).not.toContain('tag2');
       expect(data.tags).toContain('tag1');

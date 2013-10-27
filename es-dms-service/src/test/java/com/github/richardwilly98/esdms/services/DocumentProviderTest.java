@@ -41,12 +41,14 @@ import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.DocumentImpl;
 import com.github.richardwilly98.esdms.FileImpl;
+import com.github.richardwilly98.esdms.RatingImpl;
 import com.github.richardwilly98.esdms.VersionImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Permission;
+import com.github.richardwilly98.esdms.api.Rating;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.api.User;
@@ -614,8 +616,8 @@ public class DocumentProviderTest extends ProviderTestBase {
     }
 
     @Test
-    public void testDocumentMetadata() throws Throwable {
-        log.info("*** testDocumentMetadata ***");
+    public void testMetadataDocument() throws Throwable {
+        log.info("*** testMetadataDocument ***");
         loginAdminUser();
         String name = "test-document-metadata";
         String id = createDocument(name, "text/html", "/test/github/richardwilly98/services/test-attachment.html");
@@ -625,6 +627,8 @@ public class DocumentProviderTest extends ProviderTestBase {
 
         document.addTag("tag1");
         document.setAttribute("attribut1", "value1");
+        Rating rating = new RatingImpl.Builder().date(new Date()).score(7).user(UserService.DEFAULT_ADMIN_LOGIN).build();
+        document.addRating(rating);
         documentService.update(document);
 
         document = documentService.get(id);
@@ -641,7 +645,8 @@ public class DocumentProviderTest extends ProviderTestBase {
         Assert.assertTrue(document.getAttributes().get("attribut1").toString().equals("value1"));
         Assert.assertNotNull(document.getTags());
         Assert.assertTrue(document.getTags().equals(newHashSet(ImmutableSet.of("tag1"))));
-
+        Assert.assertEquals(document.getRatings().size(), 1);
+        Assert.assertEquals(document.getRatings().iterator().next(), rating);
         deleteDocument(document);
     }
     

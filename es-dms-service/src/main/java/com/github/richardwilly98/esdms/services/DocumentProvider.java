@@ -56,11 +56,13 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightField;
 
 import com.github.richardwilly98.esdms.DocumentImpl;
+import com.github.richardwilly98.esdms.RatingImpl;
 import com.github.richardwilly98.esdms.search.SearchResultImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
 import com.github.richardwilly98.esdms.api.File;
+import com.github.richardwilly98.esdms.api.Rating;
 import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
@@ -123,7 +125,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
             if (log.isTraceEnabled()) {
                 log.trace(String.format("getMetadata - %s", id));
             }
-            GetResponse response = client.prepareGet(index, type, id).setFields("id", "name", "attributes", "tags").execute().actionGet();
+            GetResponse response = client.prepareGet(index, type, id).setFields("id", "name", "attributes", "tags", "ratings").execute().actionGet();
             if (!response.isExists()) {
                 log.info(String.format("Cannot find item %s", id));
                 return null;
@@ -142,7 +144,22 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
                 }
             }
 
-            Document document = new DocumentImpl.Builder().tags(tags).id(id).name(name).attributes(attributes).roles(null).build();
+            Set<Rating> ratings = newHashSet();
+            if (response.getField("ratings") != null && response.getField("ratings").getValues().size() > 0) {
+                for (Object rating : response.getField("ratings").getValues()) {
+                    if (rating instanceof Map<?, ?>) {
+                        Map<String, Object> r = (Map<String, Object>) rating;
+                        String user = String.valueOf(r.get("user"));
+                        int score = Integer.parseInt(String.valueOf(r.get("score")));
+                        Date date = new Date(Long.parseLong(String.valueOf(r.get("date"))));
+                        ratings.add(new RatingImpl.Builder().user(user).date(date).score(score).build());
+                    } else {
+                        log.error(String.format("Wrong format for rating: %s", rating));
+                    }
+                }
+            }
+
+            Document document = new DocumentImpl.Builder().ratings(ratings).tags(tags).id(id).name(name).attributes(attributes).roles(null).build();
             return document;
         } catch (Throwable t) {
             log.error("getMetadata failed", t);

@@ -202,7 +202,8 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
             Assert.assertEquals(document.getTags().size(), 2);
             Assert.assertEquals(document.getTags(), tags);
             
-            tags = removeTag(document.getId(), "tag2");
+            removeTag(document.getId(), "tag2");
+            tags.remove("tag2");
             document = getDocument(document.getId());
             Assert.assertEquals(document.getTags().size(), 1);
             Assert.assertEquals(document.getTags(), tags);
@@ -764,18 +765,15 @@ public class TestRestDocumentService extends GuiceAndJettyTestBase<Document> {
         Assert.assertEquals(response.getStatus(), Status.CREATED.getStatusCode());
     }
 
-    private Set<String> removeTag(String id, String tag) throws Throwable {
+    private void removeTag(String id, String tag) throws Throwable {
         Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.TAGS_PATH).path(tag)
                 .request(MediaType.APPLICATION_JSON).cookie(adminCookie).delete();
-        Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
-        Set<String> tags = response.readEntity(new GenericType<Set<String>>() {
-        });
-        return tags;
+        Assert.assertEquals(response.getStatus(), Status.NO_CONTENT.getStatusCode());
     }
 
     private void removeTags(String id) throws Throwable {
         Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.TAGS_PATH)
                 .request(MediaType.APPLICATION_JSON).cookie(adminCookie).delete();
-        Assert.assertTrue(response.getStatus() == Status.NO_CONTENT.getStatusCode());
+        Assert.assertEquals(response.getStatus(), Status.NO_CONTENT.getStatusCode());
     }
 }

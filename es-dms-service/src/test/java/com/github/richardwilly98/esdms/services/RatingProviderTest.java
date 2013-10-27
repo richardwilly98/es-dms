@@ -45,6 +45,8 @@ public class RatingProviderTest extends ProviderTestBase {
     RatingService ratingService;
     
     private User ratingUser;
+    private Rating rating;
+    private Document document;
     private String id;
 
     private Rating createRating(String itemId, int score) throws Throwable {
@@ -65,6 +67,11 @@ public class RatingProviderTest extends ProviderTestBase {
         // Make sure to be login with user having sufficient permission
         loginAdminUser();
         id = createDocument();
+        rating = createRating(id, 9);
+        log.debug(rating);
+        document = documentService.get(id);
+        Assert.assertEquals(document.getRatings().size(), 1);
+        Assert.assertTrue(document.getRatings().contains(rating));
     }
     
     @AfterMethod
@@ -76,21 +83,21 @@ public class RatingProviderTest extends ProviderTestBase {
     @Test
     public void testCreateRating() throws Throwable {
         log.info("Start testCreateRating");
-        Rating rating = createRating(id, 9);
-        log.debug(rating);
-        Document document = documentService.get(id);
-        Assert.assertEquals(document.getRatings().size(), 1);
-        Assert.assertTrue(document.getRatings().contains(rating));
+//        Rating rating = createRating(id, 9);
+//        log.debug(rating);
+//        Document document = documentService.get(id);
+//        Assert.assertEquals(document.getRatings().size(), 1);
+//        Assert.assertTrue(document.getRatings().contains(rating));
     }
 
     @Test
     public void testDeleteRating() throws Throwable {
         log.info("Start testDeleteRating");
-        Rating rating = createRating(id, 9);
-        log.debug(rating);
-        Document document = documentService.get(id);
-        Assert.assertEquals(document.getRatings().size(), 1);
-        Assert.assertTrue(document.getRatings().contains(rating));
+//        Rating rating = createRating(id, 9);
+//        log.debug(rating);
+//        Document document = documentService.get(id);
+//        Assert.assertEquals(document.getRatings().size(), 1);
+//        Assert.assertTrue(document.getRatings().contains(rating));
 
         ratingService.delete(id, rating);
         document = documentService.get(id);
@@ -101,11 +108,11 @@ public class RatingProviderTest extends ProviderTestBase {
     @Test
     public void testUpdateRating() throws Throwable {
         log.info("Start testUpdateRating");
-        Rating rating = createRating(id, 9);
-        log.debug(rating);
-        Document document = documentService.get(id);
-        Assert.assertEquals(document.getRatings().size(), 1);
-        Assert.assertTrue(document.getRatings().contains(rating));
+//        Rating rating = createRating(id, 9);
+//        log.debug(rating);
+//        Document document = documentService.get(id);
+//        Assert.assertEquals(document.getRatings().size(), 1);
+//        Assert.assertTrue(document.getRatings().contains(rating));
 
         Rating rating2 = ratingService.update(id, 5);
         Assert.assertEquals(rating.getUser(), rating2.getUser());
@@ -118,11 +125,11 @@ public class RatingProviderTest extends ProviderTestBase {
     @Test
     public void testTotalRating() throws Throwable {
         log.info("Start testTotalRating");
-        Rating rating = createRating(id, 9);
-        log.debug(rating);
-        Document document = documentService.get(id);
-        Assert.assertEquals(document.getRatings().size(), 1);
-        Assert.assertTrue(document.getRatings().contains(rating));
+//        Rating rating = createRating(id, 9);
+//        log.debug(rating);
+//        Document document = documentService.get(id);
+//        Assert.assertEquals(document.getRatings().size(), 1);
+//        Assert.assertTrue(document.getRatings().contains(rating));
 
         // Make sure to have a user with enough permission
         login(createUserWithWriterRole());
@@ -147,11 +154,11 @@ public class RatingProviderTest extends ProviderTestBase {
     @Test
     public void testAverageRating() throws Throwable {
         log.info("Start testAverageRating");
-        Rating rating = createRating(id, 9);
-        log.debug(rating);
-        Document document = documentService.get(id);
-        Assert.assertEquals(document.getRatings().size(), 1);
-        Assert.assertTrue(document.getRatings().contains(rating));
+//        Rating rating = createRating(id, 9);
+//        log.debug(rating);
+//        Document document = documentService.get(id);
+//        Assert.assertEquals(document.getRatings().size(), 1);
+//        Assert.assertTrue(document.getRatings().contains(rating));
 
         // Make sure to have a user with enough permission
         login(createUserWithWriterRole());
@@ -161,17 +168,17 @@ public class RatingProviderTest extends ProviderTestBase {
         Assert.assertTrue(document.getRatings().contains(rating));
         Assert.assertTrue(document.getRatings().contains(rating2));
         float average = ratingService.getAverageRatings(id);
-        Assert.assertEquals(average, (rating.getScore() + rating2.getScore()) / 2);
+        Assert.assertEquals(average, (float)(rating.getScore() + rating2.getScore()) / 2);
     }
 
     @Test
     public void testUpdateDocumentWithRating() throws Throwable {
         log.info("Start testUpdateDocumentWithRating");
-        Rating rating = createRating(id, 9);
-        log.debug(rating);
-        Document document = documentService.get(id);
-        Assert.assertEquals(document.getRatings().size(), 1);
-        Assert.assertTrue(document.getRatings().contains(rating));
+//        Rating rating = createRating(id, 9);
+//        log.debug(rating);
+//        Document document = documentService.get(id);
+//        Assert.assertEquals(document.getRatings().size(), 1);
+//        Assert.assertTrue(document.getRatings().contains(rating));
 
         document.addTag("my-tag");
         document = documentService.update(document);
