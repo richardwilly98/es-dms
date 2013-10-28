@@ -27,6 +27,7 @@ package com.github.richardwilly98.esdms.services;
  */
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
@@ -64,6 +65,7 @@ import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Settings;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.search.FacetImpl;
+import com.github.richardwilly98.esdms.search.FacetRequestImpl;
 import com.github.richardwilly98.esdms.search.SearchResultImpl;
 import com.github.richardwilly98.esdms.search.TermImpl;
 import com.github.richardwilly98.esdms.search.api.Facet;
@@ -239,9 +241,27 @@ public class SearchProvider implements SearchService<Document> {
             SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
             return parseSearchResult(searchResponse, first, pageSize, null);
         } catch (Throwable t) {
-            log.error("search failed", t);
+            log.error("moreLikeThis failed", t);
             throw new ServiceException(t.getLocalizedMessage());
         }
     }
 
+    public Facet suggestTags(String criteria, int size) throws ServiceException {
+        try {
+            log.trace(String.format("suggestTags - %s - %s", criteria, size));
+            QueryBuilder query = QueryBuilders.matchAllQuery();
+            SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(type)
+                    .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setSize(0).setQuery(query);
+            searchRequestBuilder
+                    .addFacet(FacetBuilders.termsFacet("Tags").field("tags").size(size).regex(String.format("^%s.*", criteria)));
+            log.debug("Search request builder: " + searchRequestBuilder);
+            SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
+            List<FacetRequest> facets = newArrayList();
+            facets.add(new FacetRequestImpl.Builder().name("Tags").build());
+            return parseSearchResult(searchResponse, 0, size, facets).getFacets().values().iterator().next();
+        } catch (Throwable t) {
+            log.error("suggestTags failed", t);
+            throw new ServiceException(t.getLocalizedMessage());
+        }
+    }
 }

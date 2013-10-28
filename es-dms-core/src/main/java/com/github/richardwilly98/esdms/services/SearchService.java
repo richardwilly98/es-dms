@@ -31,6 +31,7 @@ import java.util.Map;
 
 import com.github.richardwilly98.esdms.api.ItemBase;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.search.api.Facet;
 import com.github.richardwilly98.esdms.search.api.FacetRequest;
 import com.github.richardwilly98.esdms.search.api.SearchResult;
 
@@ -45,4 +46,7 @@ public interface SearchService<T extends ItemBase> {
 
     public abstract SearchResult<T> moreLikeThis(String criteria, int first, int pageSize, int minTermFrequency, int maxItems)
 	    throws ServiceException;
+    
+    public abstract Facet suggestTags(String criteria, int size)
+            throws ServiceException;
 }

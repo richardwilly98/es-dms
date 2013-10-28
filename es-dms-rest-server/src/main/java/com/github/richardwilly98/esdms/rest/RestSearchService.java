@@ -43,6 +43,7 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.log4j.Logger;
 
 import com.github.richardwilly98.esdms.api.Document;
+import com.github.richardwilly98.esdms.search.api.Facet;
 import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.rest.entity.FacetedQuery;
@@ -54,14 +55,17 @@ import com.github.richardwilly98.esdms.services.SearchService;
 public class RestSearchService extends RestServiceBase {
 
     public static final String SEARCH_PATH = "search";
+    public static final String TAGS_PATH = "tags";
     public static final String SEARCH_ACTION = "_search";
     public static final String FACET_SEARCH_ACTION = "_facet_search";
     public static final String MORE_LIKE_THIS_ACTION = "_more_like_this";
+    public static final String SUGGEST_ACTION = "_suggest";
     public static final String SEARCH_FIRST_PARAMETER = "fi";
     public static final String SEARCH_PAGE_SIZE_PARAMETER = "ps";
     public static final String SEARCH_FACET_PARAMETER = "fa";
     public static final String MORE_LIKE_THIS_MIN_TERM_FREQUENCY_PARAMETER = "mt";
     public static final String MORE_LIKE_THIS_MAX_ITEMS_PARAMETER = "mi";
+    public static final String TAGS_SUGGEST_SIZE_PARAMETER = "si";
 
     protected final Logger log = Logger.getLogger(getClass());
     protected final SearchService<Document> service;
@@ -134,4 +138,24 @@ public class RestSearchService extends RestServiceBase {
             throw new RestServiceException(e.getLocalizedMessage());
         }
     }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path(TAGS_PATH + "/" + SUGGEST_ACTION + "/{criteria}")
+    public Response suggestTags(@PathParam("criteria") String criteria,
+            @QueryParam(TAGS_SUGGEST_SIZE_PARAMETER) @DefaultValue("10") int size) {
+        isAuthenticated();
+        if (log.isTraceEnabled()) {
+            log.trace(String.format("suggestTags - %s - %s", criteria, size));
+        }
+
+        try {
+            Facet facet = service.suggestTags(criteria, size);
+            return Response.ok(facet).build();
+        } catch (ServiceException e) {
+            throw new RestServiceException(e.getLocalizedMessage());
+        }
+    }
+
 }

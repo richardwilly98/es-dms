@@ -104,7 +104,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
     public static final String MARKDELETED_PATH = "deleted";
     public static final String UNDELETE_PATH = "undelete";
     public static final String TAGS_PATH = "tags";
-    
+
     private final DocumentService documentService;
     private final AuditService auditService;
 
@@ -791,7 +791,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getTags(@PathParam("id") String id) {
         try {
-            Document document = service.get(id);
+            Document document = documentService.getMetadata(id);
             checkNotNull(document);
             return Response.ok(document.getTags()).build();
         } catch (ServiceException t) {
@@ -805,13 +805,13 @@ public class RestDocumentService extends RestItemBaseService<Document> {
     @Path("{id}/" + TAGS_PATH + "/{tag}/")
     public Response addTag(@PathParam("id") String id, @PathParam("tag") String tag) {
         try {
-            Document document = service.get(id);
+            Document document = documentService.getMetadata(id);
             checkNotNull(document);
 
             document.getTags().add(tag);
             service.update(document);
             return Response.created(getItemUri(document, TAGS_PATH, tag)).build();
-//            return Response.ok(super.update(id, document)).build();
+            // return Response.ok(super.update(id, document)).build();
         } catch (ServiceException t) {
             String message = String.format("Error adding tag %s for document %s", tag, id);
             log.error(message, t);
@@ -824,13 +824,13 @@ public class RestDocumentService extends RestItemBaseService<Document> {
     @Produces({ MediaType.APPLICATION_JSON })
     public Response deleteTag(@PathParam("id") String id, @PathParam("tag") String tag) {
         try {
-            Document document = service.get(id);
+            Document document = documentService.getMetadata(id);
             checkNotNull(document);
 
             if (document.getTags().contains(tag)) {
-            document.getTags().remove(tag);
-            document = service.update(document);
-            return Response.noContent().build();
+                document.getTags().remove(tag);
+                document = service.update(document);
+                return Response.noContent().build();
             } else {
                 return Response.status(Status.NOT_FOUND).build();
             }
@@ -845,7 +845,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
     @Path("{id}/" + TAGS_PATH)
     public Response deleteTags(@PathParam("id") String id) {
         try {
-            Document document = service.get(id);
+            Document document = documentService.getMetadata(id);
             checkNotNull(document);
 
             document.getTags().clear();

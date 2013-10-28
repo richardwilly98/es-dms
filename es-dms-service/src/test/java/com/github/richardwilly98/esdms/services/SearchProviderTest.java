@@ -251,4 +251,72 @@ public class SearchProviderTest extends ProviderTestBase {
             deleteDocument(_id);
         }
     }
+
+    @Test
+    public void testSuggestTags() throws Throwable {
+
+        log.info("Start testSuggestTags");
+        loginAdminUser();
+        List <String> ids = newArrayList();
+        tagsCount = 0;
+        int max = 15;
+        String name = "test-suggest-tag-document";
+        String tag1= "java";
+        String tag2= "javascript";
+        String tag3= "c#";
+        String tag4= "csharp";
+
+        String id = createDocument(name, "text/plain", "/test/github/richardwilly98/services/test-attachment.txt");
+        ids.add(id);
+        addTag(id, tag1, tag2);
+
+        id = createDocument(name, "text/plain", "/test/github/richardwilly98/services/test-attachment.txt");
+        ids.add(id);
+        addTag(id, tag1, tag2, tag3);
+
+        id = createDocument(name, "text/plain", "/test/github/richardwilly98/services/test-attachment.txt");
+        ids.add(id);
+        addTag(id, tag2, tag3);
+
+        id = createDocument(name, "text/plain", "/test/github/richardwilly98/services/test-attachment.txt");
+        ids.add(id);
+        addTag(id, tag3, tag4);
+
+        id = createDocument(name, "text/plain", "/test/github/richardwilly98/services/test-attachment.txt");
+        ids.add(id);
+
+        SearchResult<Document> result = searchDocument(name, 0, max);
+        log.debug(String.format("Search - total hits: %s - item count: %s", result.getTotalHits(), result.getItems().size()));
+        Assert.assertTrue(result.getTotalHits() >= 0);
+        for (Document item : result.getItems()) {
+            Assert.assertNotNull(item);
+        }
+
+        Facet facet = searchService.suggestTags("ja", 10);
+        Assert.assertNotNull(facet);
+        Assert.assertEquals(facet.getName(), "Tags");
+        Assert.assertNotNull(facet.getTerms());
+        Assert.assertEquals(facet.getTerms().size(), 2);
+        for (Term term : facet.getTerms()) {
+            Assert.assertTrue(term.getTerm().startsWith("ja"));
+        }
+        
+        facet = searchService.suggestTags("jo", 10);
+        Assert.assertNotNull(facet);
+        Assert.assertNotNull(facet.getTerms());
+        Assert.assertEquals(facet.getTerms().size(), 0);
+        
+        facet = searchService.suggestTags("cs", 10);
+        Assert.assertNotNull(facet);
+        Assert.assertNotNull(facet.getTerms());
+        Assert.assertEquals(facet.getTerms().size(), 1);
+        for (Term term : facet.getTerms()) {
+            Assert.assertTrue(term.getTerm().startsWith("cs"));
+        }
+
+        for(String _id  : ids) {
+            deleteDocument(_id);
+        }
+
+    }
 }

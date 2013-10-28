@@ -45,6 +45,7 @@ import javax.ws.rs.core.Response.Status;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.api.Document;
@@ -63,16 +64,23 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
-    // public class TestRestDocumentService extends
-    // GuiceAndJerseyTestBase<Document> {
 
     int tagsCount = 0;
+    List<Document> documents = newArrayList();
 
     public TestRestSearchService() throws Exception {
         super();
     }
 
-    @Test()
+    @AfterMethod
+    public void cleanUp() throws Throwable {
+        for (Document document : documents) {
+            deleteDocument(document.getId());
+        }
+        documents.clear();
+    }
+
+    @Test
     public void testSearchDocument() throws Throwable {
 
         log.info("Start testSearchDocument");
@@ -150,6 +158,63 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
         }
     }
 
+    @Test
+    public void testSuggestTags() throws Throwable {
+
+        log.info("Start testSuggestTags");
+        int max = 15;
+        String name = "test-suggest-tag-document";
+        String tag1= "java";
+        String tag2= "javascript";
+        String tag3= "c#";
+        String tag4= "csharp";
+        String contentType = "text/plain";
+        String file = "/test/github/richardwilly98/services/test-attachment.html";
+
+        Document document = createDocument(name, contentType, file);
+        addTag(document.getId(), tag1, tag2);
+
+        document = createDocument(name, contentType, file);
+        addTag(document.getId(), tag1, tag2, tag3);
+
+        document = createDocument(name, contentType, file);
+        addTag(document.getId(), tag2, tag3);
+
+        document = createDocument(name, contentType, file);
+        addTag(document.getId(), tag3, tag4);
+
+        document = createDocument(name, contentType, file);
+
+        SearchResult<Document> result = searchDocument(name, 0, max);
+        log.debug(String.format("Search - total hits: %s - item count: %s", result.getTotalHits(), result.getItems().size()));
+        Assert.assertTrue(result.getTotalHits() >= 0);
+        for (Document item : result.getItems()) {
+            Assert.assertNotNull(item);
+        }
+
+        Facet facet = suggestTags("ja", 10);
+        Assert.assertNotNull(facet);
+        Assert.assertEquals(facet.getName(), "Tags");
+        Assert.assertNotNull(facet.getTerms());
+        Assert.assertEquals(facet.getTerms().size(), 2);
+        for (Term term : facet.getTerms()) {
+            Assert.assertTrue(term.getTerm().startsWith("ja"));
+        }
+        
+        facet = suggestTags("jo", 10);
+        Assert.assertNotNull(facet);
+        Assert.assertNotNull(facet.getTerms());
+        Assert.assertEquals(facet.getTerms().size(), 0);
+        
+        facet = suggestTags("cs", 10);
+        Assert.assertNotNull(facet);
+        Assert.assertNotNull(facet.getTerms());
+        Assert.assertEquals(facet.getTerms().size(), 1);
+        for (Term term : facet.getTerms()) {
+            Assert.assertTrue(term.getTerm().startsWith("cs"));
+        }
+    }
+
     private SearchResult<Document> searchDocument(String criteria, int first, int pageSize) throws Throwable {
         return searchDocument(criteria, first, pageSize, null);
     }
@@ -158,11 +223,8 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
         return searchDocument(criteria, first, pageSize, facets, null);
     }
 
-    private SearchResult<Document> searchDocument(String criteria, int first, int pageSize, List<FacetRequest> facets, Map<String, Object> filters)
-            throws Throwable {
-        // SearchResult<Document> searchResult = searchService.search(criteria,
-        // first, pageSize, facet, filters);
-        // Assert.assertNotNull(searchResult);
+    private SearchResult<Document> searchDocument(String criteria, int first, int pageSize, List<FacetRequest> facets,
+            Map<String, Object> filters) throws Throwable {
         FacetedQuery query = new FacetedQuery();
         query.setFacets(facets);
         query.setFilters(filters);
@@ -176,6 +238,16 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
         return searchResult;
     }
 
+    private Facet suggestTags(String criteria, int size) throws Throwable {
+        Response response = target().path(RestSearchService.SEARCH_PATH).path(RestSearchService.TAGS_PATH).path(RestSearchService.SUGGEST_ACTION).path(criteria).queryParam("size", size)
+                .request(MediaType.APPLICATION_JSON).cookie(adminCookie).accept(MediaType.APPLICATION_JSON).post(Entity.json(null));
+        log.debug(String.format("status: %s", response.getStatus()));
+        Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
+        Facet facet = response.readEntity(Facet.class);
+        Assert.assertNotNull(facet);
+        return facet;
+    }
+
     private void addTag(String id, String... tags) throws Throwable {
         Document document = getMetadata(id);
         for (String tag : tags) {
@@ -185,6 +257,11 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
             Assert.assertTrue(document.getTags().contains(tag));
             tagsCount++;
         }
+    }
+
+    private Document getDocument(String id) throws Throwable {
+        Document document = get(id, Document.class, RestDocumentService.DOCUMENTS_PATH);
+        return document;
     }
 
     private Document createDocument(String name, String contentType, String path) throws Throwable {
@@ -202,7 +279,9 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
         Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
         URI uri = response.getLocation();
         Assert.assertNotNull(uri);
-        return get(uri, Document.class);
+        Document document = get(uri, Document.class);
+        documents.add(document);
+        return document;
     }
 
     private void updateDocument(Document document) throws Throwable {
@@ -210,6 +289,20 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
                 .request(MediaType.APPLICATION_JSON).cookie(adminCookie).put(Entity.json(document));
         log.debug(String.format("status: %s", response.getStatus()));
         Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+    }
+
+    private void markDeletedDocument(String id) throws Throwable {
+        Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.MARKDELETED_PATH).request()
+                .cookie(adminCookie).post(null);
+        log.debug(String.format("status: %s", response.getStatus()));
+        Assert.assertTrue(response.getStatus() == Status.NO_CONTENT.getStatusCode());
+    }
+
+    private void deleteDocument(String id) throws Throwable {
+        markDeletedDocument(id);
+        Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).request().cookie(adminCookie).delete();
+        Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
+        Assert.assertNull(getDocument(id));
     }
 
     private Document getMetadata(String id) throws Throwable {
