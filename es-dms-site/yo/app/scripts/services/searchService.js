@@ -22,6 +22,14 @@ esDmsSiteApp.service('searchService', ['$http', function searchService($http) {
       };
       $http.get('api/search/_more_like_this/' + criteria + '?fi=' + first + '&ps=' + pageSize + '&mt=' + minTermFrequency + '&mi=' + maxQueryTerms, config)
         .success(callback);
-    }
+    },
+    suggestTags: function(criteria, callback) {
+      var size = 10;
+      var payload = {};
+      var config = {
+        headers: {'Content-Type':'application/json; charset=UTF-8'}
+      };
+      $http.post('api/search/tags/_suggest/' + criteria + '?size=' + size, payload, config).success(callback);
+    },
 	};
 }]);

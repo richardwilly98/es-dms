@@ -2,7 +2,7 @@
 'use strict';
 
 var esDmsSiteApp = angular.module('esDmsSiteApp',
-  ['ngCookies', 'ngResource', 'ngSanitize', 'authentication', 'ui.router', 'http-auth-interceptor', 'ui.bootstrap', 'ui.select2', 'toaster']);
+  ['ngCookies', 'ngResource', 'ngSanitize', 'authentication', 'ui.router', 'http-auth-interceptor', 'ui.bootstrap', 'toaster', 'tags-input']);
 
 esDmsSiteApp.config(function (/*$routeProvider,*/ $stateProvider, $locationProvider) {
 
