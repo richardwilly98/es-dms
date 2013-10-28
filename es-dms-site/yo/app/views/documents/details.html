@@ -18,7 +18,7 @@
 						data-ng-repeat="(name, value) in document.attributes">
 						<label class="control-label">{{ name }}</label>
 						<div class="controls">
-							<input class="uneditable-input" type="text" ng-model="value" />
+							<input class="uneditable-input" type="text" value="{{formatValue(name, value)}}" />
 						</div>
 					</div>
 					<div class="control-group" data-ng-show="tags">

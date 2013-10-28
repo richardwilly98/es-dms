@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('esDmsSiteApp')
-  .controller('DocumentsDetailsCtrl', ['$log', '$scope', '$state', 'documentService', 'searchService', '$modalInstance', 'documentId',
-    function ($log, $scope, $state, documentService, searchService, $modalInstance, documentId) {
+  .controller('DocumentsDetailsCtrl', ['$log', '$scope', '$state', '$filter', 'documentService', 'searchService', '$modalInstance', 'documentId',
+    function ($log, $scope, $state, $filter, documentService, searchService, $modalInstance, documentId) {
   $scope.document = {};
   $scope.auditEntries = {};
   $scope.moreLikeThis = {};
@@ -46,6 +46,14 @@ angular.module('esDmsSiteApp')
   };
   $scope.close = function() {
     $modalInstance.close();
+  };
+  // TODO: name should not be hardcoded. We should get the mapping definition and check field type.
+  $scope.formatValue = function(name, value) {
+    if (name === 'creation' || name === 'modified') {
+      return $filter('date')(value, 'yyyy-MM-dd HH:mm:ss Z');
+    } else {
+      return value;
+    }
   };
 
   }]);
