@@ -40,6 +40,7 @@ import org.testng.annotations.Test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.richardwilly98.esdms.DocumentImpl;
 import com.github.richardwilly98.esdms.FileImpl;
+import com.github.richardwilly98.esdms.TrackerHashMap;
 import com.github.richardwilly98.esdms.RatingImpl;
 import com.github.richardwilly98.esdms.VersionImpl;
 import com.github.richardwilly98.esdms.api.Document;
@@ -48,6 +49,7 @@ import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Rating;
 import com.github.richardwilly98.esdms.api.Version;
+import com.google.common.collect.ImmutableMap;
 
 public class DocumentSerializationTest {
 
@@ -193,5 +195,30 @@ public class DocumentSerializationTest {
 	Document document2 = mapper.readValue(json, Document.class);
 	Assert.assertTrue(document2.getRatings().size() == 1);
 	Assert.assertTrue(document2.getRatings().contains(rating));
+    }
+    
+    @Test
+    public void testTrackerHashMap() {
+        TrackerHashMap<String, Object> myHashMap = new TrackerHashMap<String, Object>();
+        myHashMap.clear();
+        myHashMap.put("key-1", "value-1");
+        Assert.assertTrue(myHashMap.getMissingKey().isEmpty());
+        myHashMap.remove("key-1");
+        Assert.assertFalse(myHashMap.getMissingKey().isEmpty());
+        Assert.assertTrue(myHashMap.getMissingKey().contains("key-1"));
+        myHashMap.put("key-1", "value-1");
+        myHashMap.put("key-2", "value-2");
+        myHashMap.clear();
+        Assert.assertFalse(myHashMap.getMissingKey().isEmpty());
+        Assert.assertEquals(myHashMap.getMissingKey().size(), 2);
+        Assert.assertTrue(myHashMap.getMissingKey().contains("key-1"));
+        Assert.assertTrue(myHashMap.getMissingKey().contains("key-2"));
+        
+        myHashMap.putAll(ImmutableMap.of("key-1", "value-1", "key-3", "value-3"));
+        // Still contains key-2 but not key-1
+        Assert.assertFalse(myHashMap.getMissingKey().isEmpty());
+        Assert.assertEquals(myHashMap.getMissingKey().size(), 1);
+        Assert.assertFalse(myHashMap.getMissingKey().contains("key-1"));
+        Assert.assertTrue(myHashMap.getMissingKey().contains("key-2"));
     }
 }
