@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -47,7 +48,9 @@ import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.base.Stopwatch;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -57,16 +60,16 @@ import org.elasticsearch.search.highlight.HighlightField;
 
 import com.github.richardwilly98.esdms.DocumentImpl;
 import com.github.richardwilly98.esdms.RatingImpl;
-import com.github.richardwilly98.esdms.search.SearchResultImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Rating;
-import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.inject.SystemParametersModule;
+import com.github.richardwilly98.esdms.search.SearchResultImpl;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -125,6 +128,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
             if (log.isTraceEnabled()) {
                 log.trace(String.format("getMetadata - %s", id));
             }
+            Stopwatch watch = Stopwatch.createStarted();
             GetResponse response = client.prepareGet(index, type, id).setFields("id", "name", "attributes", "tags", "ratings").execute().actionGet();
             if (!response.isExists()) {
                 log.info(String.format("Cannot find item %s", id));
@@ -160,6 +164,8 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
             }
 
             Document document = new DocumentImpl.Builder().ratings(ratings).tags(tags).id(id).name(name).attributes(attributes).roles(null).build();
+            watch.stop();
+            log.trace(String.format("Elpased time for getMetadata: %s", watch.elapsed(TimeUnit.MILLISECONDS)));
             return document;
         } catch (Throwable t) {
             log.error("getMetadata failed", t);
@@ -173,6 +179,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
         SimpleDocument sd = getSimpleDocument(item);
         sd.setReadOnlyAttribute(DocumentSystemAttributes.CREATION_DATE.getKey(), new Date());
         sd.setReadOnlyAttribute(DocumentSystemAttributes.AUTHOR.getKey(), getCurrentUser());
+        sd.setReadOnlyAttribute(DocumentSystemAttributes.STATUS.getKey(), DocumentStatus.AVAILABLE.getStatusCode());
         return super.create(sd);
     }
 
@@ -276,9 +283,41 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
     @Override
     public Document update(Document item) throws ServiceException {
         SimpleDocument document = updateModifiedDate(getSimpleDocument(item));
-        return super.update(document);
+        log.debug(String.format("update document - %s - versions is empty - %s", item.getId(), document.getVersions().isEmpty()));
+        if (document.getVersions().isEmpty()) {
+            return updateMetadata(document);
+        } else {
+            return super.update(document);
+        }
     }
 
+
+    // TODO: document and version should be separated in 2 objects linked as parent / child
+    // That will speed up and metadata update which will not require a full re-index of the document + version.
+    // Possible downside - queries could be more complex and potentially less efficient
+    // See: http://www.elasticsearch.org/blog/managing-relations-inside-elasticsearch/
+    public Document updateMetadata(Document item) throws ServiceException {
+        try {
+            if (log.isTraceEnabled()) {
+                log.trace(String.format("updateMetadata - %s", item.getId()));
+            }
+            Stopwatch watch = Stopwatch.createStarted();
+            byte[] document = mapper.writeValueAsBytes(item);
+            UpdateResponse response = client.prepareUpdate(index, type, item.getId())
+                    .setScript("ctx._source.remove('attributes'); ctx._source.remove('tags'); ctx._source.remove('ratings');").execute().actionGet();
+            response = client.prepareUpdate(index, type, item.getId()).setDoc(document).execute().actionGet();
+            log.trace(String.format("Elapsed time for updateMetadata #2: %s", watch.elapsed(TimeUnit.MILLISECONDS)));
+            refreshIndex();
+            watch.stop();
+            Document updatedItem = getMetadata(response.getId());
+            return updatedItem;
+        } catch (Throwable t) {
+            log.error("update failed", t);
+            throw new ServiceException(t.getLocalizedMessage());
+        }
+    }
+
+    
     @Override
     public void checkout(Document document) throws ServiceException {
         SimpleDocument sd = getSimpleDocument(document);

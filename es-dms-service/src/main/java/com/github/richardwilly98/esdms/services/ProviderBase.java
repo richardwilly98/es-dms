@@ -50,6 +50,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -145,8 +146,8 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		log.info(String.format("Cannot find item %s", id));
 		return null;
 	    }
-	    String json = response.getSourceAsString();
-	    T item = mapper.readValue(json, clazz);
+	    StreamInput stream = response.getSourceAsBytesRef().streamInput();
+	    T item = mapper.readValue(stream, clazz);
 	    validate(item);
 	    return item;
 	} catch (Throwable t) {
@@ -197,8 +198,8 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	    long totalHits = searchResponse.getHits().totalHits();
 	    long elapsedTime = searchResponse.getTookInMillis();
 	    for (SearchHit hit : searchResponse.getHits().hits()) {
-		String json = hit.getSourceAsString();
-		T item = mapper.readValue(json, clazz);
+		StreamInput stream = hit.getSourceRef().streamInput();
+		T item = mapper.readValue(stream, clazz);
 		items.add(item);
 	    }
 	    SearchResult<T> searchResult = new SearchResultImpl.Builder<T>().totalHits(totalHits).elapsedTime(elapsedTime).items(items)
@@ -220,9 +221,8 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 		item.setId(generateUniqueId(item));
 	    }
 	    validate(item);
-	    String json;
-	    json = mapper.writeValueAsString(item);
-	    IndexResponse response = client.prepareIndex(index, type).setId(item.getId()).setSource(json).execute().actionGet();
+	    byte[] data = mapper.writeValueAsBytes(item);
+	    IndexResponse response = client.prepareIndex(index, type).setId(item.getId()).setSource(data).execute().actionGet();
 	    log.trace(String.format("Index: %s - Type: %s - Id: %s", response.getIndex(), response.getType(), response.getId()));
 	    refreshIndex();
 	    T newItem = get(response.getId());
@@ -240,10 +240,10 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	    if (log.isTraceEnabled()) {
 		log.trace(String.format("update - %s", item));
 	    }
-	    String json = mapper.writeValueAsString(item);
+	    byte[] data = mapper.writeValueAsBytes(item);
 	    UpdateResponse response = client.prepareUpdate(index, type, item.getId())
 		    .setScript("ctx._source.remove('attributes'); ctx._source.remove('tags'); ctx._source.remove('ratings');").execute().actionGet();
-	    response = client.prepareUpdate(index, type, item.getId()).setDoc(json).execute().actionGet();
+	    response = client.prepareUpdate(index, type, item.getId()).setDoc(data).execute().actionGet();
 	    refreshIndex();
 	    T updatedItem = get(response.getId());
 	    return updatedItem;
