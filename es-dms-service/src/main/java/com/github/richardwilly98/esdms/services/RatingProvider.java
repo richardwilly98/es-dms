@@ -88,7 +88,7 @@ public class RatingProvider implements RatingService {
 	    if (log.isTraceEnabled()) {
 		log.trace(String.format("get - %s", itemId));
 	    }
-	    Document document = documentService.get(itemId);
+	    Document document = documentService.getMetadata(itemId);
 	    if (document == null) {
 		log.warn(String.format("Cannot find item %s", itemId));
 		return null;
@@ -118,7 +118,7 @@ public class RatingProvider implements RatingService {
 	    if (log.isTraceEnabled()) {
 		log.trace(String.format("create rating for user %s in item %s", getCurrentUser(), itemId));
 	    }
-	    Document document = documentService.get(itemId);
+	    Document document = documentService.getMetadata(itemId);
 	    if (document == null) {
 		log.warn(String.format("Cannot find item %s", itemId));
 		return null;
@@ -163,7 +163,7 @@ public class RatingProvider implements RatingService {
 	    if (log.isTraceEnabled()) {
 		log.trace(String.format("delete - %s", itemId));
 	    }
-	    Document document = documentService.get(itemId);
+	    Document document = documentService.getMetadata(itemId);
 	    if (document == null) {
 		log.warn(String.format("Cannot find item %s", itemId));
 		return;
@@ -187,7 +187,7 @@ public class RatingProvider implements RatingService {
 	    if (log.isTraceEnabled()) {
 		log.trace(String.format("getRatings - %s", itemId));
 	    }
-	    Document document = documentService.get(itemId);
+	    Document document = documentService.getMetadata(itemId);
 	    if (document == null) {
 		log.warn(String.format("Cannot find item %s", itemId));
 		return null;
