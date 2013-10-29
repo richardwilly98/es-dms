@@ -71,7 +71,8 @@
 				}
 			},
 			"tags" : {
-				"type" : "string", 
+				"type" : "string",
+				"index":"not_analyzed", 
 				"index_name" : "tag"
 			},
 			"ratings" : {
@@ -86,8 +87,7 @@
 					"score": {
 						"type": "integer"
 					}
-				}, 
-				"index_name" : "rating"
+				}
 			}
 		}
 	}
