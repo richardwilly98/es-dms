@@ -63,15 +63,16 @@
 									</a>
 									<ul data-ng-switch-when="A" class="dropdown-menu">
 										<li><a data-ng-click="showDetails(document.id)">Details</a></li>
-										<li><a href="api/documents/{{ document.id }}/view" target="_blank">View</a></li>
-										<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
+										<li><a href="api/documents/{{ document.id }}/_view" target="_blank">View</a></li>
+										<li><a href="api/documents/{{ document.id }}/_download">Download</a></li>
+										<li><a data-ng-click="addVersion(document.id)">Add Version</a></li>
 										<li><a data-ng-click="checkout(document.id)">Check-Out</a></li>
 										<li><a data-ng-click="remove(document.id)">Delete</a></li>
 									</ul>
 									<ul data-ng-switch-when="L" class="dropdown-menu">
 										<li><a data-ng-click="showDetails(document.id)">Details</a></li>
-										<li><a href="api/documents/{{ document.id }}/view" target="_blank">View</a></li>
-										<li><a href="api/documents/{{ document.id }}/download">Download</a></li>
+										<li><a href="api/documents/{{ document.id }}/_view" target="_blank">View</a></li>
+										<li><a href="api/documents/{{ document.id }}/_download">Download</a></li>
 										<li><a data-ng-click="checkin(document.id)">Check-In</a></li>
 									</ul>
 								</div>

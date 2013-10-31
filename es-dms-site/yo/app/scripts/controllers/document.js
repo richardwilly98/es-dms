@@ -250,6 +250,18 @@ esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$modal', 'documentSe
 		}
   };
 
+  $scope.addVersion = function(id) {
+    $modal.open({
+      templateUrl: 'views/documents/add-version.html',
+      controller: 'DocumentsVersionCtrl',
+      resolve: {
+        documentId: function() {
+          return id;
+        }
+      }
+    });
+  };
+
   $scope.remove = function(id) {
 		documentService.remove(id, function(data, status) {
       $log.log('remove -> ' + data + ' - ' + status);

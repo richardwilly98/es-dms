@@ -4,6 +4,7 @@ angular.module('esDmsSiteApp')
   .controller('DocumentsDetailsCtrl', ['$log', '$scope', '$state', '$filter', 'documentService', 'searchService', '$modalInstance', 'documentId',
     function ($log, $scope, $state, $filter, documentService, searchService, $modalInstance, documentId) {
   $scope.document = {};
+  $scope.versions = {};
   $scope.auditEntries = {};
   $scope.moreLikeThis = {};
   $scope.isAvailable = false;
@@ -26,6 +27,14 @@ angular.module('esDmsSiteApp')
     });
   };
   
+  $scope.loadVersions = function() {
+    $log.log('loadVersions: ' + $scope.document.id);
+    documentService.versions($scope.document.id, function(versions) {
+      $scope.versions = versions;//_.map(versions.items, function(version) {
+        // return version;
+      // });
+    });
+  };
   $scope.loadAudit = function() {
     $log.log('loadAudit: ' + $scope.document.id);
     $log.log('$state.params: ' + JSON.stringify($state.params));

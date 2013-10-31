@@ -20,6 +20,7 @@ files = [
   'app/bower_components/blueimp-file-upload/js/jquery.fileupload-angular.js',
   'app/bower_components/ng-tags-input/ng-tags-input.js',
   'app/bower_components/lodash/dist/lodash.js',
+  'app/bower_components/angularjs-file-upload/angular-file-upload.js',
   'app/scripts/*.js',
   'app/scripts/**/*.js',
   //'test/mock/**/*.js',

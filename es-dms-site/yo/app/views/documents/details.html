@@ -29,7 +29,24 @@
 					</div>
 				</form>
 			</tab>
-			<tab heading="Version" disabled="true">Version</tab>
+			<tab heading="Version" select="loadVersions()">
+				<table class="table table-condensed">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Version Id</th>
+							<th>Current</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-ng-repeat="version in versions | orderBy: 'version_id':true">
+							<td>{{ version.name }}</td>
+							<td>{{ version.version_id }}</td>
+							<td>{{ version.current }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</tab>
 			<tab heading="Audit" select="loadAudit()">
 				<table class="table table-condensed">
 					<thead>

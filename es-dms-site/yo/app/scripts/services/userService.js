@@ -13,7 +13,7 @@ esDmsSiteApp.service('userService', ['$log', '$rootScope', '$resource', '$http',
 	
 	return {
 		search: function(criteria, callback) {
-			$http.get('api/users/search/' + criteria).success(function (data) {
+			$http.get('api/users/_search/' + criteria).success(function (data) {
 				users = data.items;
 				callback(data);
 			});

@@ -3,13 +3,14 @@
 esDmsSiteApp.service('documentService', ['$sce', '$log', '$rootScope', '$resource', '$http', 'sharedService',
   function documentService($sce, $log, $rootScope, $resource, $http, sharedService) {
     var documentResource = $resource('api/documents/:id/:action/:parameter' , {id:'@id'}, {
-        checkout: {method:'POST', params: {action: 'checkout'}},
-        checkin: {method:'POST', params: {action: 'checkin'}},
-        preview: {method:'GET', params: {action: 'preview'}},
-        metadata: {method:'GET', params: {action: 'metadata'}},
-        audit: {method:'GET', params: {action: 'audit'}},
-        markDeleted: {method:'POST', params: {action: 'deleted'}},
-        undelete: {method:'POST', params: {action: 'undelete'}},
+        checkout: {method:'POST', params: {action: '_checkout'}},
+        checkin: {method:'POST', params: {action: '_checkin'}},
+        preview: {method:'GET', params: {action: '_preview'}},
+        metadata: {method:'GET', params: {action: '_metadata'}},
+        audit: {method:'GET', params: {action: '_audit'}},
+        versions: {method:'GET', params: {action: 'versions'}, isArray: true},
+        markDeleted: {method:'POST', params: {action: '_delete'}},
+        undelete: {method:'POST', params: {action: '_undelete'}},
         update: {method:'PUT', params: {}}
       });
 
@@ -60,6 +61,12 @@ esDmsSiteApp.service('documentService', ['$sce', '$log', '$rootScope', '$resourc
         var document = new documentResource.audit({'id': id}, function() {
           $log.log('get document: ' + JSON.stringify(document));
           callback(document);
+        });
+      },
+      versions: function(id, callback) {
+        $log.log('versions document: ' + id);
+        var versions = new documentResource.versions({'id': id}, function() {
+          callback(versions);
         });
       },
       addTag: function(id, tag, callback) {

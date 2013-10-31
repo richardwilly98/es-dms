@@ -23,7 +23,7 @@ esDmsSiteApp.service('roleService', ['$log', '$rootScope', '$resource', '$http',
 			}
 		},
 		search: function(criteria, callback) {
-			$http.get('api/roles/search/' + criteria).success(function (data) {
+			$http.get('api/roles/_search/' + criteria).success(function (data) {
 				roles = data.items;
 				callback(data);
 			});

@@ -6,7 +6,7 @@
 		<alert data-ng-show="$parent.showAlert" type="alert.type"
 			close="closeAlert()">{{alert.msg}}</alert>
 	</div>
-	<form class="form-horizontal" action="api/documents/upload"
+	<form class="form-horizontal" action="api/documents/_upload"
 		enctype="multipart/form-data" method="post" data-fileupload="options"
 		ng-class="{true: 'fileupload-processing'}[!!processing() || loadingFiles]">
 		<div class="modal-body">

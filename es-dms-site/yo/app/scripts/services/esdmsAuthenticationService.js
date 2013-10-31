@@ -7,13 +7,13 @@ esDmsSiteApp.service('esdmsAuthenticationService', ['$http', function ($http) {
       var config = {
         headers: {'Content-Type':'application/json; charset=UTF-8'}
       };
-      $http.post('api/auth/login', payload, config).success(callback);
+      $http.post('api/auth/_login', payload, config).success(callback);
     },
     logout: function() {
-      $http.post('api/auth/logout');
+      $http.post('api/auth/_logout');
     },
     validate: function(token, callback) {
-      $http.post('api/auth/validate').success(callback);
+      $http.post('api/auth/_validate').success(callback);
     }
   };
 }]);

@@ -37,19 +37,19 @@ describe('Service: documentService', function () {
   });
 
   beforeEach(function(){
-    $httpBackend.whenPOST('api/auth/validate').respond(validate);
+    $httpBackend.whenPOST('api/auth/_validate').respond(validate);
     $httpBackend.whenGET('api/parameters/es-dms').respond(systemSettings);
     $httpBackend.whenGET('api/users/admin').respond(user);
     $httpBackend.whenGET('api/documents/search/dummy?fi=0&ps=20').respond(documents);
     $httpBackend.whenGET('api/documents/3').respond(doc);
     $httpBackend.whenPUT('api/documents/3').respond(200, '');
-    $httpBackend.whenGET('api/documents/3/metadata').respond(doc);
-    $httpBackend.whenPOST('api/documents/3/checkout').respond(204, '');
+    $httpBackend.whenGET('api/documents/3/_metadata').respond(doc);
+    $httpBackend.whenPOST('api/documents/3/_checkout').respond(204, '');
     $httpBackend.whenPOST('api/documents/3/tags/tag1').respond(201, '');
 
     $httpBackend.whenGET('api/documents/4').respond(doc2);
     $httpBackend.whenPUT('api/documents/4').respond(200, '');
-    $httpBackend.whenGET('api/documents/4/metadata').respond(doc2);
+    $httpBackend.whenGET('api/documents/4/_metadata').respond(doc2);
     $httpBackend.whenDELETE('api/documents/4/tags/tag2').respond(204, '');
   });
 
@@ -67,7 +67,7 @@ describe('Service: documentService', function () {
   });
 
   it('should call documentService addTag method', function() {
-    $httpBackend.expectGET('api/documents/3/metadata');
+    $httpBackend.expectGET('api/documents/3/_metadata');
     $httpBackend.expectPOST('api/documents/3/tags/tag1');
     documentService.addTag(3, 'tag1', function(data) {
       expect(data.tags).toContain('tag1');
@@ -76,7 +76,7 @@ describe('Service: documentService', function () {
   });
 
   it('should call documentService removeTag method', function() {
-    $httpBackend.expectGET('api/documents/4/metadata');
+    $httpBackend.expectGET('api/documents/4/_metadata');
     $httpBackend.expectDELETE('api/documents/4/tags/tag2');
     documentService.removeTag(4, 'tag2', function(data) {
       expect(data.tags).not.toContain('tag2');
