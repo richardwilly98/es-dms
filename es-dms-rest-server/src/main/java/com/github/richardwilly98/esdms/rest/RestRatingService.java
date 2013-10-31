@@ -54,9 +54,9 @@ import com.github.richardwilly98.esdms.services.RatingService;
 public class RestRatingService extends RestServiceBase {
 
     public static final String RATINGS_PATH = "ratings";
-    public static final String ALL_PATH = "all";
-    public static final String TOTAL_PATH = "total";
-    public static final String AVERAGE_PATH = "average";
+    public static final String ALL_PATH = "_all";
+    public static final String TOTAL_PATH = "_total";
+    public static final String AVERAGE_PATH = "_average";
 
     private final RatingService ratingService;
 

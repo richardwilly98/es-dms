@@ -45,12 +45,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.log4j.Logger;
-
 import com.github.richardwilly98.esdms.api.ItemBase;
-import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.BaseService;
 import com.google.common.base.Strings;
@@ -61,11 +59,11 @@ import com.google.common.base.Strings;
 public abstract class RestItemBaseService<T extends ItemBase> extends RestServiceBase {
 
     public static final String ITEM_ID_HEADER = "esdms-id";
-    public static final String SEARCH_PATH = "search";
+    public static final String SEARCH_PATH = "_search";
     public static final String SEARCH_FIRST_PARAMETER = "fi";
     public static final String SEARCH_PAGE_SIZE_PARAMETER = "ps";
 
-    protected final Logger log = Logger.getLogger(getClass());
+//    protected final Logger log = Logger.getLogger(getClass());
     protected final BaseService<T> service;
 
     @Inject
@@ -128,7 +126,6 @@ public abstract class RestItemBaseService<T extends ItemBase> extends RestServic
     }
 
     @DELETE
-//    @Produces({ MediaType.APPLICATION_JSON })
     @Path("{id}")
     public Response delete(@PathParam("id") String id) {
         if (log.isTraceEnabled()) {

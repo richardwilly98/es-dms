@@ -292,7 +292,7 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
     }
 
     private void markDeletedDocument(String id) throws Throwable {
-        Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.MARKDELETED_PATH).request()
+        Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.MARKDELETE_PATH).request()
                 .cookie(adminCookie).post(null);
         log.debug(String.format("status: %s", response.getStatus()));
         Assert.assertTrue(response.getStatus() == Status.NO_CONTENT.getStatusCode());

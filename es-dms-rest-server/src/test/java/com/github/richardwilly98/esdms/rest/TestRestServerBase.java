@@ -248,7 +248,7 @@ public class TestRestServerBase {
     protected Cookie login(Credential credential) throws Throwable {
         try {
             log.debug(String.format("login - %s", credential));
-            WebTarget webResource = target().path("auth").path("login");
+            WebTarget webResource = target().path(RestAuthenticationService.AUTH_PATH).path(RestAuthenticationService.LOGIN_PATH);
             log.debug(webResource);
             Response response = webResource.request(MediaType.APPLICATION_JSON).post(Entity.entity(credential, MediaType.APPLICATION_JSON));
             log.debug("status: " + response.getStatus());
@@ -268,7 +268,7 @@ public class TestRestServerBase {
     protected void logout(Cookie cookie) throws Throwable {
         log.debug(String.format("logout - %s", cookie));
         checkNotNull(cookie);
-        WebTarget webResource = target().path("auth").path("logout");
+        WebTarget webResource = target().path(RestAuthenticationService.AUTH_PATH).path(RestAuthenticationService.LOGOUT_PATH);
         Response response = webResource.request().cookie(cookie).post(Entity.json(null));
         Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
         if (response.getStatus() != Status.OK.getStatusCode()) {

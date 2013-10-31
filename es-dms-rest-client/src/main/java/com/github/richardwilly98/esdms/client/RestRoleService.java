@@ -19,7 +19,7 @@ import com.google.common.collect.Iterables;
 
 public class RestRoleService extends RestItemBaseClient<Role> {
 
-    public static final String SEARCH_PATH = "search";
+    public static final String SEARCH_PATH = "_search";
     public static final String ROLES_PATH = "roles";
 
     public RestRoleService(String url) {

@@ -50,9 +50,9 @@ import com.github.richardwilly98.esdms.services.AuthenticationService;
 public class RestAuthenticationService extends RestItemBaseService<SessionImpl> {
 
     public static final String AUTH_PATH = "auth";
-    public static final String LOGIN_PATH = "login";
-    public static final String LOGOUT_PATH = "logout";
-    public static final String VALIDATE_PATH = "validate";
+    public static final String LOGIN_PATH = "_login";
+    public static final String LOGOUT_PATH = "_logout";
+    public static final String VALIDATE_PATH = "_validate";
     public static final String ES_DMS_TICKET = "ES_DMS_TICKET";
 
     @Inject

@@ -19,7 +19,7 @@ import com.google.common.collect.Iterables;
 
 public class RestUserService extends RestItemBaseClient<User> {
 
-    public static final String SEARCH_PATH = "search";
+    public static final String SEARCH_PATH = "_search";
     public static final String SEARCH_FIRST_PARAMETER = "fi";
     public static final String SEARCH_PAGE_SIZE_PARAMETER = "ps";
     public static final String USERS_PATH = "users";

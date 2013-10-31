@@ -16,9 +16,9 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 public class RestAuthenticationService extends RestClientBase {
 
     public static final String AUTH_PATH = "auth";
-    public static final String LOGOUT_PATH = "logout";
-    public static final String LOGIN_PATH = "login";
-    private static final String VALIDATE_PATH = "validate";
+    public static final String LOGOUT_PATH = "_logout";
+    public static final String LOGIN_PATH = "_login";
+    public static final String VALIDATE_PATH = "_validate";
 
     public RestAuthenticationService(final String url) {
         super(url, AUTH_PATH);
