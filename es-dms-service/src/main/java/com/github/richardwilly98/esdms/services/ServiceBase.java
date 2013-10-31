@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.services;
  * #L%
  */
 
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.inject.Inject;
@@ -47,14 +46,14 @@ public abstract class ServiceBase {
 
     final static ObjectMapper mapper = new ObjectMapper();
 
-    private String currentUser;
     final Client client;
     final Settings settings;
     final String index;
     final String type;
 
     @Inject
-    ServiceBase(final Client client, final BootstrapService bootstrapService, final String index, final String type) throws ServiceException {
+    ServiceBase(final Client client, final BootstrapService bootstrapService, final String index, final String type)
+            throws ServiceException {
         checkNotNull(client);
         checkNotNull(bootstrapService);
         checkNotNull(type);
@@ -68,31 +67,25 @@ public abstract class ServiceBase {
         this.type = type;
     }
 
-    protected void isAuthenticated() throws ServiceException {
+    protected String isAuthenticated() throws ServiceException {
         try {
-            log.debug("*** isAuthenticated ***");
+            String currentUser = null;
             Subject currentSubject = SecurityUtils.getSubject();
-            log.debug("currentSubject.isAuthenticated(): " + currentSubject.isAuthenticated());
-            log.debug("Principal: " + currentSubject.getPrincipal());
             if (currentSubject.getPrincipal() == null) {
                 throw new ServiceException("Unauthorize request");
             } else {
-                if (currentUser == null) {
-                    if (currentSubject.getPrincipal() instanceof UserImpl) {
-                        currentUser = ((UserImpl) currentSubject.getPrincipal()).getId();
-                    }
+                if (currentSubject.getPrincipal() instanceof UserImpl) {
+                    currentUser = ((UserImpl) currentSubject.getPrincipal()).getId();
                 }
             }
+            return currentUser;
         } catch (Throwable t) {
-            throw new ServiceException();
+            throw new ServiceException("Could not authenticate request");
         }
     }
 
     protected String getCurrentUser() throws ServiceException {
-        if (currentUser == null) {
-            isAuthenticated();
-        }
-        return currentUser;
+        return isAuthenticated();
     }
 
 }
