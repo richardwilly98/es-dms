@@ -2,7 +2,6 @@
 
 esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$modalInstance', '$rootScope', '$http', 'userService', 'roleService', 'userId',
 	function ($log, $scope, $modalInstance, $rootScope, $http, userService, roleService, userId) {
-	$scope.user = null;
 	$scope.newUser = false;
 	$scope.user = {};
 	$scope.password = {
