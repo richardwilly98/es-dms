@@ -52,6 +52,7 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$modalInstance', '$r
 
 	$scope.save = function() {
 		if ($scope.newUser) {
+			$scope.user.id = $scope.user.login;
 			$scope.user.password = $scope.password.pw1;
 		}
 		$scope.user.roles = $scope.selected.roles;
