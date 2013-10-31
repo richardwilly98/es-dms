@@ -344,6 +344,7 @@ public class ProviderTestBase {
         Assert.assertNotNull(newDocument);
         Assert.assertEquals(id, newDocument.getId());
         Assert.assertTrue(newDocument.hasStatus(DocumentStatus.AVAILABLE));
+        Assert.assertEquals(document.getVersions(), versions);
         log.info(String.format("New document created #%s", newDocument.getId()));
         return id;
     }

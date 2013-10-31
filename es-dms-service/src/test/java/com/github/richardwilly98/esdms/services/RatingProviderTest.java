@@ -32,8 +32,10 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.github.richardwilly98.esdms.api.Document;
+import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Rating;
 import com.github.richardwilly98.esdms.api.User;
+import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.services.RatingService;
 import com.google.common.collect.ImmutableSet;
@@ -83,6 +85,11 @@ public class RatingProviderTest extends ProviderTestBase {
     @Test
     public void testCreateRating() throws Throwable {
         log.info("Start testCreateRating");
+        Assert.assertEquals(document.getVersions().size(), 1);
+        Version version = document.getCurrentVersion();
+        Assert.assertNotNull(version);
+        File file = documentService.getVersionContent(document, version.getVersionId());
+        Assert.assertNotNull(file);
 //        Rating rating = createRating(id, 9);
 //        log.debug(rating);
 //        Document document = documentService.get(id);

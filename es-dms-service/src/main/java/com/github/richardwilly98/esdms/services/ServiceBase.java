@@ -30,19 +30,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.elasticsearch.client.Client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.Settings;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
-public abstract class ServiceBase {
-
-    final protected Logger log = Logger.getLogger(getClass());
+public abstract class ServiceBase extends AuthenticatedServiceBase {
 
     final static ObjectMapper mapper = new ObjectMapper();
 
@@ -65,27 +59,6 @@ public abstract class ServiceBase {
             this.index = settings.getLibrary();
         }
         this.type = type;
-    }
-
-    protected String isAuthenticated() throws ServiceException {
-        try {
-            String currentUser = null;
-            Subject currentSubject = SecurityUtils.getSubject();
-            if (currentSubject.getPrincipal() == null) {
-                throw new ServiceException("Unauthorize request");
-            } else {
-                if (currentSubject.getPrincipal() instanceof UserImpl) {
-                    currentUser = ((UserImpl) currentSubject.getPrincipal()).getId();
-                }
-            }
-            return currentUser;
-        } catch (Throwable t) {
-            throw new ServiceException("Could not authenticate request");
-        }
-    }
-
-    protected String getCurrentUser() throws ServiceException {
-        return isAuthenticated();
     }
 
 }

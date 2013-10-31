@@ -34,52 +34,21 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.subject.Subject;
 
 import com.github.richardwilly98.esdms.RatingImpl;
-import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Rating;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
-public class RatingProvider implements RatingService {
+public class RatingProvider extends AuthenticatedServiceBase implements RatingService {
 
-    final protected Logger log = Logger.getLogger(getClass());
-    private String currentUser;
     final DocumentService documentService;
 
     @Inject
     RatingProvider(final DocumentService documentService) throws ServiceException {
 	checkNotNull(documentService);
 	this.documentService = documentService;
-    }
-
-    protected void isAuthenticated() throws ServiceException {
-	try {
-	    Subject currentSubject = SecurityUtils.getSubject();
-	    if (currentSubject.getPrincipal() == null) {
-		throw new ServiceException("Unauthorize request");
-	    } else {
-		if (currentUser == null) {
-		    if (currentSubject.getPrincipal() instanceof UserImpl) {
-			currentUser = ((UserImpl) currentSubject.getPrincipal()).getId();
-		    }
-		}
-	    }
-	} catch (Throwable t) {
-	    throw new ServiceException();
-	}
-    }
-
-    protected String getCurrentUser() throws ServiceException {
-	currentUser = null;
-	if (currentUser == null) {
-	    isAuthenticated();
-	}
-	return currentUser;
     }
 
     @Override
@@ -139,7 +108,7 @@ public class RatingProvider implements RatingService {
 	    rating = new RatingImpl.Builder().user(getCurrentUser()).score(score).date(new Date()).build();
 	    document.addRating(rating);
 	    log.debug(String.format("About to update document with rating: %s", document));
-	    documentService.update(document);
+	    documentService.updateMetadata(document);
 	    return rating;
 	} catch (Throwable t) {
 	    log.error("create failed", t);
@@ -171,7 +140,7 @@ public class RatingProvider implements RatingService {
 	    Set<Rating> ratings = document.getRatings();
 	    if (ratings.contains(rating)) {
 		document.removeRating(rating);
-		documentService.update(document);
+		documentService.updateMetadata(document);
 	    } else {
 		log.info(String.format("Could not find rating %s in item %s", rating, itemId));
 	    }

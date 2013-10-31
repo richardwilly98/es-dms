@@ -68,13 +68,16 @@ import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Rating;
+import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.inject.SystemParametersModule;
 import com.github.richardwilly98.esdms.search.SearchResultImpl;
 import com.github.richardwilly98.esdms.search.api.SearchResult;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 @Singleton
@@ -339,12 +342,18 @@ public class DocumentProvider extends ProviderItemBase<Document> implements Docu
     @Override
     public Document update(Document item) throws ServiceException {
         SimpleDocument document = updateModifiedDate(getSimpleDocument(item));
-        log.debug(String.format("update document - %s - versions is empty - %s", item.getId(), document.getVersions().isEmpty()));
-        if (document.getVersions().isEmpty()) {
-            return updateMetadata(document);
-        } else {
+//        Optional<Version> version = Iterables.tryFind(document.getVersions(), new Predicate<Version>() {
+//            public boolean apply(Version v) {
+//                return v.getFile() != null;
+//            }
+//        });
+//        log.debug(String.format("update document - %s - found version with content? %s", item.getId(), version.isPresent()));
+//        if (version.isPresent()) {
             return super.update(document);
-        }
+//        } else {
+//            document.getVersions().clear();
+//            return updateMetadata(document);
+//        }
     }
 
     // TODO: document and version should be separated in 2 objects linked as
@@ -357,16 +366,18 @@ public class DocumentProvider extends ProviderItemBase<Document> implements Docu
     // http://www.elasticsearch.org/blog/managing-relations-inside-elasticsearch/
     public Document updateMetadata(Document item) throws ServiceException {
         try {
+            item.getVersions().clear();
+            SimpleDocument document = updateModifiedDate(getSimpleDocument(item));
             if (log.isTraceEnabled()) {
                 log.trace(String.format("updateMetadata - %s", item.getId()));
             }
             Stopwatch watch = Stopwatch.createStarted();
-            byte[] document = mapper.writeValueAsBytes(item);
+//            byte[] document = mapper.writeValueAsBytes(item);
             UpdateResponse response = client.prepareUpdate(index, TYPE, item.getId())
                     .setScript("ctx._source.remove('attributes'); ctx._source.remove('tags'); ctx._source.remove('ratings');").execute()
                     .actionGet();
-            response = client.prepareUpdate(index, TYPE, item.getId()).setDoc(document).execute().actionGet();
-            log.trace(String.format("Elapsed time for updateMetadata #2: %s", watch.elapsed(TimeUnit.MILLISECONDS)));
+            response = client.prepareUpdate(index, TYPE, item.getId()).setDoc(mapper.writeValueAsBytes(item)).execute().actionGet();
+            log.trace(String.format("Elapsed time for updateMetadata #2: %s", watch));
             refreshIndex();
             watch.stop();
             Document updatedItem = getMetadata(response.getId());

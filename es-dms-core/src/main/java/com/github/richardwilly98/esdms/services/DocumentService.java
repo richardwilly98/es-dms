@@ -81,6 +81,8 @@ public interface DocumentService extends BaseService<Document> {
 
     public abstract Document getMetadata(String id) throws ServiceException;
 
+    public abstract Document updateMetadata(Document item) throws ServiceException;
+    
     public abstract void checkin(Document document) throws ServiceException;
 
     public abstract void checkout(Document document) throws ServiceException;
