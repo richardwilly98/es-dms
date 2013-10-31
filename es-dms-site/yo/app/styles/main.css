@@ -1,5 +1,4 @@
 /* Main Stylesheet */
-@import url('../bower_components/blueimp-file-upload/css/jquery.fileupload-ui.css');
 
 /* Add top padding for navbar-top-fixed */
 body {
@@ -33,7 +32,7 @@ body {
   padding-left: 10px;
   padding-right: 10px;
 }
-/* Custom position for Toaster */
+/* Editable input test for tagging */
 .esdms-tag input[type=text] {
   width: 10em;
 }

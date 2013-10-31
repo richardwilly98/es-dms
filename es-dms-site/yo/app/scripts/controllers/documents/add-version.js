@@ -32,7 +32,7 @@ angular.module('esDmsSiteApp')
 
       $scope.upload = function (/*$files*/) {
         $log.log('onFileSelect');
-        if ($scope.files.legnth == 0) {
+        if ($scope.files.length == 0) {
           $scope.uploadMessage = 'No files selected';
           return;
         }
