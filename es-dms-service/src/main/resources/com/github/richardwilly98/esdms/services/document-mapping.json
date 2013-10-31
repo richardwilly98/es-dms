@@ -2,7 +2,7 @@
 	"document": {
 		"properties": {
 			"versions" : {
-				"type": "object",
+				"type": "nested",
 				"properties": {
 					"id" : {
 						"type": "string"
@@ -49,8 +49,7 @@
 							}
 						}
 					}
-				},
-				"index_name" : "version"
+				}
 			},
 			"attributes" : {
 				"type": "object",
@@ -76,7 +75,7 @@
 				"index_name" : "tag"
 			},
 			"ratings" : {
-				"type" : "object",
+				"type" : "nested",
 				"properties": {
 					"date": {
 						"type": "date"
