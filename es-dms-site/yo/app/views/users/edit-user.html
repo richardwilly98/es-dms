@@ -35,14 +35,13 @@
 			<div class="control-group">
 				<label class="control-label">Roles:</label>
 				<div class="controls">
-					<select multiple ng-model="selectedRoles"
+					<select multiple ng-model="selected.roles"
 						ng-options="role.name for role in roles">
 					</select>
 					<!-- select multiple ng-multiple="true" ng-model="selectedRoles" ng-options="id as role.id for role in roles | orderBy: 'id'">
               </select -->
 				</div>
 			</div>
-
 			<legend ng-hide="newUser">Change Password</legend>
 			<div class="control-group{{pwError && ' error' || ''}}">
 				<label class="control-label">Password:</label>

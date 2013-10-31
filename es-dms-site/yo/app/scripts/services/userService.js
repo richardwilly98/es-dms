@@ -66,9 +66,9 @@ esDmsSiteApp.service('userService', ['$log', '$rootScope', '$resource', '$http',
 			// 	users.push(user);
 			// }
 		},
-		get: function(id, callback) {
-			$log.log('get user: ' + id);
-      var user = new UserResource.get({'id': id}, function() {
+		get: function(login, callback) {
+			$log.log('get user: ' + login);
+      var user = new UserResource.get({'login': login}, function() {
         callback(user);
       });
     }

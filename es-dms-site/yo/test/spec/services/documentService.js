@@ -39,7 +39,7 @@ describe('Service: documentService', function () {
   beforeEach(function(){
     $httpBackend.whenPOST('api/auth/_validate').respond(validate);
     $httpBackend.whenGET('api/parameters/es-dms').respond(systemSettings);
-    $httpBackend.whenGET('api/users/admin').respond(user);
+    $httpBackend.whenGET('api/users?login=admin').respond(user);
     $httpBackend.whenGET('api/documents/search/dummy?fi=0&ps=20').respond(documents);
     $httpBackend.whenGET('api/documents/3').respond(doc);
     $httpBackend.whenPUT('api/documents/3').respond(200, '');

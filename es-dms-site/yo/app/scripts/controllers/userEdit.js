@@ -4,7 +4,6 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$modalInstance', '$r
 	function ($log, $scope, $modalInstance, $rootScope, $http, userService, roleService, userId) {
 	$scope.user = null;
 	$scope.newUser = false;
-	$scope.uid = '';
 	$scope.user = {};
 	$scope.password = {
 		'pw1': '',
@@ -12,7 +11,7 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$modalInstance', '$r
 	};
 	$scope.pwError = false;
 	$scope.incomplete = false;
-	$scope.selectedRoles = [];
+	$scope.selected = { roles: [] };
 	$scope.roles = [];
 
 	$log.log('Edit user: ' + userId);
@@ -36,11 +35,11 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$modalInstance', '$r
 					_.each($scope.roles, function(role) {
 						_.find($scope.user.roles, function(item) {
 							if (item !== null && role.id === item.id) {
-								$scope.selectedRoles.push(role);
+								$scope.selected.roles.push(role);
 							}
 						});
 					});
-					$log.log('$scope.selectedRoles: ' + JSON.stringify($scope.selectedRoles));
+					$log.log('$scope.selected.roles: ' + JSON.stringify($scope.selected.roles));
 				}
 				$log.log('roles: ' + JSON.stringify($scope.roles));
 			});
@@ -55,8 +54,7 @@ esDmsSiteApp.controller('UserEditCtrl', ['$log', '$scope', '$modalInstance', '$r
 		if ($scope.newUser) {
 			$scope.user.password = $scope.password.pw1;
 		}
-		$log.log('About to save user: ' + JSON.stringify($scope.user));
-		$scope.user.roles = $scope.selectedRoles;
+		$scope.user.roles = $scope.selected.roles;
 		userService.save($scope.user, $scope.newUser);
     $modalInstance.close();
 	};
