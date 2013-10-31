@@ -48,7 +48,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 @Singleton
-public class UserProvider extends ProviderBase<User> implements UserService {
+public class UserProvider extends ProviderItemBase<User> implements UserService {
 
     private static final String USER_MAPPING_JSON = "/com/github/richardwilly98/esdms/services/user-mapping.json";
     private final static String type = "user";
@@ -126,7 +126,7 @@ public class UserProvider extends ProviderBase<User> implements UserService {
             User newUser = super.create(user);
             return newUser;
         } catch (Throwable t) {
-            log.error("create failed", t);
+            log.error(String.format("create failed - %s", t));
             throw new ServiceException(t.getLocalizedMessage());
         }
     }

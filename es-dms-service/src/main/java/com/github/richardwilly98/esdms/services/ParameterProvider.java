@@ -45,7 +45,7 @@ import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
 @Singleton
-public class ParameterProvider extends ProviderBase<Parameter> implements ParameterService {
+public class ParameterProvider extends ProviderItemBase<Parameter> implements ParameterService {
 
     private static final String PARAMETER_MAPPING_JSON = "/com/github/richardwilly98/esdms/services/parameter-mapping.json";
     private final static String index = "system";

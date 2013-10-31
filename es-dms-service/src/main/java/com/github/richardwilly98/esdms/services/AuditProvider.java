@@ -50,7 +50,7 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.services.audit.AuditStrategy;
 
 @Singleton
-public class AuditProvider extends ProviderBase<AuditEntry> implements AuditService {
+public class AuditProvider extends ProviderItemBase<AuditEntry> implements AuditService {
 
     private static Logger log = Logger.getLogger(AuditProvider.class);
 

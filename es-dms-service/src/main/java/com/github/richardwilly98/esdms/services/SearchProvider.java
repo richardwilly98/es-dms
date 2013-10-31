@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.services;
  * #L%
  */
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
@@ -41,9 +40,6 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.log4j.Logger;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -59,10 +55,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.elasticsearch.search.facet.terms.TermsFacet;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.Document;
-import com.github.richardwilly98.esdms.api.Settings;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.search.FacetImpl;
 import com.github.richardwilly98.esdms.search.FacetRequestImpl;
@@ -75,53 +68,11 @@ import com.github.richardwilly98.esdms.search.api.Term;
 import com.github.richardwilly98.esdms.search.api.TermRequest;
 
 @Singleton
-public class SearchProvider implements SearchService<Document> {
-
-    final static Logger log = Logger.getLogger(SearchProvider.class);
-
-    final static ObjectMapper mapper = new ObjectMapper();
-    final Client client;
-    final Settings settings;
-    final String index;
-    private final static String type = "document";
-
-    private String currentUser;
+public class SearchProvider extends ServiceBase implements SearchService<Document> {
 
     @Inject
     SearchProvider(final Client client, final BootstrapService bootstrapService) throws ServiceException {
-        checkNotNull(client);
-        checkNotNull(bootstrapService);
-        checkNotNull(type);
-        this.client = client;
-        this.settings = bootstrapService.loadSettings();
-        this.index = settings.getLibrary();
-    }
-
-    protected void isAuthenticated() throws ServiceException {
-        try {
-            log.debug("*** isAuthenticated ***");
-            Subject currentSubject = SecurityUtils.getSubject();
-            log.debug("currentSubject.isAuthenticated(): " + currentSubject.isAuthenticated());
-            log.debug("Principal: " + currentSubject.getPrincipal());
-            if (currentSubject.getPrincipal() == null) {
-                throw new ServiceException("Unauthorize request");
-            } else {
-                if (currentUser == null) {
-                    if (currentSubject.getPrincipal() instanceof UserImpl) {
-                        currentUser = ((UserImpl) currentSubject.getPrincipal()).getId();
-                    }
-                }
-            }
-        } catch (Throwable t) {
-            throw new ServiceException();
-        }
-    }
-
-    protected String getCurrentUser() throws ServiceException {
-        if (currentUser == null) {
-            isAuthenticated();
-        }
-        return currentUser;
+        super(client, bootstrapService, null, DocumentProvider.TYPE);
     }
 
     protected SearchResult<Document> parseSearchResult(SearchResponse searchResponse, int first, int pageSize, List<FacetRequest> facets)
@@ -134,7 +85,7 @@ public class SearchProvider implements SearchService<Document> {
             long elapsedTime = searchResponse.getTookInMillis();
             log.trace(String.format("Total hist: %s - item count: %s", totalHits, searchResponse.getHits().hits().length));
             for (SearchHit hit : searchResponse.getHits().hits()) {
-                String json = convertFieldAsString(hit, "document");
+                String json = convertFieldAsString(hit, DocumentProvider.TYPE);
                 Document item = mapper.readValue(json, Document.class);
                 items.add(item);
             }
@@ -190,10 +141,10 @@ public class SearchProvider implements SearchService<Document> {
             throws ServiceException {
         try {
             log.trace(String.format("search %s - %s - %s - %s - %s", criteria, first, pageSize, facets, filters));
-            log.trace(String.format("index: %s - type: %s", index, type));
+            log.trace(String.format("index: %s - type: %s", index, DocumentProvider.TYPE));
             QueryBuilder query = new QueryStringQueryBuilder(criteria);
-            SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(type)
-                    .addPartialField("document", null, "versions").setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(first)
+            SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(DocumentProvider.TYPE)
+                    .addPartialField(DocumentProvider.TYPE, null, "versions").setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(first)
                     .setSize(pageSize).setQuery(query);
             if (facets != null && facets.size() > 0) {
                 for (FacetRequest facet : facets) {
@@ -232,10 +183,10 @@ public class SearchProvider implements SearchService<Document> {
             throws ServiceException {
         try {
             log.trace(String.format("moreLikeThis %s - %s - %s - %s - %s", criteria, first, pageSize, minTermFrequency, maxItems));
-            log.trace(String.format("index: %s - type: %s", index, type));
+            log.trace(String.format("index: %s - type: %s", index, DocumentProvider.TYPE));
             QueryBuilder query = QueryBuilders.moreLikeThisQuery().likeText(criteria).minTermFreq(minTermFrequency).maxQueryTerms(maxItems);
-            SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(type)
-                    .addPartialField("document", null, "versions").setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(first)
+            SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(DocumentProvider.TYPE)
+                    .addPartialField(DocumentProvider.TYPE, null, "versions").setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(first)
                     .setSize(pageSize).setQuery(query);
             log.debug("Search request builder: " + searchRequestBuilder);
             SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
@@ -250,7 +201,7 @@ public class SearchProvider implements SearchService<Document> {
         try {
             log.trace(String.format("suggestTags - %s - %s", criteria, size));
             QueryBuilder query = QueryBuilders.matchAllQuery();
-            SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(type)
+            SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(DocumentProvider.TYPE)
                     .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setSize(0).setQuery(query);
             searchRequestBuilder
                     .addFacet(FacetBuilders.termsFacet("Tags").field("tags").size(size).regex(String.format("^%s.*", criteria)));

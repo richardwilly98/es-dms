@@ -35,7 +35,7 @@ import com.github.richardwilly98.esdms.api.Permission;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
 @Singleton
-public class PermissionProvider extends ProviderBase<Permission> implements PermissionService {
+public class PermissionProvider extends ProviderItemBase<Permission> implements PermissionService {
 
     private final static String type = "permission";
 

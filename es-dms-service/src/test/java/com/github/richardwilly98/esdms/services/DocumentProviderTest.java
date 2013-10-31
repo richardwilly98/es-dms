@@ -71,20 +71,24 @@ public class DocumentProviderTest extends ProviderTestBase {
     }
 
     private Document addVersion(Document document, int versionId, File file, int parentId) throws ServiceException {
-        try {
-            if (parentId == 0) {
-                parentId = document.getCurrentVersion().getVersionId();
-            }
-            Version version = new VersionImpl.Builder().documentId(document.getId()).file(file).versionId(versionId).parentId(parentId)
-                    .build();
-            documentService.addVersion(document, version);
-            Document updatedDocument = documentService.get(document.getId());
-            Assert.assertNotNull(updatedDocument);
-            return updatedDocument;
-        } catch (ServiceException sEx) {
-            Assert.fail("addVersion failed", sEx);
-            throw sEx;
+        if (parentId == 0) {
+            parentId = document.getCurrentVersion().getVersionId();
         }
+        Version version = new VersionImpl.Builder().documentId(document.getId()).file(file).versionId(versionId).parentId(parentId).build();
+        documentService.addVersion(document, version);
+        Document updatedDocument = documentService.getMetadata(document.getId());
+        Assert.assertNotNull(updatedDocument);
+        return updatedDocument;
+    }
+
+    private File getVersionContent(Document document, int versionId) throws ServiceException {
+        if (versionId == 0) {
+            versionId = document.getCurrentVersion().getVersionId();
+        }
+        Assert.assertTrue(versionId != 0);
+        File file = documentService.getVersionContent(document, versionId);
+        Assert.assertNotNull(file);
+        return file;
     }
 
     private void deleteDocument(Document document) throws ServiceException {
@@ -122,7 +126,7 @@ public class DocumentProviderTest extends ProviderTestBase {
 
     @Test
     public void testCreateDeleteDocument() throws Throwable {
-        log.info("Start testCreateDeleteDocument ************************************");
+        log.debug("*** testCreateDeleteDocument ***");
         User user = null;
         for (User u : users) {
             for (Role role : u.getRoles()) {
@@ -134,14 +138,14 @@ public class DocumentProviderTest extends ProviderTestBase {
                 }
             }
         }
-        log.info("testCreateDeleteDocument: step 1");
+        log.debug("testCreateDeleteDocument: step 1");
         Assert.assertNotNull(user);
         login(user);
 
-        log.info("testCreateDeleteDocument: step 2");
+        log.debug("testCreateDeleteDocument: step 2");
         String id = createDocument("test-attachment.html", "text/html", "/test/github/richardwilly98/services/test-attachment.html");
         Document document = documentService.get(id);
-        log.info("testCreateDeleteDocument: step 3");
+        log.debug("testCreateDeleteDocument: step 3");
         Assert.assertNotNull(document);
         try {
             documentService.delete(document);
@@ -150,15 +154,15 @@ public class DocumentProviderTest extends ProviderTestBase {
             log.info(String.format("Document %s not deleted without having been marked for deletion. Exception raised!", id));
             log.info(e.getLocalizedMessage());
         }
-        log.info("testCreateDeleteDocument: step 4");
+        log.debug("testCreateDeleteDocument: step 4");
         documentService.markDeleted(document);
 
         document = documentService.get(id);
         Assert.assertTrue(document.hasStatus(DocumentStatus.DELETED));
 
-        log.info("testCreateDeleteDocument: step 5");
+        log.debug("testCreateDeleteDocument: step 5");
         documentService.delete(document);
-        log.info("End testCreateDeleteDocument successfully*****************************");
+        log.debug("*** End testCreateDeleteDocument ***");
     }
 
     @Test
@@ -173,7 +177,7 @@ public class DocumentProviderTest extends ProviderTestBase {
         }
     }
 
-    // TODO: hightlighting does not seem to work in unit test.
+    // TODO: highlighting does not seem to work in unit test.
     @Test(enabled = false)
     public void testHighlightDocument() throws Throwable {
         log.info("Start testHighlightDocument");
@@ -308,8 +312,10 @@ public class DocumentProviderTest extends ProviderTestBase {
         Map<String, Object> attributes = newHashMap();
         String html = "<html><body><h1>Hello World</h1></body></html>";
         String html2 = "<html><body><h1>Version 2</h1></body></html>";
+
         byte[] content = html.getBytes();
         byte[] content2 = html2.getBytes();
+        byte[] content3 = "<html><body><h1>Version 3</h1></body></html>".getBytes();
         Set<Version> versions = newHashSet();
         versions.add(new VersionImpl.Builder().documentId(id)
                 .file(new FileImpl.Builder().content(content).name("test.html").contentType("text/html").build()).current(true)
@@ -321,19 +327,11 @@ public class DocumentProviderTest extends ProviderTestBase {
         log.info(String.format("New document created %s", newDocument));
         Assert.assertNotNull(newDocument.getCurrentVersion());
         Assert.assertNotNull(newDocument.getVersions());
-        Assert.assertTrue(newDocument.getVersions().size() == 1);
-        Assert.assertTrue(newDocument.getCurrentVersion().getVersionId() == 1);
+        Assert.assertEquals(newDocument.getVersions().size(), 1);
+        Assert.assertEquals(newDocument.getCurrentVersion().getVersionId(), 1);
 
         newDocument = addVersion(newDocument, 2, new FileImpl.Builder().content(content2).name("test.html").contentType("text/html")
                 .build(), 0);
-        // Version version2 = new VersionImpl.Builder()
-        // .documentId(id)
-        // .file(new FileImpl.Builder().content(content2)
-        // .name("test.html").contentType("text/html").build())
-        // .current(false).versionId(2).parentId(1).build();
-        // documentService.addVersion(newDocument, version2);
-        //
-        // newDocument = documentService.get(id);
         log.info(String.format("Version #2 added to document %s", newDocument));
         Assert.assertTrue(newDocument.getVersions().size() == 2);
         Assert.assertTrue(newDocument.getCurrentVersion().getVersionId() == 2);
@@ -343,13 +341,18 @@ public class DocumentProviderTest extends ProviderTestBase {
         Assert.assertNotNull(v);
         Assert.assertFalse(v.isCurrent());
         Assert.assertNull(v.getFile());
+        
+        File file = getVersionContent(newDocument, 1);
+        Assert.assertNotNull(file);
+        Assert.assertEquals(file.getContent(), content);
 
         // Version #2 is current and has content
         v = newDocument.getVersion(2);
         Assert.assertNotNull(v);
         Assert.assertTrue(v.isCurrent());
-        Assert.assertNotNull(v.getFile());
-        Assert.assertEquals(v.getFile().getContent(), content2);
+        file = getVersionContent(newDocument, v.getVersionId());
+        Assert.assertNotNull(file);
+        Assert.assertEquals(file.getContent(), content2);
 
         // Test retrieve archived version (not current)
         v = documentService.getVersion(newDocument, newDocument.getVersion(1).getVersionId());
@@ -357,11 +360,27 @@ public class DocumentProviderTest extends ProviderTestBase {
         Assert.assertNotNull(v.getFile());
         Assert.assertEquals(v.getFile().getContent(), content);
 
+        // New version #3 from existing version #2
+        newDocument = addVersion(newDocument, 3, new FileImpl.Builder().content(content3).name("test.html").contentType("text/html")
+                .build(), 2);
+        log.info(String.format("Version #3 added to document %s", newDocument));
+        Assert.assertEquals(newDocument.getVersions().size(), 3);
+        Assert.assertEquals(newDocument.getCurrentVersion().getVersionId(), 3);
+
+        newDocument = documentService.getMetadata(newDocument.getId());
+
+        // Check if all File != null
+        for (Version version : newDocument.getVersions()) {
+            getVersionContent(newDocument, version.getVersionId());
+        }
+
         // Test delete version
+        int versionCount = newDocument.getVersions().size();
         documentService.deleteVersion(newDocument, v);
         newDocument = documentService.get(id);
-        Assert.assertTrue(newDocument.getVersions().size() == 1);
-        Assert.assertTrue(newDocument.getCurrentVersion().getVersionId() == 2);
+        Assert.assertEquals(newDocument.getVersions().size(), versionCount - 1);
+        Assert.assertEquals(newDocument.getCurrentVersion().getVersionId(), 3);
+        deleteDocument(newDocument);
     }
 
     @Test
@@ -403,8 +422,10 @@ public class DocumentProviderTest extends ProviderTestBase {
         Version v2 = newDocument.getVersion(2);
         Assert.assertNotNull(v2);
         Assert.assertTrue(v2.isCurrent());
-        Assert.assertEquals(v2.getFile().getContentType(), version2.getFile().getContentType());
-        Assert.assertEquals(v2.getFile().getContent(), version2.getFile().getContent());
+        Assert.assertNull(v2.getFile());
+        File file = getVersionContent(newDocument, 2);
+        Assert.assertEquals(file.getContentType(), version2.getFile().getContentType());
+        Assert.assertEquals(file.getContent(), version2.getFile().getContent());
         Assert.assertEquals(v2.getParentId(), version2.getParentId());
         Assert.assertEquals(v2.getDocumentId(), newDocument.getId());
 
@@ -639,7 +660,10 @@ public class DocumentProviderTest extends ProviderTestBase {
         Assert.assertEquals(document.getId(), id);
         Assert.assertEquals(document.getName(), name);
         Assert.assertNotNull(document.getVersions());
-        Assert.assertTrue(document.getVersions().size() == 0);
+        Assert.assertEquals(document.getVersions().size(), 1);
+        Version version = document.getCurrentVersion();
+        Assert.assertNotNull(version);
+        Assert.assertNull(version.getFile());
         Assert.assertNotNull(document.getAttributes());
         Assert.assertTrue(document.getAttributes().containsKey("attribut1"));
         Assert.assertTrue(document.getAttributes().get("attribut1").toString().equals("value1"));
@@ -649,10 +673,10 @@ public class DocumentProviderTest extends ProviderTestBase {
         Assert.assertEquals(document.getRatings().iterator().next(), rating);
         deleteDocument(document);
     }
-    
+
     @Test
     public void testSystemParameter() throws Throwable {
-        DocumentProvider provider = (DocumentProvider)documentService;
+        DocumentProvider provider = (DocumentProvider) documentService;
         Assert.assertNotNull(provider);
         Assert.assertEquals(provider.previewLength, SystemParametersModule.DEFAULT_PREVIEW_LENGTH);
     }

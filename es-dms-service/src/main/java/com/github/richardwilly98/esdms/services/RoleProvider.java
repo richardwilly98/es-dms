@@ -43,7 +43,7 @@ import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
 @Singleton
-public class RoleProvider extends ProviderBase<Role> implements RoleService {
+public class RoleProvider extends ProviderItemBase<Role> implements RoleService {
 
     private final static String type = "role";
 

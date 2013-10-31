@@ -39,9 +39,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import org.apache.log4j.Logger;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.get.GetResponse;
@@ -55,73 +52,24 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.richardwilly98.esdms.search.SearchResultImpl;
-import com.github.richardwilly98.esdms.UserImpl;
 import com.github.richardwilly98.esdms.api.ItemBase;
-import com.github.richardwilly98.esdms.search.api.SearchResult;
-import com.github.richardwilly98.esdms.api.Settings;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.search.SearchResultImpl;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 
-abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
+abstract class ProviderItemBase<T extends ItemBase> extends ServiceBase implements BaseService<T> {
 
-    final protected Logger log = Logger.getLogger(getClass());
-
-    final static ObjectMapper mapper = new ObjectMapper();
     private static Validator validator;
-    final Client client;
-    final Settings settings;
-    final String index;
-    final String type;
     final Class<T> clazz;
 
-    private String currentUser;
-
     @Inject
-    ProviderBase(final Client client, final BootstrapService bootstrapService, final String index, final String type, final Class<T> clazz)
+    ProviderItemBase(final Client client, final BootstrapService bootstrapService, final String index, final String type, final Class<T> clazz)
 	    throws ServiceException {
-	checkNotNull(client);
-	checkNotNull(bootstrapService);
-	checkNotNull(type);
+        super(client, bootstrapService, index, type);
 	checkNotNull(clazz);
-	this.client = client;
-	this.settings = bootstrapService.loadSettings();
-	if (index != null) {
-	    this.index = index;
-	} else {
-	    this.index = settings.getLibrary();
-	}
-	this.type = type;
 	this.clazz = clazz;
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-    }
-
-    protected void isAuthenticated() throws ServiceException {
-	try {
-	    log.debug("*** isAuthenticated ***");
-	    Subject currentSubject = SecurityUtils.getSubject();
-	    log.debug("currentSubject.isAuthenticated(): " + currentSubject.isAuthenticated());
-	    log.debug("Principal: " + currentSubject.getPrincipal());
-	    if (currentSubject.getPrincipal() == null) {
-		throw new ServiceException("Unauthorize request");
-	    } else {
-		if (currentUser == null) {
-		    if (currentSubject.getPrincipal() instanceof UserImpl) {
-			currentUser = ((UserImpl) currentSubject.getPrincipal()).getId();
-		    }
-		}
-	    }
-	} catch (Throwable t) {
-	    throw new ServiceException();
-	}
-    }
-
-    protected String getCurrentUser() throws ServiceException {
-	if (currentUser == null) {
-	    isAuthenticated();
-	}
-	return currentUser;
     }
 
     protected void validate(T item) throws ServiceException  {
@@ -174,7 +122,7 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
 	try {
 	    SearchResponse searchResponse = client.prepareSearch(index).setTypes(type).setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
 		    .setFrom(first).setSize(pageSize).setQuery(new QueryStringQueryBuilder(criteria)).execute().actionGet();
-	    return getSearchResult(searchResponse, first, pageSize);
+	    return parseSearchResult(searchResponse, first, pageSize);
 	} catch (Throwable t) {
 	    log.error("search failed", t);
 	    throw new ServiceException(t.getLocalizedMessage());
@@ -185,14 +133,14 @@ abstract class ProviderBase<T extends ItemBase> implements BaseService<T> {
         try {
             SearchResponse searchResponse = client.prepareSearch(index).setTypes(type).setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                     .setFrom(first).setSize(pageSize).setQuery(query).execute().actionGet();
-            return getSearchResult(searchResponse, first, pageSize);
+            return parseSearchResult(searchResponse, first, pageSize);
         } catch (Throwable t) {
             log.error("search failed", t);
             throw new ServiceException(t.getLocalizedMessage());
         }
     }
 
-    protected SearchResult<T> getSearchResult(SearchResponse searchResponse, int first, int pageSize) throws ServiceException {
+    protected SearchResult<T> parseSearchResult(SearchResponse searchResponse, int first, int pageSize) throws ServiceException {
 	try {
 	    Set<T> items = newHashSet();
 	    long totalHits = searchResponse.getHits().totalHits();

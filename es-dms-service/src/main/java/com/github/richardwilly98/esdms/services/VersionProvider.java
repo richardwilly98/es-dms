@@ -43,7 +43,7 @@ import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
 @Singleton
-public class VersionProvider extends ProviderBase<Version> implements VersionService {
+public class VersionProvider extends ProviderItemBase<Version> implements VersionService {
 
     private static final String VERSION_MAPPING_JSON = "/com/github/richardwilly98/esdms/services/version-mapping.json";
     private final static String type = "version";
@@ -120,7 +120,7 @@ public class VersionProvider extends ProviderBase<Version> implements VersionSer
 	    // watch.elapsed(TimeUnit.MILLISECONDS));
 
 	    // return versions;
-	    return getSearchResult(searchResponse, first, pageSize);
+	    return parseSearchResult(searchResponse, first, pageSize);
 	} catch (Throwable t) {
 	    log.error("search failed", t);
 	    throw new ServiceException(t.getLocalizedMessage());

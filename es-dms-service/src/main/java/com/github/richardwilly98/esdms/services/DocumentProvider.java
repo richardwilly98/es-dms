@@ -34,6 +34,7 @@ import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
@@ -54,12 +55,14 @@ import org.elasticsearch.common.base.Stopwatch;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightField;
 
 import com.github.richardwilly98.esdms.DocumentImpl;
 import com.github.richardwilly98.esdms.RatingImpl;
+import com.github.richardwilly98.esdms.VersionImpl;
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
@@ -75,10 +78,10 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
 @Singleton
-public class DocumentProvider extends ProviderBase<Document> implements DocumentService {
+public class DocumentProvider extends ProviderItemBase<Document> implements DocumentService {
 
     private static final String DOCUMENT_MAPPING_JSON = "/com/github/richardwilly98/esdms/services/document-mapping.json";
-    private final static String type = "document";
+    public final static String TYPE = "document";
     private final VersionService versionService;
 
     @Inject
@@ -87,7 +90,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
 
     @Inject
     DocumentProvider(Client client, BootstrapService bootstrapService, VersionService versionService) throws ServiceException {
-        super(client, bootstrapService, null, DocumentProvider.type, Document.class);
+        super(client, bootstrapService, null, DocumentProvider.TYPE, Document.class);
         this.versionService = versionService;
     }
 
@@ -128,8 +131,9 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
             if (log.isTraceEnabled()) {
                 log.trace(String.format("getMetadata - %s", id));
             }
+            String[] fields = { "id", "name", "attributes", "tags", "ratings" };
             Stopwatch watch = Stopwatch.createStarted();
-            GetResponse response = client.prepareGet(index, type, id).setFields("id", "name", "attributes", "tags", "ratings").execute().actionGet();
+            GetResponse response = client.prepareGet(index, TYPE, id).setFields(fields).execute().actionGet();
             if (!response.isExists()) {
                 log.info(String.format("Cannot find item %s", id));
                 return null;
@@ -163,12 +167,64 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
                 }
             }
 
-            Document document = new DocumentImpl.Builder().ratings(ratings).tags(tags).id(id).name(name).attributes(attributes).roles(null).build();
+            Document document = new DocumentImpl.Builder().versions(getVersions(id)).ratings(ratings).tags(tags).id(id).name(name)
+                    .attributes(attributes).roles(null).build();
             watch.stop();
-            log.trace(String.format("Elpased time for getMetadata: %s", watch.elapsed(TimeUnit.MILLISECONDS)));
+            log.trace(String.format("Elapsed time for getMetadata: %s", watch));
             return document;
         } catch (Throwable t) {
             log.error("getMetadata failed", t);
+            throw new ServiceException(t.getLocalizedMessage());
+        }
+    }
+
+    private Set<Version> getVersions(String id) throws ServiceException {
+        try {
+            Set<Version> versions = newHashSet();
+            QueryBuilder query = QueryBuilders.idsQuery(TYPE).addIds(id);
+            SearchResponse searchResponse = client.prepareSearch(index).setTypes(TYPE)
+                    .addPartialField("document", "versions", "versions.file").setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(0)
+                    .setSize(1).setQuery(query).execute().actionGet();
+            if (searchResponse.getHits().getTotalHits() == 1) {
+                SearchHit hit = searchResponse.getHits().hits()[0];
+                if (hit.getFields().containsKey("document") && hit.getFields().get("document").getValue() != null) {
+                    Map<String, ArrayList<Map<String, Object>>> object = hit.getFields().get("document").getValue();
+                    ArrayList<Map<String, Object>> vs = object.get("versions");
+                    if (vs != null) {
+                        for (Map<String, Object> v : vs) {
+                            VersionImpl.Builder builder = new VersionImpl.Builder();
+                            for (String key : v.keySet()) {
+                                Object value = v.get(key);
+                                if (value == null) {
+                                    continue;
+                                }
+                                if ("document_id".equals(key)) {
+                                    builder.documentId(String.valueOf(value));
+                                }
+                                if ("version_id".equals(key)) {
+                                    builder.versionId(Integer.parseInt(String.valueOf(value)));
+                                }
+                                if ("parent_id".equals(key)) {
+                                    builder.parentId(Integer.parseInt(String.valueOf(value)));
+                                }
+                                if ("id".equals(key)) {
+                                    builder.id(String.valueOf(value));
+                                }
+                                if ("name".equals(key)) {
+                                    builder.name(String.valueOf(value));
+                                }
+                                if ("current".equals(key)) {
+                                    builder.current(Boolean.parseBoolean(String.valueOf(value)));
+                                }
+                            }
+                            versions.add(builder.build());
+                        }
+                    }
+                }
+            }
+            return versions;
+        } catch (Throwable t) {
+            log.error("getVersions failed", t);
             throw new ServiceException(t.getLocalizedMessage());
         }
     }
@@ -190,7 +246,6 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
         if (!item.hasStatus(DocumentStatus.DELETED)) {
             throw new ServiceException(String.format("Precondition failure: document %s not marked for deletion!", item.getId()));
         }
-
         super.delete(item);
     }
 
@@ -204,9 +259,9 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
     public SearchResult<Document> search(String criteria, int first, int pageSize) throws ServiceException {
         try {
             QueryBuilder query = new QueryStringQueryBuilder(criteria);
-            SearchResponse searchResponse = client.prepareSearch(index).setTypes(type).addPartialField("document", null, "versions")
+            SearchResponse searchResponse = client.prepareSearch(index).setTypes(TYPE).addPartialField("document", null, "versions")
                     .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setFrom(first).setSize(pageSize).setQuery(query).execute().actionGet();
-            return getSearchResult(searchResponse, first, pageSize);
+            return parseSearchResult(searchResponse, first, pageSize);
         } catch (Throwable t) {
             log.error("search failed", t);
             throw new ServiceException(t.getLocalizedMessage());
@@ -214,8 +269,8 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
     }
 
     @Override
-    protected SearchResult<Document> getSearchResult(SearchResponse searchResponse, int first, int pageSize) throws ServiceException {
-        log.trace("*** getSearchResult ***");
+    protected SearchResult<Document> parseSearchResult(SearchResponse searchResponse, int first, int pageSize) throws ServiceException {
+        log.trace("*** parseSearchResult ***");
         try {
             // Stopwatch watch = Stopwatch.createStarted();
             Set<Document> items = newHashSet();
@@ -233,11 +288,12 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
             // watch.elapsed(TimeUnit.MILLISECONDS));
             return searchResult;
         } catch (Throwable t) {
-            log.error("getSearchResult failed", t);
+            log.error("parseSearchResult failed", t);
             throw new ServiceException(t.getLocalizedMessage());
         }
     }
 
+    // TODO Should return byte array or stream
     private String convertFieldAsString(SearchHit hit, String name) throws IOException {
         XContentBuilder builder = jsonBuilder();
         if (hit.getFields().containsKey(name)) {
@@ -291,11 +347,14 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
         }
     }
 
-
-    // TODO: document and version should be separated in 2 objects linked as parent / child
-    // That will speed up and metadata update which will not require a full re-index of the document + version.
-    // Possible downside - queries could be more complex and potentially less efficient
-    // See: http://www.elasticsearch.org/blog/managing-relations-inside-elasticsearch/
+    // TODO: document and version should be separated in 2 objects linked as
+    // parent / child
+    // That will speed up and metadata update which will not require a full
+    // re-index of the document + version.
+    // Possible downside - queries could be more complex and potentially less
+    // efficient
+    // See:
+    // http://www.elasticsearch.org/blog/managing-relations-inside-elasticsearch/
     public Document updateMetadata(Document item) throws ServiceException {
         try {
             if (log.isTraceEnabled()) {
@@ -303,9 +362,10 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
             }
             Stopwatch watch = Stopwatch.createStarted();
             byte[] document = mapper.writeValueAsBytes(item);
-            UpdateResponse response = client.prepareUpdate(index, type, item.getId())
-                    .setScript("ctx._source.remove('attributes'); ctx._source.remove('tags'); ctx._source.remove('ratings');").execute().actionGet();
-            response = client.prepareUpdate(index, type, item.getId()).setDoc(document).execute().actionGet();
+            UpdateResponse response = client.prepareUpdate(index, TYPE, item.getId())
+                    .setScript("ctx._source.remove('attributes'); ctx._source.remove('tags'); ctx._source.remove('ratings');").execute()
+                    .actionGet();
+            response = client.prepareUpdate(index, TYPE, item.getId()).setDoc(document).execute().actionGet();
             log.trace(String.format("Elapsed time for updateMetadata #2: %s", watch.elapsed(TimeUnit.MILLISECONDS)));
             refreshIndex();
             watch.stop();
@@ -317,7 +377,6 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
         }
     }
 
-    
     @Override
     public void checkout(Document document) throws ServiceException {
         SimpleDocument sd = getSimpleDocument(document);
@@ -334,6 +393,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
             String criteria, int size) throws ServiceException {
         try {
             log.trace("*** preview - length " + previewLength + " ***");
+            // TODO: Replace by QueryBuilder
             String query = jsonBuilder().startObject().startObject("bool").startArray("must").startObject().startObject("queryString")
                     .field("query", criteria).array("fields", "_all", "file").endObject().endObject().startObject()
                     .startObject("queryString").field("query", document.getId()).field("default_field", "id").endObject().endObject()
@@ -344,7 +404,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
             // TODO: This query must be in 2 cuts:
             // 1. Try to retrieve highlight fragment.
             // 2. If highlight is not available retrieve versions.file
-            SearchRequestBuilder srb = client.prepareSearch(index).setTypes(type).setSearchType(SearchType.QUERY_AND_FETCH)
+            SearchRequestBuilder srb = client.prepareSearch(index).setTypes(TYPE).setSearchType(SearchType.QUERY_AND_FETCH)
                     .addField("versions.file")
                     // .setNoFields()
                     .setQuery(query).setHighlighterPreTags("<span class='highlight-tag'>").setHighlighterPostTags("</span>")
@@ -381,13 +441,26 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
         }
     }
 
+    private void updateVersion(SimpleVersion version) throws ServiceException {
+        if (version.getFile() == null) {
+            throw new ServiceException(String.format("Version %s does not have content!!!", version.getVersionId()));
+        }
+        if (Strings.isNullOrEmpty(version.getId())) {
+            versionService.create(version);
+        } else {
+            versionService.update(version);
+        }
+    }
+
     private void updateVersions(SimpleDocument document) throws ServiceException {
         for (Version version : document.getVersions().toArray(new Version[0])) {
-            SimpleVersion sv = getSimpleVersion(version);
-            if (!sv.isCurrent()) {
+            if (!version.isCurrent()) {
+                if (version.getFile() == null) {
+                    throw new ServiceException(String.format("Version %s does not have content!!!", version.getVersionId()));
+                }
+                SimpleVersion sv = getSimpleVersion(version);
                 if (Strings.isNullOrEmpty(sv.getId())) {
-                    /* Version newVersion = */versionService.create(sv);
-                    // sv.setId(newVersion.getId());
+                    versionService.create(sv);
                 } else {
                     versionService.update(sv);
                 }
@@ -408,15 +481,23 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
         SimpleVersion sv = getSimpleVersion(version);
         if (document.getCurrentVersion() != null) {
             // Move current version to archived index
+            log.debug("Moving current version to archive: " + document.getCurrentVersion());
             SimpleVersion currentVersion = getSimpleVersion(document.getCurrentVersion());
+            // Make sure to fetch content if null
+            if (currentVersion.getFile() == null) {
+                currentVersion.setFile(getVersionContent(document, currentVersion.getVersionId()));
+            }
             currentVersion.setCurrent(false);
             if (sv.getParentId() == 0) {
                 sv.setParentId(currentVersion.getVersionId());
             }
+            updateVersion(currentVersion);
+            currentVersion.setFile(null);
             sd.updateVersion(currentVersion);
         }
         sd.addVersion(sv);
-        updateVersions(sd);
+        log.debug("addVersion - updateVersions: " + sd);
+//        updateVersions(sd);
         update(sd);
     }
 
@@ -445,7 +526,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
                     versionService.delete(lastVersion);
                 }
             } else {
-                throw new ServiceException(String.format("Version %s is current but does not have parent!", version));
+                throw new ServiceException(String.format("Version %s is current but does not have parent", version));
             }
         }
 
@@ -466,7 +547,7 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
         }
 
         sd.deleteVersion(version);
-        updateVersions(sd);
+//        updateVersions(sd);
         update(sd);
     }
 
@@ -475,9 +556,11 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
             log.trace(String.format("*** getVersion document: %s - versionId: %s ***", document, versionId));
         }
         checkNotNull(document);
-        checkNotNull(versionId);
+        checkArgument(versionId > 0, "versionId must be positive.");
         Version version = document.getVersion(versionId);
-        checkNotNull(version);
+        if (version == null) {
+            throw new ServiceException(String.format("Version %s not found.", versionId));
+        }
         if (!version.isCurrent()) {
             return versionService.get(version.getId());
         } else {
@@ -504,13 +587,20 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
     @Override
     public File getVersionContent(Document document, int versionId) throws ServiceException {
         checkNotNull(document);
-        checkArgument(versionId > 0);
+        checkArgument(versionId > 0, "versionId must be positive.");
+        log.debug(String.format("getVersionContent - %s - %s", document.getId(), versionId));
+        log.debug(document);
         Version version = document.getVersion(versionId);
+        log.debug(version);
         if (version == null) {
             throw new ServiceException(String.format("Version %s not found.", versionId));
         }
         if (version.isCurrent()) {
-            return version.getFile();
+            if (version.getFile() == null) {
+                return get(document.getId()).getCurrentVersion().getFile();
+            } else {
+                return version.getFile();
+            }
         } else {
             version = versionService.get(version.getId());
             if (version == null || version.getFile() == null) {
@@ -523,27 +613,36 @@ public class DocumentProvider extends ProviderBase<Document> implements Document
     @Override
     public void setCurrentVersion(Document document, int versionId) throws ServiceException {
         checkNotNull(document);
-        checkArgument(versionId > 0);
+        checkArgument(versionId > 0, "versionId must be positive.");
         Version version = document.getVersion(versionId);
         if (version == null) {
             throw new ServiceException(String.format("Version %s not found.", versionId));
         }
         SimpleDocument sd = getSimpleDocument(document);
         SimpleVersion sv = getSimpleVersion(document.getCurrentVersion());
+        if (sv.getFile() == null) {
+            sv.setFile(getVersionContent(document, sv.getVersionId()));
+        }
         sv.setCurrent(false);
+        updateVersion(sv);
+        sv.setFile(null);
         sd.updateVersion(sv);
 
         sv = getSimpleVersion(version);
         sv.setCurrent(true);
+        if (sv.getFile() == null) {
+            sv.setFile(getVersionContent(document, sv.getVersionId()));
+        }
         sd.updateVersion(sv);
-        updateVersions(sd);
+//        updateVersions(sd);
         update(sd);
     }
 
     @Override
     public void setVersionContent(Document document, int versionId, File file) throws ServiceException {
         checkNotNull(document);
-        checkArgument(versionId > 0);
+        checkArgument(versionId > 0, "versionId must be positive.");
+        checkNotNull(file);
         Version version = document.getVersion(versionId);
         if (version == null) {
             throw new ServiceException(String.format("Version %s not found.", versionId));
