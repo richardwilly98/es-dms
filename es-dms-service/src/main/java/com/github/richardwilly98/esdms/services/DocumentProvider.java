@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -68,16 +67,13 @@ import com.github.richardwilly98.esdms.api.Document.DocumentStatus;
 import com.github.richardwilly98.esdms.api.Document.DocumentSystemAttributes;
 import com.github.richardwilly98.esdms.api.File;
 import com.github.richardwilly98.esdms.api.Rating;
-import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.Version;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.inject.SystemParametersModule;
 import com.github.richardwilly98.esdms.search.SearchResultImpl;
 import com.github.richardwilly98.esdms.search.api.SearchResult;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 @Singleton
@@ -376,7 +372,7 @@ public class DocumentProvider extends ProviderItemBase<Document> implements Docu
             UpdateResponse response = client.prepareUpdate(index, TYPE, item.getId())
                     .setScript("ctx._source.remove('attributes'); ctx._source.remove('tags'); ctx._source.remove('ratings');").execute()
                     .actionGet();
-            response = client.prepareUpdate(index, TYPE, item.getId()).setDoc(mapper.writeValueAsBytes(item)).execute().actionGet();
+            response = client.prepareUpdate(index, TYPE, item.getId()).setDoc(mapper.writeValueAsBytes(document)).execute().actionGet();
             log.trace(String.format("Elapsed time for updateMetadata #2: %s", watch));
             refreshIndex();
             watch.stop();

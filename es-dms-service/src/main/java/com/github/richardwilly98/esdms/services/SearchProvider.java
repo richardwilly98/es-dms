@@ -54,6 +54,7 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.elasticsearch.search.facet.terms.TermsFacet;
+import org.elasticsearch.search.facet.terms.TermsFacetBuilder;
 
 import com.github.richardwilly98.esdms.api.Document;
 import com.github.richardwilly98.esdms.exception.ServiceException;
@@ -203,8 +204,12 @@ public class SearchProvider extends ServiceBase implements SearchService<Documen
             QueryBuilder query = QueryBuilders.matchAllQuery();
             SearchRequestBuilder searchRequestBuilder = client.prepareSearch(index).setTypes(DocumentProvider.TYPE)
                     .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setSize(0).setQuery(query);
-            searchRequestBuilder
-                    .addFacet(FacetBuilders.termsFacet("Tags").field("tags").size(size).regex(String.format("^%s.*", criteria)));
+            TermsFacetBuilder facetBuilder = FacetBuilders.termsFacet("Tags").field("tags").size(size);
+            if (!criteria.equals("*")) {
+                facetBuilder.regex(String.format("^%s.*", criteria));
+            }
+            searchRequestBuilder.addFacet(facetBuilder);
+
             log.debug("Search request builder: " + searchRequestBuilder);
             SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
             List<FacetRequest> facets = newArrayList();
