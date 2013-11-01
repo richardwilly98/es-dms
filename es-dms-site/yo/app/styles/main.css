@@ -49,3 +49,8 @@ body {
 .drop-box.dragover {
   border: 5px dashed blue;
 }
+
+.my-container {
+  background: #F8F8F8;
+  border: 5px dashed #DDD;
+}

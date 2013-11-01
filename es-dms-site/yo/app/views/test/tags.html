@@ -1,0 +1,15 @@
+<div class="container my-container" data-ng-controller="DocumentCtrl">
+	<div class="container-fluid" ng-controller="WorldCloudCtrl">
+	<h2>Tags Search {{ selectedWord }}</h2>
+		<div class="row-fluid">
+			<div class="span4">
+				<div id="wordCloud" class="cloud" data-words="cloud.words" data-live="live" 
+				data-interval="2000" data-callback="addSearchString">
+				</div>
+			</div>
+			<div class="span8">
+				<esdms-search-result criteria="criteria"></esdms-search-result>
+			</div>
+		</div>
+	</div>
+</div>

@@ -9,6 +9,7 @@ esDmsSiteApp.controller('NavbarCtrl', ['$scope', function ($scope) {
 		{ 'view': '/index.documents-search', title: 'Search' },
 		/*{ 'view': '/my-documents-view', title: 'My documents' },*/
 		{ 'view': '/index.documents-edit', title: 'Upload' },
+    { 'view': '/index.tags', title: 'Tags' },
     /*{ 'view': '/index.test-accordion', title: 'Test' },
     { 'view': '/view2', title: 'View #2' },
     { 'view': '/view3', title: 'Test View'},

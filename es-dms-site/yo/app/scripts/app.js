@@ -2,7 +2,8 @@
 'use strict';
 
 var esDmsSiteApp = angular.module('esDmsSiteApp',
-  ['ngCookies', 'ngResource', 'ngSanitize', 'authentication', 'ui.router', 'http-auth-interceptor', 'ui.bootstrap', 'toaster', 'tags-input', 'angularFileUpload']);
+  ['ngCookies', 'ngResource', 'ngSanitize', 'authentication', 'ui.router', 'http-auth-interceptor',
+   'ui.bootstrap', 'toaster', 'tags-input', 'angularFileUpload', 'd3']);
 
 esDmsSiteApp.config(function (/*$routeProvider,*/ $stateProvider, $locationProvider) {
 
@@ -30,6 +31,10 @@ esDmsSiteApp.config(function (/*$routeProvider,*/ $stateProvider, $locationProvi
     .state('index.test-accordion', {
       url: '/index.test-accordion',
       templateUrl: 'views/test/accordion.html'
+    })
+    .state('index.tags', {
+      url: '/index.tags',
+      templateUrl: 'views/test/tags.html'
     })
     /*.state('documents', {
       url: '/documents'

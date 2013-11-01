@@ -1,0 +1,61 @@
+<div>
+	<!--Body content-->
+	<table class="table table-condensed">
+		<thead>
+			<tr>
+				<th>Tags</th>
+				<th>Name</th>
+				<th>Author</th>
+				<th>Status</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr data-ng-repeat="document in documents">
+				<td>
+					<esdms-tagging id="document.id" tags="document.tags"></esdms-tagging>
+				</td>
+				<td>
+					<div data-ng-bind="document.name"></div>
+					<div>
+						<esdms-preview criteria="criteria" id="document.id"></esdms-preview>
+						<esdms-start-process id="document.id"></esdms-start-process>
+					</div>
+				</td>
+				<td>{{ document.attributes.author }}</td>
+				<td>{{ document.attributes.status }}</td>
+				<td>
+					<div>
+						<div data-ng-controller="DocumentsRatingCtrl" data-ng-init="getRating(document)">
+							<rating value="rating.score" max="5"></rating> 
+						</div>
+					</div>
+					<div data-ng-switch="document.attributes.status"
+						class="btn-group">
+						<a class="btn btn-success dropdown-toggle"
+							data-toggle="dropdown" href="#"> Action <span
+							class="caret"></span>
+						</a>
+						<ul data-ng-switch-when="A" class="dropdown-menu">
+							<li><a data-ng-click="showDetails(document.id)">Details</a></li>
+							<li><a href="api/documents/{{ document.id }}/_view" target="_blank">View</a></li>
+							<li><a href="api/documents/{{ document.id }}/_download">Download</a></li>
+							<li><a data-ng-click="addVersion(document.id)">Add Version</a></li>
+							<li><a data-ng-click="checkout(document.id)">Check-Out</a></li>
+							<li><a data-ng-click="remove(document.id)">Delete</a></li>
+						</ul>
+						<ul data-ng-switch-when="L" class="dropdown-menu">
+							<li><a data-ng-click="showDetails(document.id)">Details</a></li>
+							<li><a href="api/documents/{{ document.id }}/_view" target="_blank">View</a></li>
+							<li><a href="api/documents/{{ document.id }}/_download">Download</a></li>
+							<li><a data-ng-click="checkin(document.id)">Check-In</a></li>
+						</ul>
+					</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<div data-ng-show="totalPages > 1">
+		<pagination total-items="totalHits" items-per-page="pageSize" page="currentPage" max-size="maxPages"></pagination>
+	</div>
+</div>
