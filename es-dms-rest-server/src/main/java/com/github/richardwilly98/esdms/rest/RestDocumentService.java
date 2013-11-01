@@ -800,7 +800,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
             checkNotNull(document);
 
             document.getTags().add(tag);
-            documentService.update(document);
+            documentService.updateMetadata(document);
             return Response.created(getItemUri(document, TAGS_PATH, tag)).build();
             // return Response.ok(super.update(id, document)).build();
         } catch (ServiceException t) {
@@ -819,7 +819,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 
             if (document.getTags().contains(tag)) {
                 document.getTags().remove(tag);
-                document = documentService.update(document);
+                document = documentService.updateMetadata(document);
                 return Response.noContent().build();
             } else {
                 return Response.status(Status.NOT_FOUND).build();
@@ -839,7 +839,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
             checkNotNull(document);
 
             document.getTags().clear();
-            service.update(document);
+            documentService.updateMetadata(document);
             return Response.noContent().build();
         } catch (ServiceException t) {
             String message = String.format("Error deleting tags for document %s", id);
