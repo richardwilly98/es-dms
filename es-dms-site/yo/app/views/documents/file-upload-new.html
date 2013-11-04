@@ -14,6 +14,10 @@
 					<span>Add files...</span>
 				</span>
 			</div>
+			<div class="control-group" ng-show="dropSupported">
+			  <div class="drop-box" ng-file-drop="onFileSelect($files);" ng-show="dropSupported">drop files here</div>
+			  <div ng-file-drop-available="dropSupported=true" ng-show="!dropSupported">HTML5 Drop File is not supported!</div>
+			</div>
 			<div>
 				<span ng-show="uploadMessage">{{ uploadMessage }}</span>
 				<ul>
