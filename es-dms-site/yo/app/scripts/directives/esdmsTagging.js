@@ -1,6 +1,6 @@
 'use strict';
 
-esDmsSiteApp.directive('esdmsTagging', ['$log', '$compile', function ($log, $compile) {
+esDmsSiteApp.directive('esdmsTagging', ['$log', '$compile', '$q', function ($log, $compile, $q) {
 	$log.log('Start esdmsTagging');
   return {
     restrict: 'E',
@@ -35,8 +35,15 @@ esDmsSiteApp.directive('esdmsTagging', ['$log', '$compile', function ($log, $com
               }
             }
           }, true);
+
+          scope.loadItems = function() {
+            var deferred = $q.defer();
+            deferred.resolve(['Item1', 'Item2', 'Item3']);
+            return deferred.promise;
+          };
         },
         post : function(scope, element) {
+          // var template = '<tags-input ng-model="tags" ng-class="esdms-tag"><autocomplete source="loadItems"></autocomplete></tags-input>';
           var template = '<tags-input ng-model="tags" ng-class="esdms-tag"></tags-input>';
           element.replaceWith($compile(template)(scope));
         }

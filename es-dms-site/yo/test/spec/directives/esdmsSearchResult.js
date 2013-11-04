@@ -15,6 +15,5 @@ describe('Directive: esdmsSearchResult', function () {
   it('should make hidden element visible', inject(function ($compile) {
     element = angular.element('<esdms-search-result></esdms-search-result>');
     element = $compile(element)(scope);
-    // expect(element.text()).toBe('this is the esdmsSearchResult directive');
   }));
 });
