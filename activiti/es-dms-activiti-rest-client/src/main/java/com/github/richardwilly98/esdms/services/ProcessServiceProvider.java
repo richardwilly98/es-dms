@@ -123,7 +123,7 @@ public class ProcessServiceProvider implements ProcessService {
             RestSearchResult<RestProcessDefinition> processDefinitions = processDefinitionService
                     .getProcessDefinitionsByCategory(ES_DMS_CATEGORY);
             if (processDefinitions == null) {
-                throw new ServiceException("Nor process definitions found for category " + ES_DMS_CATEGORY);
+                throw new ServiceException("No process definitions found for category " + ES_DMS_CATEGORY);
             }
             return convertRestProcessDefinitions(processDefinitions);
         } catch (Throwable t) {
