@@ -8,7 +8,7 @@
 			<a class="brand" href="#">ElasticSearch Dms Client</a>
 			<ul class="nav">
 				<li data-ng-repeat="tab in tabs" data-match-route="{{tab.view}}">
-					<a href="#{{tab.view}}">{{tab.title}}</a>
+					<a href="{{tab.view}}">{{tab.title}}</a>
 				</li>
 				<li data-ng-show="showLogout" class="divider-vertical"></li>
 				<li data-ng-show="hasRole('administrator')" class="dropdown"><a
@@ -17,7 +17,7 @@
 				</a>
 					<ul class="dropdown-menu">
 						<li data-ng-repeat="tab in adminTabs"
-							data-match-route="{{tab.view}}"><a href="#{{tab.view}}">{{tab.title}}</a>
+							data-match-route="{{tab.view}}"><a href="{{tab.view}}">{{tab.title}}</a>
 						</li>
 					</ul></li>
 				<li data-ng-show="showLogout"><a href="#"

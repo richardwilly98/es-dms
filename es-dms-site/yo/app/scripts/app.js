@@ -5,35 +5,43 @@ var esDmsSiteApp = angular.module('esDmsSiteApp',
   ['ngCookies', 'ngResource', 'ngSanitize', 'authentication', 'ui.router', 'http-auth-interceptor',
    'ui.bootstrap', 'toaster', 'tags-input', 'angularFileUpload', 'd3']);
 
-esDmsSiteApp.config(function (/*$routeProvider,*/ $stateProvider, $locationProvider) {
+esDmsSiteApp.config(function ($stateProvider, $locationProvider, $urlRouterProvider) {
+
+  $locationProvider.html5Mode(true);
+  $locationProvider.hashPrefix('!');
 
   $stateProvider
-    .state('index', {
-      url: '',
+    .state('home', {
+      url: '/home',
       templateUrl: 'views/main.html'
     })
-    .state('index.documents-search', {
-      url: '/index.documents-search',
+    .state('home.search', {
+      url: '/search',
       templateUrl: 'views/documents/search.html'
     })
-    .state('index.documents-edit', {
-      url: '/index.documents-edit',
+    .state('home.upload', {
+      url: '/upload',
       templateUrl: 'views/documents/edit.html'
     })
-    .state('index.admin-users', {
-      url: '/index.admin-users',
+    .state('home.admin', {
+      abstract: true,
+      url: '/admin',
+      template: '<ui-view/>'
+    })
+    .state('home.admin.users', {
+      url: '/users',
       templateUrl: 'views/users/search-users.html'
     })
-    .state('index.admin-roles', {
-      url: '/index.admin-roles',
+    .state('home.admin.roles', {
+      url: '/roles',
       templateUrl: 'views/roles/search-roles.html'
     })
-    .state('index.test-accordion', {
-      url: '/index.test-accordion',
+    .state('test-accordion', {
+      url: '/test-accordion',
       templateUrl: 'views/test/accordion.html'
     })
-    .state('index.tags', {
-      url: '/index.tags',
+    .state('home.tags', {
+      url: '/tags',
       templateUrl: 'views/test/tags.html'
     })
     /*.state('documents', {
@@ -49,8 +57,7 @@ esDmsSiteApp.config(function (/*$routeProvider,*/ $stateProvider, $locationProvi
     })*/
     ;
 
-  $locationProvider.html5Mode(false);
-  // $locationProvider.hashPrefix('!');
+  $urlRouterProvider.otherwise('/home');
 });
 
 esDmsSiteApp.config(['$httpProvider', function($httpProvider) {

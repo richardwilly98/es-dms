@@ -1,6 +1,7 @@
 // Generated on 2013-06-30 using generator-angular 0.3.0
 'use strict';
 var LIVERELOAD_PORT = 35729;
+var modRewrite = require('connect-modrewrite');
 var lrSnippet = require('connect-livereload')({ port: LIVERELOAD_PORT });
 var proxySnippet = require('grunt-connect-proxy/lib/utils').proxyRequest;
 var mountFolder = function (connect, dir) {
@@ -54,6 +55,7 @@ module.exports = function (grunt) {
         },
         files: [
           '<%= yeoman.app %>/{,*/}*.html',
+          '<%= yeoman.app %>/views/{,*/}*.html',
           '{.tmp,<%= yeoman.app %>}/styles/{,*/}*.css',
           '{.tmp,<%= yeoman.app %>}/scripts/{,*/}*.js',
           '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
@@ -85,6 +87,9 @@ module.exports = function (grunt) {
         options: {
           middleware: function (connect) {
             return [
+              modRewrite([
+                '^/home /index.html'
+              ]),
               proxySnippet,
               lrSnippet,
               mountFolder(connect, '.tmp'),

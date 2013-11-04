@@ -29,7 +29,8 @@
     "phantomjs": "~1.9.1-0",
     "grunt-env": "~0.4.0",
     "bower": "~0.10.0",
-    "yo": "~1.0.0-rc.1.1"
+    "yo": "~1.0.0-rc.1.1",
+    "connect-modrewrite": "~0.5.11"
   },
   "engines": {
     "node": ">=0.8.0"
