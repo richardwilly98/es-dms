@@ -9,9 +9,10 @@ ES DMS is a collaborative content management framework based on AngularJS, Boots
 
 you will need to compile and run this section first. Once this part is complete, please follow instructions given in the es-dms / es-dms-site / yo / README.md file in order to install, compile and run the yo framework and the grunt server that hosts the site.
 
-Elasticsearch is required with mapper-attachment plugin. To install the required plugins in elasticsearch go to the elasticsearch base folder and type:
+Elasticsearch is required with mapper-attachment and elasticsearch-langdetect plugins. To install the required plugins in elasticsearch go to the elasticsearch base folder and type:
 
-  bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/1.8.0
+  bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/1.9.0
+  bin/plugin -install langdetect --url http://bit.ly/1cmf8AL
   bin/plugin -install mobz/elasticsearch-head              -- this will install a web based administration interface for elasticsearch
   
 Make sure elasticsearch is running before using the site. To start elasticsearch, go to the elasticseach base folder, open a command line shell and type:
@@ -75,4 +76,5 @@ License along with this program.  If not, see
 * [AngularJS] (http://angularjs.org/)
 * [Elasticsearch] (http://www.elasticsearch.org/)
 * [mapper-attachments] (https://github.com/elasticsearch/elasticsearch-mapper-attachments)
+* [langdetect] (https://github.com/jprante/elasticsearch-langdetect)
 * [Jersey] (https://jersey.java.net/)

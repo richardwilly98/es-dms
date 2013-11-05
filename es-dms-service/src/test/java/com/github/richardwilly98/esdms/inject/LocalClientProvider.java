@@ -30,6 +30,7 @@ import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilde
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.collect.Tuple;
@@ -54,7 +55,6 @@ public class LocalClientProvider implements Provider<Client> {
     public Client get() {
 	Settings settings = getSettings();
 	Tuple<Settings, Environment> initialSettings = InternalSettingsPreparer.prepareSettings(settings, true);
-	PluginManager pluginManager = new PluginManager(initialSettings.v2(), null, OutputMode.DEFAULT);
 
 	if (!initialSettings.v2().configFile().exists()) {
 	    FileSystemUtils.mkdirs(initialSettings.v2().configFile());
@@ -67,7 +67,19 @@ public class LocalClientProvider implements Provider<Client> {
 	if (!initialSettings.v2().pluginsFile().exists()) {
 	    FileSystemUtils.mkdirs(initialSettings.v2().pluginsFile());
 	    try {
-		pluginManager.downloadAndExtract(settings.get("plugins.mapper-attachments"));
+                Map<String, String> plugins = settings.getByPrefix("plugins").getAsMap();
+                for (String key : plugins.keySet()) {
+                    String url = null;
+                    String name = null;
+                    if (!plugins.get(key).startsWith("elasticsearch")) {
+                        name = key;
+                        url = plugins.get(key);
+                    } else {
+                        name = plugins.get(key);
+                    }
+                    PluginManager pluginManager = new PluginManager(initialSettings.v2(), url, OutputMode.DEFAULT);
+                    pluginManager.downloadAndExtract(name);
+                }
 	    } catch (IOException e) {
 		e.printStackTrace();
 	    }

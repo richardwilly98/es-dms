@@ -412,10 +412,10 @@ public class DocumentProvider extends ProviderItemBase<Document> implements Docu
             // 1. Try to retrieve highlight fragment.
             // 2. If highlight is not available retrieve versions.file
             SearchRequestBuilder srb = client.prepareSearch(index).setTypes(TYPE).setSearchType(SearchType.QUERY_AND_FETCH)
-                    .addField("versions.file")
-                    // .setNoFields()
+//                    .addField("versions.file")
+                     .setNoFields()
                     .setQuery(query).setHighlighterPreTags("<span class='highlight-tag'>").setHighlighterPostTags("</span>")
-                    .setHighlighterOrder("score").addHighlightedField("file", size, 1);
+                    .setHighlighterOrder("score").addHighlightedField("versions.file.content", size, 1).setHighlighterNoMatchSize(size);
             log.trace("++ Search request: " + srb);
             SearchResponse searchResponse = srb.execute().actionGet();
             if (log.isTraceEnabled()) {
@@ -432,12 +432,13 @@ public class DocumentProvider extends ProviderItemBase<Document> implements Docu
                     }
                 }
                 if (preview == null) {
-                    log.info("Preview is empty. Try to fetch file.summary from current version.");
-                    preview = hit.getFields().get("versions.file").getValue().toString();
-                    if (preview != null && preview.length() > size) {
-                        preview = preview.substring(0, size - 1);
-                    }
-                    log.trace(String.format("summary: %s", preview));
+                    log.warn("Preview should never be null since ES 0.90.6");
+//                    log.info("Preview is empty. Try to fetch file.summary from current version.");
+//                    preview = hit.getFields().get("versions.file").getValue().toString();
+//                    if (preview != null && preview.length() > size) {
+//                        preview = preview.substring(0, size - 1);
+//                    }
+//                    log.trace(String.format("summary: %s", preview));
                 }
             }
 

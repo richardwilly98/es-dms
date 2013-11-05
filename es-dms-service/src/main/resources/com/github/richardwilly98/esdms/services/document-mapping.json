@@ -2,7 +2,7 @@
 	"document": {
 		"properties": {
 			"versions" : {
-				"type": "nested",
+				"type": "object",
 				"properties": {
 					"id" : {
 						"type": "string"
@@ -20,33 +20,52 @@
 						"type": "boolean"
 					},
 					"file": {
-						"type": "attachment",
-						"fields": {
-							"file": {
-								"store": "yes",
-								"term_vector": "with_positions_offsets"
-							},
-							"title" : { 
-								"store" : "yes" 
-							},
-							"language" : { 
-								"store" : "yes" 
-							},
-							"author" : { 
-								"store" : "yes" 
-							},
-							"keywords" : { 
-								"store" : "yes" 
-							},
-							"date" : { 
-								"store" : "yes" 
-							},
-							"content_length" : { 
-								"store" : "yes" 
-							},
-							"content_type" : { 
-								"store" : "yes" 
-							}
+						"type": "object",
+						"properties": {
+							"content": {
+                                "type": "attachment",
+                                "fields": {
+                                    "content": {
+                                    	"type": "multi_field",
+                                        "fields": {
+                                            "content" : {
+                                                "type": "string",
+                                                "store": "yes",
+                                                "term_vector": "with_positions_offsets",
+                                                "index_options": "offsets" 
+                                            },
+                                            "language" : { 
+                                                "type" : "langdetect",
+                                                "fields": {
+                                                   "language" : { "type" : "string", "store" : true },
+                                                    "lang" : { "type" : "string", "store" : true }
+                                                }
+                                            }
+                                        }
+                                    },
+            						"title" : { 
+        								"store" : "yes" 
+        							},
+        							"language" : { 
+        								"store" : "yes" 
+        							},
+        							"author" : { 
+        								"store" : "yes" 
+        							},
+        							"keywords" : { 
+        								"store" : "yes" 
+        							},
+        							"date" : { 
+        								"store" : "yes" 
+        							},
+        							"content_length" : { 
+        								"store" : "yes" 
+        							},
+        							"content_type" : { 
+        								"store" : "yes" 
+        							}
+                                }
+					        }
 						}
 					}
 				}

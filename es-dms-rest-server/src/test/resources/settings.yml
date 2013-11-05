@@ -23,3 +23,4 @@ cluster:
 	
 plugins:
 	mapper-attachments: elasticsearch/elasticsearch-mapper-attachments/1.9.0
+	langdetect: http://bit.ly/1cmf8AL

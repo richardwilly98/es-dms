@@ -18,7 +18,7 @@ esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$modal', 'documentSe
   // Define facet settings. It is recommended to keep at least 'Tags' facet
   $scope.facetSettings = [
     {'name' : 'Tags', terms: [{'field': 'tags', 'size': 10}]},
-    {'name' : 'Language', terms: [{'field': 'versions.file.language', 'size': 10}]},
+    {'name' : 'Language', terms: [{'field': 'versions.file.content.language.lang', 'size': 10}]},
     {'name' : 'Author', terms: [{'field': 'attributes.author', 'size': 10}]}
   ];
 
