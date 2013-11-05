@@ -30,7 +30,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -49,9 +48,6 @@ public class FileImpl implements Serializable, File {
 
     @JsonProperty("_content_type")
     private String contentType;
-
-    @JsonIgnore
-    private String highlight;
 
     @JsonProperty("date")
     private Date date;
@@ -282,7 +278,6 @@ public class FileImpl implements Serializable, File {
         result = prime * result + Arrays.hashCode(content);
         result = prime * result + ((contentType == null) ? 0 : contentType.hashCode());
         result = prime * result + ((date == null) ? 0 : date.hashCode());
-        result = prime * result + ((highlight == null) ? 0 : highlight.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         result = prime * result + ((title == null) ? 0 : title.hashCode());
         result = prime * result + ((language == null) ? 0 : language.hashCode());
@@ -314,11 +309,6 @@ public class FileImpl implements Serializable, File {
             if (other.date != null)
                 return false;
         } else if (!date.equals(other.date))
-            return false;
-        if (highlight == null) {
-            if (other.highlight != null)
-                return false;
-        } else if (!highlight.equals(other.highlight))
             return false;
         if (name == null) {
             if (other.name != null)
