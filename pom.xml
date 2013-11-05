@@ -23,7 +23,7 @@
 		<guice.version>3.0</guice.version>
 		<joda-time.version>2.2</joda-time.version>
 		<commons-logging.version>1.1.2</commons-logging.version>
-		<elasticsearch.version>0.90.5</elasticsearch.version>
+		<elasticsearch.version>0.90.6</elasticsearch.version>
 		<guava.version>13.0.1</guava.version>
 		<slf4j.version>1.7.5</slf4j.version>
 		<mycila.version>2.9.ga</mycila.version>
