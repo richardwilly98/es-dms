@@ -9,19 +9,19 @@ ES DMS is a collaborative content management framework based on AngularJS, Boots
 
 you will need to compile and run this section first. Once this part is complete, please follow instructions given in the es-dms / es-dms-site / yo / README.md file in order to install, compile and run the yo framework and the grunt server that hosts the site.
 
-Elasticsearch is required with mapper-attachment and elasticsearch-langdetect plugins. To install the required plugins in elasticsearch go to the elasticsearch base folder and type:
+Elasticsearch is required with mapper-attachment and elasticsearch-langdetect plugins. To install the required plugins in elasticsearch go to the elasticsearch base folder and type:  
 
-  bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/1.9.0
-  bin/plugin -install langdetect --url http://bit.ly/1cmf8AL
-  bin/plugin -install mobz/elasticsearch-head              -- this will install a web based administration interface for elasticsearch
+- ```bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/1.9.0```
+- ```bin/plugin -install langdetect --url http://bit.ly/1cmf8AL```
+- ```bin/plugin -install mobz/elasticsearch-head``` this will install a web based administration interface for elasticsearch
   
 Make sure elasticsearch is running before using the site. To start elasticsearch, go to the elasticseach base folder, open a command line shell and type:
 
-- bin/elasticsearch
+- ```bin/elasticsearch```
 
 to compile and run the project's code, from the project base folder (es-dms), type the following sequence of coomands: 
-- mvn clean install
-- es-dms-site\mvn clean tomcat7:run
+- ```mvn clean install```
+- ```es-dms-site\mvn clean tomcat7:run```
 - Open browser: http://localhost:8080/es-dms-site
 
 - follow instructions at:  https://github.com/richardwilly98/es-dms/blob/master/es-dms-site/yo/README.md
