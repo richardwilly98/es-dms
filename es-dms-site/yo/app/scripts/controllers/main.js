@@ -5,15 +5,9 @@ esDmsSiteApp.controller('mainController', function ($log, $scope, $location, $mo
   $scope.user = { name: ''};
   $scope.service = sharedService;
 
-  $scope.$watch('service.getCurrentUser()',
-    function(newValue) {
-      if (newValue !== null) {
-        $log.log('watch - currentUser: ' + newValue.email);
-        $scope.user = newValue;
-      } else {
-        $scope.user = { name: ''};
-      }
-    });
+  $scope.$on('event:setCurrentUser', function(event, currentUser) {
+    $scope.user = currentUser;
+  });
 
   $scope.hasRole = function(id) {
     return sharedService.hasRole(id);

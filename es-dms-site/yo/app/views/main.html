@@ -22,8 +22,8 @@
 					</ul></li>
 				<li data-ng-show="showLogout"><a href="#"
 					data-ng-click="logout()">Logout</a></li>
-				<li data-ng-show="showLogin"><a href="#"
-          data-ng-click="login()">Login</a></li>
+				<li data-ng-show="!showLogout"><a href="#"
+          			data-ng-click="login()">Login</a></li>
 			</ul>
 			<p data-ng-show="user.name" class="navbar-text pull-right">
 				Logged in as <a data-ng-click="showUserDetails()" class="navbar-link">{{ user.name }}</a>

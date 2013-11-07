@@ -7,13 +7,12 @@ esDmsSiteApp.service('authenticationService', ['$log', '$http', 'esdmsAuthentica
 			esdmsAuthenticationService.login(username, password, rememberMe, function(data){
 				if (data.status === 'AUTHENTICATED') {
 					authService.loginConfirmed();
-					sharedService.prepForBroadcast({logout: true});
-	        sharedService.updateUserSettings('name', username);
-	        userService.get(username, function(user) {
+					sharedService.updateUserSettings('name', username);
+					userService.get(username, function(user) {
 						sharedService.setCurrentUser(user);
-	        });
+					});
 				}
-        callback(data);
+				callback(data);
 			});
 		},
 		logout: function() {

@@ -24,7 +24,6 @@ esDmsSiteApp.service('sharedService', ['$log', '$rootScope', '$http', function (
   };
   
   var currentUser = {};
-  var message = '';
   function $hasRole(id) {
     if (currentUser !== null) {
       var role = _.find(currentUser.roles, {'id' : id});
@@ -43,9 +42,10 @@ esDmsSiteApp.service('sharedService', ['$log', '$rootScope', '$http', function (
       }
 
       currentUser = cu;
-      $rootScope.$broadcast('handleBroadcast');
+      $rootScope.$broadcast('event:setCurrentUser', currentUser);
     },
     getCurrentUser: function () {
+      $log.log('getCurrentUser - caller: ' + JSON.stringify(arguments));
       if (currentUser !== null) {
         $log.log('getCurrentUser: ' + currentUser.id);
       }
@@ -55,10 +55,10 @@ esDmsSiteApp.service('sharedService', ['$log', '$rootScope', '$http', function (
       
       return currentUser;
     },
-    prepForBroadcast: function(msg) {
-      message = msg;
-      $rootScope.$broadcast('handleBroadcast');
-    },
+    // prepForBroadcast: function(msg) {
+    //   message = msg;
+    //   $rootScope.$broadcast('handleBroadcast');
+    // },
     updateUserSettings: function(name, val) {
       var _user = angular.copy(settings.user);
       _user[name] = val;
