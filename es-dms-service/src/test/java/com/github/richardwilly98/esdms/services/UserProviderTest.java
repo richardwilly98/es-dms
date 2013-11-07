@@ -136,7 +136,6 @@ public class UserProviderTest extends ProviderTestBase {
             createUser(name, "", false, email, login, password, null);
             Assert.fail("Must not be able to create a new user with duplicated login");
         } catch (ServiceException ex) {
-            log.trace(ex);
         }
     }
 
