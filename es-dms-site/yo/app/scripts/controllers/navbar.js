@@ -1,8 +1,13 @@
 'use strict';
 
-esDmsSiteApp.controller('NavbarCtrl', ['$scope', function ($scope) {
-	$scope.showLogout = true;
+esDmsSiteApp.controller('NavbarCtrl', ['$log', '$scope', 'sharedService', function ($log, $scope, $sharedService) {
+	$scope.showLogout = false;
+	$scope.showLogin = true;
+	
 	$scope.$on('handleBroadcast', function() {
+	  $scope.showLogout = $sharedService.getCurrentUser() !== undefined;
+	  $scope.showLogin = $sharedService.getCurrentUser() === undefined;
+	  $log.log('showLogout on broadcast: ' + $scope.showLogout);
   });
 	$scope.tabs = [
 		{ 'view': '/home/search', title: 'Search' },

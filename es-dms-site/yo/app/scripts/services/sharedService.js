@@ -35,9 +35,16 @@ esDmsSiteApp.service('sharedService', ['$log', '$rootScope', '$http', function (
   }
   return {
     setCurrentUser: function (cu) {
+      if (cu !== null) $log.log('setCurrentUser: ' + cu.id);
+      else $log.log('setCurrentUser: null');
+      
       currentUser = cu;
+      $rootScope.$broadcast('handleBroadcast');
     },
     getCurrentUser: function () {
+      if (currentUser !== null) $log.log('getCurrentUser: ' + currentUser.id);
+      else $log.log('getCurrentUser: null');
+      
       return currentUser;
     },
     prepForBroadcast: function(msg) {
