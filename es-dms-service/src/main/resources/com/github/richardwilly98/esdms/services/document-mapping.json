@@ -43,27 +43,30 @@
                                             }
                                         }
                                     },
-            						"title" : { 
-        								"store" : "yes" 
-        							},
-        							"language" : { 
-        								"store" : "yes" 
-        							},
-        							"author" : { 
-        								"store" : "yes" 
-        							},
-        							"keywords" : { 
-        								"store" : "yes" 
-        							},
-        							"date" : { 
-        								"store" : "yes" 
-        							},
-        							"content_length" : { 
-        								"store" : "yes" 
-        							},
-        							"content_type" : { 
-        								"store" : "yes" 
-        							}
+									"name" : { 
+										"store" : "yes"
+									},
+									"title" : { 
+										"store" : "yes"
+									},
+									"language" : {
+										"store" : "yes"
+									},
+									"author" : {
+										"store" : "yes"
+									},
+									"keywords" : {
+										"store" : "yes"
+									},
+									"date" : {
+										"store" : "yes"
+									},
+									"content_length" : {
+										"store" : "yes"
+									},
+									"content_type" : {
+										"store" : "yes"
+									}
                                 }
 					        }
 						}

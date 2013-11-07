@@ -39,8 +39,6 @@ public interface Session {
     @NotNull
     public abstract String getId();
 
-    public abstract void setId(String id);
-
     @NotNull
     public abstract String getUserId();
 
@@ -48,16 +46,10 @@ public interface Session {
 
     public abstract boolean isActive();
 
-    public abstract void setActive(boolean active);
-
     public abstract boolean isSecure();
-
-    public abstract void setSecure(boolean secure);
 
     @NotNull
     public abstract Date getCreateTime();
-
-    public abstract void setCreateTime(Date createTime);
 
     @NotNull
     public abstract Date getLastAccessTime();

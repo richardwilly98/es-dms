@@ -141,28 +141,13 @@ public class SessionImpl extends ItemBaseImpl implements ItemBase, Session {
     }
 
     @Override
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    @Override
     public boolean isSecure() {
         return secure;
     }
 
     @Override
-    public void setSecure(boolean secure) {
-        this.secure = secure;
-    }
-
-    @Override
     public Date getCreateTime() {
         return createTime;
-    }
-
-    @Override
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
     }
 
     @Override

@@ -34,19 +34,15 @@ import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 
 import com.google.inject.Key;
-import com.google.inject.Scopes;
 import com.google.inject.binder.AnnotatedBindingBuilder;
-import com.google.inject.name.Names;
 
 public class EsShiroWebModule extends ShiroWebModule {
 
-    // private final String securityFilterPath;
     private final Logger log = Logger.getLogger(this.getClass());
 
     public EsShiroWebModule(ServletContext servletContext, String securityFilterPath) {
         super(servletContext);
         log.debug("*** constructor ***");
-        // this.securityFilterPath = securityFilterPath;
     }
 
     @SuppressWarnings("unchecked")
@@ -66,11 +62,9 @@ public class EsShiroWebModule extends ShiroWebModule {
 
     @Override
     protected void bindSessionManager(AnnotatedBindingBuilder<SessionManager> bind) {
-        log.debug("*** bindSessionManager ***");
-        bind.to(EsWebSessionManager.class).in(Scopes.SINGLETON);
-        bindConstant().annotatedWith(Names.named("shiro.globalSessionTimeout")).to(30000L);
+        bind.to(EsWebSessionManager.class).asEagerSingleton();
         bind(EsWebSessionManager.class);
 
     }
-
+    
 }

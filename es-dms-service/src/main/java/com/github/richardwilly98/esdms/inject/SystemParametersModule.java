@@ -44,8 +44,11 @@ import com.google.inject.name.Named;
  */
 public class SystemParametersModule extends AbstractModule {
 
-    public static final String PREVIEW_LENGTH = "preview.length";
+    public static final String PREVIEW_LENGTH = "esdms.preview.length";
+    public static final String SESSION_TIMEOUT = "esdms.session.timeout";
+
     public static final int DEFAULT_PREVIEW_LENGTH = 1024;
+    public static final long DEFAULT_SESSION_TIMEOUT = 1800000;
 
     @Override
     protected void configure() {
@@ -55,23 +58,36 @@ public class SystemParametersModule extends AbstractModule {
     @Provides
     @Named(PREVIEW_LENGTH)
     int providePreviewLength(BootstrapService bootstrapService, ParameterService service) {
-        int previewLength = DEFAULT_PREVIEW_LENGTH;
+        return Integer.parseInt(String.valueOf(getSystemParameter(bootstrapService, service, PREVIEW_LENGTH, DEFAULT_PREVIEW_LENGTH)));
+    }
+
+    @Provides
+    @Named(SESSION_TIMEOUT)
+    long provideSessionTimeout(BootstrapService bootstrapService, ParameterService service) {
+        return Long.parseLong(String.valueOf(getSystemParameter(bootstrapService, service, SESSION_TIMEOUT, DEFAULT_SESSION_TIMEOUT)));
+    }
+    
+    private Object getSystemParameter(BootstrapService bootstrapService, ParameterService service, String key, Object defaultValue) {
+        Object value = defaultValue;
         try {
             String library = bootstrapService.loadSettings().getLibrary();
             Parameter parameter = service.get(library);
             if (parameter == null) {
-                Map<String, Object> attributes = ImmutableMap.of(PREVIEW_LENGTH, (Object) DEFAULT_PREVIEW_LENGTH);
+                Map<String, Object> attributes = ImmutableMap.of(key, value);
                 parameter = new ParameterImpl.Builder().id(library).name("System Parameter for " + library).type(ParameterType.SYSTEM).attributes(attributes)
                         .build();
                 service.create(parameter);
             }
-            if (parameter.getAttributes().containsKey(PREVIEW_LENGTH)) {
-                previewLength = Integer.parseInt(String.valueOf(parameter.getAttributes().get(PREVIEW_LENGTH)));
+            if (parameter.getAttributes().containsKey(key)) {
+                value = parameter.getAttributes().get(key);
+            } else {
+                parameter.setAttribute(key, value);
+                service.update(parameter);
             }
         } catch (ServiceException e) {
             e.printStackTrace();
         }
-        return previewLength;
+        return value;
+        
     }
-
 }

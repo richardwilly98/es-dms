@@ -37,26 +37,29 @@
 				                        }
 				                    }
 				                },
-								"title" : { 
-									"store" : "yes" 
+								"name" : { 
+									"store" : "yes"
 								},
-								"language" : { 
-									"store" : "yes" 
+				                "title" : {
+									"store" : "yes"
 								},
-								"author" : { 
-									"store" : "yes" 
+								"language" : {
+									"store" : "yes"
 								},
-								"keywords" : { 
-									"store" : "yes" 
+								"author" : {
+									"store" : "yes"
 								},
-								"date" : { 
-									"store" : "yes" 
+								"keywords" : {
+									"store" : "yes"
 								},
-								"content_length" : { 
-									"store" : "yes" 
+								"date" : {
+									"store" : "yes"
 								},
-								"content_type" : { 
-									"store" : "yes" 
+								"content_length" : {
+									"store" : "yes"
+								},
+								"content_type" : {
+									"store" : "yes"
 								}
 				            }
 				        }

@@ -76,10 +76,10 @@ public class RestAuthenticationService extends RestItemBaseService<SessionImpl> 
             if (log.isTraceEnabled()) {
                 log.trace(String.format("Create cookie %s: [%s]", ES_DMS_TICKET, token));
             }
-            // TODO: maxAge should be calculated using session.lastAccess and
-            // timeout
+            SessionImpl session = authenticationService.validate(token);
+            int maxAge = (int)(session.getTimeout() / 1000);
             return Response.ok().entity(new AuthenticationResponse("AUTHENTICATED", token))
-                    .cookie(new NewCookie(ES_DMS_TICKET, token, "/", null, 1, url.getBaseUri().getHost(), 30000, false)).build();
+                    .cookie(new NewCookie(ES_DMS_TICKET, token, "/", null, 1, url.getBaseUri().getHost(), maxAge, false)).build();
         } catch (Throwable t) {
             log.error("login failed", t);
             throw new RestServiceException(t.getLocalizedMessage());

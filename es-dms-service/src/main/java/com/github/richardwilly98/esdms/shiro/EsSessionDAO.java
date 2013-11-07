@@ -31,6 +31,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Named;
+
 import org.apache.log4j.Logger;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
@@ -38,6 +40,7 @@ import org.apache.shiro.session.mgt.eis.AbstractSessionDAO;
 
 import com.github.richardwilly98.esdms.SessionImpl;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.inject.SystemParametersModule;
 import com.github.richardwilly98.esdms.services.AuthenticationProvider;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.google.inject.Inject;
@@ -47,6 +50,10 @@ public class EsSessionDAO extends AbstractSessionDAO {
     Logger log = Logger.getLogger(this.getClass());
 
     final AuthenticationService authenticationService;
+
+    @Inject
+    @Named(SystemParametersModule.SESSION_TIMEOUT)
+    public long sessionTimeout;
 
     @Inject
     public EsSessionDAO(final AuthenticationService authenticationService) {
@@ -93,11 +100,12 @@ public class EsSessionDAO extends AbstractSessionDAO {
 	    Set<SessionImpl> sessions = authenticationService.getItems("active:true");
 	    Set<Session> activeSessions = new HashSet<Session>();
 	    for (com.github.richardwilly98.esdms.api.Session session : sessions) {
+	        log.debug(String.format("Add active session: %s", session));
 		activeSessions.add(new EsSession(session));
 	    }
 	    return activeSessions;
 	} catch (ServiceException ex) {
-	    log.error("delete failed", ex);
+	    log.error("getActiveSessions failed", ex);
 	}
 	return null;
     }
@@ -105,8 +113,9 @@ public class EsSessionDAO extends AbstractSessionDAO {
     @Override
     protected Serializable doCreate(Session session) {
 	try {
+	    session.setTimeout(sessionTimeout);
 	    if (log.isTraceEnabled()) {
-		log.trace(String.format("*** doCreate - %s", session));
+		log.trace(String.format("*** doCreate - %s - timeout: %s", session, session.getTimeout()));
 	    }
 	    Serializable sessionId = generateSessionId(session);
 	    assignSessionId(session, sessionId);
@@ -125,9 +134,6 @@ public class EsSessionDAO extends AbstractSessionDAO {
     @Override
     protected Session doReadSession(Serializable sessionId) {
 	try {
-	    // if (log.isTraceEnabled()) {
-	    // log.trace(String.format("*** doReadSession - %s", sessionId));
-	    // }
 	    com.github.richardwilly98.esdms.api.Session session = authenticationService.get(sessionId.toString());
 	    if (session == null) {
 		return null;

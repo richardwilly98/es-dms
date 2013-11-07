@@ -58,7 +58,7 @@ public class FileImpl implements Serializable, File {
     @JsonProperty("author")
     private String author;
 
-    @JsonProperty("language")
+    @JsonProperty("language.lang")
     private String language;
 
     public static class Builder {

@@ -102,7 +102,7 @@ public class AuthenticationProvider implements AuthenticationService {
             }
             String json = response.getSourceAsString();
             SessionImpl session = mapper.readValue(json, SessionImpl.class);
-            validateSession(session);
+//            validateSession(session);
             return session;
         } catch (Throwable t) {
             log.error("get failed", t);
@@ -225,6 +225,7 @@ public class AuthenticationProvider implements AuthenticationService {
     public SessionImpl validate(String token) throws ServiceException {
         SessionImpl session = get(token);
         if (session != null) {
+            validateSession(session);
             session.setLastAccessTime(new Date());
             return update(session);
         }

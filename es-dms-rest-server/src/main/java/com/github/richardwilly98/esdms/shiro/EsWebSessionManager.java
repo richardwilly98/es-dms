@@ -26,28 +26,38 @@ package com.github.richardwilly98.esdms.shiro;
  * #L%
  */
 
+import javax.inject.Named;
+
+import org.apache.log4j.Logger;
 import org.apache.shiro.session.mgt.eis.SessionDAO;
 import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 
+import com.github.richardwilly98.esdms.inject.SystemParametersModule;
 import com.github.richardwilly98.esdms.rest.RestAuthenticationService;
 import com.google.inject.Inject;
 
 public class EsWebSessionManager extends DefaultWebSessionManager {
 
+    @Override
+    public long getGlobalSessionTimeout() {
+        log.debug("getGlobalSessionTimeout - " + super.getGlobalSessionTimeout());
+        return super.getGlobalSessionTimeout();
+    }
+
+    private static Logger log = Logger.getLogger(EsWebSessionManager.class);
+
     @Inject
-    public EsWebSessionManager(SessionDAO sessionDAO) {
+    public EsWebSessionManager(SessionDAO sessionDAO, @Named(SystemParametersModule.SESSION_TIMEOUT) final long sessionTimeout) {
         super();
-        // this.setDeleteInvalidSessions(true);
-        // this.setSessionFactory(new SimpleSessionFactory());
         this.setSessionDAO(sessionDAO);
         Cookie cookie = new SimpleCookie(RestAuthenticationService.ES_DMS_TICKET);
         cookie.setHttpOnly(true);
         setSessionIdCookie(cookie);
-        // Cookie session is enabled. Cookie is managed in AuthenticationService
-        // login / logout
         setSessionIdCookieEnabled(true);
+        setGlobalSessionTimeout(sessionTimeout);
+        getGlobalSessionTimeout();
     }
 
 }
