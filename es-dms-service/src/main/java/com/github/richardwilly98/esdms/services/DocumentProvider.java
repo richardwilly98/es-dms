@@ -44,6 +44,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.elasticsearch.action.autotagging.AutoTaggingAction;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -338,18 +339,20 @@ public class DocumentProvider extends ProviderItemBase<Document> implements Docu
     @Override
     public Document update(Document item) throws ServiceException {
         SimpleDocument document = updateModifiedDate(getSimpleDocument(item));
-//        Optional<Version> version = Iterables.tryFind(document.getVersions(), new Predicate<Version>() {
-//            public boolean apply(Version v) {
-//                return v.getFile() != null;
-//            }
-//        });
-//        log.debug(String.format("update document - %s - found version with content? %s", item.getId(), version.isPresent()));
-//        if (version.isPresent()) {
-            return super.update(document);
-//        } else {
-//            document.getVersions().clear();
-//            return updateMetadata(document);
-//        }
+        // Optional<Version> version = Iterables.tryFind(document.getVersions(),
+        // new Predicate<Version>() {
+        // public boolean apply(Version v) {
+        // return v.getFile() != null;
+        // }
+        // });
+        // log.debug(String.format("update document - %s - found version with content? %s",
+        // item.getId(), version.isPresent()));
+        // if (version.isPresent()) {
+        return super.update(document);
+        // } else {
+        // document.getVersions().clear();
+        // return updateMetadata(document);
+        // }
     }
 
     // TODO: document and version should be separated in 2 objects linked as
@@ -368,7 +371,7 @@ public class DocumentProvider extends ProviderItemBase<Document> implements Docu
                 log.trace(String.format("updateMetadata - %s", item.getId()));
             }
             Stopwatch watch = Stopwatch.createStarted();
-//            byte[] document = mapper.writeValueAsBytes(item);
+            // byte[] document = mapper.writeValueAsBytes(item);
             UpdateResponse response = client.prepareUpdate(index, TYPE, item.getId())
                     .setScript("ctx._source.remove('attributes'); ctx._source.remove('tags'); ctx._source.remove('ratings');").execute()
                     .actionGet();
@@ -412,9 +415,8 @@ public class DocumentProvider extends ProviderItemBase<Document> implements Docu
             // 1. Try to retrieve highlight fragment.
             // 2. If highlight is not available retrieve versions.file
             SearchRequestBuilder srb = client.prepareSearch(index).setTypes(TYPE).setSearchType(SearchType.QUERY_AND_FETCH)
-//                    .addField("versions.file")
-                     .setNoFields()
-                    .setQuery(query).setHighlighterPreTags("<span class='highlight-tag'>").setHighlighterPostTags("</span>")
+                    // .addField("versions.file")
+                    .setNoFields().setQuery(query).setHighlighterPreTags("<span class='highlight-tag'>").setHighlighterPostTags("</span>")
                     .setHighlighterOrder("score").addHighlightedField("versions.file.content", size, 1).setHighlighterNoMatchSize(size);
             log.trace("++ Search request: " + srb);
             SearchResponse searchResponse = srb.execute().actionGet();
@@ -433,12 +435,13 @@ public class DocumentProvider extends ProviderItemBase<Document> implements Docu
                 }
                 if (preview == null) {
                     log.warn("Preview should never be null since ES 0.90.6");
-//                    log.info("Preview is empty. Try to fetch file.summary from current version.");
-//                    preview = hit.getFields().get("versions.file").getValue().toString();
-//                    if (preview != null && preview.length() > size) {
-//                        preview = preview.substring(0, size - 1);
-//                    }
-//                    log.trace(String.format("summary: %s", preview));
+                    // log.info("Preview is empty. Try to fetch file.summary from current version.");
+                    // preview =
+                    // hit.getFields().get("versions.file").getValue().toString();
+                    // if (preview != null && preview.length() > size) {
+                    // preview = preview.substring(0, size - 1);
+                    // }
+                    // log.trace(String.format("summary: %s", preview));
                 }
             }
 
@@ -479,6 +482,18 @@ public class DocumentProvider extends ProviderItemBase<Document> implements Docu
     }
 
     @Override
+    public void detectTags(Document document, int max) throws ServiceException {
+        if (log.isTraceEnabled()) {
+            log.trace(String.format("*** detectTags document: %s - count: %s ***", document, max));
+        }
+
+        checkNotNull(document);
+        refreshIndex(true);
+        client.prepareExecute(AutoTaggingAction.INSTANCE).setIndex(index).setType(type).setId(document.getId()).setField("tags")
+                .setContent("versions.file.content").setMax(max).get();
+    }
+
+    @Override
     public void addVersion(Document document, Version version) throws ServiceException {
         if (log.isTraceEnabled()) {
             log.trace(String.format("*** addVersion document: %s - version: %s ***", document, version));
@@ -505,7 +520,7 @@ public class DocumentProvider extends ProviderItemBase<Document> implements Docu
         }
         sd.addVersion(sv);
         log.debug("addVersion - updateVersions: " + sd);
-//        updateVersions(sd);
+        // updateVersions(sd);
         update(sd);
     }
 
@@ -555,7 +570,7 @@ public class DocumentProvider extends ProviderItemBase<Document> implements Docu
         }
 
         sd.deleteVersion(version);
-//        updateVersions(sd);
+        // updateVersions(sd);
         update(sd);
     }
 
@@ -642,7 +657,7 @@ public class DocumentProvider extends ProviderItemBase<Document> implements Docu
             sv.setFile(getVersionContent(document, sv.getVersionId()));
         }
         sd.updateVersion(sv);
-//        updateVersions(sd);
+        // updateVersions(sd);
         update(sd);
     }
 

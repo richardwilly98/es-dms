@@ -40,6 +40,7 @@ esDmsSiteApp.controller('DocumentsFileUploadCtrl',
       $upload.upload({
         url: 'api/documents/_upload', 
         file: $file,
+        data: {tagging: true},
         progress: function(evt) {
           var percentage = parseInt(100.0 * evt.loaded / evt.total);
           $log.log('percent: ' + percentage);

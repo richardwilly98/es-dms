@@ -263,7 +263,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
             if (document == null) {
                 throw new ServiceException(String.format("Cannot find document %s", id));
             }
-            
+
             Version version = document.getCurrentVersion();
             if (version == null) {
                 throw new ServiceException(String.format("Cannot find current version for document %s", id));
@@ -296,7 +296,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
     @Produces({ MediaType.APPLICATION_JSON })
     @Audit(AuditEntry.Event.UPLOAD)
     public Response upload(@FormDataParam("name") String name, @FormDataParam("file") InputStream uploadedInputStream,
-            @FormDataParam("file") FormDataBodyPart body) {
+            @FormDataParam("file") FormDataBodyPart body, @FormDataParam("tagging") boolean autoTagging) {
         checkNotNull(body);
         checkNotNull(body.getContentDisposition());
         String filename = body.getContentDisposition().getFileName();
@@ -321,18 +321,15 @@ public class RestDocumentService extends RestItemBaseService<Document> {
             }
             File file = new FileImpl.Builder().content(content).name(filename).contentType(contentType).build();
             Map<String, Object> attributes = newHashMap();
-            // Set<Version> versions = newHashSet();
-            // versions.add(new VersionImpl.Builder()
-            // .documentId(null)
-            // .file(file)
-            // .versionId(1).build());
             Document document = new DocumentImpl.Builder().versions(new HashSet<Version>()).name(name).attributes(attributes).roles(null)
                     .build();
             document = service.create(document);
             Response response = includeItemIdInHeaders(Response.created(getItemUri(document)), document).build();
             Version version = new VersionImpl.Builder().documentId(document.getId()).current(true).file(file).versionId(1).build();
             documentService.addVersion(document, version);
-            // return create(document);
+            if (autoTagging) {
+                documentService.detectTags(document, 10);
+            }
             return response;
         } catch (Throwable t) {
             log.error("upload failed", t);
@@ -346,8 +343,8 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 
     @POST
     @Path("{id}/" + MARKDELETE_PATH)
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces({ MediaType.APPLICATION_JSON })
+    // @Consumes(MediaType.APPLICATION_JSON)
+    // @Produces({ MediaType.APPLICATION_JSON })
     public Response queueDelete(@PathParam("id") String id) {
         try {
             Document document = service.get(id);
@@ -367,8 +364,8 @@ public class RestDocumentService extends RestItemBaseService<Document> {
 
     @POST
     @Path("{id}/" + UNDELETE_PATH)
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces({ MediaType.APPLICATION_JSON })
+    // @Consumes(MediaType.APPLICATION_JSON)
+    // @Produces({ MediaType.APPLICATION_JSON })
     public Response undelete(@PathParam("id") String id) {
         try {
             Document document = service.get(id);
@@ -412,370 +409,415 @@ public class RestDocumentService extends RestItemBaseService<Document> {
     public RestVersionService getVersionResource() {
         return new RestVersionService(authenticationService, documentService);
     }
-//    // Versions methods
-//    @GET
-//    @Produces({ MediaType.APPLICATION_JSON })
-//    @Path("{id}" + VERSIONS_PATH + "/{vid}/" + PREVIEW_PATH)
-//    public Response preview(@PathParam("id") String id, @PathParam("vid") String vid,
-//            @QueryParam(PREVIEW_CRITERIA_PARAMETER) String criteria,
-//            @QueryParam(PREVIEW_FRAGMENT_SIZE_PARAMETER) @DefaultValue("1024") int fragmentSize) {
-//        try {
-//            isAuthenticated();
-//            if (log.isTraceEnabled()) {
-//                log.trace(String.format("preview - %s - %s", id, criteria));
-//            }
-//            if (criteria == null) {
-//                criteria = "*";
-//            }
-//            Document document = service.get(id);
-//            checkNotNull(document);
-//
-//            /*
-//             * Danilo preview requires a version id parameter
-//             */
-//
-//            final String content = documentService.preview(document, /*
-//                                                                      * Integer.
-//                                                                      * parseInt
-//                                                                      * (vid),
-//                                                                      */criteria, fragmentSize);
-//            Preview preview = new Preview() {
-//
-//                @Override
-//                public String getContent() {
-//                    return content;
-//                }
-//            };
-//            return Response.status(Status.OK).entity(preview).build();
-//        } catch (ServiceException e) {
-//            log.error("preview failed", e);
-//            throw new RestServiceException(e.getLocalizedMessage());
-//        }
-//    }
-//
-//    @GET
-//    @Produces({ MediaType.APPLICATION_JSON })
-//    @Path("{id}/" + VERSIONS_PATH + "/{vid}")
-//    public Response getVersion(@PathParam("id") String id, @PathParam("vid") int vid) {
-//        if (log.isTraceEnabled()) {
-//            log.trace(String.format("getVersion - %s - %s", id, vid));
-//        }
-//        try {
-//            Document document = documentService.get(id);
-//            if (document == null) {
-//                return Response.status(Status.NOT_FOUND).build();
-//            }
-//            Version version = documentService.getVersion(document, vid);
-//            if (version == null) {
-//                return Response.status(Status.NOT_FOUND).build();
-//            }
-//            return Response.ok(version).build();
-//        } catch (ServiceException e) {
-//            throw new RestServiceException(e.getLocalizedMessage());
-//        }
-//    }
-//
-//    @POST
-////    @Path("{id}/" + UPLOAD_PATH)
-//    @Path("{id}/" + VERSIONS_PATH)
-//    @Consumes(MediaType.MULTIPART_FORM_DATA)
-//    @Produces({ MediaType.APPLICATION_JSON })
-//    public Response uploadVersion(@PathParam("id") String id, @FormDataParam("file") InputStream uploadedInputStream,
-//            @FormDataParam("file") FormDataBodyPart body) {
-//        log.info(String.format("uploadVersion to document id %s ", id));
-//        checkNotNull(body);
-//        checkNotNull(body.getContentDisposition());
-//        String filename = body.getContentDisposition().getFileName();
-//
-//        String path = null;
-//        long size = body.getContentDisposition().getSize();
-//        String contentType = body.getMediaType().toString();
-//        if (log.isTraceEnabled()) {
-//            log.trace(String.format("uploadVersion for document %s - %s - %s - %s", id, filename, size, contentType));
-//        }
-//        try {
-//            isAuthenticated();
-//            byte[] content;
-//            if (size > 16 * 1024 * 1024) {
-//                path = System.getProperty("java.io.tmpdir") + System.currentTimeMillis() + filename;
-//                writeToFile(uploadedInputStream, path);
-//                content = Files.readAllBytes(Paths.get(path));
-//            } else {
-//                content = toByteArray(uploadedInputStream);
-//            }
-//            File file = new FileImpl.Builder().content(content).name(filename).contentType(contentType).build();
-//
-//            Document document = service.get(id);
-//            checkNotNull(document);
-//
-//            if (!document.hasStatus(Document.DocumentStatus.AVAILABLE))
-//                throw new PreconditionException(String.format("uploadVersion: Document %s is not available for uploading a version", id));
-//
-//            Version currentVersion = document.getCurrentVersion();
-//            checkNotNull(currentVersion);
-//
-//            Version version = new VersionImpl.Builder().documentId(document.getId()).current(true).file(file)
-//                    .parentId(currentVersion.getVersionId()).versionId(document.getVersions().size() + 1).build();
-//            documentService.addVersion(document, version);
-//            // documentService.setCurrentVersion(document,
-//            // version.getVersionId());
-//            log.debug("new version updloaded: " + VERSIONS_PATH + "/" + version.getVersionId());
-//            Response response = Response.created(getItemUri(document, VERSIONS_PATH, String.valueOf(version.getVersionId()))).build();
-//
-//            return response;
-//        } catch (Throwable t) {
-//            log.error("uploadVersion: upload failed", t);
-//            throw new RestServiceException(t.getLocalizedMessage());
-//        } finally {
-//            if (path != null) {
-//                deleteFile(path);
-//            }
-//        }
-//    }
-//
-//    @POST
-//    @Path("{id}/" + VERSIONS_PATH + "/{vid}/" + UPLOAD_PATH)
-//    @Consumes(MediaType.MULTIPART_FORM_DATA)
-//    @Produces({ MediaType.APPLICATION_JSON })
-//    public Response uploadVersion(@PathParam("id") String id, @PathParam("vid") String vid,
-//            @FormDataParam("file") InputStream uploadedInputStream, @FormDataParam("file") FormDataBodyPart body) {
-//        checkNotNull(body);
-//        checkNotNull(body.getContentDisposition());
-//        String filename = body.getContentDisposition().getFileName();
-//
-//        String path = null;
-//        long size = body.getContentDisposition().getSize();
-//        String contentType = body.getMediaType().toString();
-//        if (log.isTraceEnabled()) {
-//            log.trace(String.format("uploadVersion - %s - %s - %s - %s - %s", id, vid, filename, size, contentType));
-//        }
-//        try {
-//            isAuthenticated();
-//            byte[] content;
-//            if (size > 16 * 1024 * 1024) {
-//                path = System.getProperty("java.io.tmpdir") + System.currentTimeMillis() + filename;
-//                writeToFile(uploadedInputStream, path);
-//                content = Files.readAllBytes(Paths.get(path));
-//            } else {
-//                content = toByteArray(uploadedInputStream);
-//            }
-//            File file = new FileImpl.Builder().content(content).name(filename).contentType(contentType).build();
-//
-//            Document document = service.get(id);
-//            checkNotNull(document);
-//
-//            if (!document.hasStatus(Document.DocumentStatus.AVAILABLE))
-//                throw new PreconditionException(String.format("Document %s is not available for uploading a version", id));
-//
-//            Version parentVersion = document.getVersion(Integer.parseInt(vid));
-//            checkNotNull(parentVersion);
-//
-//            Response response = Response.created(getItemUri(document)).build();
-//            Version version = new VersionImpl.Builder().documentId(document.getId()).current(true).file(file)
-//                    .parentId(Integer.parseInt(vid)).versionId(document.getVersions().size() + 1).build();
-//            documentService.addVersion(document, version);
-//            // documentService.setCurrentVersion(document,
-//            // version.getVersionId());
-//
-//            return response;
-//        } catch (Throwable t) {
-//            log.error("upload failed", t);
-//            throw new RestServiceException(t.getLocalizedMessage());
-//        } finally {
-//            if (path != null) {
-//                deleteFile(path);
-//            }
-//        }
-//    }
-//
-//    @POST
-//    @Path("{id}/" + VERSIONS_PATH + "/{vid}/" + UPDATE_PATH)
-//    @Consumes(MediaType.MULTIPART_FORM_DATA)
-//    @Produces({ MediaType.APPLICATION_JSON })
-//    public Response updateVersion(@PathParam("id") String id, @PathParam("vid") String vid,
-//            @FormDataParam("file") InputStream uploadedInputStream, @FormDataParam("file") FormDataBodyPart body) {
-//        log.info(String.format("uploadVersion %s for document id %s ", vid, id));
-//        checkNotNull(body);
-//        checkNotNull(body.getContentDisposition());
-//        String filename = body.getContentDisposition().getFileName();
-//
-//        String path = null;
-//        long size = body.getContentDisposition().getSize();
-//        String contentType = body.getMediaType().toString();
-//        if (log.isTraceEnabled()) {
-//            log.trace(String.format("uploadVersion %s for document %s - %s - %s - %s", vid, id, filename, size, contentType));
-//        }
-//        try {
-//            isAuthenticated();
-//            byte[] content;
-//            if (size > 16 * 1024 * 1024) {
-//                path = System.getProperty("java.io.tmpdir") + System.currentTimeMillis() + filename;
-//                writeToFile(uploadedInputStream, path);
-//                content = Files.readAllBytes(Paths.get(path));
-//            } else {
-//                content = toByteArray(uploadedInputStream);
-//            }
-//            File file = new FileImpl.Builder().content(content).name(filename).contentType(contentType).build();
-//
-//            Document document = service.get(id);
-//            checkNotNull(document);
-//
-//            if (!document.hasStatus(Document.DocumentStatus.AVAILABLE))
-//                throw new PreconditionException(String.format("uploadVersion: Document %s is not available for uploading a version", id));
-//
-//            Version version = document.getVersion(Integer.parseInt(vid));
-//            checkNotNull(version);
-//
-//            log.info(String.format("uploadVersion updating content to: [[[[" + new String(content, "UTF-8") + "]]]]"));
-//            documentService.setVersionContent(document, version.getVersionId(), file);
-//            Response response = Response.created(getItemUri(document)).build();
-//
-//            return response;
-//        } catch (Throwable t) {
-//            log.error("uploadVersion: upload failed", t);
-//            throw new RestServiceException(t.getLocalizedMessage());
-//        } finally {
-//            if (path != null) {
-//                deleteFile(path);
-//            }
-//        }
-//    }
-//
-//    @POST
-//    @Path("{id}/" + VERSIONS_PATH + "/{vid}/" + CURRENT_PATH)
-//    // @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces({ MediaType.APPLICATION_JSON })
-//    public Response setCurrentVersion(@PathParam("id") String id, @PathParam("vid") String vid) {
-//
-//        log.debug(String.format("RestDocumentService: setCurrentVersion for document %s to version %s", id, vid));
-//        try {
-//            isAuthenticated();
-//
-//            Document document = service.get(id);
-//            checkNotNull(document);
-//
-//            if (!document.hasStatus(Document.DocumentStatus.AVAILABLE))
-//                throw new PreconditionException(String.format("RestDocumentService: Document %s is not available for uploading a version",
-//                        id));
-//
-//            Version version = document.getVersion(Integer.parseInt(vid));
-//            checkNotNull(version);
-//
-//            documentService.setCurrentVersion(document, version.getVersionId());
-//
-//            Response response = Response.ok(
-//            // getItemUri(document)
-//                    ).build();
-//
-//            log.debug(String.format("RestDocumentService: document - %s, current version - %s, ", document.getId(), version.getVersionId()));
-//            log.debug("RestDocumentService: setCurrentVersion end ok");
-//            return response;
-//        } catch (Throwable t) {
-//            log.error("RestDocumentService: setCurrentVersion failed", t);
-//            throw new RestServiceException(t.getLocalizedMessage());
-//        }
-//    }
-//
-//    @GET
-//    @Path("{id}/{vid}/" + DOWNLOAD_PATH)
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    public Response download(@PathParam("id") String id, @PathParam("vid") String vid) {
-//        try {
-//            Document document = service.get(id);
-//            checkNotNull(document);
-//
-//            /*
-//             * Danilo forse si puo usare un default per il vid per poi usare il
-//             * getCurrentVersion e usare una sola version del metodo.
-//             */
-//
-//            Version version = document.getVersion(Integer.parseInt(vid));
-//            checkNotNull(version);
-//            checkNotNull(version.getFile());
-//            ContentDispositionBuilder<?, ?> contentDisposition = ContentDisposition.type("attachment");
-//
-//            contentDisposition.fileName(version.getFile().getName());
-//            if (version.getFile().getDate() != null) {
-//                contentDisposition.creationDate(version.getFile().getDate());
-//            }
-//            ResponseBuilder rb = Response.ok();
-//            rb.type(version.getFile().getContentType());
-//            InputStream stream = new ByteArrayInputStream(version.getFile().getContent());
-//            rb.entity(stream);
-//            rb.status(Status.OK);
-//            rb.header("Content-Disposition", contentDisposition.build());
-//            return rb.build();
-//        } catch (Throwable t) {
-//            log.error("download failed", t);
-//            return Response.status(Status.NOT_FOUND).build();
-//        }
-//    }
-//
-//    @GET
-//    @Produces({ MediaType.APPLICATION_JSON })
-//    @Path("{id}/" + VERSIONS_PATH)
-//    public Response getVersions(@PathParam("id") String id) {
-//        if (log.isTraceEnabled()) {
-//            log.trace(String.format("versions - %s", id));
-//        }
-//        try {
-//            Document document = service.get(id);
-//            if (document == null) {
-//                return Response.status(Status.NOT_FOUND).build();
-//            }
-//            return Response.ok(document.getVersions()).build();
-//        } catch (ServiceException e) {
-//            throw new RestServiceException(e.getLocalizedMessage());
-//        }
-//    }
-//
-//    @POST
-//    @Path("{id}/" + VERSIONS_PATH + "/{vid}/" + MARKDELETE_PATH)
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces({ MediaType.APPLICATION_JSON })
-//    public Response queueDelete(@PathParam("id") String id, @PathParam("vid") String vid) {
-//        try {
-//            Document document = service.get(id);
-//            checkNotNull(document);
-//
-//            documentService.markDeleted(document);
-//
-//            return Response.noContent().build();
-//        } catch (ServiceException t) {
-//            log.error(String.format("Document %s is not marked as available", id), t);
-//            return Response.status(Status.PRECONDITION_FAILED).build();
-//        } catch (Throwable t) {
-//            log.error(String.format("Check if document %s exists", id), t);
-//            return Response.status(Status.NOT_FOUND).build();
-//        }
-//    }
-//
-//    @DELETE
-//    @Path("{id}/" + VERSIONS_PATH + "/{vid}/")
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    @Produces({ MediaType.APPLICATION_JSON })
-//    public Response delete(@PathParam("id") String id, @PathParam("vid") String vid) {
-//        try {
-//            Document document = service.get(id);
-//            checkNotNull(document);
-//
-//            if (!document.hasStatus(Document.DocumentStatus.DELETED))
-//                throw new PreconditionException(String.format("Document %s is not marked as deleted", id));
-//
-//            Version version = document.getVersion(Integer.parseInt(vid));
-//            checkNotNull(version);
-//
-//            documentService.deleteVersion(document, version);
-//
-//            return Response.noContent().build();
-//        } catch (ServiceException t) {
-//            log.error(String.format("Error processing deletion of version %s for document %s", vid, id), t);
-//            return Response.status(Status.PRECONDITION_FAILED).build();
-//        } catch (Throwable t) {
-//            log.error(String.format("Check if document %s exists", id), t);
-//            return Response.status(Status.NOT_FOUND).build();
-//        }
-//    }
+
+    // // Versions methods
+    // @GET
+    // @Produces({ MediaType.APPLICATION_JSON })
+    // @Path("{id}" + VERSIONS_PATH + "/{vid}/" + PREVIEW_PATH)
+    // public Response preview(@PathParam("id") String id, @PathParam("vid")
+    // String vid,
+    // @QueryParam(PREVIEW_CRITERIA_PARAMETER) String criteria,
+    // @QueryParam(PREVIEW_FRAGMENT_SIZE_PARAMETER) @DefaultValue("1024") int
+    // fragmentSize) {
+    // try {
+    // isAuthenticated();
+    // if (log.isTraceEnabled()) {
+    // log.trace(String.format("preview - %s - %s", id, criteria));
+    // }
+    // if (criteria == null) {
+    // criteria = "*";
+    // }
+    // Document document = service.get(id);
+    // checkNotNull(document);
+    //
+    // /*
+    // * Danilo preview requires a version id parameter
+    // */
+    //
+    // final String content = documentService.preview(document, /*
+    // * Integer.
+    // * parseInt
+    // * (vid),
+    // */criteria, fragmentSize);
+    // Preview preview = new Preview() {
+    //
+    // @Override
+    // public String getContent() {
+    // return content;
+    // }
+    // };
+    // return Response.status(Status.OK).entity(preview).build();
+    // } catch (ServiceException e) {
+    // log.error("preview failed", e);
+    // throw new RestServiceException(e.getLocalizedMessage());
+    // }
+    // }
+    //
+    // @GET
+    // @Produces({ MediaType.APPLICATION_JSON })
+    // @Path("{id}/" + VERSIONS_PATH + "/{vid}")
+    // public Response getVersion(@PathParam("id") String id, @PathParam("vid")
+    // int vid) {
+    // if (log.isTraceEnabled()) {
+    // log.trace(String.format("getVersion - %s - %s", id, vid));
+    // }
+    // try {
+    // Document document = documentService.get(id);
+    // if (document == null) {
+    // return Response.status(Status.NOT_FOUND).build();
+    // }
+    // Version version = documentService.getVersion(document, vid);
+    // if (version == null) {
+    // return Response.status(Status.NOT_FOUND).build();
+    // }
+    // return Response.ok(version).build();
+    // } catch (ServiceException e) {
+    // throw new RestServiceException(e.getLocalizedMessage());
+    // }
+    // }
+    //
+    // @POST
+    // // @Path("{id}/" + UPLOAD_PATH)
+    // @Path("{id}/" + VERSIONS_PATH)
+    // @Consumes(MediaType.MULTIPART_FORM_DATA)
+    // @Produces({ MediaType.APPLICATION_JSON })
+    // public Response uploadVersion(@PathParam("id") String id,
+    // @FormDataParam("file") InputStream uploadedInputStream,
+    // @FormDataParam("file") FormDataBodyPart body) {
+    // log.info(String.format("uploadVersion to document id %s ", id));
+    // checkNotNull(body);
+    // checkNotNull(body.getContentDisposition());
+    // String filename = body.getContentDisposition().getFileName();
+    //
+    // String path = null;
+    // long size = body.getContentDisposition().getSize();
+    // String contentType = body.getMediaType().toString();
+    // if (log.isTraceEnabled()) {
+    // log.trace(String.format("uploadVersion for document %s - %s - %s - %s",
+    // id, filename, size, contentType));
+    // }
+    // try {
+    // isAuthenticated();
+    // byte[] content;
+    // if (size > 16 * 1024 * 1024) {
+    // path = System.getProperty("java.io.tmpdir") + System.currentTimeMillis()
+    // + filename;
+    // writeToFile(uploadedInputStream, path);
+    // content = Files.readAllBytes(Paths.get(path));
+    // } else {
+    // content = toByteArray(uploadedInputStream);
+    // }
+    // File file = new
+    // FileImpl.Builder().content(content).name(filename).contentType(contentType).build();
+    //
+    // Document document = service.get(id);
+    // checkNotNull(document);
+    //
+    // if (!document.hasStatus(Document.DocumentStatus.AVAILABLE))
+    // throw new
+    // PreconditionException(String.format("uploadVersion: Document %s is not available for uploading a version",
+    // id));
+    //
+    // Version currentVersion = document.getCurrentVersion();
+    // checkNotNull(currentVersion);
+    //
+    // Version version = new
+    // VersionImpl.Builder().documentId(document.getId()).current(true).file(file)
+    // .parentId(currentVersion.getVersionId()).versionId(document.getVersions().size()
+    // + 1).build();
+    // documentService.addVersion(document, version);
+    // // documentService.setCurrentVersion(document,
+    // // version.getVersionId());
+    // log.debug("new version updloaded: " + VERSIONS_PATH + "/" +
+    // version.getVersionId());
+    // Response response = Response.created(getItemUri(document, VERSIONS_PATH,
+    // String.valueOf(version.getVersionId()))).build();
+    //
+    // return response;
+    // } catch (Throwable t) {
+    // log.error("uploadVersion: upload failed", t);
+    // throw new RestServiceException(t.getLocalizedMessage());
+    // } finally {
+    // if (path != null) {
+    // deleteFile(path);
+    // }
+    // }
+    // }
+    //
+    // @POST
+    // @Path("{id}/" + VERSIONS_PATH + "/{vid}/" + UPLOAD_PATH)
+    // @Consumes(MediaType.MULTIPART_FORM_DATA)
+    // @Produces({ MediaType.APPLICATION_JSON })
+    // public Response uploadVersion(@PathParam("id") String id,
+    // @PathParam("vid") String vid,
+    // @FormDataParam("file") InputStream uploadedInputStream,
+    // @FormDataParam("file") FormDataBodyPart body) {
+    // checkNotNull(body);
+    // checkNotNull(body.getContentDisposition());
+    // String filename = body.getContentDisposition().getFileName();
+    //
+    // String path = null;
+    // long size = body.getContentDisposition().getSize();
+    // String contentType = body.getMediaType().toString();
+    // if (log.isTraceEnabled()) {
+    // log.trace(String.format("uploadVersion - %s - %s - %s - %s - %s", id,
+    // vid, filename, size, contentType));
+    // }
+    // try {
+    // isAuthenticated();
+    // byte[] content;
+    // if (size > 16 * 1024 * 1024) {
+    // path = System.getProperty("java.io.tmpdir") + System.currentTimeMillis()
+    // + filename;
+    // writeToFile(uploadedInputStream, path);
+    // content = Files.readAllBytes(Paths.get(path));
+    // } else {
+    // content = toByteArray(uploadedInputStream);
+    // }
+    // File file = new
+    // FileImpl.Builder().content(content).name(filename).contentType(contentType).build();
+    //
+    // Document document = service.get(id);
+    // checkNotNull(document);
+    //
+    // if (!document.hasStatus(Document.DocumentStatus.AVAILABLE))
+    // throw new
+    // PreconditionException(String.format("Document %s is not available for uploading a version",
+    // id));
+    //
+    // Version parentVersion = document.getVersion(Integer.parseInt(vid));
+    // checkNotNull(parentVersion);
+    //
+    // Response response = Response.created(getItemUri(document)).build();
+    // Version version = new
+    // VersionImpl.Builder().documentId(document.getId()).current(true).file(file)
+    // .parentId(Integer.parseInt(vid)).versionId(document.getVersions().size()
+    // + 1).build();
+    // documentService.addVersion(document, version);
+    // // documentService.setCurrentVersion(document,
+    // // version.getVersionId());
+    //
+    // return response;
+    // } catch (Throwable t) {
+    // log.error("upload failed", t);
+    // throw new RestServiceException(t.getLocalizedMessage());
+    // } finally {
+    // if (path != null) {
+    // deleteFile(path);
+    // }
+    // }
+    // }
+    //
+    // @POST
+    // @Path("{id}/" + VERSIONS_PATH + "/{vid}/" + UPDATE_PATH)
+    // @Consumes(MediaType.MULTIPART_FORM_DATA)
+    // @Produces({ MediaType.APPLICATION_JSON })
+    // public Response updateVersion(@PathParam("id") String id,
+    // @PathParam("vid") String vid,
+    // @FormDataParam("file") InputStream uploadedInputStream,
+    // @FormDataParam("file") FormDataBodyPart body) {
+    // log.info(String.format("uploadVersion %s for document id %s ", vid, id));
+    // checkNotNull(body);
+    // checkNotNull(body.getContentDisposition());
+    // String filename = body.getContentDisposition().getFileName();
+    //
+    // String path = null;
+    // long size = body.getContentDisposition().getSize();
+    // String contentType = body.getMediaType().toString();
+    // if (log.isTraceEnabled()) {
+    // log.trace(String.format("uploadVersion %s for document %s - %s - %s - %s",
+    // vid, id, filename, size, contentType));
+    // }
+    // try {
+    // isAuthenticated();
+    // byte[] content;
+    // if (size > 16 * 1024 * 1024) {
+    // path = System.getProperty("java.io.tmpdir") + System.currentTimeMillis()
+    // + filename;
+    // writeToFile(uploadedInputStream, path);
+    // content = Files.readAllBytes(Paths.get(path));
+    // } else {
+    // content = toByteArray(uploadedInputStream);
+    // }
+    // File file = new
+    // FileImpl.Builder().content(content).name(filename).contentType(contentType).build();
+    //
+    // Document document = service.get(id);
+    // checkNotNull(document);
+    //
+    // if (!document.hasStatus(Document.DocumentStatus.AVAILABLE))
+    // throw new
+    // PreconditionException(String.format("uploadVersion: Document %s is not available for uploading a version",
+    // id));
+    //
+    // Version version = document.getVersion(Integer.parseInt(vid));
+    // checkNotNull(version);
+    //
+    // log.info(String.format("uploadVersion updating content to: [[[[" + new
+    // String(content, "UTF-8") + "]]]]"));
+    // documentService.setVersionContent(document, version.getVersionId(),
+    // file);
+    // Response response = Response.created(getItemUri(document)).build();
+    //
+    // return response;
+    // } catch (Throwable t) {
+    // log.error("uploadVersion: upload failed", t);
+    // throw new RestServiceException(t.getLocalizedMessage());
+    // } finally {
+    // if (path != null) {
+    // deleteFile(path);
+    // }
+    // }
+    // }
+    //
+    // @POST
+    // @Path("{id}/" + VERSIONS_PATH + "/{vid}/" + CURRENT_PATH)
+    // // @Consumes(MediaType.APPLICATION_JSON)
+    // @Produces({ MediaType.APPLICATION_JSON })
+    // public Response setCurrentVersion(@PathParam("id") String id,
+    // @PathParam("vid") String vid) {
+    //
+    // log.debug(String.format("RestDocumentService: setCurrentVersion for document %s to version %s",
+    // id, vid));
+    // try {
+    // isAuthenticated();
+    //
+    // Document document = service.get(id);
+    // checkNotNull(document);
+    //
+    // if (!document.hasStatus(Document.DocumentStatus.AVAILABLE))
+    // throw new
+    // PreconditionException(String.format("RestDocumentService: Document %s is not available for uploading a version",
+    // id));
+    //
+    // Version version = document.getVersion(Integer.parseInt(vid));
+    // checkNotNull(version);
+    //
+    // documentService.setCurrentVersion(document, version.getVersionId());
+    //
+    // Response response = Response.ok(
+    // // getItemUri(document)
+    // ).build();
+    //
+    // log.debug(String.format("RestDocumentService: document - %s, current version - %s, ",
+    // document.getId(), version.getVersionId()));
+    // log.debug("RestDocumentService: setCurrentVersion end ok");
+    // return response;
+    // } catch (Throwable t) {
+    // log.error("RestDocumentService: setCurrentVersion failed", t);
+    // throw new RestServiceException(t.getLocalizedMessage());
+    // }
+    // }
+    //
+    // @GET
+    // @Path("{id}/{vid}/" + DOWNLOAD_PATH)
+    // @Consumes(MediaType.APPLICATION_JSON)
+    // public Response download(@PathParam("id") String id, @PathParam("vid")
+    // String vid) {
+    // try {
+    // Document document = service.get(id);
+    // checkNotNull(document);
+    //
+    // /*
+    // * Danilo forse si puo usare un default per il vid per poi usare il
+    // * getCurrentVersion e usare una sola version del metodo.
+    // */
+    //
+    // Version version = document.getVersion(Integer.parseInt(vid));
+    // checkNotNull(version);
+    // checkNotNull(version.getFile());
+    // ContentDispositionBuilder<?, ?> contentDisposition =
+    // ContentDisposition.type("attachment");
+    //
+    // contentDisposition.fileName(version.getFile().getName());
+    // if (version.getFile().getDate() != null) {
+    // contentDisposition.creationDate(version.getFile().getDate());
+    // }
+    // ResponseBuilder rb = Response.ok();
+    // rb.type(version.getFile().getContentType());
+    // InputStream stream = new
+    // ByteArrayInputStream(version.getFile().getContent());
+    // rb.entity(stream);
+    // rb.status(Status.OK);
+    // rb.header("Content-Disposition", contentDisposition.build());
+    // return rb.build();
+    // } catch (Throwable t) {
+    // log.error("download failed", t);
+    // return Response.status(Status.NOT_FOUND).build();
+    // }
+    // }
+    //
+    // @GET
+    // @Produces({ MediaType.APPLICATION_JSON })
+    // @Path("{id}/" + VERSIONS_PATH)
+    // public Response getVersions(@PathParam("id") String id) {
+    // if (log.isTraceEnabled()) {
+    // log.trace(String.format("versions - %s", id));
+    // }
+    // try {
+    // Document document = service.get(id);
+    // if (document == null) {
+    // return Response.status(Status.NOT_FOUND).build();
+    // }
+    // return Response.ok(document.getVersions()).build();
+    // } catch (ServiceException e) {
+    // throw new RestServiceException(e.getLocalizedMessage());
+    // }
+    // }
+    //
+    // @POST
+    // @Path("{id}/" + VERSIONS_PATH + "/{vid}/" + MARKDELETE_PATH)
+    // @Consumes(MediaType.APPLICATION_JSON)
+    // @Produces({ MediaType.APPLICATION_JSON })
+    // public Response queueDelete(@PathParam("id") String id, @PathParam("vid")
+    // String vid) {
+    // try {
+    // Document document = service.get(id);
+    // checkNotNull(document);
+    //
+    // documentService.markDeleted(document);
+    //
+    // return Response.noContent().build();
+    // } catch (ServiceException t) {
+    // log.error(String.format("Document %s is not marked as available", id),
+    // t);
+    // return Response.status(Status.PRECONDITION_FAILED).build();
+    // } catch (Throwable t) {
+    // log.error(String.format("Check if document %s exists", id), t);
+    // return Response.status(Status.NOT_FOUND).build();
+    // }
+    // }
+    //
+    // @DELETE
+    // @Path("{id}/" + VERSIONS_PATH + "/{vid}/")
+    // @Consumes(MediaType.APPLICATION_JSON)
+    // @Produces({ MediaType.APPLICATION_JSON })
+    // public Response delete(@PathParam("id") String id, @PathParam("vid")
+    // String vid) {
+    // try {
+    // Document document = service.get(id);
+    // checkNotNull(document);
+    //
+    // if (!document.hasStatus(Document.DocumentStatus.DELETED))
+    // throw new
+    // PreconditionException(String.format("Document %s is not marked as deleted",
+    // id));
+    //
+    // Version version = document.getVersion(Integer.parseInt(vid));
+    // checkNotNull(version);
+    //
+    // documentService.deleteVersion(document, version);
+    //
+    // return Response.noContent().build();
+    // } catch (ServiceException t) {
+    // log.error(String.format("Error processing deletion of version %s for document %s",
+    // vid, id), t);
+    // return Response.status(Status.PRECONDITION_FAILED).build();
+    // } catch (Throwable t) {
+    // log.error(String.format("Check if document %s exists", id), t);
+    // return Response.status(Status.NOT_FOUND).build();
+    // }
+    // }
 
     @GET
     @Path("{id}/" + TAGS_PATH)
