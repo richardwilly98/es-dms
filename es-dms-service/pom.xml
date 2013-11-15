@@ -13,6 +13,9 @@
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<akka.version>2.0.2</akka.version>
+		<opennlp.version>1.5.3</opennlp.version>
+		<opennlp.maxent.version>3.0.3</opennlp.maxent.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -58,6 +61,22 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/elasticsearch-opennlp-auto-tagging-plugin-0.0.1-SNAPSHOT.jar</systemPath>
 		</dependency>
+		<dependency>
+			<groupId>com.typesafe.akka</groupId>
+			<artifactId>akka-actor</artifactId>
+			<version>${akka.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.opennlp</groupId>
+			<artifactId>opennlp-tools</artifactId>
+			<version>${opennlp.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.opennlp</groupId>
+			<artifactId>opennlp-maxent</artifactId>
+			<version>${opennlp.maxent.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -97,4 +116,11 @@
 			</testResource>
 		</testResources>
 	</build>
+	<repositories>
+		<repository>
+			<id>typesafe</id>
+			<name>Typesafe Repository</name>
+			<url>http://repo.typesafe.com/typesafe/releases/</url>
+		</repository>
+	</repositories>
 </project>
