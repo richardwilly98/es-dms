@@ -54,3 +54,12 @@ body {
   background: #F8F8F8;
   border: 5px dashed #DDD;
 }
+
+.ngTagsInput .autocomplete {
+    z-index: 100;
+}
+
+.ngTagsInput .autocomplete li.suggestion {
+    line-height: 21px;
+    font-size: 13px;
+}
