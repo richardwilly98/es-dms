@@ -26,7 +26,6 @@ package org.elasticsearch.action.autotagging;
  * #L%
  */
 
-
 import java.io.IOException;
 
 import org.elasticsearch.action.support.single.custom.SingleCustomOperationRequest;

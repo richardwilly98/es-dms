@@ -26,7 +26,6 @@ package org.elasticsearch.action.autotagging;
  * #L%
  */
 
-
 import org.elasticsearch.action.Action;
 import org.elasticsearch.client.Client;
 

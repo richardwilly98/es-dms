@@ -26,7 +26,6 @@ package org.elasticsearch.action.autotagging;
  * #L%
  */
 
-
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.support.single.custom.SingleCustomOperationRequestBuilder;
 import org.elasticsearch.client.Client;

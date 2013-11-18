@@ -213,6 +213,11 @@
 	</build>
 	<repositories>
 		<repository>
+			<id>typesafe</id>
+			<name>Typesafe Repository</name>
+			<url>http://repo.typesafe.com/typesafe/releases/</url>
+		</repository>
+		<repository>
 			<id>central</id>
 			<url>http://central.maven.org/maven2/</url>
 		</repository>
