@@ -31,6 +31,9 @@
 		<shiro.version>1.2.2</shiro.version>
 		<!-- Maven plugins versions -->
 		<maven.surefire.version>2.12.3</maven.surefire.version>
+		<akka.version>2.0.2</akka.version>
+		<opennlp.version>1.5.3</opennlp.version>
+		<opennlp.maxent.version>3.0.3</opennlp.maxent.version>
 	</properties>
 
 	<profiles>
@@ -112,6 +115,24 @@
 			<groupId>com.mycila</groupId>
 			<artifactId>mycila-guice</artifactId>
 			<version>${mycila.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.typesafe.akka</groupId>
+			<artifactId>akka-actor</artifactId>
+			<version>${akka.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.opennlp</groupId>
+			<artifactId>opennlp-tools</artifactId>
+			<version>${opennlp.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.opennlp</groupId>
+			<artifactId>opennlp-maxent</artifactId>
+			<version>${opennlp.maxent.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<modules>
