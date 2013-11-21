@@ -197,4 +197,12 @@ public class UserProvider extends ProviderItemBase<User> implements UserService 
             return true;
         }
     }
+
+    @Override
+    protected void doStart() throws ServiceException {
+    }
+
+    @Override
+    protected void doStop() throws ServiceException {
+    }
 }

@@ -678,4 +678,12 @@ public class DocumentProvider extends ProviderItemBase<Document> implements Docu
         updateVersions(sd);
         update(sd);
     }
+
+    @Override
+    protected void doStart() throws ServiceException {
+    }
+
+    @Override
+    protected void doStop() throws ServiceException {
+    }
 }

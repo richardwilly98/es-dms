@@ -142,4 +142,11 @@ public class VersionProvider extends ProviderItemBase<Version> implements Versio
     // }
     // }
 
+    @Override
+    protected void doStart() throws ServiceException {
+    }
+
+    @Override
+    protected void doStop() throws ServiceException {
+    }
 }

@@ -34,11 +34,21 @@ import org.apache.shiro.guice.aop.ShiroAopModule;
 
 import com.github.richardwilly98.esdms.inject.EsJerseyServletModule;
 import com.github.richardwilly98.esdms.shiro.EsShiroWebModule;
+import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
-import com.mycila.inject.jsr250.Jsr250;
+import com.mycila.guice.ext.closeable.CloseableInjector;
+import com.mycila.guice.ext.closeable.CloseableModule;
+import com.mycila.guice.ext.jsr250.Jsr250Module;
 
 public class RestGuiceServletConfig extends GuiceServletContextListener {
+
+    @Override
+    public void contextDestroyed(ServletContextEvent servletContextEvent) {
+        log.debug("*** contextDestroyed ***");
+        injector.getInstance(CloseableInjector.class).close();
+        super.contextDestroyed(servletContextEvent);
+    }
 
     private static final Logger log = Logger.getLogger(RestGuiceServletConfig.class);
 
@@ -50,7 +60,7 @@ public class RestGuiceServletConfig extends GuiceServletContextListener {
     protected Injector getInjector() {
         log.debug("*** getInjector ***");
         String securityFilterPath = "/api/*";
-        injector = Jsr250.createInjector(new EsShiroWebModule(servletContext, securityFilterPath), new ShiroAopModule(),
+        injector = Guice.createInjector(new CloseableModule(), new Jsr250Module(), new EsShiroWebModule(servletContext, securityFilterPath), new ShiroAopModule(),
                 new EsJerseyServletModule(securityFilterPath));
 
         return injector;

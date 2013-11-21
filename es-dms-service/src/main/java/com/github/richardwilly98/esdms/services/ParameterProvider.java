@@ -112,4 +112,12 @@ public class ParameterProvider extends ProviderItemBase<Parameter> implements Pa
             throw new ServiceException(ex.getLocalizedMessage());
         }
     }
+
+    @Override
+    protected void doStart() throws ServiceException {
+    }
+
+    @Override
+    protected void doStop() throws ServiceException {
+    }
 }

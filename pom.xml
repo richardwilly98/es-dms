@@ -26,7 +26,7 @@
 		<elasticsearch.version>1.0.0.Beta1</elasticsearch.version>
 		<guava.version>13.0.1</guava.version>
 		<slf4j.version>1.7.5</slf4j.version>
-		<mycila.version>2.9.ga</mycila.version>
+		<mycila.version>3.2.ga</mycila.version>
 		<jackson.version>2.2.2</jackson.version>
 		<shiro.version>1.2.2</shiro.version>
 		<!-- Maven plugins versions -->
@@ -112,27 +112,31 @@
 			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
+    		<groupId>com.mycila.guice</groupId>
+    		<artifactId>mycila-guice-all</artifactId>
+			<version>${mycila.version}</version>
+		</dependency>
+<!-- 
+		<dependency>
 			<groupId>com.mycila</groupId>
 			<artifactId>mycila-guice</artifactId>
 			<version>${mycila.version}</version>
 		</dependency>
+		 -->
 		<dependency>
 			<groupId>com.typesafe.akka</groupId>
 			<artifactId>akka-actor</artifactId>
 			<version>${akka.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.opennlp</groupId>
 			<artifactId>opennlp-tools</artifactId>
 			<version>${opennlp.version}</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.opennlp</groupId>
 			<artifactId>opennlp-maxent</artifactId>
 			<version>${opennlp.maxent.version}</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<modules>

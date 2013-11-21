@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -222,6 +223,23 @@ abstract class ProviderItemBase<T extends ItemBase> extends ServiceBase implemen
     protected String generateUniqueId(T item) {
         return UUID.randomUUID().toString();
     }
+
+    @PostConstruct
+    private void start() throws ServiceException {
+        log.info("start " + this.getClass().getName());
+        doStart();
+    }
+    
+    protected abstract void doStart() throws ServiceException;
+    
+    @PreDestroy
+    private void stop() throws ServiceException {
+        log.info("stop " + this.getClass().getName());
+        client.close();
+        doStop();
+    }
+    
+    protected abstract void doStop() throws ServiceException;
 
     @PostConstruct
     private void createIndex() throws ServiceException {

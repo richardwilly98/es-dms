@@ -31,6 +31,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -372,4 +374,13 @@ public class AuthenticationProvider implements AuthenticationService {
 
     }
 
+    @PostConstruct
+    public void start() throws ServiceException {
+        log.info("start " + this.getClass().getName());
+    }
+
+    @PreDestroy
+    public void stop() throws ServiceException {
+        log.info("stop " + this.getClass().getName());
+    }
 }

@@ -95,4 +95,12 @@ public class RoleProvider extends ProviderItemBase<Role> implements RoleService 
         SearchResult<Role> searchResult = search(query, first, pageSize);
         return searchResult;
     }
+
+    @Override
+    protected void doStart() throws ServiceException {
+    }
+
+    @Override
+    protected void doStop() throws ServiceException {
+    }
 }

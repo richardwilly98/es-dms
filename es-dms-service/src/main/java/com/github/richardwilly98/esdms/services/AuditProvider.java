@@ -121,4 +121,11 @@ public class AuditProvider extends ProviderItemBase<AuditEntry> implements Audit
 	return events;
     }
 
+    @Override
+    protected void doStart() throws ServiceException {
+    }
+
+    @Override
+    protected void doStop() throws ServiceException {
+    }
 }

@@ -33,9 +33,11 @@ import org.apache.log4j.Logger;
 
 import com.github.richardwilly98.esdms.rest.TestEsJerseyServletModule;
 import com.github.richardwilly98.esdms.shiro.TestEsShiroWebModule;
+import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.servlet.GuiceServletContextListener;
-import com.mycila.inject.jsr250.Jsr250;
+import com.mycila.guice.ext.closeable.CloseableModule;
+import com.mycila.guice.ext.jsr250.Jsr250Module;
 
 public class TestRestGuiceServletConfig extends GuiceServletContextListener {
 
@@ -48,7 +50,7 @@ public class TestRestGuiceServletConfig extends GuiceServletContextListener {
     @Override
     protected Injector getInjector() {
         String securityFilterPath = "/api/*";
-        injector = Jsr250.createInjector(new TestEsJerseyServletModule(securityFilterPath), new TestEsShiroWebModule(servletContext,
+        injector = Guice.createInjector(new CloseableModule(), new Jsr250Module(), new TestEsJerseyServletModule(securityFilterPath), new TestEsShiroWebModule(servletContext,
                 securityFilterPath));
         return injector;
     }

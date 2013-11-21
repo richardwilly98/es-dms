@@ -63,4 +63,12 @@ public class PermissionProvider extends ProviderItemBase<Permission> implements 
 	return null;
     }
 
+    @Override
+    protected void doStart() throws ServiceException {
+    }
+
+    @Override
+    protected void doStop() throws ServiceException {
+    }
+
 }

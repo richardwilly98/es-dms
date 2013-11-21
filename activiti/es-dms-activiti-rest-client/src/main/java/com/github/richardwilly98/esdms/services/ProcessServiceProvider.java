@@ -8,6 +8,8 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
@@ -43,6 +45,7 @@ public class ProcessServiceProvider implements ProcessService {
 
     private final static Logger log = Logger.getLogger(ProcessServiceProvider.class);
 
+    private boolean enabled;
     private final ParameterService parameterService;
     private RestProcessDefinitionServiceClient processDefinitionService;
     private RestProcessInstanceServiceClient processInstanceService;
@@ -51,7 +54,6 @@ public class ProcessServiceProvider implements ProcessService {
     @Inject
     ProcessServiceProvider(final ParameterService parameterService) {
         this.parameterService = parameterService;
-        initializeServices();
     }
 
     private void initializeServices() {
@@ -81,6 +83,24 @@ public class ProcessServiceProvider implements ProcessService {
         taskService = new RestTaskServiceClient(uri);
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+    
+    @PostConstruct
+    private void doStart() {
+        initializeServices();
+        enabled = processDefinitionService.isEnabled();
+        if (!enabled) {
+            log.info("Process service is disabled.");
+        }
+    }
+    
+    @PreDestroy
+    private void doStop() {
+        
+    }
+    
     protected String getCurrentToken() {
         try {
             log.trace("*** getCurrentToken ***");

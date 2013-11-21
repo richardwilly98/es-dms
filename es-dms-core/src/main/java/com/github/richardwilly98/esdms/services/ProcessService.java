@@ -37,6 +37,8 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 
 public interface ProcessService {
 
+    public abstract boolean isEnabled();
+    
     public abstract ProcessInstance startProcessInstance(ProcessDefinition processDefinition) throws ServiceException;
     
     public abstract Set<ProcessDefinition> getProcessDefinitions() throws ServiceException;
