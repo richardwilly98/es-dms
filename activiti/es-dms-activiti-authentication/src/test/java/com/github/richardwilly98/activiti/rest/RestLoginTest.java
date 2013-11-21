@@ -2,8 +2,8 @@ package com.github.richardwilly98.activiti.rest;
 
 import java.io.IOException;
 
-import org.activiti.rest.api.RestUrls;
-import org.activiti.rest.api.identity.UserResponse;
+import org.activiti.rest.service.api.RestUrls;
+import org.activiti.rest.service.api.identity.UserResponse;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;

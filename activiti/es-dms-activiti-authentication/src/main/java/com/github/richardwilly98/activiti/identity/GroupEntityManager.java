@@ -91,7 +91,8 @@ public class GroupEntityManager extends AbstractManager implements GroupIdentity
 
     public GroupQuery createNewGroupQuery() {
         log.debug("createNewGroupQuery");
-        return new GroupQueryImpl(Context.getProcessEngineConfiguration().getCommandExecutorTxRequired());
+//        return new GroupQueryImpl(Context.getProcessEngineConfiguration().getCommandExecutorTxRequired());
+        return new GroupQueryImpl(Context.getProcessEngineConfiguration().getCommandExecutor());
     }
 
     public List<Group> findGroupByQueryCriteria(GroupQueryImpl query, Page page) {

@@ -1,6 +1,6 @@
 package com.github.richardwilly98.activiti.rest;
 
-import org.activiti.rest.application.ActivitiRestServicesApplication;
+import org.activiti.rest.service.application.ActivitiRestServicesApplication;
 
 public class EsDmsActivitiRestServicesApplication extends ActivitiRestServicesApplication {
 

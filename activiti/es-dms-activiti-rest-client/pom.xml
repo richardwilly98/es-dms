@@ -14,7 +14,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jersey.version>2.2</jersey.version>
 		<jackson.version>2.2.2</jackson.version>
-		<activiti.version>5.13</activiti.version>
+		<activiti.version>5.14</activiti.version>
 		<jetty.version>8.1.0.RC4</jetty.version>
 		<shiro.version>1.2.1</shiro.version>
 

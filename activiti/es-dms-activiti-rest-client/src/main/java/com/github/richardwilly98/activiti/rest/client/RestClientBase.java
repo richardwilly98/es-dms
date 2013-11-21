@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.net.URI;
 
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -15,6 +16,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.filter.HttpBasicAuthFilter;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
@@ -39,6 +41,8 @@ public abstract class RestClientBase<T extends RestItemBase> {
         this.clazz = clazz;
         ClientConfig configuration = new ClientConfig();
         configuration.register(MultiPartFeature.class);
+        configuration.property(ClientProperties.CONNECT_TIMEOUT, 1000);
+        configuration.property(ClientProperties.READ_TIMEOUT,    1000);
         restClient = ClientBuilder.newClient(configuration);
     }
 
@@ -58,13 +62,16 @@ public abstract class RestClientBase<T extends RestItemBase> {
      */
     protected WebTarget target(String path) {
         WebTarget target = restClient.target(getBaseURI());
-        // if (!Strings.isNullOrEmpty(path)) {
-        // target.path(path);
-        // }
-        // if (!Strings.isNullOrEmpty(token)) {
-        // target.request().cookie(new Cookie("ES_DMS_TICKET", token));
-        // }
         return target;
+    }
+
+    public boolean isEnabled() {
+        try {
+            return target().request().head().getStatus() == Status.OK.getStatusCode();
+        } catch (ProcessingException ex) {
+            log.info(String.format("Process service is not enabled. Exception: %s", ex.getMessage()));
+        }
+        return false;
     }
 
     public T create(T item) throws ServiceException {

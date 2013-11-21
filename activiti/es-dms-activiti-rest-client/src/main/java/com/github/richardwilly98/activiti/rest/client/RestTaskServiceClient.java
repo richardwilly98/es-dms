@@ -11,8 +11,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.activiti.rest.api.RestUrls;
-import org.activiti.rest.api.runtime.task.TaskRequest;
+import org.activiti.rest.service.api.RestUrls;
+import org.activiti.rest.service.api.runtime.task.TaskRequest;
 
 import com.github.richardwilly98.activiti.rest.api.RestComment;
 import com.github.richardwilly98.activiti.rest.api.RestExternalResource;

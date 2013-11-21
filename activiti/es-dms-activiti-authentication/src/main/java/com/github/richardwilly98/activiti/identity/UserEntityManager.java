@@ -172,7 +172,8 @@ public class UserEntityManager extends AbstractManager implements UserIdentityMa
 
     public UserQuery createNewUserQuery() {
         log.trace("createNewUserQuery");
-        return new UserQueryImpl(Context.getProcessEngineConfiguration().getCommandExecutorTxRequired());
+//        return new UserQueryImpl(Context.getProcessEngineConfiguration().getCommandExecutorTxRequired());
+        return new UserQueryImpl(Context.getProcessEngineConfiguration().getCommandExecutor());
     }
 
     public IdentityInfoEntity findUserInfoByUserIdAndKey(String userId, String key) {

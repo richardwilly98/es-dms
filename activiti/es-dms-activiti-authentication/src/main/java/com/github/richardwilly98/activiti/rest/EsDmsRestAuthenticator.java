@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.activiti.engine.impl.persistence.entity.UserEntity;
-import org.activiti.rest.filter.RestAuthenticator;
+import org.activiti.rest.common.filter.RestAuthenticator;
 import org.apache.log4j.Logger;
 import org.restlet.Request;
 import org.restlet.data.Cookie;
