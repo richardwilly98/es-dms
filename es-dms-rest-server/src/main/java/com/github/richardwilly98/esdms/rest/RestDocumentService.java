@@ -296,7 +296,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
     @Produces({ MediaType.APPLICATION_JSON })
     @Audit(AuditEntry.Event.UPLOAD)
     public Response upload(@FormDataParam("name") String name, @FormDataParam("file") InputStream uploadedInputStream,
-            @FormDataParam("file") FormDataBodyPart body, @FormDataParam("tagging") boolean autoTagging) {
+            @FormDataParam("file") FormDataBodyPart body, @FormDataParam("tagging") int autoTagging) {
         checkNotNull(body);
         checkNotNull(body.getContentDisposition());
         String filename = body.getContentDisposition().getFileName();
@@ -307,7 +307,7 @@ public class RestDocumentService extends RestItemBaseService<Document> {
         long size = body.getContentDisposition().getSize();
         String contentType = body.getMediaType().toString();
         if (log.isTraceEnabled()) {
-            log.trace(String.format("upload - %s - %s - %s - %s", name, filename, size, contentType));
+            log.trace(String.format("upload - %s - %s - %s - %s - %s", name, filename, size, contentType, autoTagging));
         }
         try {
             isAuthenticated();
@@ -327,8 +327,8 @@ public class RestDocumentService extends RestItemBaseService<Document> {
             Response response = includeItemIdInHeaders(Response.created(getItemUri(document)), document).build();
             Version version = new VersionImpl.Builder().documentId(document.getId()).current(true).file(file).versionId(1).build();
             documentService.addVersion(document, version);
-            if (autoTagging) {
-                documentService.detectTags(document, 10);
+            if (autoTagging > 0) {
+                documentService.detectTags(document, autoTagging);
             }
             return response;
         } catch (Throwable t) {

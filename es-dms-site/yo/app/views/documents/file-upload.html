@@ -3,21 +3,32 @@
 		<div class="modal-header">
 			<button type="button" class="close" data-ng-click="close()"
 				aria-hidden="true">&times;</button>
-			<h2>File Upload</h2>
+			<h2>New File Upload</h2>
 		</div>
 		<div class="modal-body">
 			<div class="control-group">
+				<label class="checkbox"> 
+				<input type="checkbox" data-ng-model="settings.tagging.enabled" /> Auto-Tagging
+				</label>
+			</div>
+			<div class="control-group">
 				<label class="control-label">File:</label>
-				<span class="btn btn-success fileinput-button">
-					<i class="icon-plus icon-white"></i>
-					<input type="file" name="file" data-url="api/documents/_upload" multiple esdms-upload>
-					<span>Add files...</span>
-				</span>
+				<div class="controls">
+					<span class="btn btn-success fileinput-button">
+						<i class="icon-plus icon-white"></i>
+						<input type="file" ng-file-select="onFileSelect($files)" multiple>
+						<span>Add files...</span>
+					</span>
+				</div>
+			</div>
+			<div class="control-group" ng-show="dropSupported">
+			  <div class="drop-box" ng-file-drop="onFileSelect($files);" ng-show="dropSupported">drop files here</div>
+			  <div ng-file-drop-available="dropSupported=true" ng-show="!dropSupported">HTML5 Drop File is not supported!</div>
 			</div>
 			<div>
 				<span ng-show="uploadMessage">{{ uploadMessage }}</span>
 				<ul>
-					<li ng-repeat="file in files">{{file}}</li>
+					<li ng-repeat="file in files">{{ file.name }}</li>
 				</ul>
 			</div>
 			<div ng-show="percentage">
