@@ -6,7 +6,7 @@ esDmsSiteApp.service('wordcloud', function (d3) {
     var WordCloud = function (w, h, maxEntries, addSearch, elem) {
 
         var me = {},
-            fill = d3.scale.category20b(),
+            fill = d3.scale.category10(),
             words = [],
             max,
             scale = 1,
@@ -40,6 +40,22 @@ esDmsSiteApp.service('wordcloud', function (d3) {
                     var tag;
                     tag = d.text.replace('#', '');
                     addSearch(tag);
+                })
+                .on("mouseover", function (d) {
+                    console.log('mouseover - d: ' + JSON.stringify(d));
+                    d3.select(this)
+                        .style("cursor", "pointer")
+                        .transition()
+                        .duration(transitionDuration)
+                        .style("font-size", function(d) { return (d.size * 1.5) + "px"; });
+                })
+                .on("mouseout", function (d) {
+                    console.log('mouseout: ' + JSON.stringify(d));
+                    d3.select(this)
+                        .style("cursor", "normal")
+                        .transition()
+                        .duration(transitionDuration)
+                        .style("font-size", function(d) { return d.size + "px"; });
                 })
                 .style("opacity", 1e-6)
                 .transition()
@@ -99,36 +115,36 @@ esDmsSiteApp.service('wordcloud', function (d3) {
     return { WordCloud: WordCloud };
 });
 
-esDmsSiteApp.directive('cloud', function ($log, wordcloud) {
-        return {
-            restrict: 'C',
-            scope: { words: "=words", live: "=live", interval: "=interval", callback: "=callback" },
-            link: function ($scope, elem, attrs) {
-                function init() {
-                  $log.log('cloud - init');
-                    elem.empty();
-                    $scope.wordCloud = wordcloud.WordCloud(elem.width(), elem.width() * 0.75, 250, $scope.callback, elem);
-                }
-                init();
+// esDmsSiteApp.directive('cloud', function ($log, wordcloud) {
+//         return {
+//             restrict: 'C',
+//             scope: { words: "=words", live: "=live", interval: "=interval", callback: "=callback" },
+//             link: function ($scope, elem, attrs) {
+//                 function init() {
+//                   $log.log('cloud - init');
+//                     elem.empty();
+//                     $scope.wordCloud = wordcloud.WordCloud(elem.width(), elem.width() * 0.75, 250, $scope.callback, elem);
+//                 }
+//                 init();
 
-                var lastCloudUpdate = new Date().getTime() - $scope.interval;
-                $scope.$watch("words", function() {
-                  if ((new Date().getTime() - lastCloudUpdate) > $scope.interval &&  $scope.live) {
-                    $scope.wordCloud.redraw($scope.words);
-                  }
-                });
+//                 var lastCloudUpdate = new Date().getTime() - $scope.interval;
+//                 $scope.$watch("words", function() {
+//                   if ((new Date().getTime() - lastCloudUpdate) > $scope.interval &&  $scope.live) {
+//                     $scope.wordCloud.redraw($scope.words);
+//                   }
+//                 });
 
-                /** re-initialize wordCloud on window resize */
-                $(window).resize(function () {
-                  $log.log('resize');
-                  _.throttle(function() {
-                    init(); 
-                    $scope.wordCloud.redraw($scope.words);
-                  }, 1000)(); 
-                });
-            }
-        }
-    })
+//                 /** re-initialize wordCloud on window resize */
+//                 $(window).resize(function () {
+//                   $log.log('resize');
+//                   _.throttle(function() {
+//                     init(); 
+//                     $scope.wordCloud.redraw($scope.words);
+//                   }, 1000)(); 
+//                 });
+//             }
+//         }
+//     })
 
 esDmsSiteApp.controller('WorldCloudCtrl', function ($log, $scope, searchService) {
   $scope.selectedWord = '';
@@ -146,7 +162,7 @@ esDmsSiteApp.controller('WorldCloudCtrl', function ($log, $scope, searchService)
         $log.log('Add word ' + term.term + ' - count: ' + term.count);
         words.push({'key': term.term, 'value': term.count});
       });
-      $scope.cloud.words = words.sort(function(a, b) { return b.value - a.value; });
+      $scope.cloud.words = words;
     });
   };
 

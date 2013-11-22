@@ -42,7 +42,7 @@ esDmsSiteApp.config(function ($stateProvider, $locationProvider, $urlRouterProvi
     })
     .state('home.tags', {
       url: '/tags',
-      templateUrl: 'views/test/tags.html'
+      templateUrl: 'views/search/tags.html'
     })
     /*.state('documents', {
       url: '/documents'
