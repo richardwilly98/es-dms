@@ -40,7 +40,9 @@ public class ProcessServiceProvider implements ProcessService {
     private static final String ACTIVITI_APPLICATION_NAME = "Activiti Settings";
     private static final String ACTIVITI_APPLICATION_ID = "activiti";
     private static final String REST_URL = "rest.url";
-    public static final String ACTIVITI_REST_URL = "http://localhost:8080/activiti-rest/service";
+    private static final String REST_TIMEOUT = "rest.timeout";
+    public static final String DEFAULT_REST_URL = "http://localhost:8080/activiti-rest/service";
+    public static final int DEFAULT_REST_TIMEOUT = 2000;
     public static final String ES_DMS_CATEGORY = "es-dms";
 
     private final static Logger log = Logger.getLogger(ProcessServiceProvider.class);
@@ -58,12 +60,14 @@ public class ProcessServiceProvider implements ProcessService {
 
     private void initializeServices() {
         Parameter parameter = null;
-        String activitiUrl = ACTIVITI_REST_URL;
+        String activitiUrl = DEFAULT_REST_URL;
+        int activitiTimeout = DEFAULT_REST_TIMEOUT;
         try {
             parameter = parameterService.get(ACTIVITI_APPLICATION_ID);
             if (parameter == null) {
                 Map<String, Object> attributes = newHashMap();
-                attributes.put(REST_URL, ACTIVITI_REST_URL);
+                attributes.put(REST_URL, DEFAULT_REST_URL);
+                attributes.put(REST_TIMEOUT, DEFAULT_REST_TIMEOUT);
                 parameter = new ParameterImpl.Builder().id(ACTIVITI_APPLICATION_ID).name(ACTIVITI_APPLICATION_NAME)
                         .type(ParameterType.SYSTEM).attributes(attributes).build();
                 parameterService.create(parameter);
@@ -72,21 +76,27 @@ public class ProcessServiceProvider implements ProcessService {
                 if (attributes != null && attributes.containsKey(REST_URL)) {
                     activitiUrl = attributes.get(REST_URL).toString();
                 }
+                if (attributes != null && attributes.containsKey(REST_TIMEOUT)) {
+                    try {
+                        activitiTimeout = Integer.parseInt(attributes.get(REST_TIMEOUT).toString());
+                    } finally {
+                    }
+                }
             }
         } catch (ServiceException e) {
             log.info("Cannot get activiti parameter.", e);
         }
-        log.info(String.format("Using REST Activiti: %s", activitiUrl));
+        log.info(String.format("Activiti settings - url: %s - timeout: %s", activitiUrl, activitiTimeout));
         URI uri = URI.create(activitiUrl);
-        processDefinitionService = new RestProcessDefinitionServiceClient(uri);
-        processInstanceService = new RestProcessInstanceServiceClient(uri);
-        taskService = new RestTaskServiceClient(uri);
+        processDefinitionService = new RestProcessDefinitionServiceClient(uri, activitiTimeout);
+        processInstanceService = new RestProcessInstanceServiceClient(uri, activitiTimeout);
+        taskService = new RestTaskServiceClient(uri, activitiTimeout);
     }
 
     public boolean isEnabled() {
         return enabled;
     }
-    
+
     @PostConstruct
     private void doStart() {
         initializeServices();
@@ -95,12 +105,12 @@ public class ProcessServiceProvider implements ProcessService {
             log.info("Process service is disabled.");
         }
     }
-    
+
     @PreDestroy
     private void doStop() {
-        
+
     }
-    
+
     protected String getCurrentToken() {
         try {
             log.trace("*** getCurrentToken ***");

@@ -7,6 +7,7 @@ import com.github.richardwilly98.activiti.rest.EsDmsServerWithRestActivitiServer
 import com.github.richardwilly98.activiti.rest.api.RestProcessDefinition;
 import com.github.richardwilly98.activiti.rest.api.RestSearchResult;
 import com.github.richardwilly98.activiti.rest.client.RestProcessDefinitionServiceClient;
+import com.github.richardwilly98.esdms.services.ProcessServiceProvider;
 
 public class RestActivitiProcessDefinitionServiceTest extends EsDmsServerWithRestActivitiServerBase {
 
@@ -18,7 +19,7 @@ public class RestActivitiProcessDefinitionServiceTest extends EsDmsServerWithRes
     @org.activiti.engine.test.Deployment(resources={"com/github/richardwilly98/activiti/rest/service/repository/SimpleProcessDefinitionResource.bpmn20.xml"})
     public void testGetProcessDefinitions() {
         log.debug("*** testGetProcessDefinitions ***");
-        RestProcessDefinitionServiceClient client = new RestProcessDefinitionServiceClient(getBaseURI());
+        RestProcessDefinitionServiceClient client = new RestProcessDefinitionServiceClient(getBaseURI(), ProcessServiceProvider.DEFAULT_REST_TIMEOUT);
         client.setToken(adminToken);
         RestSearchResult<RestProcessDefinition> definitions = client.getProcessDefinitions();
         Assert.assertNotNull(definitions);
@@ -36,7 +37,7 @@ public class RestActivitiProcessDefinitionServiceTest extends EsDmsServerWithRes
     @org.activiti.engine.test.Deployment(resources={"com/github/richardwilly98/activiti/rest/service/repository/SimpleProcessDefinitionResource.bpmn20.xml"})
     public void testGetProcessDefinitionsByCategory() {
         log.debug("*** testGetProcessDefinitions ***");
-        RestProcessDefinitionServiceClient client = new RestProcessDefinitionServiceClient(getBaseURI());
+        RestProcessDefinitionServiceClient client = new RestProcessDefinitionServiceClient(getBaseURI(), ProcessServiceProvider.DEFAULT_REST_TIMEOUT);
         client.setToken(adminToken);
         RestSearchResult<RestProcessDefinition> definitions = client.getProcessDefinitionsByCategory("es-dms/test");
         Assert.assertNotNull(definitions);

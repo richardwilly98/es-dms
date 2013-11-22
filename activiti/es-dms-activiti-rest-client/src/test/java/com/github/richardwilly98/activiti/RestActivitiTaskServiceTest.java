@@ -12,6 +12,7 @@ import com.github.richardwilly98.activiti.rest.api.RestTask;
 import com.github.richardwilly98.activiti.rest.client.RestProcessInstanceServiceClient;
 import com.github.richardwilly98.activiti.rest.client.RestTaskServiceClient;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.services.ProcessServiceProvider;
 import com.github.richardwilly98.esdms.services.UserService;
 
 public class RestActivitiTaskServiceTest extends EsDmsServerWithRestActivitiServerBase {
@@ -25,7 +26,7 @@ public class RestActivitiTaskServiceTest extends EsDmsServerWithRestActivitiServ
     public void testGetTasks() throws ServiceException {
         log.debug("*** testGetTasks ***");
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        RestProcessInstanceServiceClient processInstanceClient = new RestProcessInstanceServiceClient(getBaseURI());
+        RestProcessInstanceServiceClient processInstanceClient = new RestProcessInstanceServiceClient(getBaseURI(), ProcessServiceProvider.DEFAULT_REST_TIMEOUT);
         processInstanceClient.setToken(adminToken);
         RestSearchResult<RestProcessInstance> instances = processInstanceClient.getProcessInstances();
         log.debug(instances);
@@ -36,7 +37,7 @@ public class RestActivitiTaskServiceTest extends EsDmsServerWithRestActivitiServ
         log.debug(instance.getId());
         instance = processInstanceClient.getProcessInstance(instance.getId());
         Assert.assertNotNull(instance);
-        RestTaskServiceClient taskClient = new RestTaskServiceClient(getBaseURI());
+        RestTaskServiceClient taskClient = new RestTaskServiceClient(getBaseURI(), ProcessServiceProvider.DEFAULT_REST_TIMEOUT);
         taskClient.setToken(adminToken);
         RestSearchResult<RestTask> tasks = taskClient.getTasks();
         log.debug(tasks);
@@ -49,7 +50,7 @@ public class RestActivitiTaskServiceTest extends EsDmsServerWithRestActivitiServ
     public void testAddCommentToTask() throws ServiceException {
         log.debug("*** testAddCommentToTask ***");
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        RestTaskServiceClient taskClient = new RestTaskServiceClient(getBaseURI());
+        RestTaskServiceClient taskClient = new RestTaskServiceClient(getBaseURI(), ProcessServiceProvider.DEFAULT_REST_TIMEOUT);
         taskClient.setToken(adminToken);
         RestSearchResult<RestTask> tasks = taskClient.getTasks();
         log.debug(tasks);
@@ -70,7 +71,7 @@ public class RestActivitiTaskServiceTest extends EsDmsServerWithRestActivitiServ
     public void testAddExternalResourceToTask() throws ServiceException {
         log.debug("*** testAddExternalResourceToTask ***");
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        RestTaskServiceClient taskClient = new RestTaskServiceClient(getBaseURI());
+        RestTaskServiceClient taskClient = new RestTaskServiceClient(getBaseURI(), ProcessServiceProvider.DEFAULT_REST_TIMEOUT);
         taskClient.setToken(adminToken);
         RestSearchResult<RestTask> tasks = taskClient.getTasks();
         log.debug(tasks);
@@ -94,7 +95,7 @@ public class RestActivitiTaskServiceTest extends EsDmsServerWithRestActivitiServ
     public void testGetTasksByProcessInstance() throws ServiceException {
         log.debug("*** testGetTasksByProcessInstance ***");
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        RestProcessInstanceServiceClient processInstanceClient = new RestProcessInstanceServiceClient(getBaseURI());
+        RestProcessInstanceServiceClient processInstanceClient = new RestProcessInstanceServiceClient(getBaseURI(), ProcessServiceProvider.DEFAULT_REST_TIMEOUT);
         processInstanceClient.setToken(adminToken);
         RestSearchResult<RestProcessInstance> instances = processInstanceClient.getProcessInstances();
         log.debug(instances);
@@ -105,7 +106,7 @@ public class RestActivitiTaskServiceTest extends EsDmsServerWithRestActivitiServ
         log.debug(instance.getId());
         instance = processInstanceClient.getProcessInstance(instance.getId());
         Assert.assertNotNull(instance);
-        RestTaskServiceClient taskClient = new RestTaskServiceClient(getBaseURI());
+        RestTaskServiceClient taskClient = new RestTaskServiceClient(getBaseURI(), ProcessServiceProvider.DEFAULT_REST_TIMEOUT);
         taskClient.setToken(adminToken);
         RestSearchResult<RestTask> tasks = taskClient.getTasksByProcessInstance(instance.getId());
         log.debug(tasks);
@@ -118,7 +119,7 @@ public class RestActivitiTaskServiceTest extends EsDmsServerWithRestActivitiServ
     public void testSetTaskAssignee() throws ServiceException {
         log.debug("*** testSetTaskAssignee ***");
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        RestProcessInstanceServiceClient processInstanceClient = new RestProcessInstanceServiceClient(getBaseURI());
+        RestProcessInstanceServiceClient processInstanceClient = new RestProcessInstanceServiceClient(getBaseURI(), ProcessServiceProvider.DEFAULT_REST_TIMEOUT);
         processInstanceClient.setToken(adminToken);
         RestSearchResult<RestProcessInstance> instances = processInstanceClient.getProcessInstances();
         log.debug(instances);
@@ -129,7 +130,7 @@ public class RestActivitiTaskServiceTest extends EsDmsServerWithRestActivitiServ
         log.debug(instance.getId());
         instance = processInstanceClient.getProcessInstance(instance.getId());
         Assert.assertNotNull(instance);
-        RestTaskServiceClient taskClient = new RestTaskServiceClient(getBaseURI());
+        RestTaskServiceClient taskClient = new RestTaskServiceClient(getBaseURI(), ProcessServiceProvider.DEFAULT_REST_TIMEOUT);
         taskClient.setToken(adminToken);
         RestSearchResult<RestTask> tasks = taskClient.getTasksByProcessInstance(instance.getId());
         log.debug(tasks);

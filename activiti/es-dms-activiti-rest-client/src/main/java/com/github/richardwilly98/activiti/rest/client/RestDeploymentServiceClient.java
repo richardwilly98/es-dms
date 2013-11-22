@@ -20,8 +20,8 @@ public class RestDeploymentServiceClient extends RestClientBase<RestDeployment> 
 
     private static String path = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT_COLLECTION);
     
-    public RestDeploymentServiceClient(URI url) {
-        super(url, path, RestDeployment.class);
+    public RestDeploymentServiceClient(final URI url, final int timeout) {
+        super(url, timeout, path, RestDeployment.class);
     }
 
     public RestSearchResult<RestDeployment> getDeployments() {

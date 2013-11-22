@@ -20,8 +20,8 @@ public class RestProcessInstanceServiceClient extends RestClientBase<RestProcess
 
     private static String path = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION);
     
-    public RestProcessInstanceServiceClient(URI url) {
-        super(url, path, RestProcessInstance.class);
+    public RestProcessInstanceServiceClient(final URI url, final int timeout) {
+        super(url, timeout, path, RestProcessInstance.class);
     }
 
     public RestSearchResult<RestProcessInstance> getProcessInstances() {

@@ -7,6 +7,7 @@ import com.github.richardwilly98.activiti.rest.EsDmsServerWithRestActivitiServer
 import com.github.richardwilly98.activiti.rest.api.RestDeployment;
 import com.github.richardwilly98.activiti.rest.api.RestSearchResult;
 import com.github.richardwilly98.activiti.rest.client.RestDeploymentServiceClient;
+import com.github.richardwilly98.esdms.services.ProcessServiceProvider;
 
 public class RestActivitiDeploymentServiceTest extends EsDmsServerWithRestActivitiServerBase {
 
@@ -18,7 +19,7 @@ public class RestActivitiDeploymentServiceTest extends EsDmsServerWithRestActivi
     @org.activiti.engine.test.Deployment(resources={"com/github/richardwilly98/activiti/rest/service/repository/oneTaskProcess.bpmn20.xml"})
     public void testGetDeployments() {
         log.debug("*** testGetDeployments ***");
-        RestDeploymentServiceClient client = new RestDeploymentServiceClient(getBaseURI());
+        RestDeploymentServiceClient client = new RestDeploymentServiceClient(getBaseURI(), ProcessServiceProvider.DEFAULT_REST_TIMEOUT);
         client.setToken(adminToken);
         RestSearchResult<RestDeployment> deployments = client.getDeployments();
         log.debug(deployments);
@@ -35,7 +36,7 @@ public class RestActivitiDeploymentServiceTest extends EsDmsServerWithRestActivi
     @org.activiti.engine.test.Deployment(resources={"com/github/richardwilly98/activiti/rest/service/repository/twoTaskProcess.bpmn20.xml"})
     public void testGetDeployments2() {
         log.debug("*** testGetDeployments ***");
-        RestDeploymentServiceClient client = new RestDeploymentServiceClient(getBaseURI());
+        RestDeploymentServiceClient client = new RestDeploymentServiceClient(getBaseURI(), ProcessServiceProvider.DEFAULT_REST_TIMEOUT);
         client.setToken(adminToken);
         RestSearchResult<RestDeployment> deployments = client.getDeployments();
         log.debug(deployments);

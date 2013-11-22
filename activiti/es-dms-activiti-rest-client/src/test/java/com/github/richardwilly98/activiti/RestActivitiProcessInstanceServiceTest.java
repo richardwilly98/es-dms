@@ -9,6 +9,7 @@ import com.github.richardwilly98.activiti.rest.api.RestProcessInstance;
 import com.github.richardwilly98.activiti.rest.api.RestSearchResult;
 import com.github.richardwilly98.activiti.rest.client.RestProcessDefinitionServiceClient;
 import com.github.richardwilly98.activiti.rest.client.RestProcessInstanceServiceClient;
+import com.github.richardwilly98.esdms.services.ProcessServiceProvider;
 
 public class RestActivitiProcessInstanceServiceTest extends EsDmsServerWithRestActivitiServerBase {
 
@@ -22,7 +23,7 @@ public class RestActivitiProcessInstanceServiceTest extends EsDmsServerWithRestA
         log.debug("*** testGetProcessInstances ***");
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        RestProcessInstanceServiceClient client = new RestProcessInstanceServiceClient(getBaseURI());
+        RestProcessInstanceServiceClient client = new RestProcessInstanceServiceClient(getBaseURI(), ProcessServiceProvider.DEFAULT_REST_TIMEOUT);
         client.setToken(adminToken);
         RestSearchResult<RestProcessInstance> instances = client.getProcessInstances();
         log.debug(instances);
@@ -39,14 +40,14 @@ public class RestActivitiProcessInstanceServiceTest extends EsDmsServerWithRestA
     @org.activiti.engine.test.Deployment(resources = { "com/github/richardwilly98/activiti/rest/service/runtime/ProcessInstanceIdentityLinkResourceTest.process.bpmn20.xml" })
     public void testStartProcessInstance() {
         log.debug("*** testStartProcessInstance ***");
-        RestProcessDefinitionServiceClient processDefinitionClient = new RestProcessDefinitionServiceClient(getBaseURI());
+        RestProcessDefinitionServiceClient processDefinitionClient = new RestProcessDefinitionServiceClient(getBaseURI(), ProcessServiceProvider.DEFAULT_REST_TIMEOUT);
         processDefinitionClient.setToken(adminToken);
         RestSearchResult<RestProcessDefinition> definitions = processDefinitionClient.getProcessDefinitions();
         Assert.assertNotNull(definitions);
         Assert.assertEquals(definitions.getSize(), 1);
         RestProcessDefinition definition = definitions.getData().get(0);
         Assert.assertNotNull(definition);
-        RestProcessInstanceServiceClient processInstanceClient = new RestProcessInstanceServiceClient(getBaseURI());
+        RestProcessInstanceServiceClient processInstanceClient = new RestProcessInstanceServiceClient(getBaseURI(), ProcessServiceProvider.DEFAULT_REST_TIMEOUT);
         processInstanceClient.setToken(adminToken);
         RestProcessInstance instance1 = processInstanceClient.startProcessInstance(definition.getId());
         Assert.assertNotNull(instance1);

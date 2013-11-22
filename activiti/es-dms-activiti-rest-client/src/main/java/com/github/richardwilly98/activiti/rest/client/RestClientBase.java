@@ -35,14 +35,14 @@ public abstract class RestClientBase<T extends RestItemBase> {
     private final Class<T> clazz;
     private String token;
 
-    public RestClientBase(final URI url, final String path, final Class<T> clazz) {
+    public RestClientBase(final URI url, final int timeout, final String path, final Class<T> clazz) {
         this.url = url;
         this.path = path;
         this.clazz = clazz;
         ClientConfig configuration = new ClientConfig();
         configuration.register(MultiPartFeature.class);
-        configuration.property(ClientProperties.CONNECT_TIMEOUT, 2000);
-        configuration.property(ClientProperties.READ_TIMEOUT,    2000);
+        configuration.property(ClientProperties.CONNECT_TIMEOUT, timeout);
+        configuration.property(ClientProperties.READ_TIMEOUT,    timeout);
         restClient = ClientBuilder.newClient(configuration);
     }
 

@@ -18,8 +18,8 @@ public class RestProcessDefinitionServiceClient extends RestClientBase<RestProce
 
     private static String path = RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_COLLECTION);
     
-    public RestProcessDefinitionServiceClient(URI url) {
-        super(url, path, RestProcessDefinition.class);
+    public RestProcessDefinitionServiceClient(final URI url, final int timeout) {
+        super(url, timeout, path, RestProcessDefinition.class);
     }
 
     public RestSearchResult<RestProcessDefinition> getProcessDefinitions() {

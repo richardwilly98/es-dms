@@ -38,8 +38,8 @@ public class RestTaskServiceClient extends RestClientBase<RestTask> {
 
     private static String path = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_COLLECTION);
 
-    public RestTaskServiceClient(URI url) {
-        super(url, path, RestTask.class);
+    public RestTaskServiceClient(final URI url, final int timeout) {
+        super(url, timeout, path, RestTask.class);
     }
 
     @Override
