@@ -40,6 +40,8 @@ public class RestProcessDefinitionServiceClient extends RestClientBase<RestProce
         if(response.getStatus() == Status.OK.getStatusCode()) {
             processDefinitionList = response.readEntity(new GenericType<RestSearchResult<RestProcessDefinition>>() {
             });
+        } else {
+            log.warn(String.format("getProcessDefinitionsByCategory failed: %s", response));
         }
         return processDefinitionList;
     }

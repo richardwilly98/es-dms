@@ -41,8 +41,8 @@ public abstract class RestClientBase<T extends RestItemBase> {
         this.clazz = clazz;
         ClientConfig configuration = new ClientConfig();
         configuration.register(MultiPartFeature.class);
-        configuration.property(ClientProperties.CONNECT_TIMEOUT, 1000);
-        configuration.property(ClientProperties.READ_TIMEOUT,    1000);
+        configuration.property(ClientProperties.CONNECT_TIMEOUT, 2000);
+        configuration.property(ClientProperties.READ_TIMEOUT,    2000);
         restClient = ClientBuilder.newClient(configuration);
     }
 
@@ -67,7 +67,8 @@ public abstract class RestClientBase<T extends RestItemBase> {
 
     public boolean isEnabled() {
         try {
-            return target().request().head().getStatus() == Status.OK.getStatusCode();
+            target().path(path).request().get().getStatus();
+            return true;
         } catch (ProcessingException ex) {
             log.info(String.format("Process service is not enabled. Exception: %s", ex.getMessage()));
         }
