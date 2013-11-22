@@ -29,9 +29,12 @@ package com.github.richardwilly98.esdms.services;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
+import static com.google.common.collect.Sets.newLinkedHashSet;
+import static com.google.common.collect.Sets.newTreeSet;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,6 +70,7 @@ import com.github.richardwilly98.esdms.search.api.FacetRequest;
 import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.search.api.Term;
 import com.github.richardwilly98.esdms.search.api.TermRequest;
+import com.google.common.collect.Lists;
 
 @Singleton
 public class SearchProvider extends ServiceBase implements SearchService<Document> {
@@ -97,7 +101,9 @@ public class SearchProvider extends ServiceBase implements SearchService<Documen
                 for (FacetRequest facet : facets) {
                     if (searchResponse.getFacets().facetsAsMap().containsKey(facet.getName())) {
                         TermsFacet tf = (TermsFacet) searchResponse.getFacets().facetsAsMap().get(facet.getName());
-                        Set<Term> terms = newHashSet();
+//                        Set<Term> terms = newHashSet();
+//                        Set<Term> terms = newTreeSet();
+                        List<Term> terms = Lists.newArrayList();
                         for (TermsFacet.Entry entry : tf) {
                             terms.add(new TermImpl.Builder().term(entry.getTerm().string()).count(entry.getCount()).build());
                         }
@@ -212,9 +218,14 @@ public class SearchProvider extends ServiceBase implements SearchService<Documen
 
             log.debug("Search request builder: " + searchRequestBuilder);
             SearchResponse searchResponse = searchRequestBuilder.execute().actionGet();
+            log.debug("Search response: " + searchResponse);
             List<FacetRequest> facets = newArrayList();
             facets.add(new FacetRequestImpl.Builder().name("Tags").build());
-            return parseSearchResult(searchResponse, 0, size, facets).getFacets().values().iterator().next();
+            Map<String, Facet> f = parseSearchResult(searchResponse, 0, size, facets).getFacets();
+            Facet facet = f.get("Tags");
+            log.debug("Facet: " + facet);
+//            Collections.sort(facet.getTerms()); 
+            return f.values().iterator().next();
         } catch (Throwable t) {
             log.error("suggestTags failed", t);
             throw new ServiceException(t.getLocalizedMessage());

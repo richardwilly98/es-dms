@@ -30,7 +30,7 @@ import com.github.richardwilly98.esdms.search.TermImpl;
  */
 
 @JsonDeserialize(as = TermImpl.class)
-public interface Term {
+public interface Term extends Comparable<Term> {
     public abstract String getTerm();
 
     public abstract int getCount();

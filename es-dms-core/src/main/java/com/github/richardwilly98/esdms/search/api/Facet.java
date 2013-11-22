@@ -26,7 +26,7 @@ package com.github.richardwilly98.esdms.search.api;
  * #L%
  */
 
-import java.util.Set;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.richardwilly98.esdms.search.FacetImpl;
@@ -38,7 +38,7 @@ public interface Facet {
     
     public abstract String getType();
 
-    public abstract Set<Term> getTerms();
+    public abstract List<Term> getTerms();
 
     public abstract long getMissingCount();
 

@@ -26,10 +26,12 @@ package com.github.richardwilly98.esdms.api;
  * #L%
  */
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -183,7 +185,7 @@ public class UserSerializationTest {
 	users.add(new UserImpl.Builder().password("test".toCharArray()).id("test").name("test").email("test@test").login("test").build());
 	long elapsedTime = 1;
 	String term = "term";
-	Set<Term> terms = newHashSet();
+	List<Term> terms = newArrayList();
 	terms.add(new TermImpl.Builder().term(term).count(1).build());
 	Facet facet = new FacetImpl.Builder().missingCount(0).otherCount(0).totalCount(0).terms(terms).build();
 	Map<String, Facet> facets = newHashMap(ImmutableMap.of("facet1", facet));
@@ -205,7 +207,7 @@ public class UserSerializationTest {
 	long missingCount = 1;
 	long otherCount = 0;
 	long totalCount = 10;
-	Set<Term> terms = newHashSet();
+	List<Term> terms = newArrayList();
 	terms.add(new TermImpl.Builder().term("term").count(1).build());
 	Facet item = new FacetImpl.Builder().missingCount(missingCount).otherCount(otherCount).totalCount(totalCount).terms(terms).build();
 	log.debug(item);

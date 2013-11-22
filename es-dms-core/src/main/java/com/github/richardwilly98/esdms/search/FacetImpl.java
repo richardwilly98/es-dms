@@ -26,9 +26,9 @@ package com.github.richardwilly98.esdms.search;
  * #L%
  */
 
-import static com.google.common.collect.Sets.newHashSet;
+import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.Set;
+import java.util.List;
 
 import com.github.richardwilly98.esdms.search.api.Facet;
 import com.github.richardwilly98.esdms.search.api.Term;
@@ -38,7 +38,7 @@ public class FacetImpl implements Facet {
 
     private String name;
     private String type;
-    private final Set<Term> terms = newHashSet();
+    private final List<Term> terms = newArrayList();
     private long missingCount;
     private long otherCount;
     private long totalCount;
@@ -47,7 +47,7 @@ public class FacetImpl implements Facet {
 
         private String name;
         private String type;
-	private final Set<Term> terms = newHashSet();
+	private final List<Term> terms = newArrayList();
 	private long missingCount;
 	private long otherCount;
 	private long totalCount;
@@ -62,7 +62,7 @@ public class FacetImpl implements Facet {
             return this;
         }
 
-        public Builder terms(Set<Term> terms) {
+        public Builder terms(List<Term> terms) {
 	    if (terms != null) {
 		this.terms.addAll(terms);
 	    }
@@ -115,7 +115,7 @@ public class FacetImpl implements Facet {
     }
 
     @Override
-    public Set<Term> getTerms() {
+    public List<Term> getTerms() {
 	return terms;
     }
 

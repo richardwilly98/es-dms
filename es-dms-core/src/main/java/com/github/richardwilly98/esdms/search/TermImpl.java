@@ -116,4 +116,16 @@ public class TermImpl implements Term {
         return Objects.toStringHelper(this).add("term", term).add("count", count).toString();
     }
 
+    @Override
+    public int compareTo(Term term) {
+        int i = this.count - term.getCount();
+        if (i < 0) {
+            return -1;
+        }
+        if (i > 0) {
+            return 1;
+        }
+        return 0;
+    }
+
 }
