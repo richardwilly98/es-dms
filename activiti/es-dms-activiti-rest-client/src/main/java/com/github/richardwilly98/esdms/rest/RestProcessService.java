@@ -29,6 +29,7 @@ import com.github.richardwilly98.esdms.bpm.api.ProcessDefinition;
 import com.github.richardwilly98.esdms.bpm.api.ProcessInstance;
 import com.github.richardwilly98.esdms.bpm.api.Task;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
 import com.github.richardwilly98.esdms.services.DocumentService;
 import com.github.richardwilly98.esdms.services.ProcessService;
 import com.google.common.base.Strings;
@@ -67,11 +68,14 @@ public class RestProcessService {
             log.trace(String.format("getProcessDefinitions"));
         }
         try {
+            if (!processService.isEnabled()) {
+                throw new ServiceException("Process service is unavailable.");
+            }
             Set<ProcessDefinition> processDefinitions = processService.getProcessDefinitions();
             return Response.ok().entity(processDefinitions).build();
         } catch (ServiceException e) {
             log.error("getProcessDefinitions failed", e);
-            throw new WebApplicationException(e.getLocalizedMessage());
+            throw new RestServiceException(e.getLocalizedMessage());
         }
     }
 
@@ -95,7 +99,7 @@ public class RestProcessService {
             return Response.created(uri).build();
         } catch (ServiceException e) {
             log.error("startProcessInstance failed", e);
-            throw new WebApplicationException(e.getLocalizedMessage());
+            throw new RestServiceException(e.getLocalizedMessage());
         }
     }
 
@@ -115,7 +119,7 @@ public class RestProcessService {
             return Response.ok().build();
         } catch (ServiceException e) {
             log.error("attach failed", e);
-            throw new WebApplicationException(e.getLocalizedMessage());
+            throw new RestServiceException(e.getLocalizedMessage());
         }
     }
 
@@ -132,7 +136,7 @@ public class RestProcessService {
             return Response.ok(processInstance).build();
         } catch (ServiceException e) {
             log.error("getProcessInstance failed", e);
-            throw new WebApplicationException(e.getLocalizedMessage());
+            throw new RestServiceException(e.getLocalizedMessage());
         }
     }
 
@@ -149,7 +153,7 @@ public class RestProcessService {
             return Response.ok(tasks).build();
         } catch (ServiceException e) {
             log.error("getTasksByProcessInstance failed", e);
-            throw new WebApplicationException(e.getLocalizedMessage());
+            throw new RestServiceException(e.getLocalizedMessage());
         }
     }
 
@@ -167,7 +171,7 @@ public class RestProcessService {
             return Response.ok(processService.getTask(taskId)).build();
         } catch (ServiceException e) {
             log.error("updateTask failed", e);
-            throw new WebApplicationException(e.getLocalizedMessage());
+            throw new RestServiceException(e.getLocalizedMessage());
         }
     }
 }
