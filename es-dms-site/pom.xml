@@ -19,6 +19,7 @@
 		<shiro.version>1.2.1</shiro.version>
 		<jetty.version>8.1.0.RC4</jetty.version>
 		<hk2.version>2.2.0-b15</hk2.version>
+		<tuckey.version>4.0.3</tuckey.version>
 	</properties>
 	<profiles>
 		<profile>
@@ -30,7 +31,7 @@
 					<plugin>
 						<groupId>com.github.trecloux</groupId>
 						<artifactId>yeoman-maven-plugin</artifactId>
-						<version>0.1</version>
+						<version>0.2-SNAPSHOT</version>
 						<executions>
 							<execution>
 								<goals>
@@ -182,7 +183,11 @@
 			<version>2.2.4</version>
 			<scope>provided</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.tuckey</groupId>
+			<artifactId>urlrewritefilter</artifactId>
+			<version>${tuckey.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>es-dms-site</finalName>
@@ -281,4 +286,10 @@
 			</testResource>
 		</testResources>
 	</build>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>oss.sonatype.snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
