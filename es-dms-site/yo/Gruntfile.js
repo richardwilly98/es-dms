@@ -135,7 +135,7 @@ module.exports = function (grunt) {
         }]
       },
       server: '.tmp',
-      distBowerComponents: ['<%= yeoman.dist %>/bower_components']
+      build: ['<%= yeoman.dist %>/bower_components', '<%= yeoman.tmp %>']
     },
     jshint: {
       options: {
@@ -262,6 +262,14 @@ module.exports = function (grunt) {
           src: [
             'generated/*'
           ]
+        }, {
+          expand: true,
+          flatten: true,
+          cwd: '<%= yeoman.app %>',
+          dest: '<%= yeoman.dist %>/font',
+          src: [
+            'bower_components/font-awesome/font/*'
+          ]
         }]
       }
     },
@@ -345,7 +353,7 @@ module.exports = function (grunt) {
     'rev',
     'usemin',
     // Delete unnecessary bower components
-    'clean:distBowerComponents'
+    'clean:build'
   ]);
 
   grunt.registerTask('default', [
