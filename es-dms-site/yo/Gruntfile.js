@@ -135,7 +135,7 @@ module.exports = function (grunt) {
         }]
       },
       server: '.tmp',
-      build: ['<%= yeoman.dist %>/bower_components', '<%= yeoman.tmp %>']
+      build: ['<%= yeoman.dist %>/bower_components']
     },
     jshint: {
       options: {
