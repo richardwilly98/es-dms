@@ -11,7 +11,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr data-ng-repeat="document in documents">
+			<tr data-ng-repeat="document in result.documents" data-ng-controller="DocumentCtrl">
 				<td>
 					<esdms-tagging id="document.id" tags="document.tags"></esdms-tagging>
 				</td>
@@ -56,6 +56,6 @@
 		</tbody>
 	</table>
 	<div data-ng-show="totalPages > 1">
-		<pagination total-items="totalHits" items-per-page="pageSize" page="currentPage" max-size="maxPages"></pagination>
+		<pagination total-items="result.totalHits" items-per-page="pageSize" page="currentPage" max-size="maxPages"></pagination>
 	</div>
 </div>

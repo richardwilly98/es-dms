@@ -17,7 +17,7 @@ esDmsSiteApp.config(function ($stateProvider, $locationProvider, $urlRouterProvi
     })
     .state('home.search', {
       url: '/search',
-      templateUrl: 'views/documents/search.html'
+      templateUrl: 'views/search/main.html'
     })
     .state('home.upload', {
       url: '/upload',

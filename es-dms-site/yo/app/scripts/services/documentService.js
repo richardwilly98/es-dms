@@ -42,7 +42,7 @@ esDmsSiteApp.service('documentService', ['$sce', '$log', '$rootScope', '$resourc
       checkout: function(id) {
         $log.log('checkout document: ' + id);
         var doc = new documentResource.get({'id': id});
-        doc.$checkout({'id': id});
+        return doc.$checkout({'id': id});
       },
       checkin: function(id) {
         $log.log('checkin document: ' + id);

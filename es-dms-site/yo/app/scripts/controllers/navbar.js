@@ -9,14 +9,14 @@ esDmsSiteApp.controller('NavbarCtrl', ['$log', '$scope', function ($log, $scope)
   });
 
   $scope.tabs = [
-    { 'view': '/home/search', title: 'Search' },
-    { 'view': '/home/upload', title: 'Upload' },
-    { 'view': '/home/tags', title: 'Tags' }
+    { 'view': 'home/search', title: 'Search' },
+    { 'view': 'home/upload', title: 'Upload' },
+    { 'view': 'home/tags', title: 'Tags' }
     // { 'view': '/index.test-accordion', title: 'Test' },
   ];
 
   $scope.adminTabs = [
-    { 'view': '/home/admin/users', title: 'Users' },
-    { 'view': '/home/admin/roles', title: 'Roles' }
+    { 'view': 'home/admin/users', title: 'Users' },
+    { 'view': 'home/admin/roles', title: 'Roles' }
   ];
 }]);

@@ -1,17 +1,35 @@
 'use strict';
 
-esDmsSiteApp.service('searchService', ['$http', function searchService($http) {
+esDmsSiteApp.service('searchService', ['$log', '$rootScope', '$http', function searchService($log, $rootScope, $http) {
   var currentCriteria = null;
 	return {
     criteria : function(criteria) {
       currentCriteria = criteria;
     },
-		facetedSearch: function(first, pageSize, criteria, facets, filters, callback) {
+		facetedSearch: function(first, pageSize, criteria, facets, filters) {
 			var payload = {facets: facets, filters: filters};
 			var config = {
         headers: {'Content-Type':'application/json; charset=UTF-8'}
 			};
-			$http.post('api/search/_facet_search/' + criteria + '?fi=' + first + '&ps=' + pageSize, payload, config).success(callback);
+      $http.post('api/search/_facet_search/' + criteria + '?fi=' + first + '&ps=' + pageSize, payload, config)
+        .success(function(data) {
+          var result = {
+            firstIndex: data.firstIndex,
+            pageSize: data.pageSize,
+            documents: data.items,
+            facetSettings: facets,
+            totalHits: data.totalHits
+          };
+
+          if (result.totalHits !== 0) {
+            result.elapsedTime = data.elapsedTime;
+            result.facets = data.facets;
+          }
+          $rootScope.$broadcast('search:result', result);
+        })
+        .error(function(data, status) {
+          $log.log('Facetedf search failed ' + status + ' - ' + data);
+        });
 		},
     moreLikeThis: function(first, pageSize, criteria, minTermFrequency, maxQueryTerms, callback) {
       if (criteria === null) {

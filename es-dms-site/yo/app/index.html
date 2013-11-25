@@ -5,9 +5,11 @@
 <!--[if gt IE 8]><!-->
 <html class="no-js">
 <!--<![endif]-->
-<html lang="en">
+<html ng-app="esDmsSiteApp" lang="en">
 <head>
-<base href="/"></base>
+<script>
+    document.write('<base href="' + document.location + '" />');
+</script>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <title></title>
@@ -20,14 +22,14 @@
 <link rel="stylesheet" href="styles/bootstrap-responsive.css">
 <link rel="stylesheet" href="styles/toaster.css">
 <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.css">
-<!-- <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.css"> -->
 <link rel="stylesheet" href="scripts/vendors/ng-tags-input/ng-tags-input.css">
 <link rel="stylesheet" href="styles/main.css">
 <!-- endbuild -->
 
+<!-- <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.css"> -->
 <!-- link rel="stylesheet" href="bower_components/angular-ui/build/angular-ui.css"/ -->
 </head>
-<body ng-app="esDmsSiteApp">
+<body>
 	<!--[if lt IE 7]>
       <p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
     <![endif]-->
@@ -126,6 +128,7 @@
 	<script type="text/javascript"
 		src="scripts/services/documentService.js"></script>
 	<script type="text/javascript" src="scripts/controllers/document.js"></script>
+	<script type="text/javascript" src="scripts/controllers/search/search.js"></script>
 	<script type="text/javascript" src="scripts/services/searchService.js"></script>
 	<script type="text/javascript" src="scripts/controllers/login.js"></script>
 	<script type="text/javascript" src="scripts/controllers/user.js"></script>

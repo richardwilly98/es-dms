@@ -42,7 +42,6 @@ esDmsSiteApp.service('wordcloud', function (d3) {
                     addSearch(tag);
                 })
                 .on("mouseover", function (d) {
-                    console.log('mouseover - d: ' + JSON.stringify(d));
                     d3.select(this)
                         .style("cursor", "pointer")
                         .transition()
@@ -50,7 +49,6 @@ esDmsSiteApp.service('wordcloud', function (d3) {
                         .style("font-size", function(d) { return (d.size * 1.5) + "px"; });
                 })
                 .on("mouseout", function (d) {
-                    console.log('mouseout: ' + JSON.stringify(d));
                     d3.select(this)
                         .style("cursor", "normal")
                         .transition()
@@ -114,37 +112,6 @@ esDmsSiteApp.service('wordcloud', function (d3) {
       
     return { WordCloud: WordCloud };
 });
-
-// esDmsSiteApp.directive('cloud', function ($log, wordcloud) {
-//         return {
-//             restrict: 'C',
-//             scope: { words: "=words", live: "=live", interval: "=interval", callback: "=callback" },
-//             link: function ($scope, elem, attrs) {
-//                 function init() {
-//                   $log.log('cloud - init');
-//                     elem.empty();
-//                     $scope.wordCloud = wordcloud.WordCloud(elem.width(), elem.width() * 0.75, 250, $scope.callback, elem);
-//                 }
-//                 init();
-
-//                 var lastCloudUpdate = new Date().getTime() - $scope.interval;
-//                 $scope.$watch("words", function() {
-//                   if ((new Date().getTime() - lastCloudUpdate) > $scope.interval &&  $scope.live) {
-//                     $scope.wordCloud.redraw($scope.words);
-//                   }
-//                 });
-
-//                 /** re-initialize wordCloud on window resize */
-//                 $(window).resize(function () {
-//                   $log.log('resize');
-//                   _.throttle(function() {
-//                     init(); 
-//                     $scope.wordCloud.redraw($scope.words);
-//                   }, 1000)(); 
-//                 });
-//             }
-//         }
-//     })
 
 esDmsSiteApp.controller('WorldCloudCtrl', function ($log, $scope, searchService) {
   $scope.selectedWord = '';
