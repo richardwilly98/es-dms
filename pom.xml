@@ -122,12 +122,12 @@
 			<artifactId>mycila-guice</artifactId>
 			<version>${mycila.version}</version>
 		</dependency>
-		 -->
 		<dependency>
 			<groupId>com.typesafe.akka</groupId>
 			<artifactId>akka-actor</artifactId>
 			<version>${akka.version}</version>
 		</dependency>
+		 -->
 		<dependency>
 			<groupId>org.apache.opennlp</groupId>
 			<artifactId>opennlp-tools</artifactId>

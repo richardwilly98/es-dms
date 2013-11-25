@@ -51,15 +51,6 @@
 			<artifactId>commons-beanutils-core</artifactId>
 			<version>1.8.3</version>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>com.github.richardwilly98</groupId>
-			<artifactId>elasticsearch-opennlp-auto-tagging-plugin</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/elasticsearch-opennlp-auto-tagging-plugin-0.0.1-SNAPSHOT.jar</systemPath>
-		</dependency>
-		 -->
 	</dependencies>
 
 	<build>
