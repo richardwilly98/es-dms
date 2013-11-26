@@ -114,6 +114,7 @@ esDmsSiteApp.service('wordcloud', function (d3) {
 });
 
 esDmsSiteApp.controller('WorldCloudCtrl', function ($log, $scope, searchService) {
+  $scope.model = {};
   $scope.selectedWord = '';
   // $scope.criteria = '';
   $scope.live = true;
@@ -136,7 +137,7 @@ esDmsSiteApp.controller('WorldCloudCtrl', function ($log, $scope, searchService)
   $scope.addSearchString = function (word) {
     $log.log('*** addSearchString : ' + word + ' ***');
     $scope.selectedWord = ' - ' + word;
-    $scope.criteria = 'tags: ' + word;
+    $scope.model.criteria = 'tags: ' + word;
     $scope.$apply();
   }
 

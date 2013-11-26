@@ -1,4 +1,4 @@
-<div class="container widget-container" data-ng-controller="DocumentCtrl">
+<div class="container widget-container">
 	<div class="container-fluid" ng-controller="WorldCloudCtrl">
 	<h2>Tags Search {{ selectedWord }}</h2>
 		<div class="row-fluid">
@@ -8,7 +8,7 @@
 				</div>
 			</div>
 			<div class="span8">
-				<esdms-search-result criteria="criteria"></esdms-search-result>
+				<esdms-search-result criteria="model.criteria"></esdms-search-result>
 			</div>
 		</div>
 	</div>

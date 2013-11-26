@@ -24,7 +24,6 @@ esDmsSiteApp.controller('DocumentCtrl', ['$log', '$scope', '$rootScope', '$modal
 		var id = args.id;
 		var tag = args.tag;
 		documentService.removeTag(id, tag, function() {
-      // updateFacets('remove', tag);
       $rootScope.$broadcast('document:updatefacets', {'operation': 'remove', 'tag': tag});
 		});
   });

@@ -25,10 +25,10 @@ esDmsSiteApp.service('searchService', ['$log', '$rootScope', '$http', function s
             result.elapsedTime = data.elapsedTime;
             result.facets = data.facets;
           }
-          $rootScope.$broadcast('search:result', result);
+          $rootScope.$broadcast('facetedSearch:result', result);
         })
         .error(function(data, status) {
-          $log.log('Facetedf search failed ' + status + ' - ' + data);
+          $log.log('Faceted search failed ' + status + ' - ' + data);
         });
 		},
     moreLikeThis: function(first, pageSize, criteria, minTermFrequency, maxQueryTerms, callback) {

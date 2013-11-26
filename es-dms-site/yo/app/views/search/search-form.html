@@ -1,0 +1,30 @@
+    <form data-ng-submit="setCriteria()" class="form-search">
+      <div class="input-prepend">
+        <span class="add-on dropdown">
+        <div class="dropdown-toggle">
+          <i ng-class="model.action"></i>
+          <i class="icon-sort-down"></i>
+        </div>
+					<ul class="dropdown-menu">
+					  <li>
+					  	<a data-ng-click="change('simple')">
+					  		<i class="icon-search"></i> 
+					  		Simple Search 
+					  		<i data-ng-show="model.selected === 'simple'" class="icon-ok"></i>
+					  	</a>
+					  </li>
+					  <li>
+					  	<a data-ng-click="change('metadata')">
+					  		<i class="icon-lightbulb"></i> 
+					  		Metadata Search 
+					  		<i data-ng-show="model.selected === 'metadata'" class="icon-ok"></i>
+					  	</a>
+					  </li>
+					</ul>
+        </span>
+        <input type="text" name="simple" class="input-xlarge" data-ng-model="model.criteria" data-ng-show="model.selected === 'simple'"/>
+        <input type="text" name="metadata" class="input-xlarge" data-ng-model="model.criteria" data-ng-show="model.selected === 'metadata'" 
+        	typeahead="attribute for attribute in attributes | filter:$viewValue | limitTo:8">
+      </div>
+      <button type="submit" class="btn btn-primary" data-ng-click="setCriteria()">Search</button>
+    </form>

@@ -1,36 +1,39 @@
 <div class="container widget-container" data-ng-controller="SearchCtrl">
-	<h2>Documents Search</h2>
-	<form data-ng-submit="setCriteria()" class="form-search">
-		<div class="input-prepend">
-      <span class="add-on">
-        <i class="icon-align-justify"></i>
-      </span>
-      <input type="text" class="input-xlarge" data-ng-model="criteria" />
-    </div>
-		<button type="button" class="btn btn-primary" data-ng-click="setCriteria()">Search</button>
-		<div data-ng-controller="ModalSearchOptionsCtrl">
-			<a data-ng-click="open()">Options</a>
-		</div>
-	</form>
-
-	<div data-ng-show="result.totalHits">About {{ result.totalHits }} results -
-		search took {{ result.elapsedTime }} ms - items per page : {{ result.pageSize }}</div>
-		<br/>
 	<div class="container-fluid">
-		<div class="row-fluid">
-			<div class="span2">
-				<!--Sidebar content-->
-				<div class="well sidebar-nav" data-ng-show="result.facets">
-					<ul class="nav nav-list" data-ng-repeat="facet in result.facets">
-						<li>
-							<esdms-facet facet="facet" />
-						</li>
-					</ul>
-				</div>
-			</div>
-			<div class="span10">
-				<esdms-search-result criteria="model.criteria"></esdms-search-result>
-			</div>
-		</div>
-	</div>
+    <h2>Documents Search</h2>
+    <!--
+    <form data-ng-submit="setCriteria()" class="form-search">
+      <div class="input-prepend">
+        <span class="add-on">
+          <i class="icon-tasks"></i>
+          <i class="icon-sort-down"></i>
+        </span>
+        <input type="text" class="input-xlarge" data-ng-model="criteria" />
+      </div>
+      <button type="button" class="btn btn-primary" data-ng-click="setCriteria()">Search</button>
+      <div data-ng-controller="ModalSearchOptionsCtrl">
+        <a data-ng-click="open()">Options</a>
+      </div>
+    </form>
+    -->
+      <esdms-search-form data-ng-model="model"></esdms-search-form>
+      <div data-ng-controller="ModalSearchOptionsCtrl">
+        <a data-ng-click="open()">Options</a>
+      </div>
+  </div>
+
+  <div>
+    <div class="container-fluid">
+    <esdms-search-result-header></esdms-search-result-header>
+      <div class="row-fluid">
+        <div class="span2">
+          <!--Sidebar content-->
+          <esdms-facets></esdms-facets>
+        </div>
+        <div class="span10">
+          <esdms-search-result criteria="model.criteria"></esdms-search-result>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

@@ -1,6 +1,6 @@
 'use strict';
 
-esDmsSiteApp.directive('esdmsFacet', ['$log', function ($log) {
+esDmsSiteApp.directive('esdmsFacet', ['$log', '$rootScope', function ($log, $rootScope) {
   $log.log('Start esdmsFacet');
   return {
     restrict: 'E',
@@ -18,7 +18,7 @@ esDmsSiteApp.directive('esdmsFacet', ['$log', function ($log) {
       scope.toggle = function(term) {
         $log.log('click'  + JSON.stringify(term));
         term.selected = !term.selected;
-        scope.$emit('search:applyfacet', {'term': scope.facet.field, 'value': term.term, 'selected': term.selected});
+        $rootScope.$broadcast('search:applyfacet', {'term': scope.facet.field, 'value': term.term, 'selected': term.selected});
       };
       scope.toggleClass = function(term) {
         if (term.selected === undefined || !term.selected) {

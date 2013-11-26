@@ -1,12 +1,18 @@
 'use strict';
 
-esDmsSiteApp.controller('SearchCtrl', ['$log', '$scope', '$modal', 'documentService', 'searchService', 'sharedService', 'messagingService',
+esDmsSiteApp.controller('SearchCtrl', ['$scope',
+  function ($scope) {
+    $scope.model = {};
+}]);
+
+
+esDmsSiteApp.controller('SearchResultCtrl', ['$log', '$scope', '$modal', 'documentService', 'searchService', 'sharedService', 'messagingService',
   function ($log, $scope, $modal, documentService, searchService, sharedService, messagingService) {
 
   // $scope.documents = [];
-  $scope.facets = [];
-  $scope.totalHits = 0;
-  $scope.elapsedTime = 0;
+  // $scope.facets = [];
+  // $scope.totalHits = 0;
+  // $scope.elapsedTime = 0;
   $scope.maxPages = 10;
   $scope.totalPages = 0;
   $scope.currentPage = 1;
@@ -14,9 +20,9 @@ esDmsSiteApp.controller('SearchCtrl', ['$log', '$scope', '$modal', 'documentServ
   $scope.terms = [];
   $scope.service = sharedService;
   $scope.pageSize = $scope.service.getSettings().user.pageSize;
-  $scope.model = {
-    // criteria: null
-  };
+  // $scope.model = {
+  //   // criteria: null
+  // };
   
   // Define facet settings. It is recommended to keep at least 'Tags' facet
   $scope.facetSettings = [
@@ -24,11 +30,6 @@ esDmsSiteApp.controller('SearchCtrl', ['$log', '$scope', '$modal', 'documentServ
     {'name' : 'Language', terms: [{'field': 'versions.file.content.language.lang', 'size': 10}]},
     {'name' : 'Author', terms: [{'field': 'attributes.author', 'size': 10}]}
   ];
-
-  function init() {
-  }
-
-  init();
 
   $scope.$watch('service.getUserSettings()',
     function(newValue) {
@@ -39,30 +40,27 @@ esDmsSiteApp.controller('SearchCtrl', ['$log', '$scope', '$modal', 'documentServ
       }
     });
 
-  $scope.setCriteria = function() {
-    $scope.model.criteria = $scope.criteria;
-  }
-
-  $scope.search = function(/*term*/) {
-		$log.log('search - search');
-		if ($scope.criteria === undefined || $scope.criteria === '' || $scope.criteria === '*') {
-      messagingService.push({'type': 'info', 'title': 'Search', 'content': 'Empty or wildcard not allowed', 'timeout': 2000});
-      $scope.totalHits = 0;
+  $scope.search = function(criteria) {
+		$log.log('search - ' + criteria);
+		if (criteria === undefined || criteria === '' || criteria === '*') {
+      messagingService.push({'type': 'info', 'title': 'Search', 'content': 'Empty or wildcard not allowed', 'timeout': 5000});
+      //$scope.totalHits = 0;
       $scope.totalPages = 0;
+      $scope.currentPage = 1;
 			// $scope.documents = [];
       $scope.result = {};
       $scope.terms = [];
-      $scope.facets = [];
-      $scope.model.criteria = $scope.criteria;
+      //$scope.facets = [];
+      //$scope.model.criteria = $scope.criteria;
       // searchService.criteria(null);
 		} else {
       // $scope.documents = [];
       $scope.result = {};
       $scope.terms = [];
-      $scope.facets = [];
-      $scope.model.criteria = $scope.criteria;
+      //$scope.facets = [];
+      //$scope.model.criteria = $scope.criteria;
       // searchService.criteria($scope.criteria);
-			find(0, $scope.criteria, true);
+			find(0, criteria, true);
 		}
   };
 
@@ -71,15 +69,27 @@ esDmsSiteApp.controller('SearchCtrl', ['$log', '$scope', '$modal', 'documentServ
     $log.log('About to execute facetedSearch with filter: ' + JSON.stringify(filters));
     searchService.facetedSearch(first, $scope.pageSize, criteria, $scope.facetSettings, filters);
   }
+  
+  $scope.$on('search:execute', function(evt, args) {
+    if (args.criteria !== undefined) {
+      $scope.criteria = args.criteria;
+      $scope.search(args.criteria);
+    }
+  });
 
-  $scope.$on('search:result', function(evt, args) {
+  $scope.$on('facetedSearch:result', function(evt, args) {
+    $log.log('SearchResultCtrl - facetedSearch:result');
     $scope.result = args;
     if ($scope.result.totalHits === 0) {
-      if (filters !== {}) {
-        messagingService.push({'type': 'warning', 'title': 'Search', 'content': 'No document found. Please change filter', 'timeout': 2000});
+      $scope.totalPages = 0;
+      $scope.currentPage = 1;
+      $scope.result = {};
+      $scope.terms = [];
+      if (getFilters() !== {}) {
+        messagingService.push({'type': 'warning', 'title': 'Search', 'content': 'No document found. Please change filter', 'timeout': 5000});
       } else {
         $scope.facets = [];
-        messagingService.push({'type': 'info', 'title': 'Search', 'content': 'No document found', 'timeout': 2000});
+        messagingService.push({'type': 'info', 'title': 'Search', 'content': 'No document found', 'timeout': 5000});
       }
     } else {
       setPagination();
@@ -138,28 +148,30 @@ esDmsSiteApp.controller('SearchCtrl', ['$log', '$scope', '$modal', 'documentServ
     if (args.operation === undefined || args.tag === undefined) {
       return;
     }
+    $log.log('document:updatefacets: ' + args.operation + ' - ' + args.tag);
     updateFacets(args.operation, args.tag);
   });
 
-  $scope.$on('document:remove', function(evt, args) {
-    if (args === undefined) {
-      return;
-    }
-    var document = args;
-    $log.log('document:remove - ' + document.id);
-    var index = getIndexOf(document.id);
-    _.each(document.tags, function (tag) {
-      // $rootScope.$broadcast('document:updatefacets', {'operation': 'remove', 'tag': tag});
-      updateFacets('remove', tag);
-    });
-    if (index) {
-      $scope.result.documents.splice(index, 1);
-    }
-  });
+  // $scope.$on('document:remove', function(evt, args) {
+  //   if (args === undefined) {
+  //     return;
+  //   }
+  //   var document = args;
+  //   $log.log('document:remove - ' + document.id);
+  //   var index = getIndexOf(document.id);
+  //   _.each(document.tags, function (tag) {
+  //     // $rootScope.$broadcast('document:updatefacets', {'operation': 'remove', 'tag': tag});
+  //     updateFacets('remove', tag);
+  //   });
+  //   if (index) {
+  //     $scope.result.documents.splice(index, 1);
+  //   }
+  // });
 
   // Update facets
   function updateFacets(operation, tag) {
-    var tagFacet = $scope.facets.Tags;
+    $log.log('updateFacets: ' + operation + ' - ' + tag);
+    var tagFacet = $scope.result.facets.Tags;
     if (tagFacet === undefined) {
       $log.warn('Tags facet not found.');
       return;
