@@ -64,7 +64,6 @@ public class EsShiroWebModule extends ShiroWebModule {
     protected void bindSessionManager(AnnotatedBindingBuilder<SessionManager> bind) {
         bind.to(EsWebSessionManager.class).asEagerSingleton();
         bind(EsWebSessionManager.class);
-
     }
     
 }
