@@ -9,10 +9,6 @@ esDmsSiteApp.controller('SearchCtrl', ['$scope',
 esDmsSiteApp.controller('SearchResultCtrl', ['$log', '$scope', '$modal', 'documentService', 'searchService', 'sharedService', 'messagingService',
   function ($log, $scope, $modal, documentService, searchService, sharedService, messagingService) {
 
-  // $scope.documents = [];
-  // $scope.facets = [];
-  // $scope.totalHits = 0;
-  // $scope.elapsedTime = 0;
   $scope.maxPages = 10;
   $scope.totalPages = 0;
   $scope.currentPage = 1;
@@ -20,9 +16,6 @@ esDmsSiteApp.controller('SearchResultCtrl', ['$log', '$scope', '$modal', 'docume
   $scope.terms = [];
   $scope.service = sharedService;
   $scope.pageSize = $scope.service.getSettings().user.pageSize;
-  // $scope.model = {
-  //   // criteria: null
-  // };
   
   // Define facet settings. It is recommended to keep at least 'Tags' facet
   $scope.facetSettings = [
@@ -44,22 +37,13 @@ esDmsSiteApp.controller('SearchResultCtrl', ['$log', '$scope', '$modal', 'docume
 		$log.log('search - ' + criteria);
 		if (criteria === undefined || criteria === '' || criteria === '*') {
       messagingService.push({'type': 'info', 'title': 'Search', 'content': 'Empty or wildcard not allowed', 'timeout': 5000});
-      //$scope.totalHits = 0;
       $scope.totalPages = 0;
       $scope.currentPage = 1;
-			// $scope.documents = [];
       $scope.result = {};
       $scope.terms = [];
-      //$scope.facets = [];
-      //$scope.model.criteria = $scope.criteria;
-      // searchService.criteria(null);
 		} else {
-      // $scope.documents = [];
       $scope.result = {};
       $scope.terms = [];
-      //$scope.facets = [];
-      //$scope.model.criteria = $scope.criteria;
-      // searchService.criteria($scope.criteria);
 			find(0, criteria, true);
 		}
   };
@@ -70,6 +54,7 @@ esDmsSiteApp.controller('SearchResultCtrl', ['$log', '$scope', '$modal', 'docume
     searchService.facetedSearch(first, $scope.pageSize, criteria, $scope.facetSettings, filters);
   }
   
+  // Main entrypoint of the controller - see esdmsSearchResult directive who trigger this event.
   $scope.$on('search:execute', function(evt, args) {
     if (args.criteria !== undefined) {
       $scope.criteria = args.criteria;
@@ -152,22 +137,6 @@ esDmsSiteApp.controller('SearchResultCtrl', ['$log', '$scope', '$modal', 'docume
     updateFacets(args.operation, args.tag);
   });
 
-  // $scope.$on('document:remove', function(evt, args) {
-  //   if (args === undefined) {
-  //     return;
-  //   }
-  //   var document = args;
-  //   $log.log('document:remove - ' + document.id);
-  //   var index = getIndexOf(document.id);
-  //   _.each(document.tags, function (tag) {
-  //     // $rootScope.$broadcast('document:updatefacets', {'operation': 'remove', 'tag': tag});
-  //     updateFacets('remove', tag);
-  //   });
-  //   if (index) {
-  //     $scope.result.documents.splice(index, 1);
-  //   }
-  // });
-
   // Update facets
   function updateFacets(operation, tag) {
     $log.log('updateFacets: ' + operation + ' - ' + tag);
@@ -203,35 +172,6 @@ esDmsSiteApp.controller('SearchResultCtrl', ['$log', '$scope', '$modal', 'docume
   };
 
   $scope.$watch('currentPage', $scope.setPage );
-
-  // $scope.$on('document:addtag', function(evt, args) {
-		// if (args.id === undefined || args.tag === undefined) {
-		// 	return;
-		// }
-		// $log.log('*** addTag: ' + args.id + ' - ' + args.tag);
-		// var id = args.id;
-		// var tag = args.tag;
-		// documentService.addTag(id, tag, function(doc) {
-		// 	var index = getIndexOf(id);
-  //     // Update facets
-  //     updateFacets('add', tag);
-		// 	$scope.documents[index] = doc;
-		// });
-  // });
-
-  // $scope.$on('document:removetag', function(evt, args) {
-		// if (args.id === undefined || args.tag === undefined) {
-		// 	return;
-		// }
-		// $log.log('*** removetag: ' + args.id + ' - ' + args.tag);
-		// var id = args.id;
-		// var tag = args.tag;
-		// documentService.removeTag(id, tag, function(doc) {
-		// 	var index = getIndexOf(id);
-  //     updateFacets('remove', tag);
-		// 	$scope.documents[index] = doc;
-		// });
-  // });
 
   $scope.$on('search:applyfacet', function(evt, args) {
     $log.log('applyfacet: ' + JSON.stringify(args));
