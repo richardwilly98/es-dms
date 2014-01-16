@@ -173,3 +173,4 @@ test-output/
 
 # SublimeText project files
 *.sublime-workspace
+*.sublime-project
