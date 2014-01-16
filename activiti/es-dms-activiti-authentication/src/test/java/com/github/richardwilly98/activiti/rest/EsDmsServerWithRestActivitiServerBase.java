@@ -10,10 +10,15 @@ import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.test.TestHelper;
 import org.apache.log4j.Logger;
 import org.restlet.Component;
+import org.restlet.data.Parameter;
 import org.restlet.data.Protocol;
+import org.restlet.engine.http.header.HeaderConstants;
+import org.restlet.engine.http.header.HeaderUtils;
 import org.restlet.resource.ClientResource;
+import org.restlet.util.Series;
 
 import com.github.richardwilly98.activiti.EsDmsServerWithActivitiBase;
+import com.github.richardwilly98.esdms.client.RestAuthenticationService;
 
 /*
  * Inspire from https://github.com/Activiti/Activiti/blob/master/modules/activiti-rest/src/test/java/org/activiti/rest/service/BaseRestTestCase.java
@@ -91,9 +96,23 @@ public class EsDmsServerWithRestActivitiServerBase extends EsDmsServerWithActivi
         return UriBuilder.fromUri("http://localhost:" + REST_PORT + "/").build();
     }
 
+    @SuppressWarnings("unchecked")
     protected ClientResource getAuthenticatedClient(String uri) {
+        log.debug(String.format("getAuthenticatedClient - %s", uri));
         ClientResource client = new ClientResource(getBaseURI() + uri);
-        client.getCookies().add("ES_DMS_TICKET", adminToken);
+        client.getCookies().add(RestAuthenticationService.ES_DMS_TICKET, adminToken);
+        Series<Parameter> additionalHeaders = (Series<Parameter>) client.getRequest()
+                .getAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+        HeaderUtils.addHeader(RestAuthenticationService.ES_DMS_TICKET, adminToken, additionalHeaders);
+        log.info(String.format("getAuthenticatedClient - add header [%s] - [%s]", RestAuthenticationService.ES_DMS_TICKET, adminToken));
+//        Form headers = (Form)client.getRequestAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+//        if (headers == null) {
+//            headers = new Form();
+//            client.getRequestAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, headers);
+//        }
+////        headers.add("yourHeaderName", yourHeaderValue);
+////        Series<Parameter> headers = (Series<Parameter>) client.getRequestAttributes().get(HeaderConstants.ATTRIBUTE_HEADERS);
+//        headers.add("X-ESDMSTICKET", adminToken);
         // client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, "kermit",
         // "kermit");
         return client;

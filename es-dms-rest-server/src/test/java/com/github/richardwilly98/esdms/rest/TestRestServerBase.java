@@ -36,8 +36,9 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -65,6 +66,7 @@ import com.github.richardwilly98.esdms.exception.ServiceException;
 import com.github.richardwilly98.esdms.services.UserService;
 import com.github.richardwilly98.esdms.web.TestJerseyApplication;
 import com.github.richardwilly98.esdms.web.TestRestGuiceServletConfig;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.servlet.GuiceFilter;
 
@@ -81,7 +83,8 @@ public class TestRestServerBase {
     private final Server server;
     protected final static ObjectMapper mapper = new ObjectMapper();
     protected static String adminToken;
-    protected static Cookie adminCookie;
+//    protected static Cookie adminCookie;
+    protected static MultivaluedMap<String, Object> adminAuthenticationHeader;
     private final Client restClient;
     // private final Client securedClient;
     public static final int HTTP_PORT = 8081;
@@ -237,39 +240,66 @@ public class TestRestServerBase {
     private void loginAdminUser() {
         try {
             log.debug("*** loginAdminUser ***");
-            adminCookie = login(adminCredential);
-            checkNotNull(adminCookie);
-            adminToken = adminCookie.getValue();
+            adminAuthenticationHeader = login(adminCredential);
+            checkNotNull(adminAuthenticationHeader);
+            adminToken = adminAuthenticationHeader.getFirst(User.ES_DMS_TICKET).toString();
+            checkNotNull(adminToken);
+//            adminAuthenticationHeader = new MultivaluedHashMap<String, Object>(ImmutableMap.of(RestAuthenticationService.ES_DMS_TICKET, adminToken)); // ImmutableMap.of(RestAuthenticationService.ES_DMS_TICKET, adminToken);
+//            checkNotNull(adminAuthenticationHeader);
+//            adminToken = adminCookie.getValue();
         } catch (Throwable t) {
             log.error("loginAdminUser failed", t);
         }
     }
 
-    protected Cookie login(Credential credential) throws Throwable {
-        try {
-            log.debug(String.format("login - %s", credential));
-            WebTarget webResource = target().path(RestAuthenticationService.AUTH_PATH).path(RestAuthenticationService.LOGIN_PATH);
-            log.debug(webResource);
-            Response response = webResource.request(MediaType.APPLICATION_JSON).post(Entity.entity(credential, MediaType.APPLICATION_JSON));
-            log.debug("status: " + response.getStatus());
-            Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
-            for (NewCookie cookie : response.getCookies().values()) {
-                if (RestAuthenticationService.ES_DMS_TICKET.equals(cookie.getName())) {
-                    return new Cookie(cookie.getName(), cookie.getValue());
-                }
+    protected MultivaluedMap<String, Object> login(Credential credential) throws Throwable {
+        // try {
+        log.trace("*** login ***");
+        MultivaluedMap<String, Object> authenticationHeader = null;
+        WebTarget webResource = target().path(RestAuthenticationService.AUTH_PATH).path(RestAuthenticationService.LOGIN_PATH);
+        Response response = webResource.request(MediaType.APPLICATION_JSON).post(Entity.entity(credential, MediaType.APPLICATION_JSON));
+        Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+        for (NewCookie cookie : response.getCookies().values()) {
+            if (User.ES_DMS_TICKET.equals(cookie.getName())) {
+//                return new Cookie(cookie.getName(), cookie.getValue());
+//                return cookie.getValue();
+                authenticationHeader = new MultivaluedHashMap<String, Object>(ImmutableMap.of(User.ES_DMS_TICKET, cookie.getValue()));
+                break;
             }
-        } catch (Throwable t) {
-            log.error("login failed", t);
-            Assert.fail("login failed", t);
         }
-        return null;
+        // } catch (Throwable t) {
+        // log.error("login failed", t);
+        // Assert.fail("login failed", t);
+        // }
+        return authenticationHeader;
     }
 
-    protected void logout(Cookie cookie) throws Throwable {
-        log.debug(String.format("logout - %s", cookie));
-        checkNotNull(cookie);
+//    protected String login(Credential credential) throws Throwable {
+//        try {
+//            log.debug(String.format("login - %s", credential));
+//            WebTarget webResource = target().path(RestAuthenticationService.AUTH_PATH).path(RestAuthenticationService.LOGIN_PATH);
+//            log.debug(webResource);
+//            Response response = webResource.request(MediaType.APPLICATION_JSON).post(Entity.entity(credential, MediaType.APPLICATION_JSON));
+//            log.debug("status: " + response.getStatus());
+//            Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
+//            for (NewCookie cookie : response.getCookies().values()) {
+//                if (RestAuthenticationService.ES_DMS_TICKET.equals(cookie.getName())) {
+////                    return new Cookie(cookie.getName(), cookie.getValue());
+//                    return cookie.getValue();
+//                }
+//            }
+//        } catch (Throwable t) {
+//            log.error("login failed", t);
+//            Assert.fail("login failed", t);
+//        }
+//        return null;
+//    }
+
+    protected void logout(MultivaluedMap<String, Object> headers) throws Throwable {
+        log.debug(String.format("logout - %s", headers));
+        checkNotNull(headers);
         WebTarget webResource = target().path(RestAuthenticationService.AUTH_PATH).path(RestAuthenticationService.LOGOUT_PATH);
-        Response response = webResource.request().cookie(cookie).post(Entity.json(null));
+        Response response = webResource.request().headers(headers).post(Entity.json(null));
         Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
         if (response.getStatus() != Status.OK.getStatusCode()) {
             throw new ServiceException(String.format("logout failed. Response status: %s", response.getStatus()));
@@ -278,7 +308,7 @@ public class TestRestServerBase {
     }
 
     private void logoutAdminUser() throws Throwable {
-        logout(adminCookie);
+        logout(adminAuthenticationHeader);
     }
 
     protected User createUser(String login, String password) throws Throwable {
@@ -291,7 +321,7 @@ public class TestRestServerBase {
                 .build();
         String json = mapper.writeValueAsString(user);
         log.trace(json);
-        Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+        Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).headers(adminAuthenticationHeader)
                 .post(Entity.json(user));
         log.debug(String.format("status: %s", response.getStatus()));
         Assert.assertEquals(response.getStatus(), Status.CREATED.getStatusCode());
@@ -301,7 +331,7 @@ public class TestRestServerBase {
         URI uri = response.getLocation();
         Assert.assertNotNull(uri);
         log.trace(String.format("getItem - %s", uri));
-        response = client().target(uri).request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+        response = client().target(uri).request().headers(adminAuthenticationHeader).accept(MediaType.APPLICATION_JSON).get();
         if (response.getStatus() == Status.OK.getStatusCode()) {
             return response.readEntity(User.class);
         }

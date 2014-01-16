@@ -37,6 +37,8 @@ import com.github.richardwilly98.esdms.UserImpl;
 @JsonDeserialize(as = UserImpl.class)
 public interface User extends Person, Principal {
 
+    public final static String ES_DMS_TICKET = "X-ESDMSTICKET";
+    
     @NotNull(message = "login is required")
     public abstract String getLogin();
 

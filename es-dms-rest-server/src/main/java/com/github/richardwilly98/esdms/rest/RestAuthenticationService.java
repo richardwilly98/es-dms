@@ -29,11 +29,10 @@ package com.github.richardwilly98.esdms.rest;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.net.URI;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.CookieParam;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -43,6 +42,7 @@ import javax.ws.rs.core.Response;
 
 import com.github.richardwilly98.esdms.SessionImpl;
 import com.github.richardwilly98.esdms.api.Credential;
+import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.rest.exception.RestServiceException;
 import com.github.richardwilly98.esdms.rest.exception.UnauthorizedException;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
@@ -54,7 +54,7 @@ public class RestAuthenticationService extends RestItemBaseService<SessionImpl> 
     public static final String LOGIN_PATH = "_login";
     public static final String LOGOUT_PATH = "_logout";
     public static final String VALIDATE_PATH = "_validate";
-    public static final String ES_DMS_TICKET = "ES_DMS_TICKET";
+//    public static final String ES_DMS_TICKET = User.ES_DMS_TICKET;
 
     @Inject
     public RestAuthenticationService(final AuthenticationService authenticationService) {
@@ -75,12 +75,12 @@ public class RestAuthenticationService extends RestItemBaseService<SessionImpl> 
             log.trace("getPath: " + url.getPath());
             String token = authenticationService.login(credential);
             if (log.isTraceEnabled()) {
-                log.trace(String.format("Create cookie %s: [%s]", ES_DMS_TICKET, token));
+                log.trace(String.format("Create cookie [%s]:[%s]", User.ES_DMS_TICKET, token));
             }
             SessionImpl session = authenticationService.validate(token);
             int maxAge = (int)(session.getTimeout() / 1000);
             return Response.ok().entity(new AuthenticationResponse("AUTHENTICATED", token))
-                    .cookie(new NewCookie(ES_DMS_TICKET, token, "/", null, 1, url.getBaseUri().getHost(), maxAge, false)).build();
+                    .cookie(new NewCookie(User.ES_DMS_TICKET, token, "/", null, 1, url.getBaseUri().getHost(), maxAge, false)).build();
         } catch (Throwable t) {
             log.error("login failed", t);
             throw new RestServiceException(t.getLocalizedMessage());
@@ -89,13 +89,13 @@ public class RestAuthenticationService extends RestItemBaseService<SessionImpl> 
 
     @POST
     @Path(LOGOUT_PATH)
-    public Response logout(@CookieParam(value = ES_DMS_TICKET) String token) {
+    public Response logout(@HeaderParam(value = User.ES_DMS_TICKET) String token) {
         try {
             if (log.isTraceEnabled()) {
                 log.trace(String.format("logout: %s", token));
             }
             authenticationService.logout(token);
-            return Response.ok().cookie(new NewCookie(ES_DMS_TICKET, "", "/", "", "", -1, false)).build();
+            return Response.ok().cookie(new NewCookie(User.ES_DMS_TICKET, "", "/", "", "", -1, false)).build();
         } catch (Throwable t) {
             log.error("logout failed", t);
             throw new RestServiceException(t.getLocalizedMessage());
@@ -105,7 +105,7 @@ public class RestAuthenticationService extends RestItemBaseService<SessionImpl> 
     @POST
     @Path(VALIDATE_PATH)
     @Produces({ MediaType.APPLICATION_JSON })
-    public Response validate(@CookieParam(value = ES_DMS_TICKET) String token) {
+    public Response validate(@HeaderParam(value = User.ES_DMS_TICKET) String token) {
         try {
             if (log.isTraceEnabled()) {
                 log.trace(String.format("validate: %s", token));

@@ -26,7 +26,6 @@ package com.github.richardwilly98.esdms.web;
  * #L%
  */
 
-
 import java.io.IOException;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -34,16 +33,26 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 
+import com.github.richardwilly98.esdms.api.User;
+import com.github.richardwilly98.esdms.inject.SystemParametersModule;
+
 @Provider
 public class CrossDomainFilter implements ContainerResponseFilter {
 
+    public long sessionTimeout = SystemParametersModule.DEFAULT_SESSION_TIMEOUT;
+
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-        responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
-        responseContext.getHeaders().add("Access-Control-Allow-Headers", "origin, content-type, accept, authorization");
+        String origin = requestContext.getHeaderString("Origin");
+        responseContext.getHeaders().add("Access-Control-Allow-Origin", origin);
+        // responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
+        String headers = "origin, content-type, accept, authorization, " + User.ES_DMS_TICKET.toLowerCase();
+        responseContext.getHeaders().add("Access-Control-Allow-Headers", headers);
         responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
         responseContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
-        responseContext.getHeaders().add("Access-Control-Max-Age", "1209600");
+        // responseContext.getHeaders().add("Access-Control-Max-Age",
+        // "1209600");
+        responseContext.getHeaders().add("Access-Control-Max-Age", sessionTimeout / 1000);
     }
 
 }

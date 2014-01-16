@@ -5,16 +5,16 @@ import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.Collection;
 
-import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.Role.RoleType;
-import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.github.richardwilly98.esdms.search.api.SearchResult;
 import com.google.common.collect.Iterables;
 
 public class RestRoleService extends RestItemBaseClient<Role> {
@@ -29,8 +29,8 @@ public class RestRoleService extends RestItemBaseClient<Role> {
     public Role findRoleById(String token, String id) throws ServiceException {
         checkNotNull(token);
         checkNotNull(id);
-        Cookie cookie = newUserCookie(token);
-        Response response = target().path(id).request(MediaType.APPLICATION_JSON).cookie(cookie).get();
+        MultivaluedMap<String,Object> header = getAuthenticationHeader(token);
+        Response response = target().path(id).request(MediaType.APPLICATION_JSON).headers(header).get();
         if (response.getStatus() == Status.OK.getStatusCode()) {
             return response.readEntity(Role.class);
         }
@@ -40,9 +40,9 @@ public class RestRoleService extends RestItemBaseClient<Role> {
     public Collection<Role> findRolesByType(String token, RoleType type) throws ServiceException {
         checkNotNull(token);
         checkNotNull(type);
-        Cookie cookie = newUserCookie(token);
+        MultivaluedMap<String,Object> header = getAuthenticationHeader(token);
         Response response = target().queryParam("type", type.getType()).request(MediaType.APPLICATION_JSON)
-                .cookie(cookie).get();
+                .headers(header).get();
         if (response.getStatus() == Status.OK.getStatusCode()) {
             SearchResult<Role> roles = response.readEntity(new GenericType<SearchResult<Role>>() {
             });
@@ -83,8 +83,8 @@ public class RestRoleService extends RestItemBaseClient<Role> {
     public Role findUserById(String token, String id) throws ServiceException {
         checkNotNull(token);
         checkNotNull(id);
-        Cookie cookie = newUserCookie(token);
-        Response response = target().path(id).request(MediaType.APPLICATION_JSON).cookie(cookie).get();
+        MultivaluedMap<String,Object> header = getAuthenticationHeader(token);
+        Response response = target().path(id).request(MediaType.APPLICATION_JSON).headers(header).get();
         if (response.getStatus() == Status.OK.getStatusCode()) {
             return response.readEntity(Role.class);
         }
@@ -116,9 +116,9 @@ public class RestRoleService extends RestItemBaseClient<Role> {
     }
 
     private Collection<Role> find(String token, String criteria) {
-        Cookie cookie = newUserCookie(token);
+        MultivaluedMap<String,Object> header = getAuthenticationHeader(token);
         Response response = target().path(SEARCH_PATH).path(criteria).request(MediaType.APPLICATION_JSON)
-                .cookie(cookie).get();
+                .headers(header).get();
         if (response.getStatus() == Status.OK.getStatusCode()) {
             SearchResult<Role> users = response.readEntity(new GenericType<SearchResult<Role>>() {
             });

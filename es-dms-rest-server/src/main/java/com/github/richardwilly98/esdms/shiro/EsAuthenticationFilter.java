@@ -30,7 +30,6 @@ import java.util.Enumeration;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,7 +44,6 @@ import org.apache.shiro.web.util.WebUtils;
 import com.github.richardwilly98.esdms.api.Session;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
-import com.github.richardwilly98.esdms.rest.RestAuthenticationService;
 import com.github.richardwilly98.esdms.services.AuthenticationService;
 import com.github.richardwilly98.esdms.services.UserService;
 import com.google.inject.Inject;
@@ -64,6 +62,17 @@ public class EsAuthenticationFilter extends UserFilter {
     }
 
     @Override
+    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
+        HttpServletRequest httpRequest = WebUtils.toHttp(request);
+        String httpMethod = httpRequest.getMethod();
+        if ("OPTIONS".equalsIgnoreCase(httpMethod)) {
+            return true;
+        } else {
+            return super.isAccessAllowed(request, response, mappedValue);
+        }
+    }
+
+    @Override
     protected Subject getSubject(ServletRequest request, ServletResponse response) {
         if (log.isTraceEnabled()) {
             log.trace("Start getSubject");
@@ -75,13 +84,14 @@ public class EsAuthenticationFilter extends UserFilter {
         if (request instanceof HttpServletRequest) {
             HttpServletRequest httpRequest = (HttpServletRequest) request;
             log.debug("url: " + httpRequest.getRequestURL());
-            if (httpRequest.getCookies() == null) {
-                log.warn("Cookies collection is null");
-                // return new Subject.Builder().buildSubject();
-                return getSubjectFromUri((HttpServletRequest) request);
-            } else {
-                return getSubjectFromCookie((HttpServletRequest) request);
-            }
+//            if (httpRequest.getCookies() == null) {
+//                log.warn("Cookies collection is null");
+//                // return new Subject.Builder().buildSubject();
+//                return getSubjectFromUri((HttpServletRequest) request);
+//            } else {
+//                return getSubjectFromCookie((HttpServletRequest) request);
+//            }
+            return getSubjectFromUri((HttpServletRequest) request);
         }
         return new Subject.Builder().buildSubject();
     }
@@ -92,16 +102,16 @@ public class EsAuthenticationFilter extends UserFilter {
             Enumeration enumeration = request.getHeaderNames();
             while (enumeration.hasMoreElements()) {
                 Object name = enumeration.nextElement();
-                if (name != null && RestAuthenticationService.ES_DMS_TICKET.equalsIgnoreCase(name.toString())) {
-                    String token = request.getHeader(RestAuthenticationService.ES_DMS_TICKET);
+                if (name != null && User.ES_DMS_TICKET.equalsIgnoreCase(name.toString())) {
+                    String token = request.getHeader(User.ES_DMS_TICKET);
                     return getSubjectFromSessionId(token);
                 }
             }
             enumeration = request.getParameterNames();
             while (enumeration.hasMoreElements()) {
                 Object name = enumeration.nextElement();
-                if (name != null && RestAuthenticationService.ES_DMS_TICKET.equalsIgnoreCase(name.toString())) {
-                    String token = request.getParameter(RestAuthenticationService.ES_DMS_TICKET);
+                if (name != null && User.ES_DMS_TICKET.equalsIgnoreCase(name.toString())) {
+                    String token = request.getParameter(User.ES_DMS_TICKET);
                     return getSubjectFromSessionId(token);
                 }
             }
@@ -112,29 +122,29 @@ public class EsAuthenticationFilter extends UserFilter {
         return new Subject.Builder().buildSubject();
     }
 
-    private Subject getSubjectFromCookie(HttpServletRequest httpRequest) {
-        for (Cookie cookie : httpRequest.getCookies()) {
-            if (RestAuthenticationService.ES_DMS_TICKET.equalsIgnoreCase(cookie.getName())) {
-                String token = cookie.getValue();
-                log.debug(String.format("Find cookie %s: [%s]", RestAuthenticationService.ES_DMS_TICKET, token));
-                try {
-                    Subject subject = getSubjectFromSessionId(token);
-                    if (subject != null) {
-                        // log.debug("Subject principal: "
-                        // + subject.getPrincipal() + " - authenticated: "
-                        // + subject.isAuthenticated());
-                        // ThreadContext.bind(subject);
-                        return subject;
-                    } else {
-                        break;
-                    }
-                } catch (Throwable t) {
-                    log.error("getSubject failed", t);
-                }
-            }
-        }
-        return new Subject.Builder().buildSubject();
-    }
+//    private Subject getSubjectFromCookie(HttpServletRequest httpRequest) {
+//        for (Cookie cookie : httpRequest.getCookies()) {
+//            if (RestAuthenticationService.ES_DMS_TICKET.equalsIgnoreCase(cookie.getName())) {
+//                String token = cookie.getValue();
+//                log.debug(String.format("Find cookie %s: [%s]", RestAuthenticationService.ES_DMS_TICKET, token));
+//                try {
+//                    Subject subject = getSubjectFromSessionId(token);
+//                    if (subject != null) {
+//                        // log.debug("Subject principal: "
+//                        // + subject.getPrincipal() + " - authenticated: "
+//                        // + subject.isAuthenticated());
+//                        // ThreadContext.bind(subject);
+//                        return subject;
+//                    } else {
+//                        break;
+//                    }
+//                } catch (Throwable t) {
+//                    log.error("getSubject failed", t);
+//                }
+//            }
+//        }
+//        return new Subject.Builder().buildSubject();
+//    }
 
     private PrincipalCollection getPrincipals(String token) throws ServiceException {
         if (log.isTraceEnabled()) {

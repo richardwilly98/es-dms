@@ -3,8 +3,9 @@ package com.github.richardwilly98.esdms.client;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -12,6 +13,7 @@ import javax.ws.rs.core.Response.Status;
 import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.google.common.collect.ImmutableMap;
 
 public class RestAuthenticationService extends RestClientBase {
 
@@ -24,14 +26,14 @@ public class RestAuthenticationService extends RestClientBase {
         super(url, AUTH_PATH);
     }
 
-    Cookie getEsDmsCookie(Credential credential) throws ServiceException {
+    MultivaluedMap<String, Object> getEsDmsCookie(Credential credential) throws ServiceException {
         Response response = target().path(LOGIN_PATH).request(MediaType.APPLICATION_JSON)
                 .post(Entity.entity(credential, MediaType.APPLICATION_JSON));
         log.debug("status: " + response.getStatus());
         if (response.getStatus() == Status.OK.getStatusCode()) {
             for (NewCookie cookie : response.getCookies().values()) {
                 if (ES_DMS_TICKET.equals(cookie.getName())) {
-                    return new Cookie(cookie.getName(), cookie.getValue());
+                    return new MultivaluedHashMap<String, Object>(ImmutableMap.of(RestAuthenticationService.ES_DMS_TICKET, cookie.getValue()));
                 }
             }
         } else {
@@ -53,8 +55,9 @@ public class RestAuthenticationService extends RestClientBase {
 
     public void logout(String token) throws ServiceException {
         checkNotNull(token);
-        Cookie cookie = new Cookie(ES_DMS_TICKET, token);
-        Response response = target().path(LOGOUT_PATH).request().cookie(cookie).post(Entity.json(null));
+//        Cookie cookie = new Cookie(ES_DMS_TICKET, token);
+        MultivaluedMap<String, Object> header = new MultivaluedHashMap<String, Object>(ImmutableMap.of(RestAuthenticationService.ES_DMS_TICKET, token));
+        Response response = target().path(LOGOUT_PATH).request().headers(header).post(Entity.json(null));
         if (response.getStatus() != Status.OK.getStatusCode()) {
             throw new ServiceException(String.format("logout failed for %s", token));
         }
@@ -62,14 +65,15 @@ public class RestAuthenticationService extends RestClientBase {
 
     public User validate(String token) throws ServiceException {
         checkNotNull(token);
-        Cookie cookie = new Cookie(ES_DMS_TICKET, token);
-        Response response = target().path(VALIDATE_PATH).request(MediaType.APPLICATION_JSON).cookie(cookie).post(Entity.json(null));
+//        Cookie cookie = new Cookie(ES_DMS_TICKET, token);
+        MultivaluedMap<String, Object> header = new MultivaluedHashMap<String, Object>(ImmutableMap.of(RestAuthenticationService.ES_DMS_TICKET, token));
+        Response response = target().path(VALIDATE_PATH).request(MediaType.APPLICATION_JSON).headers(header).post(Entity.json(null));
         if (response.getStatus() != Status.OK.getStatusCode()) {
             throw new ServiceException(String.format("validate failed for %s", token));
         }
         
         ItemResponse item = response.readEntity(ItemResponse.class);
-        response = restClient.target(item.getUrl()).request(MediaType.APPLICATION_JSON).cookie(cookie).get();
+        response = restClient.target(item.getUrl()).request(MediaType.APPLICATION_JSON).headers(header).get();
         if (response.getStatus() != Status.OK.getStatusCode()) {
             throw new ServiceException(String.format("Cannot get user from uri %s - status %s", item, response.getStatus()));
         }

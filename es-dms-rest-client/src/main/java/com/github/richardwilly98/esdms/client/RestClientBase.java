@@ -5,18 +5,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import com.github.richardwilly98.esdms.CredentialImpl;
+import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
+import com.google.common.collect.ImmutableMap;
 
 public abstract class RestClientBase {
 
-    public static final String ES_DMS_TICKET = "ES_DMS_TICKET";
+    public static final String ES_DMS_TICKET = User.ES_DMS_TICKET;
 
     protected final Logger log = Logger.getLogger(getClass());
     private final String url;
@@ -38,14 +41,14 @@ public abstract class RestClientBase {
         return restClient.target(url).path(rootResource);
     }
 
-    protected Cookie getUserCookie(String userId, char[] password) throws ServiceException {
+    protected MultivaluedMap<String, Object> getUserCookie(String userId, char[] password) throws ServiceException {
         RestAuthenticationService authenticationClient = new RestAuthenticationService(url);
         return authenticationClient.getEsDmsCookie(new CredentialImpl.Builder().username(userId).password(password).build());
     }
 
-    protected Cookie newUserCookie(String token) {
+    protected MultivaluedMap<String, Object> getAuthenticationHeader(String token) {
         checkNotNull(token);
-        return new Cookie(ES_DMS_TICKET, token);
+        return new MultivaluedHashMap<String, Object>(ImmutableMap.of(RestAuthenticationService.ES_DMS_TICKET, token));
     }
 
 }

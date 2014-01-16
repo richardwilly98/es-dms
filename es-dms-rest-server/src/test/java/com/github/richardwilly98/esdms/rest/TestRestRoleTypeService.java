@@ -73,7 +73,8 @@ public class TestRestRoleTypeService extends GuiceAndJettyTestBase<Role> {
         log.debug("*** testGetRoleTypes ***");
         try {
             Response response;
-            response = target().path(RestRoleTypeService.ROLE_TYPES_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie).get();
+            response = target().path(RestRoleTypeService.ROLE_TYPES_PATH).request(MediaType.APPLICATION_JSON)
+                    .headers(adminAuthenticationHeader).get();
             Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
             Set<SimpleEntry> roleTypes = response.readEntity(new GenericType<Set<SimpleEntry>>() {
             });

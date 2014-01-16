@@ -21,11 +21,12 @@ import org.glassfish.jersey.client.filter.HttpBasicAuthFilter;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import com.github.richardwilly98.activiti.rest.api.RestItemBase;
+import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.exception.ServiceException;
 
 public abstract class RestClientBase<T extends RestItemBase> {
 
-    public static final String ES_DMS_TICKET = "ES_DMS_TICKET";
+    public static final String ES_DMS_TICKET = User.ES_DMS_TICKET;
     protected final Logger log = Logger.getLogger(getClass());
     private final Client restClient;
 

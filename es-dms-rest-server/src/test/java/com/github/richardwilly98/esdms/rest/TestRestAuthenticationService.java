@@ -31,8 +31,8 @@ import java.util.Set;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -63,9 +63,9 @@ public class TestRestAuthenticationService extends TestRestUserService {
             boolean rememberMe = true;
             Credential credential = new CredentialImpl.Builder().username(login).password(password.toCharArray()).rememberMe(rememberMe)
                     .build();
-            Cookie cookie = login(credential);
-            Assert.assertNotNull(cookie);
-            logout(cookie);
+            MultivaluedMap<String,Object> header = login(credential);
+            Assert.assertNotNull(header);
+            logout(header);
         } catch (Throwable t) {
             log.error("testLoginLogout fail", t);
             Assert.fail();
@@ -82,21 +82,21 @@ public class TestRestAuthenticationService extends TestRestUserService {
             boolean rememberMe = true;
             Credential credential = new CredentialImpl.Builder().username(login).password(login.toCharArray()).rememberMe(rememberMe)
                     .build();
-            Cookie cookie = login(credential);
-            Assert.assertNotNull(cookie);
-            validate(cookie);
-            logout(cookie);
+            MultivaluedMap<String,Object> header = login(credential);
+            Assert.assertNotNull(header);
+            validate(header);
+            logout(header);
         } catch (Throwable t) {
             log.error("testLoginValidate fail", t);
             Assert.fail();
         }
     }
 
-    private void validate(Cookie  cookie) throws Throwable {
+    private void validate(MultivaluedMap<String, Object> headers) throws Throwable {
         log.trace("*** validate ***");
-        Assert.assertNotNull(cookie);
+        Assert.assertNotNull(headers);
         WebTarget webResource = target().path(RestAuthenticationService.AUTH_PATH).path(RestAuthenticationService.VALIDATE_PATH);
-        Response response = webResource.request(MediaType.APPLICATION_JSON).cookie(cookie).post(Entity.json(null));
+        Response response = webResource.request(MediaType.APPLICATION_JSON).headers(headers).post(Entity.json(null));
         Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
         ItemResponse itemResponse = response.readEntity(ItemResponse.class);
         Assert.assertNotNull(itemResponse);
@@ -108,7 +108,7 @@ public class TestRestAuthenticationService extends TestRestUserService {
                 .build();
         String json = mapper.writeValueAsString(user);
         log.debug("About to create user: " + json);
-        Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+        Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).headers(adminAuthenticationHeader)
                 .post(Entity.json(user));
         Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
         if (response.getStatus() != Status.CREATED.getStatusCode()) {
@@ -117,7 +117,7 @@ public class TestRestAuthenticationService extends TestRestUserService {
         URI uri = response.getLocation();
         Assert.assertNotNull(uri);
         log.debug(String.format("getItem - %s", uri));
-        response = client().target(uri).request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+        response = client().target(uri).request().headers(adminAuthenticationHeader).accept(MediaType.APPLICATION_JSON).get();
         if (response.getStatus() == Status.OK.getStatusCode()) {
             return response.readEntity(User.class);
         }

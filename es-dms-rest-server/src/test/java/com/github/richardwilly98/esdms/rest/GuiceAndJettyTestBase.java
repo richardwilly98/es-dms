@@ -26,23 +26,17 @@ package com.github.richardwilly98.esdms.rest;
  * #L%
  */
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.net.URI;
 import java.util.Set;
 
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.testng.Assert;
 
 import com.github.richardwilly98.esdms.UserImpl;
-import com.github.richardwilly98.esdms.api.Credential;
 import com.github.richardwilly98.esdms.api.ItemBase;
 import com.github.richardwilly98.esdms.api.Role;
 import com.github.richardwilly98.esdms.api.User;
@@ -59,7 +53,7 @@ public class GuiceAndJettyTestBase<T extends ItemBase> extends TestRestServerBas
     }
 
     protected T get(String id, Class<T> type, String path) throws Throwable {
-        Response response = target().path(path).path(id).request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+        Response response = target().path(path).path(id).request().headers(adminAuthenticationHeader).accept(MediaType.APPLICATION_JSON).get();
         log.debug(String.format("status: %s", response.getStatus()));
         if (response.getStatus() == Status.OK.getStatusCode()) {
             return response.readEntity(type);
@@ -69,7 +63,7 @@ public class GuiceAndJettyTestBase<T extends ItemBase> extends TestRestServerBas
 
     protected T get(URI uri, Class<T> type) throws Throwable {
         log.trace(String.format("getItem - %s", uri));
-        Response response = client().target(uri).request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+        Response response = client().target(uri).request().headers(adminAuthenticationHeader).accept(MediaType.APPLICATION_JSON).get();
         log.trace(String.format("status: %s", response.getStatus()));
         if (response.getStatus() == Status.OK.getStatusCode()) {
             return response.readEntity(type);
@@ -78,7 +72,7 @@ public class GuiceAndJettyTestBase<T extends ItemBase> extends TestRestServerBas
     }
 
     protected T update(ItemBase item, Class<T> type, String path) throws Throwable {
-        Response response = target().path(path).path(item.getId()).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+        Response response = target().path(path).path(item.getId()).request(MediaType.APPLICATION_JSON).headers(adminAuthenticationHeader)
                 .put(Entity.json(item));
         if (response.getStatus() != Status.OK.getStatusCode()) {
             throw new ServiceException(String.format("update failed. Response status: %s", response.getStatus()));
@@ -87,41 +81,50 @@ public class GuiceAndJettyTestBase<T extends ItemBase> extends TestRestServerBas
     }
 
     protected void delete(String id, String path) throws Throwable {
-        Response response = target().path(path).path(id).request().cookie(adminCookie).delete();
+        Response response = target().path(path).path(id).request().headers(adminAuthenticationHeader).delete();
         if (response.getStatus() != Status.OK.getStatusCode()) {
             throw new ServiceException(String.format("delete failed. Response status: %s", response.getStatus()));
         }
     }
 
-    protected Cookie login(Credential credential) throws Throwable {
-        // try {
-        log.trace("*** login ***");
-        WebTarget webResource = target().path(RestAuthenticationService.AUTH_PATH).path(RestAuthenticationService.LOGIN_PATH);
-        Response response = webResource.request(MediaType.APPLICATION_JSON).post(Entity.entity(credential, MediaType.APPLICATION_JSON));
-        Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-        for (NewCookie cookie : response.getCookies().values()) {
-            if (RestAuthenticationService.ES_DMS_TICKET.equals(cookie.getName())) {
-                return new Cookie(cookie.getName(), cookie.getValue());
-            }
-        }
-        // } catch (Throwable t) {
-        // log.error("login failed", t);
-        // Assert.fail("login failed", t);
-        // }
-        return null;
-    }
+//    protected MultivaluedMap<String, Object> login(Credential credential) throws Throwable {
+//        // try {
+//        log.trace("*** login ***");
+//        MultivaluedMap<String, Object> authenticationHeader;
+//        WebTarget webResource = target().path(RestAuthenticationService.AUTH_PATH).path(RestAuthenticationService.LOGIN_PATH);
+//        Response response = webResource.request(MediaType.APPLICATION_JSON).post(Entity.entity(credential, MediaType.APPLICATION_JSON));
+//        Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+//        for (NewCookie cookie : response.getCookies().values()) {
+//            if (RestAuthenticationService.ES_DMS_TICKET.equals(cookie.getName())) {
+////                return new Cookie(cookie.getName(), cookie.getValue());
+////                return cookie.getValue();
+//                authenticationHeader = new MultivaluedHashMap<String, Object>(ImmutableMap.of(RestAuthenticationService.ES_DMS_TICKET, cookie.getValue()));
+//                break;
+//            }
+//        }
+//        // } catch (Throwable t) {
+//        // log.error("login failed", t);
+//        // Assert.fail("login failed", t);
+//        // }
+//        return authenticationHeader;
+//    }
 
-    protected void logout(Cookie cookie) throws Throwable {
-        log.trace("*** logout ***");
-        checkNotNull(cookie);
-        WebTarget webResource = target().path(RestAuthenticationService.AUTH_PATH).path(RestAuthenticationService.LOGOUT_PATH);
-        Response response = webResource.request().cookie(cookie).post(Entity.json(null));
-        Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
-        if (response.getStatus() != Status.OK.getStatusCode()) {
-            throw new ServiceException(String.format("logout failed. Response status: %s", response.getStatus()));
-        }
-
-    }
+    // protected void logout(MultivaluedMap<String, Object> headers) throws
+    // Throwable {
+    // log.trace("*** logout ***");
+    // checkNotNull(headers);
+    // WebTarget webResource =
+    // target().path(RestAuthenticationService.AUTH_PATH).path(RestAuthenticationService.LOGOUT_PATH);
+    // Response response =
+    // webResource.request().headers(headers).post(Entity.json(null));
+    // Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
+    // if (response.getStatus() != Status.OK.getStatusCode()) {
+    // throw new
+    // ServiceException(String.format("logout failed. Response status: %s",
+    // response.getStatus()));
+    // }
+    //
+    // }
 
     protected User createUser(String login, String password) throws Throwable {
         return createUser(login, password, null);
@@ -133,7 +136,7 @@ public class GuiceAndJettyTestBase<T extends ItemBase> extends TestRestServerBas
                 .build();
         String json = mapper.writeValueAsString(user);
         log.trace(json);
-        Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+        Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).headers(adminAuthenticationHeader)
                 .post(Entity.json(user));
         Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
         if (response.getStatus() != Status.CREATED.getStatusCode()) {
@@ -142,7 +145,7 @@ public class GuiceAndJettyTestBase<T extends ItemBase> extends TestRestServerBas
         URI uri = response.getLocation();
         Assert.assertNotNull(uri);
         log.debug(String.format("getItem - %s", uri));
-        response = client().target(uri).request().cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+        response = client().target(uri).request().headers(adminAuthenticationHeader).accept(MediaType.APPLICATION_JSON).get();
         if (response.getStatus() == Status.OK.getStatusCode()) {
             return response.readEntity(User.class);
         }

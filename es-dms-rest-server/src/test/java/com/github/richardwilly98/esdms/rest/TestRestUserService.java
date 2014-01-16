@@ -54,7 +54,7 @@ public class TestRestUserService extends GuiceAndJettyTestBase<UserImpl> {
     }
 
     private Role getRole(String id) throws Throwable {
-        Response response = target().path(RestRoleService.ROLES_PATH).path(id).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+        Response response = target().path(RestRoleService.ROLES_PATH).path(id).request(MediaType.APPLICATION_JSON).headers(adminAuthenticationHeader)
                 .accept(MediaType.APPLICATION_JSON).get();
         log.debug(String.format("status: %s", response.getStatus()));
         if (response.getStatus() == Status.OK.getStatusCode()) {
@@ -69,7 +69,7 @@ public class TestRestUserService extends GuiceAndJettyTestBase<UserImpl> {
         try {
             Response response = target().path(RestUserService.USERS_PATH)
                     .queryParam(RestUserService.LOGIN_PARAM, UserService.DEFAULT_ADMIN_LOGIN).request(MediaType.APPLICATION_JSON)
-                    .cookie(adminCookie).get();
+                    .headers(adminAuthenticationHeader).get();
             Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
             User user = response.readEntity(User.class);
             Assert.assertNotNull(user);
@@ -87,7 +87,7 @@ public class TestRestUserService extends GuiceAndJettyTestBase<UserImpl> {
             Response response;
             log.debug("Resource: " + target());
             response = target().path(RestUserService.USERS_PATH).path(RestItemBaseService.SEARCH_PATH)
-                    .path(UserService.DEFAULT_ADMIN_LOGIN).request(MediaType.APPLICATION_JSON).cookie(adminCookie).get();
+                    .path(UserService.DEFAULT_ADMIN_LOGIN).request(MediaType.APPLICATION_JSON).headers(adminAuthenticationHeader).get();
             log.debug("status: " + response.getStatus());
             Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
             SearchResult<User> users = response.readEntity(new GenericType<SearchResult<User>>() {
@@ -134,7 +134,7 @@ public class TestRestUserService extends GuiceAndJettyTestBase<UserImpl> {
             String login = "user-" + System.currentTimeMillis() + "@gmail.com";
             User user = createUser(login, password, ImmutableSet.of(RoleService.DefaultRoles.WRITER.getRole()));
 
-            Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
+            Response response = target().path(RestUserService.USERS_PATH).request(MediaType.APPLICATION_JSON).headers(adminAuthenticationHeader)
                     .post(Entity.json(user));
             log.debug(String.format("status: %s", response.getStatus()));
             Assert.assertTrue(response.getStatus() == Status.CONFLICT.getStatusCode());

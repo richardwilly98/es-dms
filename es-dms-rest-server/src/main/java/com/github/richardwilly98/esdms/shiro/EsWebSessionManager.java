@@ -34,8 +34,8 @@ import org.apache.shiro.web.servlet.Cookie;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 
+import com.github.richardwilly98.esdms.api.User;
 import com.github.richardwilly98.esdms.inject.SystemParametersModule;
-import com.github.richardwilly98.esdms.rest.RestAuthenticationService;
 import com.google.inject.Inject;
 
 public class EsWebSessionManager extends DefaultWebSessionManager {
@@ -52,7 +52,7 @@ public class EsWebSessionManager extends DefaultWebSessionManager {
     public EsWebSessionManager(SessionDAO sessionDAO, @Named(SystemParametersModule.SESSION_TIMEOUT) final long sessionTimeout) {
         super();
         this.setSessionDAO(sessionDAO);
-        Cookie cookie = new SimpleCookie(RestAuthenticationService.ES_DMS_TICKET);
+        Cookie cookie = new SimpleCookie(User.ES_DMS_TICKET);
         cookie.setHttpOnly(true);
         setSessionIdCookie(cookie);
         setSessionIdCookieEnabled(true);

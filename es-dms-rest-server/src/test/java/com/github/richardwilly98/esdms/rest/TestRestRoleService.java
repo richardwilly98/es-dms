@@ -50,8 +50,8 @@ public class TestRestRoleService extends GuiceAndJettyTestBase<UserImpl> {
     }
 
     private Role getRole(String id) throws Throwable {
-        Response response = target().path(RestRoleService.ROLES_PATH).path(id).request(MediaType.APPLICATION_JSON).cookie(adminCookie)
-                .accept(MediaType.APPLICATION_JSON).get();
+        Response response = target().path(RestRoleService.ROLES_PATH).path(id).request(MediaType.APPLICATION_JSON)
+                .headers(adminAuthenticationHeader).accept(MediaType.APPLICATION_JSON).get();
         log.debug(String.format("status: %s", response.getStatus()));
         if (response.getStatus() == Status.OK.getStatusCode()) {
             return response.readEntity(Role.class);
@@ -86,7 +86,7 @@ public class TestRestRoleService extends GuiceAndJettyTestBase<UserImpl> {
         try {
             Response response;
             response = target().path(RestRoleService.ROLES_PATH).queryParam("type", RoleType.SYSTEM.getType())
-                    .request(MediaType.APPLICATION_JSON).cookie(adminCookie).get();
+                    .request(MediaType.APPLICATION_JSON).headers(adminAuthenticationHeader).get();
             Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
             SearchResult<Role> roles = response.readEntity(new GenericType<SearchResult<Role>>() {
             });

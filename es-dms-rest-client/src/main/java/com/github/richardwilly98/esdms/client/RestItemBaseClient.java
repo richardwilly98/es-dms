@@ -5,8 +5,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.net.URI;
 
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -26,8 +26,8 @@ public abstract class RestItemBaseClient<T extends ItemBase> extends RestClientB
     public T create(String token, T item) throws ServiceException {
         checkNotNull(token);
         checkNotNull(item);
-        Cookie cookie = newUserCookie(token);
-        Response response = target().request(MediaType.APPLICATION_JSON).cookie(cookie)
+        MultivaluedMap<String,Object> header = getAuthenticationHeader(token);
+        Response response = target().request(MediaType.APPLICATION_JSON).headers(header)
                 .post(Entity.json(item));
         log.debug(String.format("status: %s", response.getStatus()));
         if (response.getStatus() != Status.CREATED.getStatusCode()) {
@@ -35,7 +35,7 @@ public abstract class RestItemBaseClient<T extends ItemBase> extends RestClientB
         }
         URI uri = response.getLocation();
         log.debug(String.format("getItem - %s", uri));
-        response = restClient.target(uri).request().cookie(cookie).accept(MediaType.APPLICATION_JSON).get();
+        response = restClient.target(uri).request().headers(header).accept(MediaType.APPLICATION_JSON).get();
         if (response.getStatus() == Status.OK.getStatusCode()) {
             return response.readEntity(clazz);
         }
@@ -45,8 +45,8 @@ public abstract class RestItemBaseClient<T extends ItemBase> extends RestClientB
     public void delete(String token, T item) throws ServiceException {
         checkNotNull(token);
         checkNotNull(item);
-        Cookie cookie = newUserCookie(token);
-        Response response = target()/*.path(getRootPath())*/.path(item.getId()).request(MediaType.APPLICATION_JSON).cookie(cookie)
+        MultivaluedMap<String,Object> header = getAuthenticationHeader(token);
+        Response response = target().path(item.getId()).request(MediaType.APPLICATION_JSON).headers(header)
                 .delete();
         log.debug(String.format("status: %s", response.getStatus()));
         if (response.getStatus() != Status.OK.getStatusCode()) {

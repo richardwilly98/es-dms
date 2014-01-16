@@ -164,10 +164,10 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
         log.info("Start testSuggestTags");
         int max = 15;
         String name = "test-suggest-tag-document";
-        String tag1= "java";
-        String tag2= "javascript";
-        String tag3= "c#";
-        String tag4= "csharp";
+        String tag1 = "java";
+        String tag2 = "javascript";
+        String tag3 = "c#";
+        String tag4 = "csharp";
         String contentType = "text/plain";
         String file = "/test/github/richardwilly98/services/test-attachment.html";
 
@@ -200,12 +200,12 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
         for (Term term : facet.getTerms()) {
             Assert.assertTrue(term.getTerm().startsWith("ja"));
         }
-        
+
         facet = suggestTags("jo", 10);
         Assert.assertNotNull(facet);
         Assert.assertNotNull(facet.getTerms());
         Assert.assertEquals(facet.getTerms().size(), 0);
-        
+
         facet = suggestTags("cs", 10);
         Assert.assertNotNull(facet);
         Assert.assertNotNull(facet.getTerms());
@@ -229,7 +229,8 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
         query.setFacets(facets);
         query.setFilters(filters);
         Response response = target().path(RestSearchService.SEARCH_PATH).path(RestSearchService.FACET_SEARCH_ACTION).path(criteria)
-                .request(MediaType.APPLICATION_JSON).cookie(adminCookie).accept(MediaType.APPLICATION_JSON).post(Entity.json(query));
+                .request(MediaType.APPLICATION_JSON).headers(adminAuthenticationHeader).accept(MediaType.APPLICATION_JSON)
+                .post(Entity.json(query));
         log.debug(String.format("status: %s", response.getStatus()));
         Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
         SearchResult<Document> searchResult = response.readEntity(new GenericType<SearchResult<Document>>() {
@@ -239,8 +240,9 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
     }
 
     private Facet suggestTags(String criteria, int size) throws Throwable {
-        Response response = target().path(RestSearchService.SEARCH_PATH).path(RestSearchService.TAGS_PATH).path(RestSearchService.SUGGEST_ACTION).path(criteria).queryParam("size", size)
-                .request(MediaType.APPLICATION_JSON).cookie(adminCookie).accept(MediaType.APPLICATION_JSON).post(Entity.json(null));
+        Response response = target().path(RestSearchService.SEARCH_PATH).path(RestSearchService.TAGS_PATH)
+                .path(RestSearchService.SUGGEST_ACTION).path(criteria).queryParam("size", size).request(MediaType.APPLICATION_JSON)
+                .headers(adminAuthenticationHeader).accept(MediaType.APPLICATION_JSON).post(Entity.json(null));
         log.debug(String.format("status: %s", response.getStatus()));
         Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
         Facet facet = response.readEntity(Facet.class);
@@ -274,7 +276,7 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
         form.bodyPart(p);
 
         Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(RestDocumentService.UPLOAD_PATH).request()
-                .cookie(adminCookie).post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE));
+                .headers(adminAuthenticationHeader).post(Entity.entity(form, MediaType.MULTIPART_FORM_DATA_TYPE));
         log.debug(String.format("status: %s", response.getStatus()));
         Assert.assertTrue(response.getStatus() == Status.CREATED.getStatusCode());
         URI uri = response.getLocation();
@@ -286,28 +288,29 @@ public class TestRestSearchService extends GuiceAndJettyTestBase<Document> {
 
     private void updateDocument(Document document) throws Throwable {
         Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(RestDocumentService.UPDATE_PATH)
-                .request(MediaType.APPLICATION_JSON).cookie(adminCookie).put(Entity.json(document));
+                .request(MediaType.APPLICATION_JSON).headers(adminAuthenticationHeader).put(Entity.json(document));
         log.debug(String.format("status: %s", response.getStatus()));
         Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
     }
 
     private void markDeletedDocument(String id) throws Throwable {
         Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.MARKDELETE_PATH).request()
-                .cookie(adminCookie).post(null);
+                .headers(adminAuthenticationHeader).post(null);
         log.debug(String.format("status: %s", response.getStatus()));
         Assert.assertTrue(response.getStatus() == Status.NO_CONTENT.getStatusCode());
     }
 
     private void deleteDocument(String id) throws Throwable {
         markDeletedDocument(id);
-        Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).request().cookie(adminCookie).delete();
+        Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).request().headers(adminAuthenticationHeader)
+                .delete();
         Assert.assertEquals(response.getStatus(), Status.OK.getStatusCode());
         Assert.assertNull(getDocument(id));
     }
 
     private Document getMetadata(String id) throws Throwable {
         Response response = target().path(RestDocumentService.DOCUMENTS_PATH).path(id).path(RestDocumentService.METADATA_PATH)
-                .request(MediaType.APPLICATION_JSON).cookie(adminCookie).accept(MediaType.APPLICATION_JSON).get();
+                .request(MediaType.APPLICATION_JSON).headers(adminAuthenticationHeader).accept(MediaType.APPLICATION_JSON).get();
         log.debug(String.format("status: %s", response.getStatus()));
         Assert.assertTrue(response.getStatus() == Status.OK.getStatusCode());
         Document document = response.readEntity(Document.class);
