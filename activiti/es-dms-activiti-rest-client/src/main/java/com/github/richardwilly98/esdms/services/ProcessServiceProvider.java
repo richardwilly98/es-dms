@@ -7,6 +7,8 @@ import static com.google.common.collect.Sets.newHashSet;
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -103,6 +105,26 @@ public class ProcessServiceProvider implements ProcessService {
         enabled = processDefinitionService.isEnabled();
         if (!enabled) {
             log.info("Process service is disabled.");
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    while(true) {
+                        try {
+                            Thread.sleep(60000);
+                            enabled = processDefinitionService.isEnabled();
+                            if (enabled) {
+                                log.info("Process service is enabledcd...");
+                                break;
+                            }
+                        } catch (InterruptedException ex) {
+                            log.warn("Thread process service status throw an exception.", ex);
+                        } catch (Throwable t) {
+                            
+                        }
+                    }
+                }
+            });
         }
     }
 
