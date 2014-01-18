@@ -3,6 +3,6 @@
   "name": "Activiti Settings",
   "type": 0,
   "attributes": {
-    "rest.url": "http://localhost:8080/activiti-rest/service"
+    "rest.url": "http://localhost:8088/activiti-rest/service"
   }
 }
