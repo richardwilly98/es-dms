@@ -20,6 +20,11 @@ esDmsSiteApp.controller('mainController', function ($log, $scope, $location, $mo
   $scope.logout = function() {
     authenticationService.logout();
   };
+  
+  $scope.login = function() {
+    //authenticationService.logout();
+    alert("login");
+  };
 
   $scope.showUserDetails = function() {
     var userId = sharedService.getCurrentUser().id;
