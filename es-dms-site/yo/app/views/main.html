@@ -11,15 +11,40 @@
 					<a href="{{tab.view}}">{{tab.title}}</a>
 				</li>
 				<li data-ng-show="showLogout" class="divider-vertical"></li>
-				<li data-ng-show="hasRole('administrator')" class="dropdown"><a
-					href="#" class="dropdown-toggle" data-toggle="dropdown">Administration
+				<li data-ng-show="hasRole('administrator')" class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Administration
 						<b class="caret"></b>
-				</a>
+					</a>
 					<ul class="dropdown-menu">
 						<li data-ng-repeat="tab in adminTabs"
 							data-match-route="{{tab.view}}"><a href="{{tab.view}}">{{tab.title}}</a>
 						</li>
-					</ul></li>
+					</ul>
+				</li>
+				
+				<li data-ng-show="hasRole('site-editor')" class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Site Editor
+						<b class="caret"></b>
+					</a>
+					<ul class="dropdown-menu">
+						<li data-ng-repeat="tab in siteEditorTabs"
+							data-match-route="{{tab.view}}"><a href="{{tab.view}}">{{tab.title}}</a>
+						</li>
+					</ul>
+				</li>
+				
+				<li data-ng-show="hasRole('collaborator')" class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Workspaces
+						<b class="caret"></b>
+					</a>
+					<ul class="dropdown-menu">
+						<li data-ng-repeat="tab in workspaceTabs"
+							data-match-route="{{tab.view}}"><a href="{{tab.view}}">{{tab.title}}</a>
+						</li>
+						<li><a id="messenger" onclick="TogetherJS(this); return false;">Messenger</a></li>
+					</ul>
+				</li>
+				
 				<li data-ng-show="showLogout"><a href="#"
 					data-ng-click="logout()">Logout</a></li>
 				<li data-ng-show="!showLogout"><a href="#"
@@ -38,7 +63,7 @@
 	</div>
 
 	<toaster-container> </toaster-container>
-			
+	
 	<!-- Placeholder for views -->
 	<div id="content" ui-view></div>
 

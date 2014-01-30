@@ -19,4 +19,14 @@ esDmsSiteApp.controller('NavbarCtrl', ['$log', '$scope', function ($log, $scope)
     { 'view': 'home/admin/users', title: 'Users' },
     { 'view': 'home/admin/roles', title: 'Roles' }
   ];
+  
+  $scope.siteEditorTabs = [
+    { 'view': 'home/site/admin', title: 'Sites' },
+    { 'view': 'home/site/templates', title: 'Site templates' }
+  ];
+  
+  $scope.workspaceTabs = [
+    { 'view': 'home/workspace/admin', title: 'Workspaces' },
+    { 'view': 'home/workspace/templates', title: 'Workspace templates' }
+  ];
 }]);
