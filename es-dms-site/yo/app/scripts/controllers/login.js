@@ -16,6 +16,6 @@ esDmsSiteApp.controller('LoginCtrl', ['$log', '$scope', 'authenticationService',
 
     $scope.close = function () {
       // dialog.close();
-      $modalInstance.dismiss('cancel');
+      $modalInstance.dismiss('OK');
     };
   }]);

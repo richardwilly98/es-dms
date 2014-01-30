@@ -22,10 +22,27 @@ esDmsSiteApp.controller('mainController', function ($log, $scope, $location, $mo
   };
   
   $scope.login = function() {
-    //authenticationService.logout();
-    alert("login");
+    var userId = sharedService.getCurrentUser().id;
+    if (!userId) {
+      $modal.open({
+          templateUrl: 'views/authentication/login.html',
+          controller: 'LoginCtrl',
+          resolve: {
+            userId: function() {
+              return userId;
+            }
+          }
+        });
+    }
   };
-
+  
+  $scope.showAboutDetails = function() {
+      $modal.open({
+          templateUrl: 'views/about/credits.html',
+          controller: 'CreditsCtrl',
+        });
+  };
+  
   $scope.showUserDetails = function() {
     var userId = sharedService.getCurrentUser().id;
     if (userId !== undefined) {
